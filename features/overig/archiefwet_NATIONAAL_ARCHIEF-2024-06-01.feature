@@ -155,8 +155,8 @@ Feature: Archiefwet 1995 - Beheer en openbaarheid van archiefbescheiden
   Scenario: Document tijdelijk bewaren: voor vernietiging na 10 jaar
     Given de datum is "2026-01-01"
     And een archiefstuk met de volgende eigenschappen:
-      | archiefstuk_id | aanmaakdatum | voor_vernietiging | op_selectielijst_vernietiging | bewaartermijn_jaren | selectielijst_vastgesteld | selectielijst_gepubliceerd |
-      | DOC-302        | 2015-01-01   | true              | true                          | 10                  | true                      | true                       |
+      | archiefstuk_id | aanmaakdatum | documenttype   | voor_vernietiging | op_selectielijst_vernietiging | bewaartermijn_jaren | selectielijst_vastgesteld | selectielijst_gepubliceerd |
+      | DOC-302        | 2015-01-01   | correspondentie | true              | true                          | 10                  | true                      | true                       |
     When de archiefwet/overbrenging wordt uitgevoerd door NATIONAAL_ARCHIEF
     Then hoeft het archiefstuk niet overgebracht te worden
     When de archiefwet/vernietiging wordt uitgevoerd door NATIONAAL_ARCHIEF

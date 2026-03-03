@@ -349,6 +349,8 @@ async def mcp_streamable_endpoint(request: Request):
                     # Check if request was disconnected
                     if await request.is_disconnected():
                         break
+                    # Send keepalive to maintain connection
+                    yield {"event": "keepalive", "data": json.dumps({"session_id": session_id})}
                     await asyncio.sleep(60)  # Keep connection alive
 
             except asyncio.CancelledError:

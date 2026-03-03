@@ -29,8 +29,13 @@
         }
         </style>
     </head>
-    <body>
-        <div class="workspace-container" x-data="workspaceData()" x-init="init()">
+    <body hx-on:profile-switched="refreshAfterProfileSwitch()">
+        <div class="workspace-container"
+             x-data="workspaceData()"
+             x-init="init()"
+             data-bsn="{{ active_profile_config.bsn }}"
+             data-profile="{{ active_profile }}"
+             data-default-law-tabs='{{ active_profile_config.default_law_tabs | tojson }}'>
             <!-- Tab Bar (Browser-like) -->
             <div class="tab-bar">
                 <div class="tab"
@@ -53,11 +58,13 @@
                      @click="switchTab('features')">
                     <span class="tab-label">Scenarios</span>
                 </div>
-                <div class="tab"
-                     :class="{ 'active': activeTab === 'simulatie' }"
-                     @click="switchTab('simulatie')">
-                    <span class="tab-label">Simulatie</span>
-                </div>
+                {% if feature_flags.get('SIMULATION', True) %}
+                    <div class="tab"
+                         :class="{ 'active': activeTab === 'simulatie' }"
+                         @click="switchTab('simulatie')">
+                        <span class="tab-label">Simulatie</span>
+                    </div>
+                {% endif %}
                 {% if feature_flags.get('HARMONIZE', False) %}
                     <div class="tab"
                          :class="{ 'active': activeTab === 'harmonize' }"
@@ -68,7 +75,7 @@
                 <div class="tab"
                      :class="{ 'active': activeTab === 'burger' }"
                      @click="switchTab('burger')">
-                    <span class="tab-label">Burger.nl</span>
+                    <span class="tab-label">{{ active_profile_config.portal_tab_label }}</span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'zaaksysteem' }"
@@ -219,33 +226,35 @@
                             class="tab-iframe"
                             title="Graph Analysis"></iframe>
                 </div>
-                <!-- Burger.nl Tab (IFrame) -->
+                <!-- Overheid.nl Tab (IFrame) -->
                 <div class="tab-content iframe-content"
                      x-show="activeTab === 'burger'"
                      x-cloak>
-                    <iframe src="/?demo=true"
+                    <iframe :src="'/?demo=true&bsn=' + bsn"
                             frameborder="0"
                             class="tab-iframe"
-                            title="Burger.nl"></iframe>
+                            title="{{ active_profile_config.portal_tab_label }}"></iframe>
                 </div>
                 <!-- Zaaksysteem Tab (IFrame) -->
                 <div class="tab-content iframe-content"
                      x-show="activeTab === 'zaaksysteem'"
                      x-cloak>
-                    <iframe src="/admin/TOESLAGEN?demo=true"
+                    <iframe src="/admin/{{ active_profile_config.zaaksysteem_service }}?demo=true"
                             frameborder="0"
                             class="tab-iframe"
                             title="Zaaksysteem"></iframe>
                 </div>
-                <!-- Simulatie Tab (IFrame) -->
-                <div class="tab-content iframe-content"
-                     x-show="activeTab === 'simulatie'"
-                     x-cloak>
-                    <iframe src="/simulation/?demo=true"
-                            frameborder="0"
-                            class="tab-iframe"
-                            title="Simulatie"></iframe>
-                </div>
+                {% if feature_flags.get('SIMULATION', True) %}
+                    <!-- Simulatie Tab (IFrame) -->
+                    <div class="tab-content iframe-content"
+                         x-show="activeTab === 'simulatie'"
+                         x-cloak>
+                        <iframe src="/simulation/?demo=true"
+                                frameborder="0"
+                                class="tab-iframe"
+                                title="Simulatie"></iframe>
+                    </div>
+                {% endif %}
                 {% if feature_flags.get('HARMONIZE', False) %}
                     <!-- Harmonisatie Tab (IFrame) -->
                     <div class="tab-content iframe-content"
@@ -276,6 +285,10 @@
                  x-cloak
                  @click.away="menuOpen = false"
                  class="menu-dropdown-fixed">
+                <!-- Demo Profile Section -->
+                <div class="menu-section-title">Demo Profiel</div>
+                <div id="demo-profile-selector">{% include "demo/partials/demo_profile_selector.html" %}</div>
+                <div class="menu-divider"></div>
                 <!-- Feature Flags Section -->
                 <div class="menu-section-title">Feature Flags</div>
                 <div id="demo-feature-flags">{% include "demo/partials/feature_flags.html" %}</div>
@@ -319,10 +332,45 @@
         <!-- JavaScript -->
         <script src="/static/js/demo.js"></script>
         <script>
+        // Refresh after profile switch: in-page content swap to preserve fullscreen.
+        // Fullscreen is on document.documentElement, so replacing body content won't exit it.
+        function refreshAfterProfileSwitch() {
+            localStorage.removeItem('openedLawTabs');
+            localStorage.removeItem('activeLawTabId');
+            // Keep activeTab in localStorage so the current tab stays focused
+
+            fetch('/demo/')
+                .then(r => r.text())
+                .then(html => {
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+                    // Replace body children — preserves body element and its attributes
+                    // (including hx-on:profile-switched). Fullscreen stays because
+                    // the fullscreen element is document.documentElement (<html>), not <body>.
+                    document.body.innerHTML = doc.body.innerHTML;
+
+                    // Scripts inserted via innerHTML don't execute, so re-create them.
+                    // Skip external scripts (already loaded), only re-run inline scripts.
+                    document.body.querySelectorAll('script:not([src])').forEach(old => {
+                        const s = document.createElement('script');
+                        s.textContent = old.textContent;
+                        old.parentNode.replaceChild(s, old);
+                    });
+
+                    // Re-initialize HTMX on the new content
+                    htmx.process(document.body);
+                })
+                .catch(error => {
+                    console.error('Failed to refresh workspace:', error);
+                    window.location.reload();
+                });
+        }
+
         // Global variables for feature testing (needed by feature_viewer_partial.html)
-        let currentFeaturePath = '';
-        let currentRunId = null;
-        let pollInterval = null;
+        // Using var instead of let so they can be re-declared during profile switch content swap
+        var currentFeaturePath = '';
+        var currentRunId = null;
+        var pollInterval = null;
 
         // Global functions for feature scenarios (called by onclick handlers in rendered HTML)
         function toggleScenario(element) {
@@ -518,6 +566,7 @@
         function workspaceData() {
             return {
                 activeTab: 'presentatie',
+                bsn: new URLSearchParams(window.location.search).get('bsn') || document.querySelector('.workspace-container').dataset.bsn,
                 lawsContent: '',
                 featuresContent: '',
                 lawsLoaded: false,
@@ -542,6 +591,24 @@
                     // Initialize theme
                     document.documentElement.setAttribute('data-theme', this.theme);
 
+                    // Sync fullscreen state (preserved during in-page profile switches)
+                    this.isFullscreen = !!document.fullscreenElement;
+
+                    // Default law tabs from active demo profile (read from data attributes)
+                    const defaultLawTabs = JSON.parse(this.$el.dataset.defaultLawTabs);
+                    const activeProfileName = this.$el.dataset.profile;
+
+                    // Check if stored profile matches the active profile
+                    const savedProfile = localStorage.getItem('demoProfile');
+                    const profileChanged = savedProfile && savedProfile !== activeProfileName;
+
+                    if (profileChanged) {
+                        // Profile changed — clear stale tabs
+                        localStorage.removeItem('openedLawTabs');
+                        localStorage.removeItem('activeLawTabId');
+                    }
+                    localStorage.setItem('demoProfile', activeProfileName);
+
                     // Load law tabs from localStorage
                     const savedLawTabs = localStorage.getItem('openedLawTabs');
                     if (savedLawTabs) {
@@ -562,9 +629,17 @@
                         }
                     }
 
+                    // If no saved tabs, use default tabs for demo
+                    if (this.openedLawTabs.length === 0) {
+                        this.openedLawTabs = defaultLawTabs;
+                        this.activeLawTabId = defaultLawTabs.length > 0 ? defaultLawTabs[defaultLawTabs.length - 1].id : null;
+                        this.nextLawTabId = defaultLawTabs.length + 1;
+                        this.saveLawTabsToStorage();
+                    }
+
                     // Check URL hash first
                     const hash = window.location.hash.substring(1);
-                    const validTabs = ['presentatie', 'laws', 'features', 'graph', 'burger', 'zaaksysteem', 'simulatie'{% if feature_flags.get('HARMONIZE', False) %}, 'harmonize'{% endif %}];
+                    const validTabs = ['presentatie', 'laws', 'features', 'graph', 'burger', 'zaaksysteem'{% if feature_flags.get('SIMULATION', True) %}, 'simulatie'{% endif %}{% if feature_flags.get('HARMONIZE', False) %}, 'harmonize'{% endif %}];
 
                     if (hash && validTabs.includes(hash)) {
                         this.activeTab = hash;
@@ -633,7 +708,7 @@
                             if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
                                 e.preventDefault(); // Prevent full page refresh
 
-                                const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'{% if feature_flags.get('HARMONIZE', False) %}, 'harmonize'{% endif %}];
+                                const iframeTabs = ['graph', 'burger', 'zaaksysteem'{% if feature_flags.get('SIMULATION', True) %}, 'simulatie'{% endif %}{% if feature_flags.get('HARMONIZE', False) %}, 'harmonize'{% endif %}];
 
                                 if (iframeTabs.includes(self.activeTab)) {
                                     // Find and reload the active iframe
@@ -655,7 +730,7 @@
                     // Listen for postMessage from iframes when Ctrl-R is pressed inside them
                     window.addEventListener('message', (e) => {
                         if (e.origin === window.location.origin && e.data.type === 'refresh-iframe') {
-                            const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'{% if feature_flags.get('HARMONIZE', False) %}, 'harmonize'{% endif %}];
+                            const iframeTabs = ['graph', 'burger', 'zaaksysteem'{% if feature_flags.get('SIMULATION', True) %}, 'simulatie'{% endif %}{% if feature_flags.get('HARMONIZE', False) %}, 'harmonize'{% endif %}];
 
                             if (iframeTabs.includes(this.activeTab)) {
                                 const iframe = document.querySelector(`.iframe-content[x-show="activeTab === '${this.activeTab}'"] iframe`);
@@ -670,14 +745,13 @@
 
                 toggleFullscreen() {
                     if (!document.fullscreenElement) {
-                        // Enter fullscreen
-                        const element = document.querySelector('.workspace-container');
+                        // Enter fullscreen on documentElement so swapping .workspace-container
+                        // during profile switches doesn't exit fullscreen
+                        const element = document.documentElement;
                         if (element.requestFullscreen) {
                             element.requestFullscreen();
                         } else if (element.webkitRequestFullscreen) {
                             element.webkitRequestFullscreen(); // Safari
-                        } else if (element.msRequestFullscreen) {
-                            element.msRequestFullscreen(); // IE11
                         }
                         this.isFullscreen = true;
                     } else {
@@ -686,8 +760,6 @@
                             document.exitFullscreen();
                         } else if (document.webkitExitFullscreen) {
                             document.webkitExitFullscreen(); // Safari
-                        } else if (document.msExitFullscreen) {
-                            document.msExitFullscreen(); // IE11
                         }
                         this.isFullscreen = false;
                     }

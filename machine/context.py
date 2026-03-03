@@ -16,6 +16,7 @@ logger = IndentLogger(logging.getLogger("service"))
 def clean_nan_value(value: Any, expected_type: str | None = None) -> Any:
     """
     Clean NaN values from pandas dataframes, converting them to appropriate defaults.
+    Also converts pandas Timestamps to ISO format strings for JSON serialization.
 
     Args:
         value: The value to clean (could be NaN, None, or a valid value)
@@ -29,6 +30,10 @@ def clean_nan_value(value: Any, expected_type: str | None = None) -> Any:
         return [clean_nan_value(v, expected_type) for v in value]
     elif isinstance(value, dict):
         return {k: clean_nan_value(v, expected_type) for k, v in value.items()}
+
+    # Convert pandas Timestamp to ISO format string for JSON serialization
+    if isinstance(value, pd.Timestamp):
+        return value.isoformat()
 
     # Check if value is NaN (pandas float NaN or numpy NaN) - only for scalars
     try:
@@ -231,6 +236,12 @@ class RuleContext:
                     claim = self.claims.get(path)
                     value = claim.new_value
                     logger.debug(f"Resolving from CLAIM: {value}")
+
+                    # Coerce claim values to match the expected type from the spec
+                    if path in self.property_specs:
+                        spec = self.property_specs[path]
+                        value = self._coerce_claim_value(value, spec)
+
                     node.result = value
                     node.resolve_type = "CLAIM"
 
@@ -281,10 +292,28 @@ class RuleContext:
 
                 # Check parameters
                 if path in self.parameters:
-                    logger.debug(f"Resolving from PARAMETERS: {self.parameters[path]}")
-                    node.result = self.parameters[path]
+                    value = self.parameters[path]
+
+                    # Coerce parameter values to match the expected type from the spec
+                    # (form-submitted values may be stored as strings in case parameters)
+                    if path in self.property_specs:
+                        spec = self.property_specs[path]
+                        value = self._coerce_claim_value(value, spec)
+
+                    logger.debug(f"Resolving from PARAMETERS: {value}")
+                    node.result = value
                     node.resolve_type = "PARAMETER"
-                    return self.parameters[path]
+
+                    # Add spec information if available
+                    if path in self.property_specs:
+                        spec = self.property_specs[path]
+                        node.required = bool(spec.get("required", False))
+                        if "type" in spec:
+                            node.details["type"] = spec["type"]
+                        if "type_spec" in spec:
+                            node.details["type_spec"] = spec["type_spec"]
+
+                    return value
 
                 # Check outputs
                 if path in self.outputs:
@@ -337,10 +366,46 @@ class RuleContext:
                         if source_ref.get("source_type") == "laws":
                             table = "laws"
                             df = self.service_provider.resolver.rules_dataframe()
-                        if source_ref.get("source_type") == "events":
+                        elif source_ref.get("source_type") == "events":
                             table = "events"
                             events = self.service_provider.case_manager.get_events()
                             df = pd.DataFrame(events)
+                        elif source_ref.get("source_type") == "cases":
+                            table = "cases"
+                            cases = self.service_provider.case_manager.get_all_cases()
+                            df = pd.DataFrame(
+                                [
+                                    {
+                                        "case_id": str(case.id),
+                                        "bsn": case.bsn,
+                                        "service": case.service,
+                                        "law": case.law,
+                                        "status": (
+                                            case.status.value if hasattr(case.status, "value") else str(case.status)
+                                        ),
+                                        "approved": case.approved,
+                                        "created_at": case.created_at,
+                                        "year": case.created_at.year if case.created_at else None,
+                                        # Flatten parameters for filtering
+                                        **(case.parameters or {}),
+                                    }
+                                    for case in cases
+                                    if case is not None
+                                ]
+                            )
+                        elif (
+                            source_ref.get("source_type")
+                            and self.service_provider
+                            and hasattr(self.service_provider, "services")
+                            and source_ref.get("source_type") in self.service_provider.services
+                        ):
+                            # Delegate to specific service's source dataframes
+                            service_name = source_ref.get("source_type")
+                            service = self.service_provider.services[service_name]
+                            table = source_ref.get("table")
+                            if table and table in service.source_dataframes:
+                                df = service.source_dataframes[table]
+                                logger.debug(f"Resolving from SERVICE SOURCE {service_name}.{table}")
                         elif self.sources and "table" in source_ref:
                             table = source_ref.get("table")
                             if table in self.sources:
@@ -353,6 +418,10 @@ class RuleContext:
                             node.result = result
                             node.resolve_type = "SOURCE"
                             node.required = bool(spec.get("required", False))
+
+                            if result is None and node.required:
+                                self.missing_required = True
+                                logger.warning(f"Required source resolved to None: {path}")
 
                             # Add type information to the node
                             if "type" in spec:
@@ -415,11 +484,12 @@ class RuleContext:
         if path == "january_first":
             calc_date = datetime.strptime(self.calculation_date, "%Y-%m-%d").date()
             return calc_date.replace(month=1, day=1).isoformat()
+        if path == "year":
+            # Return as int for proper DataFrame filtering
+            return int(self.calculation_date[:4])
         if path == "prev_january_first":
             calc_date = datetime.strptime(self.calculation_date, "%Y-%m-%d").date()
             return calc_date.replace(month=1, day=1, year=calc_date.year - 1).isoformat()
-        if path == "year":
-            return self.calculation_date[:4]
         return None
 
     def _resolve_from_service(self, path, service_ref, spec):
@@ -441,6 +511,7 @@ class RuleContext:
         cache_key = (
             f"{path}({','.join([f'{k}:{param_to_str(v)}' for k, v in sorted(parameters.items())])},{reference_date})"
         )
+
         if cache_key in self.values_cache:
             logger.debug(f"Resolving from CACHE with key '{cache_key}': {self.values_cache[cache_key]}")
             return self.values_cache[cache_key]
@@ -472,10 +543,101 @@ class RuleContext:
         self.add_to_path(service_node)
 
         try:
+            # First check if there's an approved case for this service/law/parameters combination
+            # This allows service_references to see approved vergunningen
+            found_approved_case = False
+            approved_case_parameters = None
+            if self.service_provider and hasattr(self.service_provider, "case_manager"):
+                case_manager = self.service_provider.case_manager
+                if case_manager:
+                    all_cases = case_manager.get_all_cases()
+                    for case in all_cases:
+                        if (
+                            case
+                            and case.service == service_ref["service"]
+                            and case.law == service_ref["law"]
+                            and case.approved
+                            and hasattr(case.status, "value")
+                            and case.status.value == "DECIDED"
+                        ):
+                            # Check if parameters match (e.g., KVK_NUMMER)
+                            case_params = case.parameters or {}
+                            params_match = True
+                            for key, value in parameters.items():
+                                if key in case_params and case_params[key] != value:
+                                    params_match = False
+                                    break
+
+                            if params_match:
+                                found_approved_case = True
+                                # Found an approved case with matching parameters
+                                field = service_ref["field"]
+
+                                # If the service_reference declares resolve_from_case_existence,
+                                # the existence of an approved case is sufficient — return True
+                                if service_ref.get("resolve_from_case_existence", False):
+                                    resolved_value = True
+                                    logger.debug(
+                                        f"Resolved {field}=True from approved case {case.id} "
+                                        f"(resolve_from_case_existence=True)"
+                                    )
+                                else:
+                                    # For other fields, use verified_result (the decided values)
+                                    # Fall back to claimed_result if verified_result doesn't have the field
+                                    verified = case.verified_result or {}
+                                    claimed = case.claimed_result or {}
+                                    if field in verified:
+                                        resolved_value = verified[field]
+                                    elif field in claimed:
+                                        resolved_value = claimed[field]
+                                    else:
+                                        # Store the case's parameters for re-evaluation fallback
+                                        approved_case_parameters = case_params
+                                        continue  # Field not found, try next case or fall through
+
+                                    logger.debug(f"Resolved {field} from approved case {case.id}: {resolved_value}")
+
+                                self.values_cache[cache_key] = resolved_value
+
+                                # Build proper path structure so the UI shows the source reference
+                                # Create a child node to represent the resolved value from the approved case
+                                # This node will be processed by extract_value_tree() and added to
+                                # service_entry["children"], which triggers the template to show
+                                # "Resultaat van het uitrekenen [law]"
+                                child_node = PathNode(
+                                    type="resolve",
+                                    name=f"Value from approved case: {field}",
+                                    result=resolved_value,
+                                    resolve_type="APPROVED_CASE",
+                                    details={
+                                        "path": field,
+                                        "source": "approved_case",
+                                        "case_id": str(case.id),
+                                        "type": spec.get("type"),
+                                    },
+                                )
+
+                                # Update service_node with result and children
+                                # Directly append child_node - extract_value_tree will process it
+                                # because APPROVED_CASE is in the resolve_type whitelist
+                                service_node.result = resolved_value
+                                service_node.details["source"] = "approved_case"
+                                service_node.details["case_id"] = str(case.id)
+                                service_node.children.append(child_node)
+
+                                return resolved_value
+
+            # If an approved case exists but the specific field wasn't in its stored
+            # results, re-evaluate using the case's stored parameters (which include
+            # user-submitted values that aren't available from the outer evaluation's
+            # parameters alone).
+            eval_parameters = parameters
+            if found_approved_case and approved_case_parameters:
+                eval_parameters = {**parameters, **approved_case_parameters}
             result = self.service_provider.evaluate(
                 service_ref["service"],
                 service_ref["law"],
-                parameters,
+                eval_parameters,
                 reference_date,
                 self.overwrite_input,
                 requested_output=service_ref["field"],
@@ -489,11 +651,65 @@ class RuleContext:
             service_node.result = value
             service_node.children.append(result.path)
 
-            self.missing_required = self.missing_required or result.missing_required
+            # Only propagate missing_required from inner evaluation if this field
+            # is itself required and couldn't be resolved. Otherwise, an optional
+            # service_reference whose inner law has unresolved inputs would
+            # incorrectly mark the outer law as having missing required values.
+            if value is None and spec.get("required", False):
+                self.missing_required = True
 
             return value
         finally:
             self.pop_path()
+
+    @staticmethod
+    def _coerce_claim_value(value: Any, spec: dict[str, Any]) -> Any:
+        """Coerce a claim value to match the expected type from the spec.
+
+        Claim values from form submissions are often strings. This method
+        casts them to the type declared in the spec (number, boolean, enum)
+        so that downstream comparisons work correctly.
+        """
+        if value is None:
+            return value
+
+        expected_type = spec.get("type")
+        type_spec = spec.get("type_spec", {})
+
+        # For enums, try to match the value to the actual enum value type
+        if expected_type == "enum" and "enum" in type_spec and isinstance(value, str):
+            enum_values = type_spec["enum"]
+            # Check if enum values are numeric
+            if enum_values and isinstance(enum_values[0], int):
+                try:
+                    int_val = int(value)
+                    if int_val in enum_values:
+                        return int_val
+                except (ValueError, TypeError):
+                    pass
+            elif enum_values and isinstance(enum_values[0], float):
+                try:
+                    float_val = float(value)
+                    return float_val
+                except (ValueError, TypeError):
+                    pass
+
+        # For number type, cast string to number
+        if expected_type == "number" and isinstance(value, str):
+            try:
+                float_val = float(value)
+                return int(float_val) if float_val == int(float_val) else float_val
+            except (ValueError, TypeError):
+                pass
+
+        # For boolean type, cast string to bool
+        if expected_type == "boolean" and isinstance(value, str):
+            if value.lower() in ("true", "1", "yes"):
+                return True
+            if value.lower() in ("false", "0", "no"):
+                return False
+
+        return value
 
     def _resolve_type_spec_enums(self, spec: dict[str, Any], type_spec: dict[str, Any]) -> dict[str, Any]:
         """
@@ -540,6 +756,22 @@ class RuleContext:
                     df = df[df[select_on["name"]].isin(value)]
                 else:
                     df = df[df[select_on["name"]] == value]
+
+        # Handle aggregation operations
+        aggregation = source_ref.get("aggregation")
+        if aggregation:
+            if aggregation == "count":
+                return len(df)
+            elif aggregation == "sum" and "field" in source_ref:
+                return df[source_ref["field"]].sum()
+            elif aggregation == "max" and "field" in source_ref:
+                return df[source_ref["field"]].max()
+            elif aggregation == "min" and "field" in source_ref:
+                return df[source_ref["field"]].min()
+            elif aggregation == "avg" and "field" in source_ref:
+                return df[source_ref["field"]].mean()
+            elif aggregation == "median" and "field" in source_ref:
+                return df[source_ref["field"]].median()
 
         # Get specified fields
         fields = source_ref.get("fields", [])

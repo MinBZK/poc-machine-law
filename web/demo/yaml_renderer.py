@@ -47,6 +47,7 @@ def _discover_laws_cached(
                 "service": data.get("service", ""),
                 "description": data.get("description", ""),
                 "valid_from": str(data.get("valid_from", "")),
+                "discoverable": data.get("discoverable", "CITIZEN"),
                 "directory": str(relative_path.parts[0])
                 if relative_path.parts
                 else str(relative_path.parent),  # Top-level directory only
@@ -291,7 +292,7 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
 
             collapsed_class = "collapsed" if default_collapsed else ""
 
-            html_parts.append(f'<div class="yaml-section {collapsed_class}" data-key="{html.escape(k)}">')
+            html_parts.append(f'<div class="yaml-section {collapsed_class}" data-key="{html.escape(str(k))}">')
             html_parts.append('  <div class="yaml-key-line" onclick="toggleSection(this)">')
 
             if is_collapsible:
@@ -299,7 +300,7 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
             else:
                 html_parts.append('    <span class="collapse-icon-placeholder"></span>')
 
-            html_parts.append(f'    <span class="yaml-key">{html.escape(k)}:</span>')
+            html_parts.append(f'    <span class="yaml-key">{html.escape(str(k))}:</span>')
 
             # Add cross-law link if this is a service_reference
             if k == "service_reference" and isinstance(v, dict) and "_link" in v:

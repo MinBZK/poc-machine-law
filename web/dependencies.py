@@ -1,5 +1,5 @@
 import locale
-from datetime import datetime
+from datetime import date, datetime
 from importlib.metadata import version as get_version
 from pathlib import Path
 
@@ -115,7 +115,7 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
 
         if isinstance(date_str, str):
             date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-        elif isinstance(date_str, datetime):
+        elif isinstance(date_str, datetime | date):
             date_obj = date_str
 
         try:

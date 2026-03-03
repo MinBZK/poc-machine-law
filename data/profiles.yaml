@@ -39,6 +39,20 @@ globalServices:
     - gemeente: Arnhem
       arrondissement: GELDERLAND
       rechtbank: RECHTBANK_GELDERLAND
+# Configuration for seeding historical cases at startup (demo/test only)
+case_seeds:
+  - service: "GEMEENTE_ROTTERDAM"
+    law: "algemene_plaatselijke_verordening/ontheffingspas_geluid"
+    table: "ontheffingen_geluid_historie"
+    bsn_lookup:
+      table: "exploitatie_inschrijvingen"
+      match_field: "kvk_nummer"
+      bsn_field: "bsn_eigenaar"
+    parameters:
+      KVK_NUMMER: "kvk_nummer"
+      ACTIVITEITSDATUM: "datum"
+    result:
+      komt_in_aanmerking_voor_geluidsontheffing: true
 profiles:
   '100000001':
     name: Merijn van der Meer
@@ -132,10 +146,10 @@ profiles:
           buitenlands_inkomen: 0
         monthly_income:
         - bsn: '100000001'
-          bedrag: 50000
+          bedrag: 208333
         maandelijks_inkomen:
         - bsn: '100000001'
-          bedrag: 0
+          bedrag: 201250
         assets:
         - bsn: '100000001'
           bedrag: 500000
@@ -144,10 +158,10 @@ profiles:
           bedrag: 500000
         business_income:
         - bsn: '100000001'
-          bedrag: 600000
+          bedrag: 208333
         bedrijfsinkomen:
         - bsn: '100000001'
-          bedrag: 600000
+          bedrag: 208333
         buitenlands_inkomen:
         - bsn: '100000001'
           bedrag: 0
@@ -214,7 +228,7 @@ profiles:
           verzekerd_wia: false
         uwv_toetsingsinkomen:
         - bsn: '100000001'
-          toetsingsinkomen: 600000
+          toetsingsinkomen: 2415000
         uwv_werkgegevens:
         - bsn: '100000001'
           gemiddeld_uren_per_week: 0.0
@@ -2664,7 +2678,7 @@ profiles:
           uren_per_week: 32
           worked_hours: 1664
         wet_structuur_uitvoeringsorganisatie_werk_en_inkomen:
-        - BSN: '888888888'
+        - bsn: '888888888'
           insured_years: 5
       BELASTINGDIENST:
         box1:
@@ -4126,3 +4140,396 @@ profiles:
           status: ACTIEF
           functie: COMMANDITAIR_VENNOOT
           bevoegdheid: GEEN
+
+  # Profile: Claudia van Dam - Horeca ondernemer Rotterdam
+  '999999990':
+    name: Claudia van Dam
+    description: Eigenaar van koffiezaak Noon in Rotterdam West, horeca ondernemer met exploitatievergunning
+    properties:
+      - Ondernemer
+    sources:
+      CBS:
+        levensverwachting:
+        - jaar: 2025
+          verwachting_65: 20.5
+        cbs_enquetes:
+        - kvk_nummer: '85234567'
+          is_geselecteerd_cbs_enquete: true
+          enquete_type: Productiestatistiek
+          frequentie: jaarlijks
+          volgende_deadline: '2026-06-30'
+          gebruikt_rgs_boekhouding: true
+          rgs_versie: '3.5'
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '999999990'
+          geboortedatum: '1994-03-20'
+          verblijfsadres: Rotterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 31
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Agniesestraat 22A, 3032TL Rotterdam
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '999999990'
+          partnerschap_type: GEEN
+          partner_bsn: null
+          has_partner: false
+        verblijfplaats:
+        - bsn: '999999990'
+          straat: Agniesestraat
+          huisnummer: '22A'
+          postcode: 3032TL
+          woonplaats: Rotterdam
+          type: WOONADRES
+        personen_vog:
+        - bsn: '999999990'
+          heeft_geldige_vog: true
+          afgiftedatum: '2024-12-01'
+      BELASTINGDIENST:
+        box1:
+        - bsn: '999999990'
+          loon_uit_dienstbetrekking: 0
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 3500000
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '999999990'
+          reguliere_voordelen: 0
+          vervreemdingsvoordelen: 0
+        box3:
+        - bsn: '999999990'
+          spaargeld: 2500000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '999999990'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '999999990'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '999999990'
+          bedrag: 291700
+        assets:
+        - bsn: '999999990'
+          bedrag: 2500000
+        business_income:
+        - bsn: '999999990'
+          bedrag: 3500000
+        # Werkgeversbijdrage ZVW - Claudia heeft geen werknemers
+        werkgevers:
+        - kvk_nummer: '85234567'
+          heeft_werknemers: false
+          totaal_bruto_loon: 0
+      KVK:
+        inschrijvingen:
+        - bsn: '999999990'
+          bsn_eigenaar: '999999990'
+          kvk_nummer: '85234567'
+          handelsnaam: Koffiezaak Noon
+          rechtsvorm: EENMANSZAAK
+          status: Actief
+          activiteit: Horeca (SBI 56102, Cafés)
+          sbi_code: '56102'
+          datum_aanvang: '2025-01-15'
+          aantal_werknemers: 0
+          datum_telling: '2025-01-01'
+        functionarissen:
+        - bsn: '999999990'
+          kvk_nummer: '85234567'
+          handelsnaam: Koffiezaak Noon
+          rechtsvorm: EENMANSZAAK
+          status: Actief
+          functie: EIGENAAR
+          bevoegdheid: VOLLEDIG
+          datum_inschrijving: '2025-01-15'
+          datum_uitschrijving: null
+        vestigingen:
+        - kvk_nummer: '85234567'
+          adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+        organisaties:
+        - kvk_nummer: '85234567'
+          rechtsvorm: EENMANSZAAK
+          status: Actief
+          aantal_werknemers: 0
+          datum_telling: '2025-01-01'
+          datum_aanvang: '2025-01-15'
+          vestigingsadres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+        jaarrekeningen:
+        - kvk_nummer: '85234567'
+          rechtsvorm: EENMANSZAAK
+          laatste_boekjaar_einde: '2025-12-31'
+      UWV:
+        arbeidsverhoudingen:
+        - bsn: '999999990'
+          dienstverband_type: GEEN
+          verzekerd_ww: false
+          verzekerd_wia: false
+        uwv_toetsingsinkomen:
+        - bsn: '999999990'
+          toetsingsinkomen: 3500000
+        uwv_werkgegevens:
+        - bsn: '999999990'
+          gemiddeld_uren_per_week: 0.0
+          huidige_uren_per_week: 0.0
+          gewerkte_weken_36: 0
+          arbeidsverleden_jaren: 0
+          jaarloon: 0
+        ziektewet:
+        - bsn: '999999990'
+          heeft_ziektewet_uitkering: false
+        WIA:
+        - bsn: '999999990'
+          heeft_wia_uitkering: false
+      RVZ:
+        verzekeringen:
+        - bsn: '999999990'
+          polis_status: ACTIEF
+          verdrag_status: GEEN
+          zorg_type: BASIS
+      DUO:
+        inschrijvingen:
+        - bsn: '999999990'
+          onderwijssoort: GEEN
+        studiefinanciering:
+        - bsn: '999999990'
+          ontvangt_studiefinanciering: false
+        is_student:
+        - bsn: '999999990'
+          waarde: false
+        receives_study_grant:
+        - bsn: '999999990'
+          waarde: false
+      DJI:
+        detenties:
+        - bsn: '999999990'
+          is_gedetineerd: false
+        is_detainee:
+        - bsn: '999999990'
+          waarde: false
+        detentie:
+        - bsn: '999999990'
+          is_gedetineerd: false
+      IND:
+        verblijfsvergunningen:
+        - bsn: '999999990'
+          type: PERMANENT
+          status: VERLEEND
+        residence_permit_type:
+        - bsn: '999999990'
+          type: PERMANENT
+        vreemdelingenwet:
+        - bsn: '999999990'
+          verblijfsvergunning_type: null
+      RECHTSPRAAK:
+        curatele:
+        - bsn: '999999990'
+          is_onder_curatele: false
+          datum_uitspraak: null
+      KADASTER:
+        bag_verblijfsobjecten:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          gebruiksdoel: bijeenkomstfunctie
+          oppervlakte: 85
+          status: Actief
+          bouwjaar: 1920
+      SVH:
+        registraties:
+        - bsn: '999999990'
+          registratienummer: 'SVH-2024-123456'
+          naam: Claudia van Dam
+          is_geregistreerd: true
+          registratiedatum: '2024-06-15'
+      GEMEENTE_ROTTERDAM:
+        vestigingen:
+        - kvk_nummer: '85234567'
+          adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          schenkt_alcohol: false
+          heeft_terras: true
+        vergunningen:
+        - kvk_nummer: '85234567'
+          heeft_exploitatievergunning: true
+          categorie: '1'
+          vergunde_categorie: Categorie 1
+          datum_verleend: '2025-08-01'
+          geldig_tot: '2030-08-01'
+          heeft_alcoholvergunning: false
+          type_horeca: Daghoreca
+          openingstijden: '07:00 - 23:00'
+          vergunde_activiteiten:
+            - Verstrekken van etenswaren
+            - Alcoholvrije dranken
+        ontheffingen_geluid_historie:
+        - kvk_nummer: '85234567'
+          datum: '2026-01-05'
+          reden: Nieuwjaarsfeest
+        - kvk_nummer: '85234567'
+          datum: '2026-01-12'
+          reden: Live muziek
+        - kvk_nummer: '85234567'
+          datum: '2026-01-19'
+          reden: Verjaardag
+        geluidsklachten:
+        - kvk_nummer: '85234567'
+          heeft_actieve_klachten: false
+        # Data voor exploitatievergunning
+        exploitatie_inschrijvingen:
+        - kvk_nummer: '85234567'
+          bsn_eigenaar: '999999990'
+          aangevraagde_categorie: licht
+          activiteiten:
+            - eten
+            - drinken
+        beheerders:
+        - kvk_nummer: '85234567'
+          schenkt_alcohol: false
+          bsn: '999999990'
+          heeft_vog: true
+          leeftijd: 31
+          is_onder_curatele: false
+          heeft_svh_diploma: false
+          alle_hebben_vog: true
+          alle_voldoen_leeftijd: true
+          geen_onder_curatele: true
+        # Data voor alcoholwetvergunning - leidinggevenden tabel
+        leidinggevenden:
+        - kvk_nummer: '85234567'
+          bsn: '999999990'
+          naam: Claudia van Dam
+          leeftijd: 31
+          is_onder_curatele: false
+          heeft_svh_diploma: true
+          svh_registratienummer: 'SVH-2024-123456'
+          is_van_slecht_levensgedrag: false
+          is_ingeschreven_svh_register: true
+          aantal_voldoet_alle_eisen: 1
+        inrichtingen:
+        - kvk_nummer: '85234567'
+          vloeroppervlakte_horecalokaliteit: 85
+          type_bedrijf: horecabedrijf
+        horecagebiedsplannen:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          categorie: licht
+          gebied: Rotterdam West
+          toegestane_categorieen:
+            - licht
+            - middelzwaar
+          maximaal_aantal: 50
+          ontwikkelruimte: true
+          categorie_toegestaan: true
+        vergunningen_historie:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          bsn: '999999990'
+          vergunning_type: exploitatievergunning
+          afgiftedatum: '2025-08-01'
+          intrekkingsdatum: null
+          intrekkingsreden: null
+          handhavingsacties: []
+          ingetrokken_slecht_levensgedrag: false
+        omgevingsplan_toetsingen:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          categorie: licht
+          horeca_toegestaan: true
+        # Data voor terrasvergunning
+        bgt_terraslocaties:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          locatie: voor
+          beschikbare_oppervlakte: 100.0
+          functie_oppervlak: voetpad
+          is_openbare_weg: true
+        terrassenbeleid:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          seizoen: jaarrond
+          gebied: Rotterdam West
+          max_oppervlakte: 20.0
+          max_sluitingstijd_doordeweeks: 25
+          max_sluitingstijd_weekend: 26
+          seizoensregels: jaarrond toegestaan
+          toegestane_locaties:
+            - voor
+            - zij
+      LBB:
+        bibob_adviezen:
+        - kvk_nummer: '85234567'
+          bsn: '999999990'
+          advies_uitgebracht: true
+          mate_van_gevaar: geen_gevaar
+      RVO:
+        # WPM rapportageverplichting gegevens - Claudia heeft geen werknemers
+        wpm_gegevens:
+        - kvk_nummer: '85234567'
+          aantal_werknemers: 0
+          verstrekt_mobiliteitsvergoeding: false
+        # Informatieplicht energiebesparing - koffiezaak met professionele apparatuur
+        # (drempel: 50.000 kWh elektriciteit of 25.000 m³ gas)
+        rvo_rapportages:
+        - kvk_nummer: '85234567'
+          rapportages:
+          - datum: '2023-11-28'
+            status: goedgekeurd
+            rapportage_jaar: 2023
+            elektriciteit_kwh: 58000
+            gasverbruik_m3: 9200
+            maatregelen:
+            - beschrijving: LED-verlichting in zaak
+              status: uitgevoerd
+              jaar: 2023
+              besparing_kwh: 2400
+            - beschrijving: Thermostaatkranen geïnstalleerd
+              status: uitgevoerd
+              jaar: 2022
+              besparing_m3: 400
+            - beschrijving: HR-107 CV-ketel geïnstalleerd
+              status: gepland
+              jaar: 2025
+              besparing_m3: 1500
+        rvo_energiemaatregelen:
+        - kvk_nummer: '85234567'
+          maatregelen:
+          - beschrijving: LED-verlichting in zaak en keuken
+            status: uitgevoerd
+            jaar: 2025
+            besparing_kwh: 3200
+          - beschrijving: HR-107 CV-ketel geïnstalleerd
+            status: uitgevoerd
+            jaar: 2025
+            besparing_m3: 1500
+          - beschrijving: Energiezuinige koelingen (A++ label)
+            status: uitgevoerd
+            jaar: 2025
+            besparing_kwh: 4800
+          - beschrijving: Isolatie van warmwaterleidingen
+            status: gepland
+            jaar: 2026
+            besparing_m3: 800
+        rvo_energiegegevens:
+        - kvk_nummer: '85234567'
+          elektriciteit_kwh: 62000
+          gasverbruik_m3: 8000
+          is_woonfunctie: false
+      NVWA:
+        # HACCP voedselveiligheid - Claudia's koffiezaak is een levensmiddelenbedrijf
+        nvwa_registratie:
+        - kvk_nummer: '85234567'
+          is_levensmiddelenbedrijf: true
+          is_geregistreerd_nvwa: true
+          heeft_haccp_systeem: true
+          type_haccp_systeem: 'hygienecode'
+        nvwa_inspectiegegevens:
+        - kvk_nummer: '85234567'
+          laatste_inspectiedatum: '2025-06-15'
+          laatste_inspectieresultaat: 'voldoende'
+        nvwa_meldplicht:
+        - kvk_nummer: '85234567'
+          is_levensmiddelenbedrijf: true
+          heeft_actief_incident: false

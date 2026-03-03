@@ -54,6 +54,7 @@ class BracketModel:
     discretized_features: dict[str, tuple[str, float]] = field(
         default_factory=dict
     )  # derived_col → (source, threshold)
+    primary_feature: str = "income"  # X-axis feature for bracket boundaries
 
 
 @dataclass
@@ -65,6 +66,7 @@ class BracketLearnerConfig:
     rounding_bracket: float = 1000.0  # round bracket boundaries to nearest €1000
     min_group_size: int = 30  # minimum data points per household group
     max_grouping_keys: int = 4  # max grouping dimensions to prevent combinatorial explosion
+    primary_feature: str = "income"  # X-axis feature for bracket model
 
 
 class BracketLearner:
@@ -198,18 +200,19 @@ class BracketLearner:
 
         feature_names = list(X.columns)
 
-        if "income" not in X.columns:
-            raise ValueError("Income column required for bracket model")
+        pf = self.config.primary_feature
+        if pf not in X.columns:
+            raise ValueError(f"Primary feature '{pf}' column required for bracket model")
 
-        income = X["income"]
+        primary_values = X[pf]
         quantiles = np.linspace(0, 1, self.config.n_brackets + 1)
-        raw_boundaries = np.quantile(income, quantiles)
+        raw_boundaries = np.quantile(primary_values, quantiles)
 
         # Round boundaries
         boundaries = [round(b / self.config.rounding_bracket) * self.config.rounding_bracket for b in raw_boundaries]
         boundaries = sorted(set(boundaries))
         if len(boundaries) < 2:
-            boundaries = [float(income.min()), float(income.max())]
+            boundaries = [float(primary_values.min()), float(primary_values.max())]
 
         # Determine household types — select the most impactful grouping keys
         candidate_keys = (
@@ -222,7 +225,7 @@ class BracketLearner:
         discretized_info: dict[str, tuple[str, float]] = {}  # derived_col -> (source_col, threshold)
         if continuous_keys:
             for col in continuous_keys:
-                if col not in X.columns or col == "income":
+                if col not in X.columns or col == pf:
                     continue
                 threshold, eta_sq = self._find_best_split(X[col].values, y_amount.values)
                 if eta_sq <= 0.05:  # only if explains >5% of variance
@@ -290,7 +293,7 @@ class BracketLearner:
             for key, val in ht.items():
                 ht_mask &= X[key] == val
 
-            ht_income = income[ht_mask].values
+            ht_income = primary_values[ht_mask].values
             ht_amount = y_amount[ht_mask].values
 
             if len(ht_income) < 5:
@@ -332,6 +335,7 @@ class BracketLearner:
             feature_names=feature_names,
             feature_influence=feature_influence,
             discretized_features=discretized_info,
+            primary_feature=pf,
         )
 
     def _compute_boundary_amounts(self, income: np.ndarray, amount: np.ndarray, boundaries: list[float]) -> list[float]:
@@ -354,7 +358,7 @@ class BracketLearner:
 
         for i in range(len(X)):
             row = X.iloc[i]
-            row_income = row.get("income", 0)
+            row_primary = row.get(model.primary_feature, 0)
 
             best_amount = 0.0
             for seg in model.segments:
@@ -363,10 +367,10 @@ class BracketLearner:
                     if not match:
                         continue
 
-                if row_income < seg.income_lower or row_income > seg.income_upper:
+                if row_primary < seg.income_lower or row_primary > seg.income_upper:
                     continue
 
-                best_amount = seg.predict(row_income)
+                best_amount = seg.predict(row_primary)
                 break
 
             if model.child_supplement > 0 and "children_count" in X.columns:

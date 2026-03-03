@@ -5,8 +5,13 @@
         <div class="w-1/3 bg-white shadow-lg p-6 overflow-y-auto flex-shrink-0">
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Harmonisatie</h2>
             <p class="text-sm text-gray-600 mb-6">
-                Combineer meerdere toeslagen en uitkeringen tot een
-                vereenvoudigde, geharmoniseerde wet.
+                {% if profile_type == "ondernemer" %}
+                    Combineer meerdere ondernemerswetten tot een
+                    vereenvoudigd compliance-overzicht.
+                {% else %}
+                    Combineer meerdere toeslagen en uitkeringen tot een
+                    vereenvoudigde, geharmoniseerde wet.
+                {% endif %}
             </p>
             <form id="harmonisatie-form" @submit.prevent="train()" class="space-y-5">
                 <!-- Accordeon: Wetselectie -->
@@ -36,32 +41,23 @@
                     </button>
                     <div x-show="showWetSelectie" x-cloak class="p-4 space-y-3">
                         <p class="text-xs text-gray-500 mb-2">Selecteer welke wetten geharmoniseerd worden:</p>
-                        <div>
-                            <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Toeslagen</h4>
-                            <template x-for="law in availableLaws.filter(l => l.group === 'Toeslagen')"
-                                      :key="law.id">
-                                <label class="flex items-center space-x-2 py-1 cursor-pointer">
-                                    <input type="checkbox"
-                                           :value="law.id"
-                                           x-model="selectedLaws"
-                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                    <span class="text-sm text-gray-700" x-text="law.label"></span>
-                                </label>
-                            </template>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Sociale zekerheid</h4>
-                            <template x-for="law in availableLaws.filter(l => l.group === 'Sociale zekerheid')"
-                                      :key="law.id">
-                                <label class="flex items-center space-x-2 py-1 cursor-pointer">
-                                    <input type="checkbox"
-                                           :value="law.id"
-                                           x-model="selectedLaws"
-                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                    <span class="text-sm text-gray-700" x-text="law.label"></span>
-                                </label>
-                            </template>
-                        </div>
+                        <template x-for="group in [...new Set(availableLaws.map(l => l.group))]"
+                                  :key="group">
+                            <div>
+                                <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1"
+                                    x-text="group"></h4>
+                                <template x-for="law in availableLaws.filter(l => l.group === group)"
+                                          :key="law.id">
+                                    <label class="flex items-center space-x-2 py-1 cursor-pointer">
+                                        <input type="checkbox"
+                                               :value="law.id"
+                                               x-model="selectedLaws"
+                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="text-sm text-gray-700" x-text="law.label"></span>
+                                    </label>
+                                </template>
+                            </div>
+                        </template>
                     </div>
                 </div>
                 <!-- Accordeon 1: Populatiebeheer (collapsed by default) -->
@@ -94,7 +90,11 @@
                         {% set pop_show_saved = false %}
                         {% set pop_show_create = false %}
                         {% set pop_show_header = false %}
-                        {% include "partials/populatiebeheer.html" %}
+                        {% if profile_type == "ondernemer" %}
+                            {% include "partials/populatiebeheer_business.html" %}
+                        {% else %}
+                            {% include "partials/populatiebeheer.html" %}
+                        {% endif %}
                     </div>
                 </div>
                 <!-- Accordeon: Methode -->
@@ -124,7 +124,7 @@
                     </button>
                     <div x-show="showMethode" x-cloak class="p-4 space-y-3">
                         <div class="flex gap-2">
-                            <template x-for="m in ['bracket', 'tree', 'parametric']" :key="m">
+                            <template x-for="m in availableMethods" :key="m">
                                 <button type="button"
                                         @click="config.method = m"
                                         class="flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors cursor-pointer"
@@ -214,7 +214,10 @@
                         <template x-if="config.method === 'bracket'">
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Aantal inkomensschijven</label>
+                                    <label class="block text-sm font-medium text-gray-700"
+                                           x-text="profileType === 'ondernemer' ? 'Aantal oppervlakteschijven' : 'Aantal inkomensschijven'">
+                                        Aantal inkomensschijven
+                                    </label>
                                     <span class="block text-xs text-gray-400 mb-1">Meer schijven = fijnmaziger, maar complexer.</span>
                                     <input type="range"
                                            x-model.number="config.n_brackets"
@@ -382,7 +385,8 @@
                         </svg>
                         <p class="text-lg font-medium text-gray-700">Model wordt getraind...</p>
                         <p class="text-sm text-gray-500 mt-1">
-                            Simulatie met <span x-text="activeRun?.config?.num_people || '?'"></span> personen wordt uitgevoerd.
+                            Simulatie met <span x-text="activeRun?.config?.num_people || '?'"></span>
+                            <span x-text="profileType === 'ondernemer' ? 'bedrijven' : 'personen'"></span> wordt uitgevoerd.
                         </p>
                     </div>
                 </div>
@@ -410,25 +414,34 @@
                             </svg>
                         </button>
                         <div x-show="sections.metrics" x-cloak class="px-4 pb-4">
-                            <div class="grid grid-cols-3 gap-4">
+                            <div class="grid gap-4"
+                                 :class="profileType === 'ondernemer' ? 'grid-cols-1' : 'grid-cols-3'">
                                 <div class="bg-gray-50 rounded-lg p-3">
-                                    <div class="text-sm font-medium text-gray-500">Nauwkeurigheid recht (Accuracy)</div>
+                                    <div class="text-sm font-medium text-gray-500"
+                                         x-text="profileType === 'ondernemer' ? 'Nauwkeurigheid compliance (Accuracy)' : 'Nauwkeurigheid recht (Accuracy)'">
+                                    </div>
                                     <div class="text-2xl font-bold text-gray-900"
                                          x-text="formatPct(activeRun?.result?.metrics?.eligibility_accuracy)"></div>
-                                    <div class="text-xs text-gray-400 mt-1">Hoe vaak het model correct bepaalt of iemand recht heeft</div>
+                                    <div class="text-xs text-gray-400 mt-1"
+                                         x-text="profileType === 'ondernemer' ? 'Hoe vaak het model correct bepaalt of een bedrijf aan de verplichting voldoet' : 'Hoe vaak het model correct bepaalt of iemand recht heeft'">
+                                    </div>
                                 </div>
-                                <div class="bg-gray-50 rounded-lg p-3">
-                                    <div class="text-sm font-medium text-gray-500">Verklarende waarde bedrag (R&sup2;)</div>
-                                    <div class="text-2xl font-bold text-gray-900"
-                                         x-text="formatNum(activeRun?.result?.metrics?.amount_r2)"></div>
-                                    <div class="text-xs text-gray-400 mt-1">Hoe goed het model het bedrag kan voorspellen (1.0 = perfect)</div>
-                                </div>
-                                <div class="bg-gray-50 rounded-lg p-3">
-                                    <div class="text-sm font-medium text-gray-500">Gemiddelde afwijking bedrag (MAE)</div>
-                                    <div class="text-2xl font-bold text-gray-900"
-                                         x-text="'EUR ' + formatNum(activeRun?.result?.metrics?.amount_mae)"></div>
-                                    <div class="text-xs text-gray-400 mt-1">Hoeveel het berekende bedrag gemiddeld afwijkt van het werkelijke</div>
-                                </div>
+                                <template x-if="profileType !== 'ondernemer'">
+                                    <div class="bg-gray-50 rounded-lg p-3">
+                                        <div class="text-sm font-medium text-gray-500">Verklarende waarde bedrag (R&sup2;)</div>
+                                        <div class="text-2xl font-bold text-gray-900"
+                                             x-text="formatNum(activeRun?.result?.metrics?.amount_r2)"></div>
+                                        <div class="text-xs text-gray-400 mt-1">Hoe goed het model het bedrag kan voorspellen (1.0 = perfect)</div>
+                                    </div>
+                                </template>
+                                <template x-if="profileType !== 'ondernemer'">
+                                    <div class="bg-gray-50 rounded-lg p-3">
+                                        <div class="text-sm font-medium text-gray-500">Gemiddelde afwijking bedrag (MAE)</div>
+                                        <div class="text-2xl font-bold text-gray-900"
+                                             x-text="'EUR ' + formatNum(activeRun?.result?.metrics?.amount_mae)"></div>
+                                        <div class="text-xs text-gray-400 mt-1">Hoeveel het berekende bedrag gemiddeld afwijkt van het werkelijke</div>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -539,13 +552,14 @@
                                                 <span class="font-medium"
                                                       x-text="(activeRun?.result?.law_analysis?.laws?.[lawKey]?.splits ?? '-') + ' (' + formatPct(activeRun?.result?.law_analysis?.laws?.[lawKey]?.complexity) + ')'"></span>
                                             </div>
-                                            <div class="flex justify-between">
+                                            <div x-show="profileType !== 'ondernemer'" class="flex justify-between">
                                                 <span class="text-gray-500">Bedragbijdrage</span>
                                                 <span class="font-medium"
                                                       x-text="formatPct(activeRun?.result?.law_analysis?.laws?.[lawKey]?.amount_contribution)"></span>
                                             </div>
                                             <div class="flex justify-between">
-                                                <span class="text-gray-500">Bereik</span>
+                                                <span class="text-gray-500"
+                                                      x-text="profileType === 'ondernemer' ? 'Voldoet aan verplichting' : 'Bereik'"></span>
                                                 <span class="font-medium"
                                                       x-text="formatPct(activeRun?.result?.law_analysis?.laws?.[lawKey]?.eligibility_rate)"></span>
                                             </div>
@@ -587,7 +601,8 @@
                                           x-text="formatPct(activeRun?.result?.metrics?.cross_validation?.f1_mean) + ' (\u00b1' + formatPct(activeRun?.result?.metrics?.cross_validation?.f1_std) + ')'"></span>
                                 </div>
                                 <div>
-                                    <span class="text-gray-500">Recall (hoeveel rechthebbenden gevonden):
+                                    <span class="text-gray-500"
+                                          x-text="profileType === 'ondernemer' ? 'Recall (hoeveel verplichte bedrijven gevonden):' : 'Recall (hoeveel rechthebbenden gevonden):'">
                                         <br>
                                     </span>
                                     <span class="font-medium"
@@ -603,7 +618,7 @@
                                 @click="sections.rules = !sections.rules"
                                 class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
                             <h3 class="text-lg font-semibold text-gray-900">
-                                Regels voor recht op toeslag
+                                <span x-text="profileType === 'ondernemer' ? 'Regels voor compliance' : 'Regels voor recht op toeslag'"></span>
                                 <span class="text-sm font-normal text-gray-500"
                                       x-text="'(' + (activeRun?.result?.rules?.length || 0) + ' regels)'"></span>
                             </h3>
@@ -627,8 +642,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Berekening toeslagbedrag (inline within rules) -->
-                            <div x-show="activeRun?.result?.formulas?.length > 0" class="mt-4">
+                            <!-- Berekening toeslagbedrag (inline within rules, hidden for ondernemer) -->
+                            <div x-show="profileType !== 'ondernemer' && activeRun?.result?.formulas?.length > 0"
+                                 class="mt-4">
                                 <h4 class="text-sm font-medium text-gray-700 mb-3">
                                     Berekening toeslagbedrag
                                     <span class="text-sm font-normal text-gray-500"
@@ -642,7 +658,7 @@
                                                 <span class="text-sm font-medium text-emerald-700"
                                                       x-text="'Groep ' + (idx + 1)"></span>
                                                 <div class="text-xs text-gray-500">
-                                                    <span x-text="'personen (n): ' + formula.samples"></span>
+                                                    <span x-text="(profileType === 'ondernemer' ? 'bedrijven' : 'personen') + ' (n): ' + formula.samples"></span>
                                                     <span class="ml-2"
                                                           x-text="'verkl. waarde (R\u00b2): ' + formatNum(formula.r2_score)"></span>
                                                 </div>
@@ -686,7 +702,7 @@
                                           :key="key">
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs text-gray-600 w-40 truncate"
-                                              x-text="(() => { const labels = { 'has_partner': 'Heeft partner', 'has_children': 'Heeft kinderen', 'housing_type_rent': 'Woonsituatie', 'is_student': 'Is student', 'has_dutch_nationality': 'Nationaliteit', 'is_detained': 'Is gedetineerd', 'is_health_insured': 'Zorgverzekerd', 'receives_child_benefit': 'Kinderbijslag', 'receives_study_financing': 'Studiefinanciering', 'childcare_type': 'Soort opvang' }; if (labels[key]) return labels[key]; const disc = activeRun?.result?.discretized_features || {}; if (disc[key]) { const src = { age: 'Leeftijd', net_worth: 'Vermogen', rent_amount: 'Huur', children_count: 'Kinderen', youngest_child_age: 'Leeftijd jongste', work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren', standaardpremie: 'Standaardpremie', business_income: 'Bedrijfsinkomen', childcare_hours_per_child: 'Opvanguren', childcare_hourly_rate: 'Uurtarief' }; return (src[disc[key].source] || disc[key].source) + ' > ' + Math.round(disc[key].threshold); } return key; })()"></span>
+                                              x-text="(() => { const labels = { 'has_partner': 'Heeft partner', 'has_children': 'Heeft kinderen', 'housing_type_rent': 'Woonsituatie', 'is_student': 'Is student', 'has_dutch_nationality': 'Nationaliteit', 'is_detained': 'Is gedetineerd', 'is_health_insured': 'Zorgverzekerd', 'receives_child_benefit': 'Kinderbijslag', 'receives_study_financing': 'Studiefinanciering', 'childcare_type': 'Soort opvang', 'type_bedrijf_horeca': 'Horecabedrijf', 'is_onder_curatele': 'Onder curatele', 'sbi_is_food': 'SBI levensmiddelen', 'bereidt_of_serveert_voedsel': 'Bereidt voedsel', 'is_woonfunctie': 'Woonfunctie' }; if (labels[key]) return labels[key]; const disc = activeRun?.result?.discretized_features || {}; if (disc[key]) { const src = { age: 'Leeftijd', net_worth: 'Vermogen', rent_amount: 'Huur', children_count: 'Kinderen', youngest_child_age: 'Leeftijd jongste', work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren', standaardpremie: 'Standaardpremie', business_income: 'Bedrijfsinkomen', childcare_hours_per_child: 'Opvanguren', childcare_hourly_rate: 'Uurtarief', leeftijd_leidinggevende: 'Leeftijd leidinggevende', vloeroppervlakte: 'Vloeroppervlakte', jaarlijks_elektriciteitsverbruik_kwh: 'Elektriciteit', jaarlijks_gasverbruik_m3: 'Gasverbruik' }; return (src[disc[key].source] || disc[key].source) + ' > ' + Math.round(disc[key].threshold); } return key; })()"></span>
                                         <div class="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                                             <div class="h-full rounded-full transition-all"
                                                  :class="value > 0.05 ? 'bg-blue-500' : 'bg-gray-300'"
@@ -712,25 +728,29 @@
                                             <summary class="px-3 py-2 cursor-pointer hover:bg-gray-50 flex justify-between items-center">
                                                 <span class="text-sm font-medium text-gray-700" x-text="group.label"></span>
                                                 <span class="text-xs text-gray-400"
-                                                      x-text="'max €' + Math.max(...group.bands.map(b => b.amount_from)).toFixed(0) + '/mnd'"></span>
+                                                      x-text="'max €' + Math.max(...group.bands.map(b => b.amount_from)).toFixed(0) + (profileType === 'ondernemer' ? '' : '/mnd')"></span>
                                             </summary>
                                             <div class="px-3 pb-2">
                                                 <table class="min-w-full text-sm">
                                                     <thead>
                                                         <tr class="bg-gray-50">
-                                                            <th class="px-2 py-1 text-left text-xs">Inkomen van</th>
+                                                            <th class="px-2 py-1 text-left text-xs"
+                                                                x-text="profileType === 'ondernemer' ? 'Oppervlakte van' : 'Inkomen van'">
+                                                            </th>
                                                             <th class="px-2 py-1 text-left text-xs">t/m</th>
-                                                            <th class="px-2 py-1 text-right text-xs">Toeslag/mnd</th>
+                                                            <th class="px-2 py-1 text-right text-xs"
+                                                                x-text="profileType === 'ondernemer' ? 'Kosten' : 'Toeslag/mnd'">
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <template x-for="(band, idx) in group.bands" :key="idx">
                                                             <tr class="border-t border-gray-100">
                                                                 <td class="px-2 py-1 text-sm"
-                                                                    x-text="'€' + Number(idx === 0 ? band.income_from : band.income_from + 1).toLocaleString('nl-NL')">
+                                                                    x-text="profileType === 'ondernemer' ? Number(idx === 0 ? band.income_from : band.income_from + 1).toLocaleString('nl-NL') + ' m²' : '€' + Number(idx === 0 ? band.income_from : band.income_from + 1).toLocaleString('nl-NL')">
                                                                 </td>
                                                                 <td class="px-2 py-1 text-sm"
-                                                                    x-text="'€' + Number(band.income_to).toLocaleString('nl-NL')">
+                                                                    x-text="profileType === 'ondernemer' ? Number(band.income_to).toLocaleString('nl-NL') + ' m²' : '€' + Number(band.income_to).toLocaleString('nl-NL')">
                                                                 </td>
                                                                 <td class="px-2 py-1 text-right font-mono font-semibold"
                                                                     :class="band.amount_from > 0 ? 'text-green-700' : 'text-gray-400'"
@@ -746,9 +766,9 @@
                                 </template>
                             </div>
                             <p class="text-xs text-gray-400 mt-2"
-                               x-text="'Groepen zonder toeslag (' + bracketGroups().filter(g => !g.bands.some(b => b.amount_from > 0)).length + ') zijn verborgen'">
+                               x-text="'Groepen zonder ' + (profileType === 'ondernemer' ? 'kosten' : 'toeslag') + ' (' + bracketGroups().filter(g => !g.bands.some(b => b.amount_from > 0)).length + ') zijn verborgen'">
                             </p>
-                            <template x-if="activeRun?.result?.child_supplement > 0">
+                            <template x-if="activeRun?.result?.child_supplement > 0 && profileType !== 'ondernemer'">
                                 <p class="mt-3 text-sm text-gray-600">
                                     Kindtoeslag: <span class="font-semibold"
        x-text="'EUR ' + Number(activeRun.result.child_supplement).toFixed(0)"></span> extra per kind per maand
@@ -1041,7 +1061,9 @@
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <tr>
-                                        <td class="px-4 py-2 text-gray-700">Nauwkeurigheid recht (Accuracy)</td>
+                                        <td class="px-4 py-2 text-gray-700"
+                                            x-text="profileType === 'ondernemer' ? 'Nauwkeurigheid compliance (Accuracy)' : 'Nauwkeurigheid recht (Accuracy)'">
+                                        </td>
                                         <template x-for="(run, i) in completedRuns" :key="'acc-'+run.id">
                                             <td class="px-4 py-2 text-right">
                                                 <span x-text="formatPct(run.result?.metrics?.eligibility_accuracy)"></span>
@@ -1053,7 +1075,7 @@
                                             </td>
                                         </template>
                                     </tr>
-                                    <tr>
+                                    <tr x-show="profileType !== 'ondernemer'">
                                         <td class="px-4 py-2 text-gray-700">Verklarende waarde bedrag (R&sup2;)</td>
                                         <template x-for="(run, i) in completedRuns" :key="'r2-'+run.id">
                                             <td class="px-4 py-2 text-right">
@@ -1066,7 +1088,7 @@
                                             </td>
                                         </template>
                                     </tr>
-                                    <tr>
+                                    <tr x-show="profileType !== 'ondernemer'">
                                         <td class="px-4 py-2 text-gray-700">Gemiddelde afwijking bedrag (MAE)</td>
                                         <template x-for="(run, i) in completedRuns" :key="'mae-'+run.id">
                                             <td class="px-4 py-2 text-right">
@@ -1298,6 +1320,7 @@
         if (slider && display) display.textContent = slider.value;
     }
 
+    {% if profile_type != "ondernemer" %}
     let previousAgeValues = {
         age_18_30: {{ default_params.age_18_30 }},
         age_30_45: {{ default_params.age_30_45 }},
@@ -1408,13 +1431,15 @@
         validateAgeDistribution();
         updateIncomeDistribution();
     }
+    {% endif %}
 
     // --- Alpine.js app ---
     function synthesizeApp() {
         return {
+            profileType: '{{ profile_type }}',
             config: {
-                num_people: 1000,
-                method: 'bracket',
+                num_people: {{ default_params.num_people }},
+                method: 'tree',
                 max_depth: 5,
                 min_samples: 50,
                 max_rules: 10,
@@ -1429,20 +1454,13 @@
             showInstellingen: true,
             showWetSelectie: false,
             showMethode: true,
-            availableLaws: [
-                {id: 'zorgtoeslag', label: 'Zorgtoeslag', group: 'Toeslagen'},
-                {id: 'huurtoeslag', label: 'Huurtoeslag', group: 'Toeslagen'},
-                {id: 'kindgebonden_budget', label: 'Kindgebonden budget', group: 'Toeslagen'},
-                {id: 'kinderopvangtoeslag', label: 'Kinderopvangtoeslag', group: 'Toeslagen'},
-                {id: 'bijstand', label: 'Bijstand', group: 'Sociale zekerheid'},
-                {id: 'aow', label: 'AOW', group: 'Sociale zekerheid'},
-                {id: 'ww', label: 'WW-uitkering', group: 'Sociale zekerheid'},
-            ],
-            selectedLaws: ['zorgtoeslag', 'huurtoeslag', 'kindgebonden_budget'],
+            availableLaws: {{ available_laws | tojson }},
+            selectedLaws: {{ default_selected | tojson }},
             methodLabels: {tree: 'Beslisboom', bracket: 'Staffelmodel', parametric: 'Parametrisch'},
+            availableMethods: {{ (['bracket', 'tree'] if profile_type == 'ondernemer' else ['bracket', 'tree', 'parametric']) | tojson }},
             methodDescriptions: {
                 tree: 'Beslisboom + lineaire regressie. Goed interpreteerbaar, flexibele regels.',
-                bracket: 'Inkomensafhankelijke staffel met lineaire interpolatie. Geen cliff effects.',
+                bracket: '{{ "Oppervlakteafhankelijke staffel met lineaire interpolatie. Geen cliff effects." if profile_type == "ondernemer" else "Inkomensafhankelijke staffel met lineaire interpolatie. Geen cliff effects." }}',
                 parametric: 'Vereenvoudigde formule: max(0, basis - afbouw% x (inkomen - drempel)). Meest compact.',
             },
             sections: {
@@ -1499,33 +1517,45 @@
                     const el = document.getElementById(id);
                     return el ? el.value : '';
                 };
-                return {
+                const data = {
                     num_people: getVal('num_people'),
                     simulation_date: getStr('simulation_date'),
                     method: this.config.method,
                     selected_laws: this.selectedLaws,
+                    profile_type: this.profileType,
                     max_depth: this.config.max_depth,
                     min_samples: this.config.min_samples,
                     max_rules: this.config.max_rules,
                     n_brackets: this.config.n_brackets,
-                    age_distribution: {
+                };
+                if (this.profileType === 'ondernemer') {
+                    data.business_params = {
+                        horeca_percentage: getVal('horeca_percentage'),
+                        levensmiddelen_percentage: getVal('levensmiddelen_percentage'),
+                        bedrijfsgrootte_klein: getVal('bedrijfsgrootte_klein'),
+                        bedrijfsgrootte_middel: getVal('bedrijfsgrootte_middel'),
+                        bedrijfsgrootte_groot: getVal('bedrijfsgrootte_groot'),
+                    };
+                } else {
+                    data.age_distribution = {
                         age_18_30: getVal('age_18_30'),
                         age_30_45: getVal('age_30_45'),
                         age_45_67: getVal('age_45_67'),
                         age_67_85: getVal('age_67_85'),
                         age_85_plus: getVal('age_85_plus'),
-                    },
-                    income_distribution: {
+                    };
+                    data.income_distribution = {
                         income_low_pct: getVal('income_low_pct'),
                         income_middle_pct: getVal('income_middle_pct'),
                         income_high_pct: getVal('income_high_pct'),
-                    },
-                    economic_params: {
+                    };
+                    data.economic_params = {
                         zero_income_prob: getVal('zero_income_prob'),
                         rent_percentage: getVal('rent_percentage'),
                         student_percentage_young: getVal('student_percentage_young'),
-                    },
-                };
+                    };
+                }
+                return data;
             },
 
             runParamSummary(run) {
@@ -1534,9 +1564,10 @@
                 const methodLabel = this.methodLabels[c.method] || c.method;
                 const lawCount = (c.selected_laws || []).length;
                 const lawSuffix = lawCount ? ', ' + lawCount + ' wetten' : '';
-                if (c.method === 'bracket') return methodLabel + ', ' + c.num_people + ' pers, ' + (c.n_brackets || 5) + ' schijven' + lawSuffix;
-                if (c.method === 'parametric') return methodLabel + ', ' + c.num_people + ' pers' + lawSuffix;
-                return methodLabel + ', ' + c.num_people + ' pers, diepte ' + c.max_depth + lawSuffix;
+                const unit = this.profileType === 'ondernemer' ? ' bedr' : ' pers';
+                if (c.method === 'bracket') return methodLabel + ', ' + c.num_people + unit + ', ' + (c.n_brackets || 5) + ' schijven' + lawSuffix;
+                if (c.method === 'parametric') return methodLabel + ', ' + c.num_people + unit + lawSuffix;
+                return methodLabel + ', ' + c.num_people + unit + ', diepte ' + c.max_depth + lawSuffix;
             },
 
             paramLabels: {
@@ -1617,6 +1648,7 @@
                 const labels = {
                     zorgtoeslag: 'ZT', huurtoeslag: 'HT', kindgebonden_budget: 'KGB',
                     kinderopvangtoeslag: 'KOT', bijstand: 'BIJ', aow: 'AOW', ww: 'WW',
+                    alcoholwet: 'AW', haccp: 'HACCP', energie_informatieplicht: 'ENR',
                 };
                 return labels[key] || key;
             },
@@ -1630,6 +1662,9 @@
                     bijstand: 'bg-amber-100 text-amber-800',
                     aow: 'bg-cyan-100 text-cyan-800',
                     ww: 'bg-orange-100 text-orange-800',
+                    alcoholwet: 'bg-red-100 text-red-800',
+                    haccp: 'bg-lime-100 text-lime-800',
+                    energie_informatieplicht: 'bg-yellow-100 text-yellow-800',
                 };
                 return classes[key] || 'bg-gray-100 text-gray-800';
             },
@@ -1643,6 +1678,12 @@
                     is_student: ['Niet-student', 'Student'],
                     has_dutch_nationality: ['Niet-Nederlands', 'Nederlands'],
                     is_detained: ['Niet gedetineerd', 'Gedetineerd'],
+                    type_bedrijf_horeca: ['Geen horeca', 'Horecabedrijf'],
+                    is_onder_curatele: ['Niet onder curatele', 'Onder curatele'],
+                    sbi_is_food: ['Geen levensmiddelen-SBI', 'Levensmiddelen-SBI'],
+                    bereidt_of_serveert_voedsel: ['Geen voedsel', 'Bereidt/serveert voedsel'],
+                    is_woonfunctie: ['Geen woonfunctie', 'Woonfunctie'],
+                    has_terrace: ['Zonder terras', 'Met terras'],
                 };
                 // Add labels for auto-discretized features (e.g. age_above_67)
                 const disc = this.activeRun?.result?.discretized_features || {};
@@ -1652,6 +1693,10 @@
                     work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren',
                     standaardpremie: 'Standaardpremie', business_income: 'Bedrijfsinkomen',
                     childcare_hours_per_child: 'Opvanguren', childcare_hourly_rate: 'Uurtarief',
+                    leeftijd_leidinggevende: 'Leeftijd leidinggevende',
+                    vloeroppervlakte: 'Vloeroppervlakte',
+                    jaarlijks_elektriciteitsverbruik_kwh: 'Elektriciteit (kWh)',
+                    jaarlijks_gasverbruik_m3: 'Gasverbruik (m\u00b3)',
                 };
                 for (const [derivedCol, info] of Object.entries(disc)) {
                     const srcLabel = sourceLabels[info.source] || info.source;
@@ -1682,7 +1727,7 @@
             },
 
             formatHouseholdFilter(filter, labels) {
-                if (!filter || Object.keys(filter).length === 0) return 'Alle huishoudens';
+                if (!filter || Object.keys(filter).length === 0) return this.profileType === 'ondernemer' ? 'Alle bedrijven' : 'Alle huishoudens';
                 const parts = [];
                 for (const [key, val] of Object.entries(filter)) {
                     const pair = labels[key];
@@ -1700,6 +1745,15 @@
                     housing_type_rent: 'Huurwoning', is_student: 'Student',
                     work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren',
                     has_dutch_nationality: 'Nationaliteit', is_detained: 'Gedetineerd',
+                    leeftijd_leidinggevende: 'Leeftijd leidinggevende',
+                    vloeroppervlakte: 'Vloeroppervlakte',
+                    type_bedrijf_horeca: 'Horecabedrijf',
+                    is_onder_curatele: 'Onder curatele',
+                    sbi_is_food: 'SBI levensmiddelen',
+                    bereidt_of_serveert_voedsel: 'Bereidt/serveert voedsel',
+                    jaarlijks_elektriciteitsverbruik_kwh: 'Elektriciteit (kWh)',
+                    jaarlijks_gasverbruik_m3: 'Gasverbruik (m\u00b3)',
+                    is_woonfunctie: 'Woonfunctie',
                 };
                 if (labels[key]) return labels[key];
                 // Handle auto-discretized feature names like age_above_67
@@ -1716,7 +1770,9 @@
                 if (node.is_leaf) {
                     const isEligible = node.prediction === 'True' || node.prediction === '1' || node.prediction === 'eligible' || node.prediction === true;
                     const cls = isEligible ? 'tree-leaf-eligible' : 'tree-leaf-not';
-                    const label = isEligible ? 'Recht' : 'Geen recht';
+                    const label = this.profileType === 'ondernemer'
+                        ? (isEligible ? 'Voldoet' : 'Voldoet niet')
+                        : (isEligible ? 'Recht' : 'Geen recht');
                     const pct = (node.confidence * 100).toFixed(0);
                     return '<div class="tree-branch"><span class="tree-label ' + cls + '">' +
                            label + ' <span style="opacity:0.7; margin-left:4px;">(' + pct + '%, n=' + node.samples + ')</span></span></div>';

@@ -1,3 +1,4 @@
+@skip-go
 Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
   Als horecaondernemer in Rotterdam
   Wil ik weten of ik een Alcoholwetvergunning kan krijgen
@@ -27,7 +28,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status | rechtsvorm |
       | 85234567   | Actief | VOF        |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM leidinggevenden gegevens:
@@ -57,7 +58,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status | rechtsvorm  |
       | 85234567   | Actief | Eenmanszaak |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM leidinggevenden gegevens:
@@ -87,7 +88,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status | rechtsvorm  |
       | 85234567   | Actief | Eenmanszaak |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM leidinggevenden gegevens:
@@ -121,7 +122,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status | rechtsvorm  |
       | 85234567   | Actief | Eenmanszaak |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM leidinggevenden gegevens:
@@ -148,7 +149,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status | rechtsvorm  |
       | 85234567   | Actief | Eenmanszaak |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM leidinggevenden gegevens:
@@ -179,7 +180,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status | rechtsvorm  |
       | 85234567   | Actief | Eenmanszaak |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM leidinggevenden gegevens:
@@ -210,7 +211,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status | rechtsvorm  |
       | 85234567   | Actief | Eenmanszaak |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM leidinggevenden gegevens:
@@ -237,7 +238,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status | rechtsvorm  |
       | 85234567   | Actief | Eenmanszaak |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM leidinggevenden gegevens:
@@ -270,7 +271,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status | rechtsvorm |
       | 85234567   | Actief | BV         |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM leidinggevenden gegevens:
@@ -303,7 +304,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status        | rechtsvorm  |
       | 85234567   | Uitgeschreven | Eenmanszaak |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM leidinggevenden gegevens:

@@ -45,7 +45,20 @@ def prepare_synthesis_data(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series, p
         X = X.drop(columns=["childcare_type"])
 
     # Convert booleans to int
-    for col in ["has_partner", "has_children", "is_student"]:
+    for col in [
+        "has_partner",
+        "has_children",
+        "is_student",
+        "type_bedrijf_horeca",
+        "is_onder_curatele",
+        "sbi_is_food",
+        "bereidt_of_serveert_voedsel",
+        "is_woonfunctie",
+        "is_geselecteerd_cbs_enquete",
+        "rechtsvorm_vereist_jaarrekening",
+        "heeft_actief_incident",
+        "has_terrace",
+    ]:
         if col in X.columns:
             X[col] = X[col].astype(int)
 

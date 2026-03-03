@@ -5,28 +5,8 @@ This module defines:
 2. Which sections should be expanded/collapsed by default when viewing specific laws
 """
 
-# Laws to DISABLE in demo mode (by service)
-# All other laws will be enabled by default
-# This list drives the FEATURE_LAW_* environment variable settings
-DEMO_DISABLED_LAWS = {
-    "BELASTINGDIENST": [
-        "zorgverzekeringswet/bijdrage",  # Disable inkomensafhankelijke bijdrage
-    ],
-    "PENSIOENFONDS": [
-        "pensioenwet",  # Pensioenuitkering
-    ],
-    "SVB": [
-        "algemene_kinderbijslagwet",  # Kinderbijslag gegevens
-        "algemene_nabestaandenwet",  # Anw-uitkering
-        "algemene_ouderdomswet/leeftijdsbepaling",  # AOW leeftijdsbepaling
-        "algemene_ouderdomswet_gegevens",  # AOW gegevens
-        "participatiewet/aio",  # AIO-aanvulling
-    ],
-    "TOESLAGEN": [
-        "wet_kinderopvang",  # Kinderopvangtoeslag uit, maar huurtoeslag aan
-    ],
-}
-
+# Per-profile disabled laws are now configured in demo_profiles.py (DemoProfiles).
+# Each profile has its own "disabled_laws" dict that explicitly controls law visibility.
 
 # Demo collapse configuration per law file
 DEMO_COLLAPSE_CONFIG = {
@@ -121,6 +101,85 @@ DEMO_COLLAPSE_CONFIG = {
         ],
         "collapse_all_except_expanded": True,
     },
+    # Alcoholwet - Collapse most sections, show only key info
+    "alcoholwet/vergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    "alcoholwet/vergunning/VWS-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # Exploitatievergunning - Collapse most sections
+    "algemene_plaatselijke_verordening/exploitatievergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # Terrasvergunning - Collapse most sections
+    "algemene_plaatselijke_verordening/terrassen/GEMEENTE_ROTTERDAM-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # Geluidsontheffing - Collapse most sections
+    "algemene_plaatselijke_verordening/ontheffingspas_geluid/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # Informatieplicht Energiebesparing - Show properties and output
+    "omgevingswet/energiebesparing/informatieplicht/RVO-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # HACCP Voedselveiligheid - Show properties and output
+    "warenwet/haccp/NVWA-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # CBS Statistiekverplichting - Show properties and output
+    "wet_op_het_centraal_bureau_voor_de_statistiek/enquete/CBS-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # KVK Jaarrekening Deponeringsplicht - Show properties and output
+    "handelsregisterwet/jaarrekening/KVK-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # NVWA Meldplicht Voedselveiligheidsincident - Show properties and output
+    "warenwet/meldplicht/NVWA-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
 }
 
 
@@ -173,18 +232,16 @@ def should_expand_in_demo_mode(law_path: str, item_path: str) -> bool:
     return False
 
 
-def configure_demo_feature_flags():
+def configure_demo_feature_flags() -> None:
     """
-    Configure feature flags for demo mode based on DEMO_DISABLED_LAWS.
+    Configure feature flags for demo mode based on the active profile.
 
-    This sets FEATURE_LAW_* environment variables to disable specific laws.
-    Should be called once at application startup when in demo mode.
+    Delegates to DemoProfiles.apply_feature_flags() which handles both
+    general feature flags and per-profile law visibility.
     """
-    from web.feature_flags import FeatureFlags
+    from web.demo_profiles import DemoProfiles
 
-    for service, disabled_laws in DEMO_DISABLED_LAWS.items():
-        for law in disabled_laws:
-            FeatureFlags.disable_law(service, law)
+    DemoProfiles.apply_feature_flags()
 
 
 def is_law_enabled_in_demo(law: str, service: str) -> bool:

@@ -7,6 +7,7 @@ from fastapi.responses import HTMLResponse
 
 from explain.llm_factory import LLMFactory
 from explain.mcp_connector import MCPLawConnector
+from web.demo_profiles import get_demo_bsn
 from web.dependencies import (
     TODAY,
     get_case_manager,
@@ -261,11 +262,14 @@ manager = ChatConnectionManager()
 @router.get("/", response_class=HTMLResponse)
 async def get_chat_page(
     request: Request,
-    bsn: str = "100000001",
+    bsn: str = None,
     llm: str = Query(None, description="LLM provider to use (claude or vlam)"),
     services: EngineInterface = Depends(get_machine_service),
 ):
     """Render the chat interface page"""
+    if bsn is None:
+        bsn = get_demo_bsn()
+
     # Check if chat feature is enabled
     if not is_chat_enabled():
         return templates.TemplateResponse(
@@ -358,7 +362,7 @@ async def websocket_endpoint(
         connection_data = json.loads(data)
 
         # Get the BSN from the client_id or connection data
-        bsn = connection_data.get("bsn") or (client_id.split("_")[1] if "_" in client_id else "100000001")
+        bsn = connection_data.get("bsn") or (client_id.split("_")[1] if "_" in client_id else get_demo_bsn())
         # Get LLM provider from request or use default
         selected_provider = connection_data.get("provider") or LLMFactory.get_provider()
 

@@ -1,0 +1,60 @@
+<div>
+    {% if current_case and current_case.status == 'SUBMITTED' %}
+        {# Application submitted - show in behandeling status #}
+        <p class="text-sm text-gray-600 mb-2">Uw aanvraag voor een terrasvergunning wordt beoordeeld voor een terras van</p>
+        <div class="flex items-baseline">
+            <span class="text-4xl font-bold text-blue-600">{{ current_case.claimed_result.vergunde_oppervlakte|default(result.vergunde_oppervlakte|default(path.TERRAS_OPPERVLAKTE.result|default('') ) ) }}</span>
+            <span class="ml-1 text-lg text-gray-600">m&sup2;</span>
+        </div>
+    {% elif current_case and current_case.status == 'IN_REVIEW' %}
+        {# Application under review #}
+        <p class="text-sm text-gray-600 mb-2">Uw aanvraag voor een terrasvergunning wordt beoordeeld voor een terras van</p>
+        <div class="flex items-baseline">
+            <span class="text-4xl font-bold text-blue-600">{{ current_case.claimed_result.vergunde_oppervlakte|default(result.vergunde_oppervlakte|default('') ) }}</span>
+            <span class="ml-1 text-lg text-gray-600">m&sup2;</span>
+        </div>
+    {% elif current_case and current_case.status == 'DECIDED' and current_case.approved %}
+        {# Application approved - show toegekend status #}
+        <p class="text-sm text-gray-600 mb-2">U heeft een geldige terrasvergunning voor uw terras van</p>
+        <div class="flex items-baseline">
+            <span class="text-4xl font-bold text-green-600">{{ current_case.claimed_result.vergunde_oppervlakte|default(result.vergunde_oppervlakte|default('') ) }}</span>
+            <span class="ml-1 text-lg text-gray-600">m&sup2;</span>
+            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
+                    hx-target="#shared-application-panel"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                waarom?
+            </button>
+        </div>
+    {% elif missing_required %}
+        {# Missing required data - same text as base_tile #}
+        <h4 class="text-sm font-medium text-gray-500 mb-1">
+            Om te weten of u in aanmerking komt zijn extra gegevens nodig. Die kunt u hier aanleveren.
+        </h4>
+    {% elif result.heeft_recht_op_terrasvergunning %}
+        {# Requirements met - show eligible status #}
+        <p class="text-sm text-gray-600 mb-2">U komt waarschijnlijk in aanmerking voor een terrasvergunning van</p>
+        <div class="flex items-baseline">
+            <span class="text-4xl font-bold text-green-600">{{ result.vergunde_oppervlakte|default(path.TERRAS_OPPERVLAKTE.result|default('') ) }}</span>
+            <span class="ml-1 text-lg text-gray-600">m&sup2;</span>
+            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
+                    hx-target="#shared-application-panel"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                waarom?
+            </button>
+        </div>
+    {% else %}
+        {# Not eligible #}
+        <h4 class="text-sm font-medium text-gray-500 mb-1">
+            U komt waarschijnlijk niet in aanmerking voor een terrasvergunning.
+            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
+                    hx-target="#shared-application-panel"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                waarom?
+            </button>
+        </h4>
+        {% if result.weigeringsgrond %}<p class="text-sm text-gray-600">{{ result.weigeringsgrond }}</p>{% endif %}
+    {% endif %}
+</div>

@@ -262,13 +262,70 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                                 </span>
                                             </div>
                                         </div>
-                                        <div class="mt-3 grid grid-cols-2 gap-4 text-sm">
-                                            <div>
-                                                <p class="text-gray-600">Nieuwe waarde</p>
-                                                <p>{{ claim.new_value | format_value }}</p>
-                                            </div>
+                                        <div class="mt-3 text-sm">
+                                            {% if claim.old_value is sequence and claim.old_value is not string %}
+                                                {# Array values - show as list with additions/removals highlighted #}
+                                                <div class="bg-white rounded p-3 border border-gray-200">
+                                                    <p class="text-gray-600 font-medium mb-2">Wijziging:</p>
+                                                    <ul class="space-y-1">
+                                                        {# Show items that stay the same #}
+                                                        {% for item in claim.old_value %}
+                                                            {% if item in claim.new_value %}
+                                                                <li class="flex items-center text-gray-700">
+                                                                    <span class="w-5 h-5 mr-2 text-gray-400">•</span>
+                                                                    {{ item }}
+                                                                </li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        {# Show items that are removed (in old but not in new) #}
+                                                        {% for item in claim.old_value %}
+                                                            {% if item not in claim.new_value %}
+                                                                <li class="flex items-center text-red-700 font-medium">
+                                                                    <svg class="w-5 h-5 mr-2 text-red-500"
+                                                                         fill="none"
+                                                                         stroke="currentColor"
+                                                                         viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                    </svg>
+                                                                    <span class="line-through">{{ item }}</span>
+                                                                    <span class="ml-2 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded">intrekken</span>
+                                                                </li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        {# Show items that are added (in new but not in old) #}
+                                                        {% for item in claim.new_value %}
+                                                            {% if item not in claim.old_value %}
+                                                                <li class="flex items-center text-green-700 font-medium">
+                                                                    <svg class="w-5 h-5 mr-2 text-green-500"
+                                                                         fill="none"
+                                                                         stroke="currentColor"
+                                                                         viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                                    </svg>
+                                                                    {{ item }}
+                                                                    <span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">toevoegen</span>
+                                                                </li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %}
+                                                {# Non-array values - show old/new side by side #}
+                                                <div class="grid grid-cols-2 gap-4">
+                                                    {% if claim.old_value is not none %}
+                                                        <div>
+                                                            <p class="text-gray-600">Oude waarde</p>
+                                                            <p>{{ claim.old_value | format_value }}</p>
+                                                        </div>
+                                                    {% endif %}
+                                                    <div>
+                                                        <p class="text-gray-600">Nieuwe waarde</p>
+                                                        <p>{{ claim.new_value | format_value }}</p>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
                                             {% if claim.status == 'APPROVED' %}
-                                                <div>
+                                                <div class="mt-2">
                                                     <p class="text-gray-600">Geverifieerde waarde</p>
                                                     <p>{{ claim.verified_value | format_value }}</p>
                                                 </div>

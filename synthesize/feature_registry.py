@@ -183,6 +183,113 @@ FEATURE_REGISTRY: list[FeatureSpec] = [
         laws=["kinderopvangtoeslag"],
         is_grouping=True,
     ),
+    # --- Business / ondernemer features ---
+    FeatureSpec(
+        sim_column="leeftijd_leidinggevende",
+        display_name="Leeftijd leidinggevende",
+        yaml_inputs=["LEEFTIJD_LEIDINGGEVENDE"],
+        laws=["alcoholwet"],
+        is_continuous=True,
+        discretize_laws=["alcoholwet"],
+    ),
+    FeatureSpec(
+        sim_column="vloeroppervlakte",
+        display_name="Vloeroppervlakte (m²)",
+        yaml_inputs=["VLOEROPPERVLAKTE"],
+        laws=["alcoholwet", "haccp", "precariobelasting"],
+        is_continuous=True,
+        discretize_laws=["alcoholwet"],
+    ),
+    FeatureSpec(
+        sim_column="type_bedrijf_horeca",
+        display_name="Horecabedrijf",
+        yaml_inputs=["TYPE_BEDRIJF"],
+        laws=["alcoholwet"],
+        is_grouping=True,
+    ),
+    FeatureSpec(
+        sim_column="is_onder_curatele",
+        display_name="Onder curatele",
+        yaml_inputs=["IS_ONDER_CURATELE"],
+        laws=["alcoholwet"],
+        is_grouping=True,
+    ),
+    FeatureSpec(
+        sim_column="sbi_is_food",
+        display_name="SBI-code levensmiddelen",
+        yaml_inputs=["SBI_CODE"],
+        laws=["haccp", "nvwa_meldplicht"],
+        is_grouping=True,
+    ),
+    FeatureSpec(
+        sim_column="bereidt_of_serveert_voedsel",
+        display_name="Bereidt/serveert voedsel",
+        yaml_inputs=["BEREIDT_OF_SERVEERT_VOEDSEL"],
+        laws=["haccp", "nvwa_meldplicht"],
+        is_grouping=True,
+    ),
+    FeatureSpec(
+        sim_column="jaarlijks_elektriciteitsverbruik_kwh",
+        display_name="Elektriciteitsverbruik (kWh/jaar)",
+        yaml_inputs=["JAARLIJKS_ELEKTRICITEITSVERBRUIK"],
+        laws=["energie_informatieplicht"],
+        is_continuous=True,
+        discretize_laws=["energie_informatieplicht"],
+    ),
+    FeatureSpec(
+        sim_column="jaarlijks_gasverbruik_m3",
+        display_name="Gasverbruik (m³/jaar)",
+        yaml_inputs=["JAARLIJKS_GASVERBRUIK"],
+        laws=["energie_informatieplicht"],
+        is_continuous=True,
+        discretize_laws=["energie_informatieplicht"],
+    ),
+    FeatureSpec(
+        sim_column="is_woonfunctie",
+        display_name="Woonfunctie",
+        yaml_inputs=["IS_WOONFUNCTIE"],
+        laws=["energie_informatieplicht"],
+        is_grouping=True,
+    ),
+    # --- CBS Enquete ---
+    FeatureSpec(
+        sim_column="is_geselecteerd_cbs_enquete",
+        display_name="Geselecteerd voor CBS-enquête",
+        yaml_inputs=["IS_GESELECTEERD_CBS_ENQUETE"],
+        laws=["cbs_enquete"],
+        is_grouping=True,
+    ),
+    # --- KVK Jaarrekening ---
+    FeatureSpec(
+        sim_column="rechtsvorm_vereist_jaarrekening",
+        display_name="Rechtsvorm vereist jaarrekening",
+        yaml_inputs=["RECHTSVORM"],
+        laws=["kvk_jaarrekening"],
+        is_grouping=True,
+    ),
+    # --- NVWA Meldplicht ---
+    FeatureSpec(
+        sim_column="heeft_actief_incident",
+        display_name="Actief voedselincident",
+        yaml_inputs=["HEEFT_ACTIEF_INCIDENT"],
+        laws=["nvwa_meldplicht"],
+        is_grouping=True,
+    ),
+    # --- Precariobelasting ---
+    FeatureSpec(
+        sim_column="terras_oppervlakte",
+        display_name="Terrasoppervlakte (m²)",
+        yaml_inputs=["TERRAS_OPPERVLAKTE"],
+        laws=["precariobelasting"],
+        is_continuous=True,
+    ),
+    FeatureSpec(
+        sim_column="has_terrace",
+        display_name="Heeft terras",
+        yaml_inputs=["HEEFT_TERRAS"],
+        laws=["precariobelasting"],
+        is_grouping=True,
+    ),
 ]
 
 
@@ -197,19 +304,26 @@ def get_grouping_features_for_laws(selected_laws: list[str]) -> list[str]:
     return [f.sim_column for f in features if f.is_grouping]
 
 
-def get_continuous_features_for_laws(selected_laws: list[str]) -> list[str]:
+def get_continuous_features_for_laws(
+    selected_laws: list[str],
+    exclude_primary: str = "income",
+) -> list[str]:
     """Get continuous feature column names eligible for auto-discretization.
 
     Only returns features that have explicit discretize_laws matching
     the selected laws. This prevents spurious splits (e.g. age split
     at 55 when only zorgtoeslag/huurtoeslag are selected).
+
+    Args:
+        selected_laws: Laws to get features for.
+        exclude_primary: Primary feature to exclude (used as X-axis in bracket model).
     """
     features = get_features_for_laws(selected_laws)
     return [
         f.sim_column
         for f in features
         if f.is_continuous
-        and f.sim_column != "income"
+        and f.sim_column != exclude_primary
         and f.discretize_laws
         and any(law in f.discretize_laws for law in selected_laws)
     ]
