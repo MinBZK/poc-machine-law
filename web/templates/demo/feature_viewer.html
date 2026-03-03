@@ -5,11 +5,11 @@
         <!-- Sidebar with feature list -->
         <aside class="demo-sidebar">
             <div class="sidebar-header">
-                <h2>Feature Files</h2>
+                <h2>{{ t.feature_files if t else 'Feature Files' }}</h2>
                 <input type="text"
                        id="feature-search"
                        class="law-search"
-                       placeholder="Zoek features...">
+                       placeholder="{{ t.feature_search_placeholder if t else 'Zoek features...' }}">
             </div>
             <div class="law-list" id="feature-list">
                 {% for directory, features in grouped_features.items() %}
@@ -39,8 +39,12 @@
             <div class="feature-viewer">
                 <!-- Toolbar -->
                 <div class="feature-toolbar">
-                    <button class="btn btn-secondary" onclick="expandAllScenarios()">Alles uitklappen</button>
-                    <button class="btn btn-secondary" onclick="collapseAllScenarios()">Alles inklappen</button>
+                    <button class="btn btn-secondary" onclick="expandAllScenarios()">
+                        {{ t.feature_expand_all if t else 'Alles uitklappen' }}
+                    </button>
+                    <button class="btn btn-secondary" onclick="collapseAllScenarios()">
+                        {{ t.feature_collapse_all if t else 'Alles inklappen' }}
+                    </button>
                     <span class="scenario-status" id="scenario-status"></span>
                 </div>
                 <!-- Gherkin content -->
@@ -50,11 +54,13 @@
         <!-- Output panel -->
         <aside class="output-panel">
             <div class="output-header">
-                <h3>Test Output</h3>
-                <button class="btn btn-small" onclick="clearOutput()">Wissen</button>
+                <h3>{{ t.feature_test_output if t else 'Test Output' }}</h3>
+                <button class="btn btn-small" onclick="clearOutput()">{{ t.feature_clear if t else 'Wissen' }}</button>
             </div>
             <div class="output-content" id="output-content">
-                <div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>
+                <div class="output-placeholder">
+                    {{ t.feature_output_placeholder if t else 'Run a scenario to see output here...' }}
+                </div>
             </div>
         </aside>
     </div>
@@ -170,15 +176,15 @@ async function pollForOutput() {
         // Update status
         const statusEl = document.getElementById('scenario-status');
         if (data.status === 'completed') {
-            statusEl.textContent = '✅ Geslaagd';
+            statusEl.textContent = '✅ Passed';
             statusEl.className = 'scenario-status passed';
             clearInterval(pollInterval);
         } else if (data.status === 'failed') {
-            statusEl.textContent = '❌ Mislukt';
+            statusEl.textContent = '❌ Failed';
             statusEl.className = 'scenario-status failed';
             clearInterval(pollInterval);
         } else {
-            statusEl.textContent = '⏳ Bezig...';
+            statusEl.textContent = '⏳ Running...';
             statusEl.className = 'scenario-status running';
         }
 

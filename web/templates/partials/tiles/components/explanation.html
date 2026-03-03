@@ -65,7 +65,7 @@
                 <p>{{ explanation|safe }}</p>
                 {% if current_provider %}
                     <div class="mt-2 text-xs text-gray-400 flex items-center">
-                        <span>Gegenereerd door {{ current_provider|capitalize }}</span>
+                        <span>{{ t.explanation_generated_by if t else 'Gegenereerd door' }} {{ current_provider|capitalize }}</span>
                     </div>
                 {% endif %}
             </div>

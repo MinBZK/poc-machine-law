@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from simulate import LawSimulator
+from web.demo.translations import get_lang, get_translations
 from web.dependencies import is_demo_mode, templates
 from web.law_parameters import get_default_law_parameters_subprocess
 
@@ -48,6 +49,9 @@ async def debug_law_params():
 @router.get("/")
 async def simulation_page(request: Request):
     """Render the simulation configuration page"""
+    lang = get_lang(request)
+    t = get_translations(lang)
+
     # Get default values via subprocess (avoids Services initialization conflicts)
     # This will have all auto-discovered parameters with their default values
     law_params = get_default_law_parameters_subprocess()
@@ -98,6 +102,8 @@ async def simulation_page(request: Request):
             "law_params": law_params,
             "all_profiles": {},  # Empty dict for compatibility with base template
             "demo_mode": is_demo_mode(request),
+            "t": t,
+            "lang": lang,
         },
     )
 

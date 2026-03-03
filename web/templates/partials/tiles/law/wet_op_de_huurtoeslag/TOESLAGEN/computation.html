@@ -1,21 +1,25 @@
 <div>
     {% if result.is_gerechtigd %}
-        <h4 class="text-sm font-medium text-gray-600 mb-2">Uw huurtoeslag is waarschijnlijk</h4>
+        <h4 class="text-sm font-medium text-gray-600 mb-2">
+            {{ t.comp_your_huurtoeslag if t else 'Uw huurtoeslag is waarschijnlijk' }}
+        </h4>
         <div class="flex items-baseline">
             <span class="text-4xl font-bold text-indigo-600">{{ (result.subsidiebedrag / 100) | format_currency }}</span>
-            <span class="ml-2 text-gray-600">per maand</span>
+            <span class="ml-2 text-gray-600">{{ t.comp_per_month if t else 'per maand' }}</span>
             <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=explanation"
                     hx-target="#shared-application-panel"
                     hx-swap="innerHTML"
                     class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
-                waarom?
+                {{ t.tile_why if t else 'waarom?' }}
             </button>
         </div>
     {% elif missing_required %}
         <h4 class="text-sm font-medium text-gray-500 mb-1">
-            Om te weten of u in aanmerking komt zijn extra gegevens nodig. Die kunt u hier aanleveren.
+            {{ t.comp_provide_data_hint if t else 'Om te weten of u in aanmerking komt zijn extra gegevens nodig. Die kunt u hier aanleveren.' }}
         </h4>
     {% else %}
-        <h4 class="text-sm font-medium text-gray-500 mb-1">U krijgt waarschijnlijk geen huurtoeslag.</h4>
+        <h4 class="text-sm font-medium text-gray-500 mb-1">
+            {{ t.comp_no_huurtoeslag if t else 'U krijgt waarschijnlijk geen huurtoeslag.' }}
+        </h4>
     {% endif %}
 </div>

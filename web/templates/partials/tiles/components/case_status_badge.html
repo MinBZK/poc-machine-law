@@ -1,16 +1,16 @@
 <div class="flex items-center space-x-3">
-    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if current_case.status == 'SUBMITTED' %} bg-blue-100 text-blue-800">Ingediend
+    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if current_case.status == 'SUBMITTED' %} bg-blue-100 text-blue-800">{{ t.badge_submitted if t else 'Ingediend' }}
     {% elif current_case.status == 'IN_REVIEW' %}
-        bg-yellow-100 text-yellow-800">In behandeling
+        bg-yellow-100 text-yellow-800">{{ t.badge_in_review if t else 'In behandeling' }}
     {% elif current_case.status == 'DECIDED' and current_case.approved and not hide_toegekend_badge %}
-        bg-green-100 text-green-800">Toegekend
+        bg-green-100 text-green-800">{{ t.badge_granted if t else 'Toegekend' }}
     {% elif current_case.status == 'DECIDED' and not current_case.approved %}
-        bg-red-100 text-red-800">Afgewezen
+        bg-red-100 text-red-800">{{ t.badge_rejected if t else 'Afgewezen' }}
     {% elif current_case.status == 'OBJECTED' %}
-        bg-purple-100 text-purple-800">In bezwaar gegaan
+        bg-purple-100 text-purple-800">{{ t.badge_objected if t else 'In bezwaar gegaan' }}
     {% endif %}
 </span>
 {% if current_case.modified_on %}
-    <span class="text-sm text-gray-400">laatste wijziging {{ current_case.modified_on.strftime("%-d %B %Y") }}</span>
+    <span class="text-sm text-gray-400">{{ t.badge_last_modified if t else 'laatste wijziging' }} {{ current_case.modified_on.strftime("%-d %B %Y") }}</span>
 {% endif %}
 </div>

@@ -4,10 +4,10 @@
         <!-- Left Panel: Parameters -->
         <div class="w-1/3 bg-white shadow-lg p-6 overflow-y-auto flex-shrink-0">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-gray-900">Simulatie Parameters</h2>
+                <h2 class="text-2xl font-bold text-gray-900">{{ t.sim_parameters if t else 'Simulatie Parameters' }}</h2>
                 <button onclick="showKeyboardHelp()"
                         class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
-                        title="Sneltoetsen (?)">
+                        title="{{ t.sim_shortcuts if t else 'Sneltoetsen (?)' }}">
                     <svg class="w-3.5 h-3.5"
                          fill="none"
                          stroke="currentColor"
@@ -31,9 +31,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                 </path>
                             </svg>
-                            Wetgeving
+                            {{ t.sim_legislation if t else 'Wetgeving' }}
                         </h2>
-                        <p class="text-sm text-gray-600 mt-1 ml-8">Pas de parameters van wetten en regelingen aan</p>
+                        <p class="text-sm text-gray-600 mt-1 ml-8">
+                            {{ t.sim_legislation_desc if t else 'Pas de parameters van wetten en regelingen aan' }}
+                        </p>
                     </div>
                     <div class="p-4 space-y-4">
                         <!-- Law Parameters - Collapsible -->
@@ -41,7 +43,7 @@
                             <button type="button"
                                     onclick="toggleSection('law-parameters-section')"
                                     class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                                <h3 class="text-base font-medium text-gray-900">Parameters van Wetgeving</h3>
+                                <h3 class="text-base font-medium text-gray-900">{{ t.sim_law_parameters if t else 'Parameters van Wetgeving' }}</h3>
                                 <svg id="law-parameters-section-chevron"
                                      class="w-5 h-5 text-gray-500 transform transition-transform"
                                      fill="none"
@@ -113,7 +115,7 @@
                             <button type="button"
                                     onclick="toggleSection('config-section')"
                                     class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                                <h3 class="text-base font-medium text-gray-900">Eigen Configuraties</h3>
+                                <h3 class="text-base font-medium text-gray-900">{{ t.sim_custom_configs if t else 'Eigen Configuraties' }}</h3>
                                 <svg id="config-section-chevron"
                                      class="w-5 h-5 text-gray-500 transform transition-transform"
                                      fill="none"
@@ -124,7 +126,7 @@
                             </button>
                             <div id="config-section" class="px-4 pb-4 hidden">
                                 <p class="text-sm text-gray-600 mb-3 mt-3">
-                                    Sla je huidige configuratie op om later te hergebruiken, of laad een eerder opgeslagen configuratie.
+                                    {{ t.sim_custom_configs_desc if t else 'Sla je huidige configuratie op om later te hergebruiken, of laad een eerder opgeslagen configuratie.' }}
                                 </p>
                                 <div class="flex items-center space-x-3">
                                     <button type="button"
@@ -137,7 +139,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2">
                                             </path>
                                         </svg>
-                                        Configuratie opslaan
+                                        {{ t.sim_save_config if t else 'Configuratie opslaan' }}
                                     </button>
                                     <button type="button"
                                             onclick="loadConfiguration()"
@@ -149,7 +151,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
                                             </path>
                                         </svg>
-                                        Configuratie laden
+                                        {{ t.sim_load_config if t else 'Configuratie laden' }}
                                     </button>
                                 </div>
                                 <div class="mt-4">
@@ -173,7 +175,7 @@
                          fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
                     </svg>
-                    Nieuwe Simulatie
+                    {{ t.sim_new_simulation if t else 'Nieuwe Simulatie' }}
                 </button>
                 <button type="button"
                         id="compare-button"
@@ -186,7 +188,7 @@
                          stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
-                    Vergelijk Simulaties
+                    {{ t.sim_compare_simulations if t else 'Vergelijk Simulaties' }}
                 </button>
             </div>
         </div>
@@ -197,7 +199,9 @@
                 <div class="flex items-start" id="tab-bar">
                     <!-- Tabs will be dynamically added here -->
                     <div id="initial-tab" class="py-4 px-4 text-gray-500">
-                        <p class="text-sm">Configureer de parameters en klik op "Nieuwe Simulatie" om te beginnen</p>
+                        <p class="text-sm">
+                            {{ t.sim_start_hint if t else 'Configureer de parameters en klik op "Nieuwe Simulatie" om te beginnen' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -211,13 +215,16 @@
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
-                        <h3 class="mt-4 text-lg font-medium text-gray-900">Machine Law Simulator</h3>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">{{ t.sim_title if t else 'Machine Law Simulator' }}</h3>
                         <p class="mt-2 text-sm text-gray-600">
-                            Deze simulator genereert een populatie met realistische demografische kenmerken en berekent voor elke persoon
-                            de toepassing van alle beschikbare wetten.
+                            {{ t.sim_description if t else 'Deze simulator genereert een populatie met realistische demografische kenmerken en berekent voor elke persoon de toepassing van alle beschikbare wetten.' }}
                         </p>
-                        <p class="mt-2 text-sm text-gray-600">U kunt de parameters aanpassen om verschillende scenario's te testen.</p>
-                        <p class="mt-6 text-base text-gray-700 font-medium">Klik op "Nieuwe Simulatie" hier links om te beginnen</p>
+                        <p class="mt-2 text-sm text-gray-600">
+                            {{ t.sim_description_2 if t else 'U kunt de parameters aanpassen om verschillende scenario\'s te testen.' }}
+                        </p>
+                        <p class="mt-6 text-base text-gray-700 font-medium">
+                            {{ t.sim_start_hint_2 if t else 'Klik op "Nieuwe Simulatie" hier links om te beginnen' }}
+                        </p>
                     </div>
                 </div>
             </div>
