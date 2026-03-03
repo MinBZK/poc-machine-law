@@ -9,6 +9,7 @@ from starlette.responses import RedirectResponse
 from explain.llm_factory import LLMFactory
 from machine.utils import RuleResolver
 from web.config_loader import ConfigLoader
+from web.demo.translations import get_lang, get_translations
 from web.demo_profiles import DemoProfiles
 from web.dependencies import (
     get_case_manager,
@@ -349,6 +350,9 @@ async def admin_dashboard(
     case_manager: CaseManagerInterface = Depends(get_case_manager),
 ):
     """Main admin dashboard view"""
+    lang = get_lang(request)
+    t = get_translations(lang)
+
     all_laws = rule_resolver.get_service_laws()
     available_services = list(all_laws.keys())
 
@@ -371,6 +375,8 @@ async def admin_dashboard(
             "service_laws": service_laws,
             "service_cases": service_cases,
             "demo_mode": is_demo_mode(request),
+            "t": t,
+            "lang": lang,
         },
     )
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ lang or 'nl' }}">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +31,7 @@
                                         </svg>
                                     </div>
                                     <div class="ml-3">
-                                        <h3 class="text-sm font-medium text-red-800">Fout opgetreden</h3>
+                                        <h3 class="text-sm font-medium text-red-800">{{ t.error_occurred if t else 'Fout opgetreden' }}</h3>
                                         <div class="mt-2 text-sm text-red-700">
                                             <p>{{ error_message }}</p>
                                             {% if error_details %}<p class="mt-2">{{ error_details }}</p>{% endif %}
@@ -43,16 +43,18 @@
                         <div class="flex flex-col space-y-3">
                             <button onclick="window.location.reload()"
                                     class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
-                                Probeer opnieuw
+                                {{ t.error_retry if t else 'Probeer opnieuw' }}
                             </button>
                             <a href="/"
                                class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Terug naar hoofdpagina
+                                {{ t.error_back_home if t else 'Terug naar hoofdpagina' }}
                             </a>
                         </div>
                         {% if bsn %}
                             <div class="text-center">
-                                <p class="text-sm text-gray-500">Problemen met BSN: {{ bsn }}</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ t.error_bsn_problems|replace('{bsn}', bsn) if t else 'Problemen met BSN: ' ~ bsn }}
+                                </p>
                             </div>
                         {% endif %}
                     </div>
