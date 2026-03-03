@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ lang or 'nl' }}">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,17 +21,17 @@
             <!-- Header -->
             <header class="demo-header">
                 <div class="demo-brand">
-                    <h1>RegelRecht Demo Mode</h1>
-                    <p class="demo-subtitle">Machine-uitvoerbaar Nederlands recht</p>
+                    <h1>{{ t.brand_title if t else 'RegelRecht Demo Mode' }}</h1>
+                    <p class="demo-subtitle">{{ t.brand_subtitle if t else 'Machine-uitvoerbaar Nederlands recht' }}</p>
                 </div>
                 <nav class="demo-nav">
                     <a href="/demo"
-                       class="nav-link {% if active_tab == 'laws' %}active{% endif %}">Wetten</a>
-                    <a href="/analysis/graph/" class="nav-link">Graaf analyse</a>
+                       class="nav-link {% if active_tab == 'laws' %}active{% endif %}">{{ t.nav_laws if t else 'Wetten' }}</a>
+                    <a href="/analysis/graph/" class="nav-link">{{ t.nav_graph if t else 'Graaf analyse' }}</a>
                     <a href="/demo/features"
-                       class="nav-link {% if active_tab == 'features' %}active{% endif %}">Features</a>
-                    <a href="/simulation" class="nav-link">Simulatie</a>
-                    <a href="/" class="nav-link">Overheid.nl</a>
+                       class="nav-link {% if active_tab == 'features' %}active{% endif %}">{{ t.nav_features if t else 'Features' }}</a>
+                    <a href="/simulation" class="nav-link">{{ t.nav_simulation if t else 'Simulatie' }}</a>
+                    <a href="/" class="nav-link">{{ t.nav_overheidnl if t else 'Overheid.nl' }}</a>
                 </nav>
             </header>
             <!-- Main Content -->

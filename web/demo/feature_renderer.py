@@ -3,6 +3,8 @@
 import html
 from typing import Any
 
+from web.demo.translations import t as translate
+
 # Dutch translations for Gherkin keywords
 KEYWORD_TRANSLATIONS = {
     "Feature:": "Functionaliteit:",
@@ -29,13 +31,14 @@ def translate_keyword(keyword: str) -> str:
     return KEYWORD_TRANSLATIONS.get(keyword, keyword)
 
 
-def render_feature_to_html(parsed_feature: dict[str, Any]) -> str:
+def render_feature_to_html(parsed_feature: dict[str, Any], lang: str = "nl") -> str:
     """
     Render parsed Gherkin feature to HTML with syntax highlighting.
     Filters out scenarios tagged with @ui or @browser.
 
     Args:
         parsed_feature: Parsed feature dict from feature_parser
+        lang: Language code for UI strings ('nl' or 'en')
 
     Returns:
         HTML string with collapsible scenarios and syntax highlighting
@@ -82,25 +85,27 @@ def render_feature_to_html(parsed_feature: dict[str, Any]) -> str:
     ]
 
     for idx, scenario in runnable_scenarios:
-        html_parts.append(render_scenario(scenario, idx))
+        html_parts.append(render_scenario(scenario, idx, lang=lang))
 
     # Show message if scenarios were filtered
     filtered_count = len(scenarios) - len(runnable_scenarios)
     if filtered_count > 0:
+        notice_text = translate("feature_hidden_notice", lang, n=filtered_count)
         html_parts.append('<div class="gherkin-filtered-notice">')
-        html_parts.append(f"  <em>Let op: {filtered_count} scenario(s) verborgen (vereisen browser/UI setup)</em>")
+        html_parts.append(f"  <em>{html.escape(notice_text)}</em>")
         html_parts.append("</div>")
 
     html_parts.append("</div>")
     return "\n".join(html_parts)
 
 
-def render_scenario(scenario: dict[str, Any], index: int) -> str:
+def render_scenario(scenario: dict[str, Any], index: int, lang: str = "nl") -> str:
     """Render a single scenario with collapse functionality."""
     html_parts = []
 
     scenario_type = "Scenario Outline:" if scenario.get("type") == "outline" else "Scenario:"
     translated_type = translate_keyword(scenario_type)
+    run_label = translate("feature_run", lang)
 
     html_parts.append(f'<div class="gherkin-scenario collapsed" data-scenario-index="{index}">')
 
@@ -110,7 +115,7 @@ def render_scenario(scenario: dict[str, Any], index: int) -> str:
     html_parts.append(f'    <span class="gherkin-keyword">{translated_type}</span>')
     html_parts.append(f'    <span class="gherkin-name">{html.escape(scenario["name"])}</span>')
     html_parts.append(
-        f'    <button class="btn-run" onclick="event.stopPropagation(); runScenario(\'{index}\')">Uitvoeren ▶</button>'
+        f'    <button class="btn-run" onclick="event.stopPropagation(); runScenario(\'{index}\')">{html.escape(run_label)}</button>'
     )
     html_parts.append("  </div>")
 

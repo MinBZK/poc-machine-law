@@ -1,15 +1,15 @@
 {% extends "demo/base.html" %}
-{% block title %}Feature Files - Machine Law Demo{% endblock %}
+{% block title %}{{ t.features_list_title if t else 'Feature Files' }} - Machine Law Demo{% endblock %}
 {% block content %}
     <div class="demo-layout">
         <!-- Sidebar -->
         <aside class="demo-sidebar">
             <div class="sidebar-header">
-                <h2>Feature Files</h2>
+                <h2>{{ t.feature_files if t else 'Feature Files' }}</h2>
                 <input type="text"
                        id="feature-search"
                        class="law-search"
-                       placeholder="Zoek features...">
+                       placeholder="{{ t.feature_search_placeholder if t else 'Zoek features...' }}">
             </div>
             <div class="law-list" id="feature-list">
                 {% for directory, features in grouped_features.items() %}
@@ -36,8 +36,10 @@
         <!-- Main content -->
         <main class="demo-content">
             <div class="feature-intro">
-                <h1>Feature Files</h1>
-                <p>Selecteer een feature bestand uit de zijbalk om scenario's te bekijken en uit te voeren.</p>
+                <h1>{{ t.features_list_title if t else 'Feature Files' }}</h1>
+                <p>
+                    {{ t.features_list_intro if t else "Selecteer een feature bestand uit de zijbalk om scenario's te bekijken en uit te voeren." }}
+                </p>
             </div>
         </main>
     </div>
