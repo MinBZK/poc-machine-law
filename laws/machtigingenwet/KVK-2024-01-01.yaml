@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.8/schema.json
 uuid: 3f8a2b1c-9d4e-4f5a-b8c7-6e1d2f3a4b5c
 name: Bepalen vertegenwoordigingsbevoegdheid namens rechtspersonen
 law: machtigingenwet
@@ -7,7 +7,8 @@ legal_character: "BESCHIKKING"
 decision_type: "ANDERE_HANDELING"
 valid_from: 2024-01-01
 service: "KVK"
-discoverable: "DELEGATION_PROVIDER"
+discoverable: "REPRESENTATION_PROVIDER"
+legal_category: "BEVOEGDHEID"
 legal_basis:
   law: "Burgerlijk Wetboek Boek 2"
   bwb_id: "BWBR0003045"
