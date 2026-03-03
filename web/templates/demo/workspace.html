@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ lang or 'nl' }}">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,10 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
         <script defer
                 src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+        <script>
+        window.__lang = localStorage.getItem('lang') || '{{ lang or "nl" }}';
+        window.__translations = {{ t | tojson }};
+        </script>
         <style>
         [x-cloak] {
             display: none !important;
@@ -41,35 +45,35 @@
                 <div class="tab"
                      :class="{ 'active': activeTab === 'presentatie' }"
                      @click="switchTab('presentatie')">
-                    <span class="tab-label">Presentatie</span>
+                    <span class="tab-label" x-text="tx('nav_presentation')"></span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'laws' }"
                      @click="switchTab('laws')">
-                    <span class="tab-label">Wetten</span>
+                    <span class="tab-label" x-text="tx('nav_laws')"></span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'graph' }"
                      @click="switchTab('graph')">
-                    <span class="tab-label">Graaf analyse</span>
+                    <span class="tab-label" x-text="tx('nav_graph')"></span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'features' }"
                      @click="switchTab('features')">
-                    <span class="tab-label">Scenarios</span>
+                    <span class="tab-label" x-text="tx('nav_scenarios')"></span>
                 </div>
                 {% if feature_flags.get('SIMULATION', True) %}
                     <div class="tab"
                          :class="{ 'active': activeTab === 'simulatie' }"
                          @click="switchTab('simulatie')">
-                        <span class="tab-label">Simulatie</span>
+                        <span class="tab-label" x-text="tx('nav_simulation')"></span>
                     </div>
                 {% endif %}
                 {% if feature_flags.get('HARMONIZE', False) %}
                     <div class="tab"
                          :class="{ 'active': activeTab === 'harmonize' }"
                          @click="switchTab('harmonize')">
-                        <span class="tab-label">Harmonisatie</span>
+                        <span class="tab-label" x-text="tx('nav_harmonize')"></span>
                     </div>
                 {% endif %}
                 <div class="tab"
@@ -80,7 +84,7 @@
                 <div class="tab"
                      :class="{ 'active': activeTab === 'zaaksysteem' }"
                      @click="switchTab('zaaksysteem')">
-                    <span class="tab-label">Zaaksysteem</span>
+                    <span class="tab-label" x-text="tx('nav_zaaksysteem')"></span>
                 </div>
                 <!-- Temporary Tabs (dismissable) -->
                 <template x-for="tab in temporaryTabs" :key="tab.id">
@@ -90,7 +94,7 @@
                         <span class="tab-label" x-text="tab.name"></span>
                         <button class="temp-tab-close"
                                 @click.stop="closeTemporaryTab(tab.id)"
-                                title="Sluiten">×</button>
+                                :title="tx('close_tab')">×</button>
                     </div>
                 </template>
                 <!-- Hamburger Menu Button -->
@@ -117,7 +121,8 @@
                 <button class="law-tabs-clear-all"
                         @click="closeAllLawTabs()"
                         x-show="openedLawTabs.length > 1"
-                        title="Alle wetten-tabs sluiten">Alles wissen</button>
+                        :title="tx('close_all_law_tabs_confirm')"
+                        x-text="tx('clear_all_law_tabs')"></button>
             </div>
             <!-- Tab Content Container -->
             <div class="tab-content-wrapper">
@@ -129,17 +134,18 @@
                         <!-- Slide 1: Title -->
                         <div class="slide" x-show="currentSlide === 0" x-cloak>
                             <div class="slide-content title-slide">
-                                <h1>RegelRecht</h1>
-                                <p class="slide-subtitle">van wet naar digitale werking</p>
+                                <h1 x-text="tx('slide_title')"></h1>
+                                <p class="slide-subtitle" x-text="tx('slide_subtitle')"></p>
                                 <div class="slide-footer">
-                                    <span x-text="new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})"></span>
+                                    <span x-text="new Date().toLocaleDateString(lang === 'en' ? 'en-GB' : 'nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})"></span>
                                     <div class="presenter-area"
                                          @dblclick="editingPresenterName = true"
-                                         title="Dubbelklik om naam te wijzigen">
+                                         :title="tx('slide_presenter_placeholder')">
                                         <span x-show="!editingPresenterName && presenterName"
                                               x-text="presenterName"></span>
                                         <span x-show="!editingPresenterName && !presenterName"
-                                              class="presenter-placeholder">[dubbelklik voor naam]</span>
+                                              class="presenter-placeholder"
+                                              x-text="tx('slide_presenter_placeholder')"></span>
                                         <input x-show="editingPresenterName"
                                                x-model="presenterName"
                                                @keydown.enter="savePresenterName()"
@@ -147,57 +153,57 @@
                                                @keydown.escape="editingPresenterName = false"
                                                x-ref="presenterInput"
                                                class="presenter-input"
-                                               placeholder="Uw naam">
+                                               :placeholder="tx('slide_presenter_input_placeholder')">
                                     </div>
-                                    <span>Bureau Architectuur, BZK</span>
+                                    <span x-text="tx('slide_org')"></span>
                                 </div>
                             </div>
                         </div>
-                        <!-- Slide 2: Nu -->
+                        <!-- Slide 2: Current Situation -->
                         <div class="slide" x-show="currentSlide === 1" x-cloak>
                             <div class="slide-content content-slide centered-content">
-                                <h2>Huidige Situatie</h2>
-                                <p>Iedere organisatie</p>
+                                <h2 x-text="tx('slide2_title')"></h2>
+                                <p x-text="tx('slide2_line1')"></p>
                                 <p>
-                                    heeft een <strong>eigen interpretatie</strong> van de wet
+                                    <span x-text="tx('slide2_line2_pre')"></span><strong x-text="tx('slide2_line2_bold')"></strong><span x-text="tx('slide2_line2_post')"></span>
                                 </p>
                                 <p>
-                                    die landt in <strong>eigen software</strong>
+                                    <span x-text="tx('slide2_line3_pre')"></span><strong x-text="tx('slide2_line3_bold')"></strong><span x-text="tx('slide2_line3_post')"></span>
                                 </p>
                             </div>
                         </div>
-                        <!-- Slide 3: Het probleem -->
+                        <!-- Slide 3: The Consequence -->
                         <div class="slide" x-show="currentSlide === 2" x-cloak>
                             <div class="slide-content content-slide centered-content">
-                                <h2>Het gevolg</h2>
-                                <p>Geen overzicht</p>
-                                <p>Onvoorspelbaar</p>
-                                <p>Onbeheersbaar</p>
+                                <h2 x-text="tx('slide3_title')"></h2>
+                                <p x-text="tx('slide3_line1')"></p>
+                                <p x-text="tx('slide3_line2')"></p>
+                                <p x-text="tx('slide3_line3')"></p>
                             </div>
                         </div>
-                        <!-- Slide 4: Wat als... -->
+                        <!-- Slide 4: What if -->
                         <div class="slide" x-show="currentSlide === 3" x-cloak>
                             <div class="slide-content content-slide centered-content">
-                                <h2>Wat als</h2>
+                                <h2 x-text="tx('slide4_title')"></h2>
                                 <p>
-                                    We <strong>beginnen met de wet</strong>
+                                    <span x-text="tx('slide4_line1_pre')"></span><strong x-text="tx('slide4_line1_bold')"></strong><span x-text="tx('slide4_line1_post')"></span>
                                 </p>
                                 <p>
-                                    Deze <strong>machine uitvoerbaar</strong> maken
+                                    <span x-text="tx('slide4_line2_pre')"></span><strong x-text="tx('slide4_line2_bold')"></strong><span x-text="tx('slide4_line2_post')"></span>
                                 </p>
                                 <p>
-                                    <strong>Openbaar</strong> publiceren
+                                    <span x-text="tx('slide4_line3_pre')"></span><strong x-text="tx('slide4_line3_bold')"></strong><span x-text="tx('slide4_line3_post')"></span>
                                 </p>
                             </div>
                         </div>
                         <!-- Slide 5: Demo -->
                         <div class="slide" x-show="currentSlide === 4" x-cloak>
                             <div class="slide-content title-slide">
-                                <h1>Demo RegelRecht</h1>
+                                <h1 x-text="tx('slide5_title')"></h1>
                                 <div class="slide-disclaimers">
-                                    <p>Proof of concept</p>
-                                    <p>Compleet verhaal, geen eindproduct</p>
-                                    <p>We maken beleid door te doen</p>
+                                    <p x-text="tx('slide5_disclaimer1')"></p>
+                                    <p x-text="tx('slide5_disclaimer2')"></p>
+                                    <p x-text="tx('slide5_disclaimer3')"></p>
                                 </div>
                             </div>
                         </div>
@@ -286,31 +292,36 @@
                  @click.away="menuOpen = false"
                  class="menu-dropdown-fixed">
                 <!-- Demo Profile Section -->
-                <div class="menu-section-title">Demo Profiel</div>
+                <div class="menu-section-title" x-text="tx('menu_demo_profile')"></div>
                 <div id="demo-profile-selector">{% include "demo/partials/demo_profile_selector.html" %}</div>
                 <div class="menu-divider"></div>
                 <!-- Feature Flags Section -->
-                <div class="menu-section-title">Feature Flags</div>
+                <div class="menu-section-title" x-text="tx('menu_feature_flags')"></div>
                 <div id="demo-feature-flags">{% include "demo/partials/feature_flags.html" %}</div>
                 <div class="menu-divider"></div>
+                <!-- Language Toggle -->
+                <button @click="toggleLanguage(); menuOpen = false" class="menu-item">
+                    <span x-text="tx('menu_language_flag') + ' ' + tx('menu_language')"></span>
+                </button>
                 <!-- Fullscreen Toggle -->
                 <button @click="toggleFullscreen(); menuOpen = false" class="menu-item">
-                    <span x-show="!isFullscreen">⛶ Volledig scherm</span>
-                    <span x-show="isFullscreen">⤓ Volledig scherm verlaten</span>
+                    <span x-show="!isFullscreen" x-text="'⛶ ' + tx('menu_fullscreen')"></span>
+                    <span x-show="isFullscreen" x-text="'⤓ ' + tx('menu_exit_fullscreen')"></span>
                 </button>
                 <!-- Dark Mode Toggle -->
                 <button @click="toggleTheme(); menuOpen = false" class="menu-item">
-                    <span x-show="theme === 'light'">🌙 Donkere modus</span>
-                    <span x-show="theme === 'dark'">☀️ Lichte modus</span>
+                    <span x-show="theme === 'light'" x-text="'🌙 ' + tx('menu_dark_mode')"></span>
+                    <span x-show="theme === 'dark'" x-text="'☀️ ' + tx('menu_light_mode')"></span>
                 </button>
                 <!-- Admin -->
                 <button @click="openTemporaryTab('Admin', '/admin/control?demo=true'); menuOpen = false"
-                        class="menu-item">⚙️ Admin</button>
+                        class="menu-item"
+                        x-text="'⚙️ ' + tx('menu_admin')"></button>
                 <div class="menu-divider"></div>
                 <!-- Reset State -->
                 <form hx-post="/admin/reset"
                       hx-trigger="submit"
-                      hx-on::after-request="var btn = event.target.querySelector('button'); btn.disabled = true; btn.innerText = 'Bezig met resetten…'; setTimeout(() => window.location.reload(), 7000)"
+                      hx-on::after-request="var btn = event.target.querySelector('button'); btn.disabled = true; btn.innerText = window.__translations.menu_resetting || 'Resetting…'; setTimeout(() => window.location.reload(), 7000)"
                       class="menu-item-form">
                     <button type="submit" class="menu-item menu-item-danger">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -321,7 +332,7 @@
                             <path d="M20 4v5h-5" />
                             </g>
                         </svg>
-                        Reset state
+                        <span x-text="tx('menu_reset_state')"></span>
                     </button>
                 </form>
                 <div class="menu-divider"></div>
@@ -402,7 +413,7 @@
 
         async function runScenario(scenarioIndex) {
             const outputContent = document.getElementById('output-content');
-            outputContent.innerHTML = '<div class="output-running">Scenario wordt uitgevoerd...</div>';
+            outputContent.innerHTML = '<div class="output-running">' + (window.__translations.status_running_scenario || 'Running scenario...') + '</div>';
 
             try {
                 const response = await fetch('/demo/feature/run-scenario', {
@@ -504,19 +515,19 @@
                 // Update status
                 const statusEl = document.getElementById('scenario-status');
                 if (data.status === 'completed') {
-                    statusEl.textContent = '✅ Geslaagd';
+                    statusEl.textContent = '✅ ' + (window.__translations.status_passed || 'Passed');
                     statusEl.className = 'scenario-status passed';
                     clearInterval(pollInterval);
                     // Scroll to top when test completes
                     outputContent.scrollTop = 0;
                 } else if (data.status === 'failed') {
-                    statusEl.textContent = '❌ Mislukt';
+                    statusEl.textContent = '❌ ' + (window.__translations.status_failed || 'Failed');
                     statusEl.className = 'scenario-status failed';
                     clearInterval(pollInterval);
                     // Scroll to top when test completes
                     outputContent.scrollTop = 0;
                 } else {
-                    statusEl.textContent = '⏳ Bezig...';
+                    statusEl.textContent = '⏳ ' + (window.__translations.status_running || 'Running...');
                     statusEl.className = 'scenario-status running';
                     // Auto-scroll to bottom while running
                     outputContent.scrollTop = outputContent.scrollHeight;
@@ -530,7 +541,7 @@
 
         async function runAllScenarios() {
             const outputContent = document.getElementById('output-content');
-            outputContent.innerHTML = '<div class="output-running">Alle scenario\'s worden uitgevoerd...</div>';
+            outputContent.innerHTML = '<div class="output-running">' + (window.__translations.status_running_all || 'Running all scenarios...') + '</div>';
 
             try {
                 const response = await fetch('/demo/run-feature', {
@@ -555,7 +566,7 @@
 
         function clearOutput() {
             document.getElementById('output-content').innerHTML =
-                '<div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>';
+                '<div class="output-placeholder">' + (window.__translations.feature_output_placeholder || 'Run a scenario to see output here...') + '</div>';
             document.getElementById('scenario-status').textContent = '';
             if (pollInterval) {
                 clearInterval(pollInterval);
@@ -586,6 +597,9 @@
                 totalSlides: 5,
                 presenterName: localStorage.getItem('presenterName') || '',
                 editingPresenterName: false,
+                // Language state
+                lang: window.__lang || 'nl',
+                translations: window.__translations || {},
 
                 init() {
                     // Initialize theme
@@ -840,6 +854,32 @@
                     this.editingPresenterName = false;
                 },
 
+                tx(key) {
+                    return this.translations[key] || key;
+                },
+
+                async toggleLanguage() {
+                    this.lang = this.lang === 'nl' ? 'en' : 'nl';
+                    localStorage.setItem('lang', this.lang);
+                    document.cookie = 'lang=' + this.lang + ';path=/;max-age=31536000';
+                    document.documentElement.lang = this.lang;
+
+                    // Fetch new translations
+                    try {
+                        const response = await fetch('/demo/api/translations/' + this.lang);
+                        this.translations = await response.json();
+                        window.__translations = this.translations;
+                        window.__lang = this.lang;
+                    } catch (e) {
+                        console.error('Failed to fetch translations:', e);
+                    }
+
+                    // Reload HTMX partials so server-rendered content also updates
+                    this.lawsLoaded = false;
+                    this.featuresLoaded = false;
+                    this.loadTabContent(this.activeTab);
+                },
+
                 switchTab(tab) {
                     this.activeTab = tab;
 
@@ -854,11 +894,17 @@
                 },
 
                 async loadTabContent(tab, url = null) {
+                    // Helper to append lang query param
+                    const addLang = (u) => {
+                        const sep = u.includes('?') ? '&' : '?';
+                        return u + sep + 'lang=' + this.lang;
+                    };
+
                     // Load laws content
                     if (tab === 'laws') {
                         if (!this.lawsLoaded || url) {
                             try {
-                                const fetchUrl = url || '/demo/workspace/laws';
+                                const fetchUrl = addLang(url || '/demo/workspace/laws');
                                 const response = await fetch(fetchUrl);
 
                                 // Get the final URL after any redirects
@@ -932,7 +978,7 @@
                     if (tab === 'features') {
                         if (!this.featuresLoaded || url) {
                             try {
-                                const fetchUrl = url || '/demo/workspace/features';
+                                const fetchUrl = addLang(url || '/demo/workspace/features');
                                 const response = await fetch(fetchUrl);
                                 this.featuresContent = await response.text();
                                 this.featuresLoaded = true;
@@ -1170,7 +1216,7 @@
                             const lawPath = href.replace('/demo/law/', '');
 
                             // Extract name from link text or use path
-                            const lawName = link.textContent.replace('→ Ga naar ', '').trim() || lawPath;
+                            const lawName = link.textContent.replace(/^→\s*(Ga naar|Go to)\s*/, '').trim() || lawPath;
 
                             // Open in new law tab (without service/law metadata for cross-refs)
                             this.openLawTab(lawPath, lawName, '', '');

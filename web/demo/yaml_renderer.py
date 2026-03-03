@@ -8,6 +8,7 @@ from typing import Any
 import yaml
 
 from web.demo.demo_config import should_expand_in_demo_mode
+from web.demo.translations import t as translate
 
 # Global context for current law path (used during rendering)
 _current_law_path: str | None = None
@@ -253,7 +254,7 @@ def get_yaml_section_priority(key: str) -> int:
     return priority_map.get(key, 100)
 
 
-def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path: str = "") -> str:
+def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path: str = "", lang: str = "nl") -> str:
     """
     Render YAML data structure to HTML with collapsible sections.
 
@@ -262,6 +263,7 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
         level: Current nesting level
         key: The key for this data element
         parent_path: Dot-separated path to parent (for demo collapse config)
+        lang: Language code for UI strings ('nl' or 'en')
 
     Returns:
         HTML string representing the YAML structure
@@ -305,9 +307,10 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
             # Add cross-law link if this is a service_reference
             if k == "service_reference" and isinstance(v, dict) and "_link" in v:
                 link_info = v["_link"]
+                goto_label = translate("law_goto", lang)
                 html_parts.append(
                     f'    <a href="/demo/law/{html.escape(link_info["target"])}" class="cross-law-link">'
-                    f"→ Ga naar {html.escape(link_info['display'])}</a>"
+                    f"\u2192 {html.escape(goto_label)} {html.escape(link_info['display'])}</a>"
                 )
 
             if not is_collapsible:
@@ -317,7 +320,7 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
 
             if is_collapsible:
                 html_parts.append('  <div class="yaml-value-content">')
-                html_parts.append(render_yaml_to_html(v, level + 1, k, current_path))
+                html_parts.append(render_yaml_to_html(v, level + 1, k, current_path, lang=lang))
                 html_parts.append("  </div>")
 
             html_parts.append("</div>")  # Close yaml-section
@@ -394,14 +397,16 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
                 html_parts.append(f'      <span class="yaml-key">{html.escape(str(label))}</span>')
                 html_parts.append("    </div>")
                 html_parts.append('    <div class="yaml-value-content">')
-                html_parts.append(f"      {render_yaml_to_html(item, level + 1, key=None, parent_path=item_path)}")
+                html_parts.append(
+                    f"      {render_yaml_to_html(item, level + 1, key=None, parent_path=item_path, lang=lang)}"
+                )
                 html_parts.append("    </div>")
                 html_parts.append("  </div>")
             else:
                 # Non-dict items: render as before (not collapsible)
                 html_parts.append('  <div class="yaml-array-item">')
                 html_parts.append('    <span class="array-bullet">-</span>')
-                html_parts.append(f"    {render_yaml_to_html(item, level + 1, parent_path=parent_path)}")
+                html_parts.append(f"    {render_yaml_to_html(item, level + 1, parent_path=parent_path, lang=lang)}")
                 html_parts.append("  </div>")
 
         html_parts.append("</div>")
