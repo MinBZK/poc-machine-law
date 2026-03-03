@@ -22,29 +22,29 @@
             <div>
                 <h3 class="font-medium text-gray-900">
                     {% if event.event_type == 'Submitted' %}
-                        Ingediend
+                        {{ t.event_submitted if t else 'Ingediend' }}
                     {% elif event.event_type == 'Reset' %}
                         Reset
                     {% elif event.event_type == 'AutomaticallyDecided' %}
-                        Automatisch besloten
+                        {{ t.event_auto_decided if t else 'Automatisch besloten' }}
                     {% elif event.event_type == 'AddedToManualReview' %}
-                        Overgezet naar handmatige beoordeling
+                        {{ t.event_manual_review if t else 'Overgezet naar handmatige beoordeling' }}
                     {% elif event.event_type == 'Decided' %}
-                        Besloten
+                        {{ t.event_decided if t else 'Besloten' }}
                     {% elif event.event_type == 'Objected' %}
-                        In bezwaar
+                        {{ t.event_objected if t else 'In bezwaar' }}
                     {% elif event.event_type == 'ObjectionStatusDetermined' %}
-                        In bezwaar gesteld
+                        {{ t.event_objection_status if t else 'In bezwaar gesteld' }}
                     {% elif event.event_type == 'ObjectionAdmissibilityDetermined' %}
-                        Bezwaar ontvankelijkheid vastgesteld
+                        {{ t.event_objection_admissibility if t else 'Bezwaar ontvankelijkheid vastgesteld' }}
                     {% elif event.event_type == 'AppealStatusDetermined' %}
-                        In beroep gesteld
+                        {{ t.event_appeal_status if t else 'In beroep gesteld' }}
                     {% elif event.event_type == 'ClaimCreated' %}
-                        Claim aangemaakt
+                        {{ t.event_claim_created if t else 'Claim aangemaakt' }}
                     {% elif event.event_type == 'ClaimApproved' %}
-                        Claim goedgekeurd
+                        {{ t.event_claim_approved if t else 'Claim goedgekeurd' }}
                     {% elif event.event_type == 'ClaimRejected' %}
-                        Claim afgewezen
+                        {{ t.event_claim_rejected if t else 'Claim afgewezen' }}
                     {% else %}
                         {{ event.event_type|title }}
                     {% endif %}
@@ -54,13 +54,13 @@
         </div>
         {% if event.data.reason %}
             <div class="mt-3">
-                <h4 class="text-sm font-medium text-gray-900 mb-1">Reden:</h4>
+                <h4 class="text-sm font-medium text-gray-900 mb-1">{{ t.event_reason if t else 'Reden:' }}</h4>
                 <p class="text-sm bg-white/75 rounded p-3">{{ event.data.reason }}</p>
             </div>
         {% endif %}
         {% if event.event_type == 'Submitted' %}
             <div class="mt-3">
-                <h4 class="text-sm font-medium text-gray-900 mb-1">Geclaimde Resultaten:</h4>
+                <h4 class="text-sm font-medium text-gray-900 mb-1">{{ t.event_claimed_results if t else 'Geclaimde Resultaten:' }}</h4>
                 <div class="bg-white/75 rounded p-3">
                     {% for key, value in event.data.claimed_result.items() %}
                         <div class="grid grid-cols-2 gap-2 text-sm">
@@ -74,18 +74,20 @@
             <div class="mt-3">
                 <div class="bg-white/75 rounded p-3 mb-3">
                     <div class="grid grid-cols-2 gap-2 text-sm">
-                        <span class="text-gray-600">Beslissing</span>
+                        <span class="text-gray-600">{{ t.event_decision if t else 'Beslissing' }}</span>
                         <span class="text-gray-900 font-medium">
                             {% if event.data.approved %}
-                                Goedgekeurd
+                                {{ t.event_approved if t else 'Goedgekeurd' }}
                             {% else %}
-                                Afgewezen
+                                {{ t.event_rejected if t else 'Afgewezen' }}
                             {% endif %}
                         </span>
                     </div>
                 </div>
                 {% if event.data.verified_result %}
-                    <h4 class="text-sm font-medium text-gray-900 mb-1">Geverifieerde Resultaten:</h4>
+                    <h4 class="text-sm font-medium text-gray-900 mb-1">
+                        {{ t.event_verified_results if t else 'Geverifieerde Resultaten:' }}
+                    </h4>
                     <div class="bg-white/75 rounded p-3">
                         {% for key, value in event.data.verified_result.items() %}
                             <div class="grid grid-cols-2 gap-2 text-sm">
@@ -98,12 +100,12 @@
             </div>
         {% elif event.event_type == 'AddedToManualReview' %}
             <div class="mt-3">
-                <h4 class="text-sm font-medium text-gray-900 mb-1">Vergelijking Resultaten:</h4>
+                <h4 class="text-sm font-medium text-gray-900 mb-1">{{ t.event_comparison if t else 'Vergelijking Resultaten:' }}</h4>
                 <div class="bg-white/75 rounded p-3">
                     <div class="grid grid-cols-3 gap-2 text-sm border-b border-gray-200 pb-2 mb-2">
-                        <span class="font-medium text-gray-900">Veld</span>
-                        <span class="font-medium text-gray-900">Geclaimd</span>
-                        <span class="font-medium text-gray-900">Geverifieerd</span>
+                        <span class="font-medium text-gray-900">{{ t.event_field if t else 'Veld' }}</span>
+                        <span class="font-medium text-gray-900">{{ t.event_claimed if t else 'Geclaimd' }}</span>
+                        <span class="font-medium text-gray-900">{{ t.event_verified if t else 'Geverifieerd' }}</span>
                     </div>
                     {% for key, value in event.data.verified_result.items() %}
                         <div class="grid grid-cols-3 gap-2 text-sm">

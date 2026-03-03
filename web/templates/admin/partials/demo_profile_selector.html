@@ -1,8 +1,8 @@
 <div class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600"
      id="demo-profile-selector">
-    <h1 class="text-gray-900 text-3xl font-semibold mb-5">Demo Profiel</h1>
+    <h1 class="text-gray-900 text-3xl font-semibold mb-5">{{ t.admin_demo_profile if t else 'Demo Profiel' }}</h1>
     <p class="mb-5">
-        Selecteer het actieve demo profiel. Dit bepaalt welke BSN, wetten en scenario's standaard worden getoond.
+        {{ t.admin_demo_profile_desc if t else 'Selecteer het actieve demo profiel. Dit bepaalt welke BSN, wetten en scenario&apos;s standaard worden getoond.' }}
     </p>
     <div class="flex space-x-4">
         {% for profile_name, profile in demo_profiles.items() %}

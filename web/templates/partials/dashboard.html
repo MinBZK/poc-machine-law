@@ -609,12 +609,12 @@
                             <button type="button"
                                     id="prev-btn"
                                     class="cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none">
-                                Terug
+                                {{ t.portal_back if t else 'Terug' }}
                             </button>
                             <button type="submit"
                                     id="next-btn"
                                     class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none">
-                                Volgende
+                                {{ t.portal_next if t else 'Volgende' }}
                             </button>
                             <button type="submit"
                                     id="submit-btn"
@@ -631,14 +631,13 @@
 <!-- Info Section -->
 <section class="mt-12 grid md:grid-cols-2 gap-8">
     <div class="bg-blue-50 rounded-lg p-6">
-        <h3 class="font-semibold text-lg mb-4">Over deze demo</h3>
+        <h3 class="font-semibold text-lg mb-4">{{ t.portal_about_demo if t else 'Over deze demo' }}</h3>
         <p class="text-gray-600">
-            Deze demo laat zien hoe wetten als code werken. De getoonde
-            profielen zijn voorbeelden uit de testscenarios.
+            {{ t.portal_about_demo_desc if t else 'Deze demo laat zien hoe wetten als code werken. De getoonde profielen zijn voorbeelden uit de testscenarios.' }}
         </p>
     </div>
     <div class="bg-gray-50 rounded-lg p-6">
-        <h3 class="font-semibold text-lg mb-4">Beschikbare regelingen</h3>
+        <h3 class="font-semibold text-lg mb-4">{{ t.portal_available_schemes if t else 'Beschikbare regelingen' }}</h3>
         <ul class="space-y-2">
             {% if active_profile_config and active_profile_config.type == 'ondernemer' %}
                 <li class="flex items-center">

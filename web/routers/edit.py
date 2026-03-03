@@ -15,6 +15,7 @@ from fastapi import (
 )
 from fastapi.responses import HTMLResponse, JSONResponse
 
+from web.demo.translations import get_lang, get_translations
 from web.dependencies import get_case_manager, get_claim_manager, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface
 from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
@@ -38,6 +39,8 @@ async def get_edit_form(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Return the edit form HTML"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     # Get all 'value' query parameters (there might be multiple for arrays)
     values = request.query_params.getlist("value")
 
@@ -100,6 +103,8 @@ async def get_edit_form(
             "show_approve": show_approve,
             "claim_data": claim_data,
             "details": parsed_details,
+            "t": t,
+            "lang": lang,
         },
     )
 
@@ -121,6 +126,8 @@ async def update_value(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Handle the value update by creating a claim"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     logger.warn(
         f"Updating value - service: {service}, law: {law}, bsn: {bsn}, "
         f"case_id: {case_id}, reason: {reason}, claimant: {claimant}"
@@ -240,6 +247,8 @@ async def update_value(
             "new_value": parsed_value,
             "claim_id": claim_id,
             "details": details,
+            "t": t,
+            "lang": lang,
         },
     )
     response.headers["HX-Trigger"] = "edit-dialog-closed"
@@ -254,6 +263,8 @@ async def reject_claim(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Handle dropping a claim by rejecting it"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     try:
         claim_manager.reject_claim(
             claim_id=claim_id,
@@ -261,7 +272,7 @@ async def reject_claim(
             rejection_reason=f"Claim dropped: {reason}",
         )
 
-        response = templates.TemplateResponse("partials/claim_dropped.html", {"request": request})
+        response = templates.TemplateResponse("partials/claim_dropped.html", {"request": request, "t": t, "lang": lang})
         response.headers["HX-Trigger"] = "edit-dialog-closed"
         return response
     except ValueError as e:
@@ -274,11 +285,15 @@ async def get_reject_claim_form(
     claim_id: str,
 ):
     """Return the drop claim form HTML"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     return templates.TemplateResponse(
         "partials/reject_claim_form.html",
         {
             "request": request,
             "claim_id": claim_id,
+            "t": t,
+            "lang": lang,
         },
     )
 
@@ -290,6 +305,8 @@ async def approve_claim(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Handle approving a claim by verifying it with its original new_value"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     try:
         claim_manager.approve_claim(
             claim_id=claim_id,
@@ -297,7 +314,9 @@ async def approve_claim(
             verified_value=None,
         )
 
-        response = templates.TemplateResponse("partials/claim_approved.html", {"request": request})
+        response = templates.TemplateResponse(
+            "partials/claim_approved.html", {"request": request, "t": t, "lang": lang}
+        )
         response.headers["HX-Trigger"] = "edit-dialog-closed"
         return response
     except ValueError as e:
@@ -316,6 +335,8 @@ async def update_missing_values(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Handle the bulk update of missing required values - multi value version"""
+    lang = get_lang(request)
+    t = get_translations(lang)
 
     # Get form data
     form_data = await request.form()
@@ -415,10 +436,12 @@ async def update_missing_values(
         "partials/edit_success.html",
         {
             "request": request,
-            "key": "Benodigde gegevens",
-            "new_value": "Bijgewerkt",
+            "key": t.get("edit_required_data", "Benodigde gegevens"),
+            "new_value": t.get("edit_updated", "Bijgewerkt"),
             "claim_id": None,
             "details": None,
+            "t": t,
+            "lang": lang,
         },
     )
     response.headers["HX-Trigger"] = "edit-dialog-closed, reload-page"

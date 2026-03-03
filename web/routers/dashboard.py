@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Depends, Request
 
+from web.demo.translations import get_lang, get_translations
 from web.dependencies import TODAY, get_machine_service, templates
 from web.engines import EngineInterface
 
@@ -78,6 +79,8 @@ async def total_net_income(
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Calculate total net income (benefits - taxes) for a citizen"""
+    lang = get_lang(request)
+    t = get_translations(lang)
 
     benefits = []
     taxes = []
@@ -162,5 +165,7 @@ async def total_net_income(
             "total_taxes_monthly_cents": total_taxes_monthly,
             "net_income_monthly_cents": net_income_monthly,
             "errors": errors,
+            "t": t,
+            "lang": lang,
         },
     )

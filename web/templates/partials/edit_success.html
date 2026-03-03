@@ -11,9 +11,9 @@
         <div class="ml-3">
             <p class="text-sm font-medium text-green-800">
                 {% if key == "Benodigde gegevens" %}
-                    Alle benodigde gegevens zijn bijgewerkt
+                    {{ t.edit_all_data_updated if t else 'Alle benodigde gegevens zijn bijgewerkt' }}
                 {% else %}
-                    Waarde succesvol bijgewerkt:
+                    {{ t.edit_value_updated if t else 'Waarde succesvol bijgewerkt:' }}
                     <span x-text="displayValue({{ new_value|tojson }})"></span>
                 {% endif %}
             </p>

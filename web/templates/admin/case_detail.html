@@ -6,7 +6,7 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
         {# Top navigation bar #}
         <div class="bg-white shadow">
             <div class="px-6 py-4 flex justify-between items-center">
-                <h1 class="text-2xl font-bold">Zaakdetails</h1>
+                <h1 class="text-2xl font-bold">{{ t.case_detail_title if t else 'Zaakdetails' }}</h1>
                 <div class="-mt-2 -mr-2">{{ org_logo(case.service) }}</div>
             </div>
         </div>
@@ -14,51 +14,49 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
             <div class="bg-white shadow rounded-lg">
                 <!-- Basisinformatie -->
                 <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4">Basisinformatie</h2>
+                    <h2 class="text-lg font-semibold mb-4">{{ t.case_basic_info if t else 'Basisinformatie' }}</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <p class="text-sm text-gray-600">Persoon</p>
+                            <p class="text-sm text-gray-600">{{ t.case_person if t else 'Persoon' }}</p>
                             <p class="font-medium">{{ person_name }}</p>
                             <p class="text-gray-500">BSN: {{ case.bsn }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Dienst</p>
+                            <p class="text-sm text-gray-600">{{ t.case_service if t else 'Dienst' }}</p>
                             <p class="font-medium">{{ case.service }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Wet</p>
+                            <p class="text-sm text-gray-600">{{ t.case_law if t else 'Wet' }}</p>
                             <p class="font-medium">{{ case.law }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Regelspecificatie</p>
+                            <p class="text-sm text-gray-600">{{ t.case_rulespec if t else 'Regelspecificatie' }}</p>
                             <p class="font-medium">{{ case.rulespec_uuid }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-1">Status</p>
+                            <p class="text-sm text-gray-600 mb-1">{{ t.case_status if t else 'Status' }}</p>
                             {% if case.status == 'SUBMITTED' %}
-                                <span class="bg-blue-100 text-blue-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Ingediend</span>
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">{{ t.case_status_submitted if t else 'Ingediend' }}</span>
                             {% elif case.status == 'DECIDED' %}
-                                <span class="bg-green-100 text-green-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Besloten</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">{{ t.case_status_decided if t else 'Besloten' }}</span>
                             {% elif case.status == 'IN_REVIEW' %}
-                                <span class="bg-yellow-100 text-yellow-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">In
-                                behandeling</span>
+                                <span class="bg-yellow-100 text-yellow-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">{{ t.case_status_in_review if t else 'In behandeling' }}</span>
                             {% elif case.status == 'OBJECTED' %}
-                                <span class="bg-red-100 text-red-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Onder bezwaar</span>
+                                <span class="bg-red-100 text-red-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">{{ t.case_status_objected if t else 'Onder bezwaar' }}</span>
                             {% else %}
                                 <span class="bg-gray-100 text-gray-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">{{
                                 case.status }}</span>
                             {% endif %}
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-1">Goedgekeurd</p>
+                            <p class="text-sm text-gray-600 mb-1">{{ t.case_approved_label if t else 'Goedgekeurd' }}</p>
                             <p class="font-medium">
                                 {% if case.approved %}
-                                    <span class="bg-green-100 text-green-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Ja</span>{%
+                                    <span class="bg-green-100 text-green-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">{{ t.case_yes if t else 'Ja' }}</span>{%
                                     elif case.approved is sameas false %}
-                                    <span class="bg-red-100 text-red-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Nee</span>
+                                    <span class="bg-red-100 text-red-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">{{ t.case_no if t else 'Nee' }}</span>
                                 {% else %}
-                                    <span class="bg-blue-100 text-blue-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Nog
-                                    niet bepaald</span>
+                                    <span class="bg-blue-100 text-blue-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">{{ t.case_not_determined if t else 'Nog niet bepaald' }}</span>
                                 {% endif %}
                             </p>
                         </div>
@@ -66,109 +64,110 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                 </div>
                 <!-- Bezwaarstatus -->
                 <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4">Bezwaarstatus</h2>
+                    <h2 class="text-lg font-semibold mb-4">{{ t.case_objection_status if t else 'Bezwaarstatus' }}</h2>
                     {% if case.objection_status %}
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <p class="text-sm text-gray-600">Bezwaar mogelijk</p>
+                                <p class="text-sm text-gray-600">{{ t.case_objection_possible if t else 'Bezwaar mogelijk' }}</p>
                                 <p class="font-medium">
                                     {% if case.objection_status.possible %}
-                                        Ja
+                                        {{ t.case_yes if t else 'Ja' }}
                                     {% else %}
-                                        Nee
+                                        {{ t.case_no if t else 'Nee' }}
                                     {% endif
                                     %}
                                 </p>
                             </div>
                             {% if case.objection_status.not_possible_reason %}
                                 <div>
-                                    <p class="text-sm text-gray-600">Reden bezwaar niet mogelijk</p>
+                                    <p class="text-sm text-gray-600">{{ t.case_objection_not_possible_reason if t else 'Reden bezwaar niet mogelijk' }}</p>
                                     <p class="font-medium">{{ case.objection_status.not_possible_reason }}</p>
                                 </div>
                             {% endif %}
                             {% if case.objection_status.objection_period %}
                                 <div>
-                                    <p class="text-sm text-gray-600">Bezwaartermijn</p>
-                                    <p class="font-medium">{{ case.objection_status.objection_period }} weken</p>
+                                    <p class="text-sm text-gray-600">{{ t.case_objection_period if t else 'Bezwaartermijn' }}</p>
+                                    <p class="font-medium">{{ case.objection_status.objection_period }} {{ t.case_weeks if t else 'weken' }}</p>
                                 </div>
                             {% endif %}
                             {% if case.objection_status.decision_period %}
                                 <div>
-                                    <p class="text-sm text-gray-600">Beslistermijn</p>
-                                    <p class="font-medium">{{ case.objection_status.decision_period }} weken</p>
+                                    <p class="text-sm text-gray-600">{{ t.case_decision_period if t else 'Beslistermijn' }}</p>
+                                    <p class="font-medium">{{ case.objection_status.decision_period }} {{ t.case_weeks if t else 'weken' }}</p>
                                 </div>
                             {% endif %}
                             {% if case.objection_status.extension_period %}
                                 <div>
-                                    <p class="text-sm text-gray-600">Verdagingstermijn</p>
-                                    <p class="font-medium">{{ case.objection_status.extension_period }} weken</p>
+                                    <p class="text-sm text-gray-600">{{ t.case_extension_period if t else 'Verdagingstermijn' }}</p>
+                                    <p class="font-medium">{{ case.objection_status.extension_period }} {{ t.case_weeks if t else 'weken' }}</p>
                                 </div>
                             {% endif %}
                         </div>
                     {% else %}
-                        <p class="text-gray-500">Bezwaarstatus wordt door de AWB bepaald als er een besluit is.</p>
+                        <p class="text-gray-500">
+                            {{ t.case_objection_determined_by_awb if t else 'Bezwaarstatus wordt door de AWB bepaald als er een besluit is.' }}
+                        </p>
                     {% endif %}
                 </div>
                 <!-- Beroepstatus -->
                 <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4">Beroepstatus</h2>
+                    <h2 class="text-lg font-semibold mb-4">{{ t.case_appeal_status if t else 'Beroepstatus' }}</h2>
                     {% if case.appeal_status %}
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <p class="text-sm text-gray-600">Beroep mogelijk</p>
+                                <p class="text-sm text-gray-600">{{ t.case_appeal_possible if t else 'Beroep mogelijk' }}</p>
                                 <p class="font-medium">
                                     {% if case.appeal_status.possible %}
-                                        Ja
+                                        {{ t.case_yes if t else 'Ja' }}
                                     {% else %}
-                                        Nee
+                                        {{ t.case_no if t else 'Nee' }}
                                     {% endif %}
                                 </p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600">Reden beroep niet mogelijk</p>
+                                <p class="text-sm text-gray-600">{{ t.case_appeal_not_possible_reason if t else 'Reden beroep niet mogelijk' }}</p>
                                 <p class="font-medium">{{ case.appeal_status.not_possible_reason }}</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600">Beroepstermijn</p>
-                                <p class="font-medium">{{ case.appeal_status.appeal_period }} weken</p>
+                                <p class="text-sm text-gray-600">{{ t.case_appeal_period if t else 'Beroepstermijn' }}</p>
+                                <p class="font-medium">{{ case.appeal_status.appeal_period }} {{ t.case_weeks if t else 'weken' }}</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600">Direct beroep mogelijk</p>
+                                <p class="text-sm text-gray-600">{{ t.case_direct_appeal if t else 'Direct beroep mogelijk' }}</p>
                                 <p class="font-medium">
                                     {% if case.appeal_status.direct_appeal %}
-                                        Ja
+                                        {{ t.case_yes if t else 'Ja' }}
                                     {% else %}
-                                        Nee {%
+                                        {{ t.case_no if t else 'Nee' }} {%
                                         endif %}
                                     </p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-600">Reden direct beroep</p>
+                                    <p class="text-sm text-gray-600">{{ t.case_direct_appeal_reason if t else 'Reden direct beroep' }}</p>
                                     <p class="font-medium">{{ case.appeal_status.direct_appeal_reason }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-600">Bevoegde rechtbank</p>
+                                    <p class="text-sm text-gray-600">{{ t.case_competent_court if t else 'Bevoegde rechtbank' }}</p>
                                     <p class="font-medium">{{ case.appeal_status.competent_court }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-600">Type rechter</p>
+                                    <p class="text-sm text-gray-600">{{ t.case_court_type if t else 'Type rechter' }}</p>
                                     <p class="font-medium">{{ case.appeal_status.court_type }}</p>
                                 </div>
                             </div>
                         {% else %}
                             <p class="text-gray-500">
-                                Beroepstatus wordt door de AWB bepaald als er een besluit op bezwaar
-                                is.
+                                {{ t.case_appeal_determined_by_awb if t else 'Beroepstatus wordt door de AWB bepaald als er een besluit op bezwaar is.' }}
                             </p>
                         {% endif %}
                     </div>
                     <!-- Resultaten -->
                     <div class="p-6 border-b border-gray-200">
-                        <h2 class="text-lg font-semibold mb-4">Resultaten</h2>
+                        <h2 class="text-lg font-semibold mb-4">{{ t.case_results if t else 'Resultaten' }}</h2>
                         <div class="grid grid-cols-2 gap-6">
                             <!-- Geclaimde resultaten -->
                             <div>
-                                <h3 class="text-md font-medium mb-2">Geclaimde Resultaten</h3>
+                                <h3 class="text-md font-medium mb-2">{{ t.case_claimed_results if t else 'Geclaimde Resultaten' }}</h3>
                                 {% if case.claimed_result %}
                                     <div class="bg-gray-50 p-4 rounded-md">
                                         <div class="grid grid-cols-2 gap-4">
@@ -198,12 +197,12 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                         </div>
                                     </div>
                                 {% else %}
-                                    <p class="text-gray-500">Geen geclaimde resultaten</p>
+                                    <p class="text-gray-500">{{ t.case_no_claimed_results if t else 'Geen geclaimde resultaten' }}</p>
                                 {% endif %}
                             </div>
                             <!-- Geverifieerde resultaten -->
                             <div>
-                                <h3 class="text-md font-medium mb-2">Geverifieerde Resultaten</h3>
+                                <h3 class="text-md font-medium mb-2">{{ t.case_verified_results if t else 'Geverifieerde Resultaten' }}</h3>
                                 {% if case.verified_result %}
                                     <div class="bg-gray-50 p-4 rounded-md">
                                         <div class="grid grid-cols-2 gap-4">
@@ -233,14 +232,14 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                         </div>
                                     </div>
                                 {% else %}
-                                    <p class="text-gray-500">Geen geverifieerde resultaten</p>
+                                    <p class="text-gray-500">{{ t.case_no_verified_results if t else 'Geen geverifieerde resultaten' }}</p>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
                     <!-- Claims -->
                     <div class="p-6 border-b border-gray-200">
-                        <h2 class="text-lg font-semibold mb-4">Claims</h2>
+                        <h2 class="text-lg font-semibold mb-4">{{ t.case_claims if t else 'Claims' }}</h2>
                         {% if case.claim_ids %}
                             <div class="space-y-4">
                                 {% for claim_id in case.claim_ids %}
@@ -252,12 +251,11 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                             <div class="mt-2">
                                                 <span class="text-sm">
                                                     {% if claim.status == 'PENDING' %}
-                                                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1.5 inline-block rounded-full text-xs">In
-                                                        behandeling</span>
+                                                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1.5 inline-block rounded-full text-xs">{{ t.case_claim_pending if t else 'In behandeling' }}</span>
                                                     {% elif claim.status == 'APPROVED' %}
-                                                        <span class="bg-green-100 text-green-800 px-3 py-1.5 inline-block rounded-full text-xs">Goedgekeurd</span>
+                                                        <span class="bg-green-100 text-green-800 px-3 py-1.5 inline-block rounded-full text-xs">{{ t.case_claim_approved if t else 'Goedgekeurd' }}</span>
                                                     {% elif claim.status == 'REJECTED' %}
-                                                        <span class="bg-red-100 text-red-800 px-3 py-1.5 inline-block rounded-full text-xs">Afgewezen</span>
+                                                        <span class="bg-red-100 text-red-800 px-3 py-1.5 inline-block rounded-full text-xs">{{ t.case_claim_rejected if t else 'Afgewezen' }}</span>
                                                     {% endif %}
                                                 </span>
                                             </div>
@@ -266,7 +264,7 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                             {% if claim.old_value is sequence and claim.old_value is not string %}
                                                 {# Array values - show as list with additions/removals highlighted #}
                                                 <div class="bg-white rounded p-3 border border-gray-200">
-                                                    <p class="text-gray-600 font-medium mb-2">Wijziging:</p>
+                                                    <p class="text-gray-600 font-medium mb-2">{{ t.case_change if t else 'Wijziging:' }}</p>
                                                     <ul class="space-y-1">
                                                         {# Show items that stay the same #}
                                                         {% for item in claim.old_value %}
@@ -288,7 +286,7 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                                     </svg>
                                                                     <span class="line-through">{{ item }}</span>
-                                                                    <span class="ml-2 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded">intrekken</span>
+                                                                    <span class="ml-2 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded">{{ t.case_withdraw if t else 'intrekken' }}</span>
                                                                 </li>
                                                             {% endif %}
                                                         {% endfor %}
@@ -303,7 +301,7 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                                                     </svg>
                                                                     {{ item }}
-                                                                    <span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">toevoegen</span>
+                                                                    <span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">{{ t.case_add if t else 'toevoegen' }}</span>
                                                                 </li>
                                                             {% endif %}
                                                         {% endfor %}
@@ -314,19 +312,19 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                                 <div class="grid grid-cols-2 gap-4">
                                                     {% if claim.old_value is not none %}
                                                         <div>
-                                                            <p class="text-gray-600">Oude waarde</p>
+                                                            <p class="text-gray-600">{{ t.case_old_value if t else 'Oude waarde' }}</p>
                                                             <p>{{ claim.old_value | format_value }}</p>
                                                         </div>
                                                     {% endif %}
                                                     <div>
-                                                        <p class="text-gray-600">Nieuwe waarde</p>
+                                                        <p class="text-gray-600">{{ t.case_new_value if t else 'Nieuwe waarde' }}</p>
                                                         <p>{{ claim.new_value | format_value }}</p>
                                                     </div>
                                                 </div>
                                             {% endif %}
                                             {% if claim.status == 'APPROVED' %}
                                                 <div class="mt-2">
-                                                    <p class="text-gray-600">Geverifieerde waarde</p>
+                                                    <p class="text-gray-600">{{ t.case_verified_value if t else 'Geverifieerde waarde' }}</p>
                                                     <p>{{ claim.verified_value | format_value }}</p>
                                                 </div>
                                             {% endif %}
@@ -340,7 +338,7 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                     </svg>
-                                                    Goedkeuren
+                                                    {{ t.case_approve_btn if t else 'Goedkeuren' }}
                                                 </button>
                                                 <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer"
                                                         hx-get="/edit/reject_claim_form"
@@ -349,7 +347,7 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
-                                                    Afwijzen
+                                                    {{ t.case_reject_btn if t else 'Afwijzen' }}
                                                 </button>
                                             </div>
                                         {% endif %}
@@ -357,18 +355,18 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                 {% endfor %}
                             </div>
                         {% else %}
-                            <p class="text-gray-500">Geen claims voor deze zaak</p>
+                            <p class="text-gray-500">{{ t.case_no_claims if t else 'Geen claims voor deze zaak' }}</p>
                         {% endif %}
                     </div>
                     <!-- Parameters -->
                     <div class="p-6 {% if case.status == 'IN_REVIEW' %}border-b border-gray-200{% endif %}">
-                        <h2 class="text-lg font-semibold mb-6">Gebruikte gegevens</h2>
+                        <h2 class="text-lg font-semibold mb-6">{{ t.case_used_data if t else 'Gebruikte gegevens' }}</h2>
                         {{ render_path(path, case.id|string, case.service, case.law, case.bsn,
                                                 claim_map, show_approve=True, claimant="CIVIL_SERVANT") }}
                     </div>
                     <!-- Gebeurtenissen -->
                     <div class="p-6 {% if case.status == 'IN_REVIEW' %}border-b border-gray-200{% endif %}">
-                        <h2 class="text-lg font-semibold mb-6">Gebeurtenissen</h2>
+                        <h2 class="text-lg font-semibold mb-6">{{ t.case_events if t else 'Gebeurtenissen' }}</h2>
                         <div class="space-y-6">
                             {% for event in case.events %}{{ render_event(event) }}{% endfor %}
                         </div>
@@ -376,24 +374,24 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                     <!-- Beoordeling Formulier -->
                     {% if case.status in ['IN_REVIEW', 'OBJECTED'] %}
                         <div class="p-6" id="review-form-container">
-                            <h2 class="text-lg font-semibold mb-4">Beoordelingsacties</h2>
+                            <h2 class="text-lg font-semibold mb-4">{{ t.case_review_actions if t else 'Beoordelingsacties' }}</h2>
                             <form hx-post="/admin/cases/{{ case.id }}/complete-review"
                                   hx-target="#review-form-container"
                                   class="space-y-4 max-w-lg">
                                 <div>
-                                    <label class="block text-sm font-medium mb-2">Beslissing</label>
+                                    <label class="block text-sm font-medium mb-2">{{ t.case_decision if t else 'Beslissing' }}</label>
                                     <select name="decision" class="w-full border rounded-md p-2">
-                                        <option value="true">Goedkeuren</option>
-                                        <option value="false">Afwijzen</option>
+                                        <option value="true">{{ t.case_decision_approve if t else 'Goedkeuren' }}</option>
+                                        <option value="false">{{ t.case_decision_reject if t else 'Afwijzen' }}</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-2">Reden</label>
+                                    <label class="block text-sm font-medium mb-2">{{ t.case_reason if t else 'Reden' }}</label>
                                     <textarea name="reason" class="w-full border rounded-md p-2" rows="3"></textarea>
                                 </div>
                                 <button type="submit"
                                         class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer">
-                                    Beoordeling indienen
+                                    {{ t.case_submit_review if t else 'Beoordeling indienen' }}
                                 </button>
                             </form>
                         </div>

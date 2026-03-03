@@ -1,7 +1,7 @@
 <div class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600"
      id="feature-flags">
     <h1 class="text-gray-900 text-3xl font-semibold mb-5">Feature Flags</h1>
-    <p class="mb-5">Schakel features aan of uit voor de applicatie.</p>
+    <p class="mb-5">{{ t.admin_ff_description if t else 'Schakel features aan of uit voor de applicatie.' }}</p>
     <div class="space-y-4">
         {% for name, enabled in feature_flags.items() %}
             <div class="flex items-center space-x-4">
