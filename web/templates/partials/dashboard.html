@@ -694,6 +694,12 @@
     </div>
 </section>
 <script>
+  // Translation helper for JS strings (if not already defined by parent page)
+  if (typeof _t === 'undefined') {
+    window.__t = {{ t | tojson if t else '{}' | safe }};
+    window._t = function(key, fallback) { return (window.__t && window.__t[key]) || fallback; };
+  }
+
   // Date selector handling
   const dateInput = document.getElementById('date-input');
   if (dateInput) {
@@ -762,84 +768,84 @@
             {
               type: "input",
               name: "loon_uit_dienstbetrekking",
-              label: "Box 1: Loon uit dienstbetrekking",
+              label: _t('js_wiz_box1_employment', 'Box 1: Loon uit dienstbetrekking'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box1', [{}])[0].loon_uit_dienstbetrekking | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box1', [{}])[0].loon_uit_dienstbetrekking | default(0)) / 100) | int }}" || _t('js_wiz_new_gross_annual', 'Nieuw bruto jaarbedrag…'),
             },
             {
               type: "input",
               name: "uitkeringen_en_pensioenen",
-              label: "Box 1: Uitkeringen en pensioenen",
+              label: _t('js_wiz_box1_benefits', 'Box 1: Uitkeringen en pensioenen'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box1', [{}])[0].uitkeringen_en_pensioenen | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box1', [{}])[0].uitkeringen_en_pensioenen | default(0)) / 100) | int }}" || _t('js_wiz_new_gross_annual', 'Nieuw bruto jaarbedrag…'),
             },
             {
               type: "input",
               name: "winst_uit_onderneming",
-              label: "Box 1: Winst uit onderneming",
+              label: _t('js_wiz_box1_business', 'Box 1: Winst uit onderneming'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box1', [{}])[0].winst_uit_onderneming | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box1', [{}])[0].winst_uit_onderneming | default(0)) / 100) | int }}" || _t('js_wiz_new_gross_annual', 'Nieuw bruto jaarbedrag…'),
             },
             {
               type: "input",
               name: "resultaat_overige_werkzaamheden",
-              label: "Box 1: Resultaat overige werkzaamheden",
+              label: _t('js_wiz_box1_other', 'Box 1: Resultaat overige werkzaamheden'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box1', [{}])[0].resultaat_overige_werkzaamheden | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box1', [{}])[0].resultaat_overige_werkzaamheden | default(0)) / 100) | int }}" || _t('js_wiz_new_gross_annual', 'Nieuw bruto jaarbedrag…'),
             },
             {
               type: "input",
               name: "eigen_woning",
-              label: "Box 1: Inkomsten uit eigen woning",
+              label: _t('js_wiz_box1_housing', 'Box 1: Inkomsten uit eigen woning'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box1', [{}])[0].eigen_woning | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box1', [{}])[0].eigen_woning | default(0)) / 100) | int }}" || _t('js_wiz_new_gross_annual', 'Nieuw bruto jaarbedrag…'),
             },
 
             {
               type: "input",
               name: "reguliere_voordelen",
-              label: "Box 2: Reguliere voordelen (dividend)",
+              label: _t('js_wiz_box2_dividends', 'Box 2: Reguliere voordelen (dividend)'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box2', [{}])[0].reguliere_voordelen | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box2', [{}])[0].reguliere_voordelen | default(0)) / 100) | int }}" || _t('js_wiz_new_gross_annual', 'Nieuw bruto jaarbedrag…'),
             },
             {
               type: "input",
               name: "vervreemdingsvoordelen",
-              label: "Box 2: Vervreemdingsvoordelen (verkoop aanmerkelijk belang)",
+              label: _t('js_wiz_box2_disposal', 'Box 2: Vervreemdingsvoordelen (verkoop aanmerkelijk belang)'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box2', [{}])[0].vervreemdingsvoordelen | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box2', [{}])[0].vervreemdingsvoordelen | default(0)) / 100) | int }}" || _t('js_wiz_new_gross_annual', 'Nieuw bruto jaarbedrag…'),
             },
 
             {
               type: "input",
               name: "spaargeld",
-              label: "Box 3: Spaargeld",
+              label: _t('js_wiz_box3_savings', 'Box 3: Spaargeld'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box3', [{}])[0].spaargeld | default(0)) / 100) | int }}" || 'Nieuw bedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box3', [{}])[0].spaargeld | default(0)) / 100) | int }}" || _t('js_wiz_new_amount', 'Nieuw bedrag…'),
             },
             {
               type: "input",
               name: "beleggingen",
-              label: "Box 3: Beleggingen",
+              label: _t('js_wiz_box3_investments', 'Box 3: Beleggingen'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box3', [{}])[0].beleggingen | default(0)) / 100) | int }}" || 'Nieuw bedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box3', [{}])[0].beleggingen | default(0)) / 100) | int }}" || _t('js_wiz_new_amount', 'Nieuw bedrag…'),
             },
             {
               type: "input",
               name: "onroerend_goed",
-              label: "Box 3: Onroerend goed",
+              label: _t('js_wiz_box3_property', 'Box 3: Onroerend goed'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box3', [{}])[0].onroerend_goed | default(0)) / 100) | int }}" || 'Nieuw bedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box3', [{}])[0].onroerend_goed | default(0)) / 100) | int }}" || _t('js_wiz_new_amount', 'Nieuw bedrag…'),
             },
             {
               type: "input",
               name: "schulden",
-              label: "Box 3: Schulden",
+              label: _t('js_wiz_box3_debts', 'Box 3: Schulden'),
               inputType: "number",
-              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box3', [{}])[0].schulden | default(0)) / 100) | int }}" || 'Nieuw bedrag…',
+              placeholder: "{{ ((profile.sources.get('BELASTINGDIENST', {}).get('box3', [{}])[0].schulden | default(0)) / 100) | int }}" || _t('js_wiz_new_amount', 'Nieuw bedrag…'),
             },
 
-            { type: "input", name: "effective_date", label: "Ingangsdatum", inputType: "date" },
+            { type: "input", name: "effective_date", label: _t('js_wiz_effective_date', 'Ingangsdatum'), inputType: "date" },
           ],
         ],
         woonadres: [
@@ -858,30 +864,30 @@
             {
               type: "input",
               name: "adres.straat",
-              label: "Nieuwe straatnaam",
+              label: _t('js_wiz_new_street', 'Nieuwe straatnaam'),
               inputType: "text",
-              placeholder: "{{ profile.sources.RvIG.get('verblijfplaats', [{}])[0].straat | default('') }}" || 'Straatnaam…',
+              placeholder: "{{ profile.sources.RvIG.get('verblijfplaats', [{}])[0].straat | default('') }}" || _t('js_wiz_street_ph', 'Straatnaam…'),
             },
             {
               type: "input",
               name: "adres.huisnummer",
-              label: "Nieuw huisnummer",
+              label: _t('js_wiz_new_house_nr', 'Nieuw huisnummer'),
               inputType: "text",
-              placeholder: "{{ profile.sources.RvIG.get('verblijfplaats', [{}])[0].huisnummer | default('') }}" || 'Huisnummer…',
+              placeholder: "{{ profile.sources.RvIG.get('verblijfplaats', [{}])[0].huisnummer | default('') }}" || _t('js_wiz_house_nr_ph', 'Huisnummer…'),
             },
             {
               type: "input",
               name: "adres.postcode",
-              label: "Nieuwe postcode",
+              label: _t('js_wiz_new_postcode', 'Nieuwe postcode'),
               inputType: "text",
-              placeholder: "{{ profile.sources.RvIG.get('verblijfplaats', [{}])[0].postcode | default('') }}" || 'Postcode…',
+              placeholder: "{{ profile.sources.RvIG.get('verblijfplaats', [{}])[0].postcode | default('') }}" || _t('js_wiz_postcode_ph', 'Postcode…'),
             },
             {
               type: "input",
               name: "adres.woonplaats",
-              label: "Nieuwe woonplaats",
+              label: _t('js_wiz_new_city', 'Nieuwe woonplaats'),
               inputType: "text",
-              placeholder: "{{ profile.sources.RvIG.get('verblijfplaats', [{}])[0].woonplaats | default('') }}" || 'Woonplaats…',
+              placeholder: "{{ profile.sources.RvIG.get('verblijfplaats', [{}])[0].woonplaats | default('') }}" || _t('js_wiz_city_ph', 'Woonplaats…'),
             },
           ],
           // [
@@ -895,32 +901,32 @@
           //     ],
           //   },
           // ],
-          [{ type: "input", name: "effective_date", label: "Ingangsdatum", inputType: "date" }],
+          [{ type: "input", name: "effective_date", label: _t('js_wiz_effective_date', 'Ingangsdatum'), inputType: "date" }],
         ],
         huurprijs: [
           [
             {
               type: "input",
               name: "huurprijs",
-              label: "Nieuwe huurprijs",
+              label: _t('js_wiz_new_rent', 'Nieuwe huurprijs'),
               inputType: "number",
-              placeholder: "Voer de nieuwe huurprijs in…",
+              placeholder: _t('js_wiz_rent_ph', 'Voer de nieuwe huurprijs in…'),
             },
             {
               type: "input",
               name: "servicekosten",
-              label: "Servicekosten",
+              label: _t('js_wiz_service_costs', 'Servicekosten'),
               inputType: "number",
-              placeholder: "Voer de nieuwe maandelijkse servicekosten in…",
+              placeholder: _t('js_wiz_service_ph', 'Voer de nieuwe maandelijkse servicekosten in…'),
             },
             {
               type: "input",
               name: "subsidiabele_servicekosten",
-              label: "Subsidiabele servicekosten",
+              label: _t('js_wiz_subsidized_service', 'Subsidiabele servicekosten'),
               inputType: "number",
-              placeholder: "Voer de nieuwe maandelijkse servicekosten in…",
+              placeholder: _t('js_wiz_service_ph', 'Voer de nieuwe maandelijkse servicekosten in…'),
             },
-            { type: "input", name: "effective_date", label: "Ingangsdatum", inputType: "date" },
+            { type: "input", name: "effective_date", label: _t('js_wiz_effective_date', 'Ingangsdatum'), inputType: "date" },
           ],
         ],
         huishouden: [
@@ -928,39 +934,39 @@
             {
               type: "select",
               name: "situation_household_change_type",
-              label: "Wijziging gezin of huishouden",
+              label: _t('js_wiz_household_change', 'Wijziging gezin of huishouden'),
               options: [
                 {
                   value: "samenwonen",
-                  label: "Ik ga trouwen of samenwonen",
+                  label: _t('js_wiz_marry_cohabit', 'Ik ga trouwen of samenwonen'),
                   icon: "heart",
                 },
                 {
                   value: "scheiden",
-                  label: "Ik ga scheiden of wij gaan uit elkaar",
+                  label: _t('js_wiz_divorce', 'Ik ga scheiden of wij gaan uit elkaar'),
                   icon: "heart-broken",
                 },
                 {
                   value: "co-ouder",
-                  label: "Ik word co-ouder",
+                  label: _t('js_wiz_co_parent', 'Ik word co-ouder'),
                   icon: "co-parent",
                 },
                 {
                   value: "iemand-bij",
-                  label: "Er komt iemand bij mij wonen",
+                  label: _t('js_wiz_someone_in', 'Er komt iemand bij mij wonen'),
                   icon: "person-more",
                 },
                 {
                   value: "iemand-weg",
-                  label: "Er gaat iemand mijn huis uit",
+                  label: _t('js_wiz_someone_out', 'Er gaat iemand mijn huis uit'),
                   icon: "person-less",
                 },
                 {
                   value: "overlijden",
-                  label: "Er is iemand overleden",
+                  label: _t('js_wiz_death', 'Er is iemand overleden'),
                   icon: "death",
                 },
-                { value: "kind", label: "Ik krijg een kind", icon: "child" },
+                { value: "kind", label: _t('js_wiz_child', 'Ik krijg een kind'), icon: "child" },
               ],
             },
           ],
@@ -968,7 +974,7 @@
             {
               type: "input",
               name: "effective_date",
-              label: "Ingangsdatum",
+              label: _t('js_wiz_effective_date', 'Ingangsdatum'),
               inputType: "date",
             },
           ],
@@ -1160,17 +1166,17 @@
         .then((response) => response.json())
         .then((data) => {
           if (data.status === "ok") {
-            showToast("Wijziging succesvol doorgegeven!", "success");
+            showToast(_t('js_wiz_success', 'Wijziging succesvol doorgegeven!'), "success");
           } else {
             showToast(
-              "Fout bij doorgeven wijziging: " +
-                (data.message || "Onbekende fout"),
+              _t('js_wiz_error', 'Fout bij doorgeven wijziging:') + ' ' +
+                (data.message || _t('js_wiz_unknown_error', 'Onbekende fout')),
               "error",
             );
           }
         })
         .catch(() => {
-          showToast("Netwerkfout bij doorgeven wijziging.", "error");
+          showToast(_t('js_wiz_network_error', 'Netwerkfout bij doorgeven wijziging.'), "error");
         });
 
       // Reset wizard

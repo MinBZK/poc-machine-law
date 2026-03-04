@@ -32,6 +32,11 @@
         </style>
         <!-- Chart.js for visualizations -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+        // Translation helper for JS strings
+        window.__t = {{ t | tojson if t else '{}' | safe }};
+        function _t(key, fallback) { return (window.__t && window.__t[key]) || fallback; }
+        </script>
     </head>
     <body class="min-h-screen bg-gray-100">
         <div class="flex flex-col h-screen">
