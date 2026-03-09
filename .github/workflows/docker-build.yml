@@ -7,10 +7,12 @@ permissions:
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.actor_type != 'Bot'
     runs-on: ubuntu-latest
 
     steps:
@@ -30,18 +32,27 @@ jobs:
         run: |
           echo "github_repository=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
 
+      - name: Determine image tag
+        id: image-tag
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and Push Image with Kaniko
         uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
+          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}:${{ steps.image-tag.outputs.tag }}
 
       - name: Build and Push Go Backend Image with Kaniko
         uses: int128/kaniko-action@v1
         with:
           file: ./machinev2/backend/Dockerfile
           push: true
-          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/machinev2/backend:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
+          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/machinev2/backend:${{ steps.image-tag.outputs.tag }}
 
       - name: Build and Push Wallet varification server with Kaniko
         uses: int128/kaniko-action@v1
@@ -49,4 +60,4 @@ jobs:
           context: ./wallet
           file: ./wallet/verification_server.Dockerfile
           push: true
-          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/wallet/verification_server:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
+          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/wallet/verification_server:${{ steps.image-tag.outputs.tag }}
