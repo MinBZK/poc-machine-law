@@ -7,7 +7,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         # Nav / Tabs
         "nav_presentation": "Presentatie",
         "nav_laws": "Wetten",
-        "nav_graph": "Graaf analyse",
+        "nav_graph": "Analyse",
         "nav_scenarios": "Scenarios",
         "nav_simulation": "Simulatie",
         "nav_harmonize": "Harmonisatie",
@@ -61,6 +61,14 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "slide5_disclaimer1": "Proof of concept",
         "slide5_disclaimer2": "Compleet verhaal, geen eindproduct",
         "slide5_disclaimer3": "We maken beleid door te doen",
+        # Summary slide (after demo)
+        "slide_summary_title": "Wat we zagen",
+        "slide_summary_flow": "Wet → YAML → Tests → Uitvoering → Portaal",
+        "slide_summary_line1": "Eén bron van waarheid",
+        "slide_summary_line2": "Transparant en toetsbaar",
+        "slide_summary_line3": "Herbruikbaar door iedere organisatie",
+        # Thank you slide
+        "slide_thanks": "Bedankt",
         # Law viewer
         "law_available_laws": "Beschikbare Wetten",
         "law_search_placeholder": "Zoek wetten...",
@@ -1096,7 +1104,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         # Nav / Tabs
         "nav_presentation": "Presentation",
         "nav_laws": "Laws",
-        "nav_graph": "Graph Analysis",
+        "nav_graph": "Analysis",
         "nav_scenarios": "Scenarios",
         "nav_simulation": "Simulation",
         "nav_harmonize": "Harmonization",
@@ -1150,6 +1158,14 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "slide5_disclaimer1": "Proof of concept",
         "slide5_disclaimer2": "Complete story, not a final product",
         "slide5_disclaimer3": "We shape policy by doing",
+        # Summary slide (after demo)
+        "slide_summary_title": "What we saw",
+        "slide_summary_flow": "Law → YAML → Tests → Execution → Portal",
+        "slide_summary_line1": "Single source of truth",
+        "slide_summary_line2": "Transparent and verifiable",
+        "slide_summary_line3": "Reusable by every organization",
+        # Thank you slide
+        "slide_thanks": "Thank you",
         # Law viewer
         "law_available_laws": "Available Laws",
         "law_search_placeholder": "Search laws...",
