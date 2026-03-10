@@ -1629,7 +1629,7 @@ function displayResults(data, simulationId) {
             <h3 class="text-sm font-medium text-gray-700 mt-6 mb-2">Wetten & Regelingen</h3>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('zorgtoeslagwet', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('zorgtoeslagwet', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-medium flex items-center">${getLawIcon('zorgtoeslagwet')}Zorgtoeslag</h4>
@@ -1638,12 +1638,12 @@ function displayResults(data, simulationId) {
                                     Gem. bedrag: €${data.summary.laws.zorgtoeslagwet.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="zorgtoeslagwet-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="zorgtoeslagwet-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="zorgtoeslagwet-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="zorgtoeslagwet-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
                             ${data.summary.laws.zorgtoeslagwet.breakdowns ? renderLawBreakdowns(data.summary.laws.zorgtoeslagwet.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
@@ -1651,7 +1651,7 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('huurtoeslag', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('huurtoeslag', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-medium flex items-center">${getLawIcon('huurtoeslag')}Huurtoeslag</h4>
@@ -1660,12 +1660,12 @@ function displayResults(data, simulationId) {
                                     Gem. bedrag: €${data.summary.laws.huurtoeslag.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="huurtoeslag-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="huurtoeslag-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="huurtoeslag-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="huurtoeslag-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
                             ${data.summary.laws.huurtoeslag.breakdowns ? renderLawBreakdowns(data.summary.laws.huurtoeslag.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
@@ -1673,7 +1673,7 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('algemeneouderdomswet', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('algemeneouderdomswet', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-medium flex items-center">${getLawIcon('algemeneouderdomswet')}AOW</h4>
@@ -1682,12 +1682,12 @@ function displayResults(data, simulationId) {
                                     Gem. bedrag: €${data.summary.laws.algemeneouderdomswet.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="aow-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="aow-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="aow-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="aow-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
                             ${data.summary.laws.algemeneouderdomswet.breakdowns ? renderLawBreakdowns(data.summary.laws.algemeneouderdomswet.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
@@ -1695,7 +1695,7 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('bijstand', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('bijstand', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-medium flex items-center">${getLawIcon('bijstand')}Bijstand</h4>
@@ -1704,12 +1704,12 @@ function displayResults(data, simulationId) {
                                     Gem. bedrag: €${data.summary.laws.bijstand.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="bijstand-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="bijstand-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="bijstand-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="bijstand-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
                             ${data.summary.laws.bijstand.breakdowns ? renderLawBreakdowns(data.summary.laws.bijstand.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
@@ -1717,7 +1717,7 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kinderopvang', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kinderopvang', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-medium flex items-center">${getLawIcon('kinderopvang')}Kinderopvangtoeslag</h4>
@@ -1726,12 +1726,12 @@ function displayResults(data, simulationId) {
                                     Gem. bedrag: €${data.summary.laws.kinderopvang.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kinderopvang-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kinderopvang-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="kinderopvang-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="kinderopvang-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
                             ${data.summary.laws.kinderopvang.breakdowns ? renderLawBreakdowns(data.summary.laws.kinderopvang.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
@@ -1739,7 +1739,7 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kindgebonden_budget', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kindgebonden_budget', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-medium flex items-center">${getLawIcon('kindgebonden_budget')}Kindgebonden budget</h4>
@@ -1748,12 +1748,12 @@ function displayResults(data, simulationId) {
                                     Gem. bedrag: €${data.summary.laws.kindgebonden_budget.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kindgebonden_budget-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kindgebonden_budget-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="kindgebonden_budget-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="kindgebonden_budget-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
                             ${data.summary.laws.kindgebonden_budget.breakdowns ? renderLawBreakdowns(data.summary.laws.kindgebonden_budget.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
@@ -1761,7 +1761,7 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('ww', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('ww', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-medium flex items-center">${getLawIcon('ww')}WW-uitkering</h4>
@@ -1770,12 +1770,12 @@ function displayResults(data, simulationId) {
                                     Gem. bedrag: €${data.summary.laws.ww.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="ww-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="ww-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="ww-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="ww-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
                             ${data.summary.laws.ww.breakdowns ? renderLawBreakdowns(data.summary.laws.ww.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
@@ -1790,7 +1790,7 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('inkomstenbelasting', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('inkomstenbelasting', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-medium flex items-center">${getLawIcon('income_tax')}Inkomstenbelasting</h4>
@@ -1799,12 +1799,12 @@ function displayResults(data, simulationId) {
                                     Belastingtarief: ${data.summary.laws.inkomstenbelasting.avg_tax_rate.toFixed(1)}%
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="inkomstenbelasting-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="inkomstenbelasting-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="inkomstenbelasting-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="inkomstenbelasting-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
                             ${data.summary.laws.inkomstenbelasting.breakdowns ? renderTaxBreakdowns(data.summary.laws.inkomstenbelasting.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
@@ -1814,7 +1814,7 @@ function displayResults(data, simulationId) {
 
             <!-- Besteedbaar Inkomen - Final Result -->
             <div class="mt-8 bg-green-50 border-2 border-green-200 rounded-lg p-6">
-                <div class="cursor-pointer hover:bg-green-100 transition-colors cursor-pointer -m-6 p-6" onclick="toggleLawDetails('besteedbaar-inkomen', this)">
+                <div class="cursor-pointer hover:bg-green-100 transition-colors cursor-pointer -m-6 p-6" onclick="toggleLawDetails('besteedbaar-inkomen', this, '${simulationId}')">
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
                             <div class="flex items-center mb-4">
@@ -1839,12 +1839,12 @@ function displayResults(data, simulationId) {
                                 </div>
                             </div>
                         </div>
-                        <svg class="w-5 h-5 text-green-600 mt-1 transform transition-transform" id="besteedbaar-inkomen-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-green-600 mt-1 transform transition-transform" id="besteedbaar-inkomen-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </div>
                 </div>
-                <div id="besteedbaar-inkomen-details" class="hidden mt-6 pt-6 border-t border-green-200">
+                <div id="besteedbaar-inkomen-details-${simulationId}" class="hidden mt-6 pt-6 border-t border-green-200">
                     <div class="space-y-4">
                         ${data.summary.disposable_income.breakdowns ? renderDisposableIncomeBreakdowns(data.summary.disposable_income.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                     </div>
@@ -2163,9 +2163,10 @@ function createCSVRow(label, baseValue, compValues, format) {
     return row + '\n';
 }
 
-function toggleLawDetails(lawName, element) {
-    const details = document.getElementById(lawName + '-details');
-    const chevron = document.getElementById(lawName + '-chevron');
+function toggleLawDetails(lawName, element, simulationId) {
+    const suffix = simulationId ? '-' + simulationId : '';
+    const details = document.getElementById(lawName + '-details' + suffix);
+    const chevron = document.getElementById(lawName + '-chevron' + suffix);
 
     if (details.classList.contains('hidden')) {
         details.classList.remove('hidden');
