@@ -2,6 +2,64 @@
 
 <!-- version list -->
 
+## v1.12.1 (2026-03-10)
+
+### Bug Fixes
+
+- Make simulation result panel IDs unique per simulation
+  ([#404](https://github.com/MinBZK/poc-machine-law/pull/404),
+  [`32d9b15`](https://github.com/MinBZK/poc-machine-law/commit/32d9b1515f871cdbbfc5f7f710b89e355ee15568))
+
+- Show all laws in sidebar and fix simulation panel IDs
+  ([#404](https://github.com/MinBZK/poc-machine-law/pull/404),
+  [`32d9b15`](https://github.com/MinBZK/poc-machine-law/commit/32d9b1515f871cdbbfc5f7f710b89e355ee15568))
+
+- Show all laws in sidebar for Merijn demo profile
+  ([#404](https://github.com/MinBZK/poc-machine-law/pull/404),
+  [`32d9b15`](https://github.com/MinBZK/poc-machine-law/commit/32d9b1515f871cdbbfc5f7f710b89e355ee15568))
+
+### Chores
+
+- Sync VERSION file to 1.12.0
+  ([`6a0e77f`](https://github.com/MinBZK/poc-machine-law/commit/6a0e77faa02cb61423aa04f2d4940ed7c8bcd8e5))
+
+- **deps**: Bump github.com/oapi-codegen/runtime
+  ([#385](https://github.com/MinBZK/poc-machine-law/pull/385),
+  [`42ee3c0`](https://github.com/MinBZK/poc-machine-law/commit/42ee3c0e27aa9a39ae25617a2c40a4e1fec62997))
+
+- **deps**: Bump the go-deps group in /machinev2/machine with 5 updates
+  ([#386](https://github.com/MinBZK/poc-machine-law/pull/386),
+  [`46657b5`](https://github.com/MinBZK/poc-machine-law/commit/46657b50ea3f9e7c7b72a022f6ca97e6909d8ccc))
+
+- **deps**: Bump the python-minor-patch group with 8 updates
+  ([#393](https://github.com/MinBZK/poc-machine-law/pull/393),
+  [`70c79e3`](https://github.com/MinBZK/poc-machine-law/commit/70c79e37bcdf27c059d261b63a70e5799a19b671))
+
+- **deps-dev**: Bump eslint from 9.39.2 to 10.0.2 in /analysis/graph
+  ([#390](https://github.com/MinBZK/poc-machine-law/pull/390),
+  [`d72579b`](https://github.com/MinBZK/poc-machine-law/commit/d72579b879d5bc8fe91c01d5fce29d37d9cf783b))
+
+- **deps-dev**: Bump eslint from 9.39.2 to 10.0.2 in /analysis/laws
+  ([#392](https://github.com/MinBZK/poc-machine-law/pull/392),
+  [`cc79918`](https://github.com/MinBZK/poc-machine-law/commit/cc79918b6a34503e142cab931f8985c3749f28fa))
+
+- **deps-dev**: Bump eslint from 9.39.2 to 10.0.2 in /importer
+  ([#391](https://github.com/MinBZK/poc-machine-law/pull/391),
+  [`c34a085`](https://github.com/MinBZK/poc-machine-law/commit/c34a0859a2dd69dfdc4ca7dca0c4ca6e16e5067d))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([#389](https://github.com/MinBZK/poc-machine-law/pull/389),
+  [`5bef37f`](https://github.com/MinBZK/poc-machine-law/commit/5bef37fde56792f6901f66436cff165f07ee6b6c))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([#388](https://github.com/MinBZK/poc-machine-law/pull/388),
+  [`fe17582`](https://github.com/MinBZK/poc-machine-law/commit/fe175826103176c4dd4259c529e70d11b32b0a8f))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([#387](https://github.com/MinBZK/poc-machine-law/pull/387),
+  [`4a4e88c`](https://github.com/MinBZK/poc-machine-law/commit/4a4e88c82417433ce9919d94762c89146b74a8c0))
+
+
 ## v1.12.0 (2026-03-03)
 
 ### Chores
