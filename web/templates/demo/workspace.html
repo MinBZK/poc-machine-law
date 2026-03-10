@@ -227,6 +227,12 @@
                         <div class="slide" x-show="currentSlide === 6 && demoGiven" x-cloak>
                             <div class="slide-content title-slide">
                                 <h1 x-text="tx('slide_thanks')"></h1>
+                                <div class="slide-qr">
+                                    <img src="/static/img/qr-aanmelden.svg" alt="QR code" class="qr-code">
+                                    <a href="https://minbzk.github.io/regelrecht/aanmelden"
+                                       class="qr-link"
+                                       translate="no">minbzk.github.io/regelrecht/aanmelden</a>
+                                </div>
                                 <p class="slide-subtitle" translate="no">regelrecht@minbzk.nl</p>
                             </div>
                         </div>
@@ -879,7 +885,7 @@
                 },
 
                 tx(key) {
-                    return this.translations[key] || key;
+                    return key in this.translations ? this.translations[key] : key;
                 },
 
                 async toggleLanguage() {
