@@ -39,10 +39,8 @@ DEMO_PROFILES: dict[str, dict] = {
             "HARMONIZE": False,
             "SIMULATION": True,
         },
-        # Wetten tab sidebar: only zorgtoeslag
-        "sidebar_laws": [
-            "zorgtoeslagwet/TOESLAGEN-2025-01-01",
-        ],
+        # Wetten tab sidebar: None = show all laws
+        "sidebar_laws": None,
         # Graaf analyse: no whitelist = show all non-hidden laws
         "graph_laws": None,
         # Pre-select the detentiestatus → zorgtoeslag → verzekeringsstatus chain (UUIDs)
