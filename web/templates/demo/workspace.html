@@ -51,7 +51,7 @@
                 <div class="tab"
                      :class="{ 'active': activeTab === 'graph' }"
                      @click="switchTab('graph')">
-                    <span class="tab-label">Graaf analyse</span>
+                    <span class="tab-label">Analyse</span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'features' }"
@@ -129,17 +129,21 @@
                         <!-- Slide 1: Title -->
                         <div class="slide" x-show="currentSlide === 0" x-cloak>
                             <div class="slide-content title-slide">
-                                <h1>RegelRecht</h1>
-                                <p class="slide-subtitle">van wet naar digitale werking</p>
+                                <h1 translate="no">RegelRecht</h1>
+                                <p class="slide-subtitle" x-show="lang === 'nl'">van wet naar digitale werking</p>
+                                <p class="slide-subtitle" x-show="lang === 'en'" translate="no">from law to digital execution</p>
                                 <div class="slide-footer">
-                                    <span x-text="new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})"></span>
+                                    <span x-text="new Date().toLocaleDateString(lang === 'nl' ? 'nl-NL' : 'en-US', {day: 'numeric', month: 'long', year: 'numeric'})"></span>
                                     <div class="presenter-area"
                                          @dblclick="editingPresenterName = true"
-                                         title="Dubbelklik om naam te wijzigen">
+                                         :title="lang === 'nl' ? 'Dubbelklik om naam te wijzigen' : 'Double-click to edit name'">
                                         <span x-show="!editingPresenterName && presenterName"
                                               x-text="presenterName"></span>
-                                        <span x-show="!editingPresenterName && !presenterName"
+                                        <span x-show="!editingPresenterName && !presenterName && lang === 'nl'"
                                               class="presenter-placeholder">[dubbelklik voor naam]</span>
+                                        <span x-show="!editingPresenterName && !presenterName && lang === 'en'"
+                                              class="presenter-placeholder"
+                                              translate="no">[double-click for name]</span>
                                         <input x-show="editingPresenterName"
                                                x-model="presenterName"
                                                @keydown.enter="savePresenterName()"
@@ -147,15 +151,16 @@
                                                @keydown.escape="editingPresenterName = false"
                                                x-ref="presenterInput"
                                                class="presenter-input"
-                                               placeholder="Uw naam">
+                                               :placeholder="lang === 'nl' ? 'Uw naam' : 'Your name'">
                                     </div>
-                                    <span>Bureau Architectuur, BZK</span>
+                                    <span translate="no">Bureau Architectuur, BZK</span>
                                 </div>
                             </div>
                         </div>
                         <!-- Slide 2: Nu -->
                         <div class="slide" x-show="currentSlide === 1" x-cloak>
-                            <div class="slide-content content-slide centered-content">
+                            <div class="slide-content content-slide centered-content"
+                                 x-show="lang === 'nl'">
                                 <h2>Huidige Situatie</h2>
                                 <p>Iedere organisatie</p>
                                 <p>
@@ -165,19 +170,41 @@
                                     die landt in <strong>eigen software</strong>
                                 </p>
                             </div>
+                            <div class="slide-content content-slide centered-content"
+                                 x-show="lang === 'en'"
+                                 translate="no">
+                                <h2>Current Situation</h2>
+                                <p>Every organization</p>
+                                <p>
+                                    has its <strong>own interpretation</strong> of the law
+                                </p>
+                                <p>
+                                    that ends up in <strong>its own software</strong>
+                                </p>
+                            </div>
                         </div>
                         <!-- Slide 3: Het probleem -->
                         <div class="slide" x-show="currentSlide === 2" x-cloak>
-                            <div class="slide-content content-slide centered-content">
+                            <div class="slide-content content-slide centered-content"
+                                 x-show="lang === 'nl'">
                                 <h2>Het gevolg</h2>
                                 <p>Geen overzicht</p>
                                 <p>Onvoorspelbaar</p>
                                 <p>Onbeheersbaar</p>
                             </div>
+                            <div class="slide-content content-slide centered-content"
+                                 x-show="lang === 'en'"
+                                 translate="no">
+                                <h2>The Consequence</h2>
+                                <p>No overview</p>
+                                <p>Unpredictable</p>
+                                <p>Unmanageable</p>
+                            </div>
                         </div>
                         <!-- Slide 4: Wat als... -->
                         <div class="slide" x-show="currentSlide === 3" x-cloak>
-                            <div class="slide-content content-slide centered-content">
+                            <div class="slide-content content-slide centered-content"
+                                 x-show="lang === 'nl'">
                                 <h2>Wat als</h2>
                                 <p>
                                     We <strong>beginnen met de wet</strong>
@@ -189,16 +216,85 @@
                                     <strong>Openbaar</strong> publiceren
                                 </p>
                             </div>
+                            <div class="slide-content content-slide centered-content"
+                                 x-show="lang === 'en'"
+                                 translate="no">
+                                <h2>What if</h2>
+                                <p>
+                                    We <strong>start with the law</strong>
+                                </p>
+                                <p>
+                                    Make it <strong>machine executable</strong>
+                                </p>
+                                <p>
+                                    Publish it <strong>openly</strong>
+                                </p>
+                            </div>
                         </div>
                         <!-- Slide 5: Demo -->
                         <div class="slide" x-show="currentSlide === 4" x-cloak>
-                            <div class="slide-content title-slide">
-                                <h1>Demo RegelRecht</h1>
+                            <div class="slide-content title-slide" x-show="lang === 'nl'">
+                                <h1 translate="no">Demo RegelRecht</h1>
                                 <div class="slide-disclaimers">
                                     <p>Proof of concept</p>
                                     <p>Compleet verhaal, geen eindproduct</p>
                                     <p>We maken beleid door te doen</p>
                                 </div>
+                            </div>
+                            <div class="slide-content title-slide"
+                                 x-show="lang === 'en'"
+                                 translate="no">
+                                <h1 translate="no">Demo RegelRecht</h1>
+                                <div class="slide-disclaimers">
+                                    <p>Proof of concept</p>
+                                    <p>Complete story, not a final product</p>
+                                    <p>We shape policy by doing</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 6: Summary (only after demo) -->
+                        <div class="slide" x-show="currentSlide === 5 && demoGiven" x-cloak>
+                            <div class="slide-content content-slide centered-content"
+                                 x-show="lang === 'nl'">
+                                <h2>Wat we zagen</h2>
+                                <p>Wet &rarr; YAML &rarr; Tests &rarr; Uitvoering &rarr; Portaal</p>
+                                <p>
+                                    <strong>Eén bron van waarheid</strong>
+                                </p>
+                                <p>
+                                    <strong>Transparant en toetsbaar</strong>
+                                </p>
+                                <p>
+                                    <strong>Herbruikbaar door iedere organisatie</strong>
+                                </p>
+                            </div>
+                            <div class="slide-content content-slide centered-content"
+                                 x-show="lang === 'en'"
+                                 translate="no">
+                                <h2>What we saw</h2>
+                                <p>Law &rarr; YAML &rarr; Tests &rarr; Execution &rarr; Portal</p>
+                                <p>
+                                    <strong>Single source of truth</strong>
+                                </p>
+                                <p>
+                                    <strong>Transparent and verifiable</strong>
+                                </p>
+                                <p>
+                                    <strong>Reusable by every organization</strong>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Slide 7: Thank you (only after demo) -->
+                        <div class="slide" x-show="currentSlide === 6 && demoGiven" x-cloak>
+                            <div class="slide-content title-slide" x-show="lang === 'nl'">
+                                <h1>Bedankt</h1>
+                                <p class="slide-subtitle" translate="no">regelrecht@minbzk.nl</p>
+                            </div>
+                            <div class="slide-content title-slide"
+                                 x-show="lang === 'en'"
+                                 translate="no">
+                                <h1>Thank you</h1>
+                                <p class="slide-subtitle">regelrecht@minbzk.nl</p>
                             </div>
                         </div>
                     </div>
@@ -293,6 +389,13 @@
                 <div class="menu-section-title">Feature Flags</div>
                 <div id="demo-feature-flags">{% include "demo/partials/feature_flags.html" %}</div>
                 <div class="menu-divider"></div>
+                <!-- Slide Language Toggle -->
+                <button @click="lang = lang === 'nl' ? 'en' : 'nl'; localStorage.setItem('slideLang', lang); menuOpen = false"
+                        class="menu-item"
+                        translate="no">
+                    <span x-show="lang === 'nl'">🌐 Slides: English</span>
+                    <span x-show="lang === 'en'">🌐 Slides: Nederlands</span>
+                </button>
                 <!-- Fullscreen Toggle -->
                 <button @click="toggleFullscreen(); menuOpen = false" class="menu-item">
                     <span x-show="!isFullscreen">⛶ Volledig scherm</span>
@@ -586,6 +689,8 @@
                 totalSlides: 5,
                 presenterName: localStorage.getItem('presenterName') || '',
                 editingPresenterName: false,
+                lang: localStorage.getItem('slideLang') || 'nl',
+                demoGiven: false,
 
                 init() {
                     // Initialize theme
@@ -686,10 +791,10 @@
                             if (self.activeTab === 'presentatie' && !self.editingPresenterName) {
                                 if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
                                     e.preventDefault();
-                                    // If on last slide, navigate to Wetten tab
-                                    if (self.currentSlide === self.totalSlides - 1) {
+                                    // If on last slide, navigate to Wetten tab (but not after demo)
+                                    if (self.currentSlide === self.totalSlides - 1 && !self.demoGiven) {
                                         self.switchTab('laws');
-                                    } else {
+                                    } else if (self.currentSlide < self.totalSlides - 1) {
                                         self.nextSlide();
                                     }
                                 } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
@@ -841,6 +946,17 @@
                 },
 
                 switchTab(tab) {
+                    // Detect leaving presentatie tab → mark demo as given
+                    if (this.activeTab === 'presentatie' && tab !== 'presentatie') {
+                        this.demoGiven = true;
+                        this.totalSlides = 7;
+                    }
+
+                    // Returning to presentatie after demo → jump to summary slide
+                    if (tab === 'presentatie' && this.demoGiven && this.activeTab !== 'presentatie') {
+                        this.currentSlide = 5;
+                    }
+
                     this.activeTab = tab;
 
                     // Update URL hash
