@@ -79,7 +79,7 @@
                 <div class="tab"
                      :class="{ 'active': activeTab === 'burger' }"
                      @click="switchTab('burger')">
-                    <span class="tab-label">{{ active_profile_config.portal_tab_label }}</span>
+                    <span class="tab-label" x-text="tx('nav_burger')"></span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'zaaksysteem' }"
@@ -134,8 +134,8 @@
                         <!-- Slide 1: Title -->
                         <div class="slide" x-show="currentSlide === 0" x-cloak>
                             <div class="slide-content title-slide">
-                                <h1 x-text="tx('slide_title')"></h1>
-                                <p class="slide-subtitle" x-text="tx('slide_subtitle')"></p>
+                                <h1 x-text="tx('slide_title_line1')"></h1>
+                                <h1 x-text="tx('slide_title_line2')"></h1>
                                 <div class="slide-footer">
                                     <span x-text="new Date().toLocaleDateString(lang === 'en' ? 'en-GB' : 'nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})"></span>
                                     <div class="presenter-area"
@@ -207,24 +207,36 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Slide 6: Summary (only after demo) -->
+                        <!-- Slide 6: Summary - what we saw (only after demo) -->
                         <div class="slide" x-show="currentSlide === 5 && demoGiven" x-cloak>
                             <div class="slide-content content-slide centered-content">
-                                <h2 x-text="tx('slide_summary_title')"></h2>
-                                <p x-text="tx('slide_summary_flow')"></p>
+                                <h2 x-text="tx('slide_summary1_title')"></h2>
+                                <p x-text="tx('slide_summary1_line1')"></p>
+                                <div class="slide-flow-indent">
+                                    <p x-text="tx('slide_summary1_line2')"></p>
+                                    <p x-text="tx('slide_summary1_line3')"></p>
+                                    <p x-text="tx('slide_summary1_line4')"></p>
+                                    <p x-text="tx('slide_summary1_line5')"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 7: Summary - what this means (only after demo) -->
+                        <div class="slide" x-show="currentSlide === 6 && demoGiven" x-cloak>
+                            <div class="slide-content content-slide centered-content">
+                                <h2 x-text="tx('slide_summary2_title')"></h2>
                                 <p>
-                                    <strong x-text="tx('slide_summary_line1')"></strong>
+                                    <strong x-text="tx('slide_summary2_line1_bold')"></strong><span x-text="tx('slide_summary2_line1_rest')"></span>
                                 </p>
                                 <p>
-                                    <strong x-text="tx('slide_summary_line2')"></strong>
+                                    <strong x-text="tx('slide_summary2_line2_bold')"></strong><span x-text="tx('slide_summary2_line2_rest')"></span>
                                 </p>
                                 <p>
-                                    <strong x-text="tx('slide_summary_line3')"></strong>
+                                    <strong x-text="tx('slide_summary2_line3_bold')"></strong><span x-text="tx('slide_summary2_line3_rest')"></span>
                                 </p>
                             </div>
                         </div>
-                        <!-- Slide 7: Thank you (only after demo) -->
-                        <div class="slide" x-show="currentSlide === 6 && demoGiven" x-cloak>
+                        <!-- Slide 8: Thank you (only after demo) -->
+                        <div class="slide" x-show="currentSlide === 7 && demoGiven" x-cloak>
                             <div class="slide-content title-slide">
                                 <h1 x-text="tx('slide_thanks')"></h1>
                                 <div class="slide-qr">
@@ -914,12 +926,12 @@
                     // Detect leaving presentatie tab → mark demo as given
                     if (this.activeTab === 'presentatie' && tab !== 'presentatie') {
                         this.demoGiven = true;
-                        this.totalSlides = 7;
+                        this.totalSlides = 8;
                     }
 
                     // Returning to presentatie after demo → jump to summary slide
                     if (tab === 'presentatie' && this.demoGiven && this.activeTab !== 'presentatie') {
-                        this.currentSlide = 5;
+                        this.currentSlide = 4;
                     }
 
                     this.activeTab = tab;
