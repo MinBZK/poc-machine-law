@@ -13,20 +13,24 @@
                 <div class="flex space-x-2">
                     <button type="button"
                             class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 cursor-pointer"
-                            onclick="showDialog('{{ case.id }}', true)">Goedkeuren</button>
+                            onclick="showDialog('{{ case.id }}', true)">
+                        {{ t.admin_approve if t else 'Goedkeuren' }}
+                    </button>
                     <button type="button"
                             class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 cursor-pointer"
-                            onclick="showDialog('{{ case.id }}', false)">Afwijzen</button>
+                            onclick="showDialog('{{ case.id }}', false)">
+                        {{ t.admin_reject if t else 'Afwijzen' }}
+                    </button>
                 </div>
             {% endif %}
             {% if case.status == 'DECIDED' %}
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if case.approved %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                    {{ 'Toegekend' if case.approved else 'Afgewezen' }}
+                    {{ (t.admin_granted if t else 'Toegekend') if case.approved else (t.admin_rejected if t else 'Afgewezen') }}
                 </span>
             {% endif %}
             <div class="mt-2">
                 <a href="/admin/cases/{{ case.id }}"
-                   class="text-sm text-blue-600 hover:underline">Bekijk details</a>
+                   class="text-sm text-blue-600 hover:underline">{{ t.admin_view_details if t else 'Bekijk details' }}</a>
             </div>
         </div>
     </form>
@@ -42,17 +46,19 @@
                       hx-target="closest div.mb-2"
                       hx-swap="outerHTML">
                     <input type="hidden" name="decision" id="decision-input-{{ case.id }}" />
-                    <label class="block mb-3">Reden:</label>
+                    <label class="block mb-3">{{ t.admin_reason if t else 'Reden:' }}</label>
                     <textarea name="reason"
                               class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                               rows="4"></textarea>
                     <div class="mt-6 flex justify-end space-x-3">
                         <button type="button"
                                 class="px-5 py-2.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 text-base cursor-pointer"
-                                onclick="closeDialog('{{ case.id }}')">Annuleren</button>
+                                onclick="closeDialog('{{ case.id }}')">
+                            {{ t.admin_cancel if t else 'Annuleren' }}
+                        </button>
                         <button type="submit"
                                 class="px-5 py-2.5 text-white rounded-md text-base cursor-pointer"
-                                id="confirm-btn-{{ case.id }}">Bevestigen</button>
+                                id="confirm-btn-{{ case.id }}">{{ t.admin_confirm if t else 'Bevestigen' }}</button>
                     </div>
                 </form>
             </div>
@@ -70,7 +76,7 @@
         decisionInput.value = isApprove;
 
         // Set title and button style based on decision
-        title.textContent = isApprove ? "Zaak goedkeuren" : "Zaak afwijzen";
+        title.textContent = isApprove ? "{{ t.admin_approve_case if t else 'Zaak goedkeuren' }}" : "{{ t.admin_reject_case if t else 'Zaak afwijzen' }}";
         confirmBtn.className = `px-5 py-2.5 text-white rounded-md text-base ${isApprove
             ? "bg-green-600 hover:bg-green-700"
             : "bg-red-600 hover:bg-red-700"

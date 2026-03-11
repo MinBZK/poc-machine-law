@@ -23,15 +23,21 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-xl font-semibold text-yellow-800 mb-2">{{ feature_name }} feature uitgeschakeld</h2>
-                        <p class="text-yellow-700">De {{ feature_name }} functionaliteit is momenteel uitgeschakeld door de beheerder.</p>
-                        <p class="text-yellow-700 mt-4">Neem contact op met de beheerder als je toegang nodig hebt tot deze functie.</p>
+                        <h2 class="text-xl font-semibold text-yellow-800 mb-2">
+                            {{ t.feature_disabled_title.format(name=feature_name) if t else feature_name ~ ' feature uitgeschakeld' }}
+                        </h2>
+                        <p class="text-yellow-700">
+                            {{ t.feature_disabled_desc.format(name=feature_name) if t else 'De ' ~ feature_name ~ ' functionaliteit is momenteel uitgeschakeld door de beheerder.' }}
+                        </p>
+                        <p class="text-yellow-700 mt-4">
+                            {{ t.feature_disabled_contact if t else 'Neem contact op met de beheerder als je toegang nodig hebt tot deze functie.' }}
+                        </p>
                     </div>
                 </div>
             </div>
             <a href="{{ return_url }}"
                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                Terug naar Dashboard
+                {{ t.feature_disabled_back if t else 'Terug naar Dashboard' }}
             </a>
         </div>
     </body>

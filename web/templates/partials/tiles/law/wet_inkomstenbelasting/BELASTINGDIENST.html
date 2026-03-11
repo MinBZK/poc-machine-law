@@ -4,9 +4,11 @@
     {% if result.totale_belastingschuld and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
         {% if result.totale_belastingschuld != current_case.claimed_result.totale_belastingschuld %}
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h4 class="font-medium text-gray-900 mb-2">Verschil met eerdere aangifte</h4>
+                <h4 class="font-medium text-gray-900 mb-2">
+                    {{ t.tile_difference_with_earlier_tax if t else 'Verschil met eerdere aangifte' }}
+                </h4>
                 <p class="text-sm text-gray-600 mb-4">
-                    Uw eerdere aangegeven bedrag was {{ (current_case.claimed_result.totale_belastingschuld / 100) | format_currency }}.
+                    {{ t.tile_earlier_declared_amount.format(amount=(current_case.claimed_result.totale_belastingschuld / 100) | format_currency) if t else 'Uw eerdere aangegeven bedrag was ' ~ ((current_case.claimed_result.totale_belastingschuld / 100) | format_currency) ~ '.' }}
                 </p>
                 {% if can_submit_claims|default(true) %}
                     <button type="button"
@@ -14,7 +16,7 @@
                             hx-target="#shared-application-panel"
                             hx-swap="innerHTML"
                             class="w-full px-4 py-2 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
-                        Aangifte wijzigen
+                        {{ t.tile_change_declaration if t else 'Aangifte wijzigen' }}
                     </button>
                 {% else %}
                     <p class="text-sm text-gray-500">
@@ -25,7 +27,7 @@
                              stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
-                        Vraag je wettelijk vertegenwoordiger om de aangifte te wijzigen.
+                        {{ t.tile_ask_representative_change_declaration if t else 'Vraag je wettelijk vertegenwoordiger om de aangifte te wijzigen.' }}
                     </p>
                 {% endif %}
             </div>
@@ -38,7 +40,7 @@
                 hx-target="#shared-application-panel"
                 hx-swap="innerHTML"
                 class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
-            Aangifte inkomstenbelasting doen
+            {{ t.tile_apply_tax if t else 'Aangifte inkomstenbelasting doen' }}
         </button>
     {% else %}
         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
@@ -50,11 +52,13 @@
                      stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-                Je kunt zelf geen aangifte doen. Vraag je wettelijk vertegenwoordiger om dit voor je te doen.
+                {{ t.tile_minor_blocked_tax if t else 'Je kunt zelf geen aangifte doen. Vraag je wettelijk vertegenwoordiger om dit voor je te doen.' }}
             </p>
         </div>
     {% endif %}
 {% endblock %}
 {% block approved_status %}
-    <p class="text-sm text-green-600 text-center">Uw aangifte is verwerkt en goedgekeurd.</p>
+    <p class="text-sm text-green-600 text-center">
+        {{ t.tile_tax_approved if t else 'Uw aangifte is verwerkt en goedgekeurd.' }}
+    </p>
 {% endblock %}

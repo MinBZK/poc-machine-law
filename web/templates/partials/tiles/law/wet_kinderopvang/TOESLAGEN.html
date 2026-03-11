@@ -4,16 +4,18 @@
     {% if result.jaarbedrag and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
         {% if result.jaarbedrag != current_case.claimed_result.jaarbedrag %}
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h4 class="font-medium text-gray-900 mb-2">Verschil met eerdere aanvraag</h4>
+                <h4 class="font-medium text-gray-900 mb-2">
+                    {{ t.tile_difference_with_earlier if t else 'Verschil met eerdere aanvraag' }}
+                </h4>
                 <p class="text-sm text-gray-600 mb-4">
-                    U vroeg eerder {{ (current_case.claimed_result.jaarbedrag / 100) | format_currency }} kinderopvangtoeslag aan.
+                    {{ t.tile_you_requested_earlier.format(amount=(current_case.claimed_result.jaarbedrag / 100) | format_currency ~ ' kinderopvangtoeslag') if t else 'U vroeg eerder ' ~ ((current_case.claimed_result.jaarbedrag / 100) | format_currency) ~ ' kinderopvangtoeslag aan.' }}
                 </p>
                 <button type="button"
                         hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
                         hx-target="#shared-application-panel"
                         hx-swap="innerHTML"
                         class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
-                    Vraag opnieuw aan
+                    {{ t.tile_reapply if t else 'Vraag opnieuw aan' }}
                 </button>
             </div>
         {% endif %}
@@ -25,7 +27,7 @@
                 hx-target="#shared-application-panel"
                 hx-swap="innerHTML"
                 class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
-            Kinderopvangtoeslag aanvragen
+            {{ t.tile_apply_kinderopvang if t else 'Kinderopvangtoeslag aanvragen' }}
         </button>
     {% else %}
         {% include "partials/tiles/components/minor_blocked_message.html" %}
@@ -33,6 +35,6 @@
 {% endblock %}
 {% block approved_status %}
     <p class="text-sm text-green-600 text-center">
-        Uw aanvraag is goedgekeurd, uw kinderopvangtoeslag zal maandelijks worden uitgekeerd.
+        {{ t.tile_approved_monthly.format(benefit='kinderopvangtoeslag') if t else 'Uw aanvraag is goedgekeurd, uw kinderopvangtoeslag zal maandelijks worden uitgekeerd.' }}
     </p>
 {% endblock %}

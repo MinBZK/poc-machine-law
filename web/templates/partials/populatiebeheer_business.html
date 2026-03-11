@@ -17,18 +17,22 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
                     </path>
                 </svg>
-                Bedrijfspopulatie
+                {{ t.pop_biz_title if t else 'Bedrijfspopulatie' }}
             </h2>
-            <p class="text-sm text-gray-600 mt-1 ml-8">Definieer de samenstelling van de bedrijfspopulatie</p>
+            <p class="text-sm text-gray-600 mt-1 ml-8">
+                {{ t.pop_biz_subtitle if t else 'Definieer de samenstelling van de bedrijfspopulatie' }}
+            </p>
         </div>
     {% endif %}
     <div class="{% if pop_show_header is not defined or pop_show_header %}p-4 {% endif %}space-y-4">
         <!-- Basis Instellingen -->
         <div class="bg-white border border-gray-200 rounded-lg p-4">
-            <h3 class="text-base font-medium text-gray-900 mb-3">Basis Instellingen</h3>
+            <h3 class="text-base font-medium text-gray-900 mb-3">{{ t.pop_basic_settings if t else 'Basis Instellingen' }}</h3>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                    <label for="num_people" class="block text-sm font-medium text-gray-700">Aantal bedrijven</label>
+                    <label for="num_people" class="block text-sm font-medium text-gray-700">
+                        {{ t.pop_biz_num_companies if t else 'Aantal bedrijven' }}
+                    </label>
                     <input type="range"
                            name="num_people"
                            id="num_people"
@@ -45,13 +49,15 @@
                     </div>
                 </div>
                 <div>
-                    <label for="simulation_date" class="block text-sm font-medium text-gray-700">Simulatiedatum</label>
+                    <label for="simulation_date" class="block text-sm font-medium text-gray-700">
+                        {{ t.pop_simulation_date if t else 'Simulatiedatum' }}
+                    </label>
                     <input type="date"
                            name="simulation_date"
                            id="simulation_date"
                            value="{{ default_params.simulation_date }}"
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    <p class="mt-1 text-sm text-gray-500">Datum voor wetsevaluatie</p>
+                    <p class="mt-1 text-sm text-gray-500">{{ t.pop_date_for_evaluation if t else 'Datum voor wetsevaluatie' }}</p>
                 </div>
             </div>
         </div>
@@ -60,7 +66,9 @@
             <button type="button"
                     onclick="toggleSection('business-type-section')"
                     class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                <h3 class="text-base font-medium text-gray-900">Bedrijfstypeverdeling</h3>
+                <h3 class="text-base font-medium text-gray-900">
+                    {{ t.pop_biz_type_distribution if t else 'Bedrijfstypeverdeling' }}
+                </h3>
                 <svg id="business-type-section-chevron"
                      class="w-5 h-5 text-gray-500 transform transition-transform"
                      fill="none"
@@ -73,7 +81,9 @@
                 <div class="space-y-3">
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="horeca_percentage" class="font-medium text-gray-700">Horecabedrijven</label>
+                            <label for="horeca_percentage" class="font-medium text-gray-700">
+                                {{ t.pop_biz_horeca if t else 'Horecabedrijven' }}
+                            </label>
                             <span id="horeca_percentage_value" class="text-gray-500">{{ default_params.horeca_percentage }}%</span>
                         </div>
                         <input type="range"
@@ -85,11 +95,13 @@
                                step="5"
                                oninput="updateSliderValue('horeca_percentage')"
                                class="mt-1 w-full">
-                        <p class="text-xs text-gray-400">Restaurants, cafes, bars</p>
+                        <p class="text-xs text-gray-400">{{ t.pop_biz_horeca_desc if t else 'Restaurants, cafes, bars' }}</p>
                     </div>
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="levensmiddelen_percentage" class="font-medium text-gray-700">Levensmiddelenbedrijven</label>
+                            <label for="levensmiddelen_percentage" class="font-medium text-gray-700">
+                                {{ t.pop_biz_food if t else 'Levensmiddelenbedrijven' }}
+                            </label>
                             <span id="levensmiddelen_percentage_value" class="text-gray-500">{{ default_params.levensmiddelen_percentage }}%</span>
                         </div>
                         <input type="range"
@@ -101,7 +113,7 @@
                                step="5"
                                oninput="updateSliderValue('levensmiddelen_percentage')"
                                class="mt-1 w-full">
-                        <p class="text-xs text-gray-400">Supermarkten, bakkerijen, slagerijen</p>
+                        <p class="text-xs text-gray-400">{{ t.pop_biz_food_desc if t else 'Supermarkten, bakkerijen, slagerijen' }}</p>
                     </div>
                 </div>
             </div>
@@ -111,7 +123,7 @@
             <button type="button"
                     onclick="toggleSection('business-size-section')"
                     class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                <h3 class="text-base font-medium text-gray-900">Bedrijfsgrootte</h3>
+                <h3 class="text-base font-medium text-gray-900">{{ t.pop_biz_size if t else 'Bedrijfsgrootte' }}</h3>
                 <svg id="business-size-section-chevron"
                      class="w-5 h-5 text-gray-500 transform transition-transform"
                      fill="none"
@@ -124,7 +136,9 @@
                 <div class="space-y-3">
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="bedrijfsgrootte_klein" class="font-medium text-gray-700">Klein (&lt;50 m²)</label>
+                            <label for="bedrijfsgrootte_klein" class="font-medium text-gray-700">
+                                {{ t.pop_biz_small if t else 'Klein (&lt;50 m²)' }}
+                            </label>
                             <span id="bedrijfsgrootte_klein_value" class="text-gray-500">{{ default_params.bedrijfsgrootte_klein }}%</span>
                         </div>
                         <input type="range"
@@ -139,7 +153,9 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="bedrijfsgrootte_middel" class="font-medium text-gray-700">Middel (50-100 m²)</label>
+                            <label for="bedrijfsgrootte_middel" class="font-medium text-gray-700">
+                                {{ t.pop_biz_medium if t else 'Middel (50-100 m²)' }}
+                            </label>
                             <span id="bedrijfsgrootte_middel_value" class="text-gray-500">{{ default_params.bedrijfsgrootte_middel }}%</span>
                         </div>
                         <input type="range"
@@ -154,7 +170,9 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="bedrijfsgrootte_groot" class="font-medium text-gray-700">Groot (&gt;100 m²)</label>
+                            <label for="bedrijfsgrootte_groot" class="font-medium text-gray-700">
+                                {{ t.pop_biz_large if t else 'Groot (&gt;100 m²)' }}
+                            </label>
                             <span id="bedrijfsgrootte_groot_value" class="text-gray-500">{{ default_params.bedrijfsgrootte_groot }}%</span>
                         </div>
                         <input type="range"

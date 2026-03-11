@@ -19,9 +19,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
                     </path>
                 </svg>
-                Populatiebeheer
+                {{ t.pop_title if t else 'Populatiebeheer' }}
             </h2>
-            <p class="text-sm text-gray-600 mt-1 ml-8">Definieer de demografische samenstelling van de populatie</p>
+            <p class="text-sm text-gray-600 mt-1 ml-8">
+                {{ t.pop_subtitle if t else 'Definieer de demografische samenstelling van de populatie' }}
+            </p>
         </div>
     {% endif %}
     <div class="{% if pop_show_header is not defined or pop_show_header %}p-4 {% endif %}space-y-4">
@@ -37,7 +39,7 @@
                          viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
-                    Scenarios
+                    {{ t.pop_scenarios if t else 'Scenarios' }}
                 </h3>
                 <svg id="scenarios-section-chevron"
                      class="w-5 h-5 text-gray-500 transform transition-transform"
@@ -62,8 +64,10 @@
                                     </path>
                                 </svg>
                                 <div>
-                                    <div class="font-medium text-gray-900">Huidige Realiteit</div>
-                                    <div class="text-sm text-gray-500">Standaard parameters - huidige Nederlandse situatie</div>
+                                    <div class="font-medium text-gray-900">{{ t.pop_current_reality if t else 'Huidige Realiteit' }}</div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ t.pop_current_reality_desc if t else 'Standaard parameters - huidige Nederlandse situatie' }}
+                                    </div>
                                 </div>
                             </div>
                         </button>
@@ -78,8 +82,10 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
                                 </svg>
                                 <div>
-                                    <div class="font-medium text-gray-900">Economische Recessie</div>
-                                    <div class="text-sm text-gray-500">Hogere werkloosheid, lagere inkomens, verhoogde bijstand</div>
+                                    <div class="font-medium text-gray-900">{{ t.pop_recession if t else 'Economische Recessie' }}</div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ t.pop_recession_desc if t else 'Hogere werkloosheid, lagere inkomens, verhoogde bijstand' }}
+                                    </div>
                                 </div>
                             </div>
                         </button>
@@ -95,8 +101,10 @@
                                     </path>
                                 </svg>
                                 <div>
-                                    <div class="font-medium text-gray-900">Wooncrisis</div>
-                                    <div class="text-sm text-gray-500">Hogere huren, meer huurders, verhoogde huurtoeslag</div>
+                                    <div class="font-medium text-gray-900">{{ t.pop_housing_crisis if t else 'Wooncrisis' }}</div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ t.pop_housing_crisis_desc if t else 'Hogere huren, meer huurders, verhoogde huurtoeslag' }}
+                                    </div>
                                 </div>
                             </div>
                         </button>
@@ -112,8 +120,10 @@
                                     </path>
                                 </svg>
                                 <div>
-                                    <div class="font-medium text-gray-900">Vergrijzing</div>
-                                    <div class="text-sm text-gray-500">Meer ouderen, hogere AOW uitgaven, minder werkenden</div>
+                                    <div class="font-medium text-gray-900">{{ t.pop_aging if t else 'Vergrijzing' }}</div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ t.pop_aging_desc if t else 'Meer ouderen, hogere AOW uitgaven, minder werkenden' }}
+                                    </div>
                                 </div>
                             </div>
                         </button>
@@ -129,8 +139,10 @@
                                     </path>
                                 </svg>
                                 <div>
-                                    <div class="font-medium text-gray-900">Zorgkosten Stijging</div>
-                                    <div class="text-sm text-gray-500">Hogere zorgpremies, meer zorgtoeslag nodig</div>
+                                    <div class="font-medium text-gray-900">{{ t.pop_healthcare if t else 'Zorgkosten Stijging' }}</div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ t.pop_healthcare_desc if t else 'Hogere zorgpremies, meer zorgtoeslag nodig' }}
+                                    </div>
                                 </div>
                             </div>
                         </button>
@@ -143,7 +155,7 @@
             <button type="button"
                     onclick="toggleSection('demographics-section')"
                     class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                <h3 class="text-base font-medium text-gray-900">Demografie</h3>
+                <h3 class="text-base font-medium text-gray-900">{{ t.pop_demographics if t else 'Demografie' }}</h3>
                 <svg id="demographics-section-chevron"
                      class="w-5 h-5 text-gray-500 transform transition-transform"
                      fill="none"
@@ -154,11 +166,13 @@
             </button>
             <div id="demographics-section" class="px-4 pb-4 hidden">
                 <!-- Age Distribution -->
-                <h3 class="text-sm font-medium text-gray-700 mb-2 mt-3">Leeftijdsverdeling</h3>
+                <h3 class="text-sm font-medium text-gray-700 mb-2 mt-3">
+                    {{ t.pop_age_distribution if t else 'Leeftijdsverdeling' }}
+                </h3>
                 <div class="space-y-3">
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="age_18_30" class="font-medium text-gray-700">18-30 jaar</label>
+                            <label for="age_18_30" class="font-medium text-gray-700">{{ t.pop_age_18_30 if t else '18-30 jaar' }}</label>
                             <span id="age_18_30_value" class="text-gray-500">{{ default_params.age_18_30 }}%</span>
                         </div>
                         <input type="range"
@@ -173,7 +187,7 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="age_30_45" class="font-medium text-gray-700">30-45 jaar</label>
+                            <label for="age_30_45" class="font-medium text-gray-700">{{ t.pop_age_30_45 if t else '30-45 jaar' }}</label>
                             <span id="age_30_45_value" class="text-gray-500">{{ default_params.age_30_45 }}%</span>
                         </div>
                         <input type="range"
@@ -188,7 +202,7 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="age_45_67" class="font-medium text-gray-700">45-67 jaar</label>
+                            <label for="age_45_67" class="font-medium text-gray-700">{{ t.pop_age_45_67 if t else '45-67 jaar' }}</label>
                             <span id="age_45_67_value" class="text-gray-500">{{ default_params.age_45_67 }}%</span>
                         </div>
                         <input type="range"
@@ -203,7 +217,7 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="age_67_85" class="font-medium text-gray-700">67-85 jaar</label>
+                            <label for="age_67_85" class="font-medium text-gray-700">{{ t.pop_age_67_85 if t else '67-85 jaar' }}</label>
                             <span id="age_67_85_value" class="text-gray-500">{{ default_params.age_67_85 }}%</span>
                         </div>
                         <input type="range"
@@ -218,7 +232,7 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="age_85_plus" class="font-medium text-gray-700">85+ jaar</label>
+                            <label for="age_85_plus" class="font-medium text-gray-700">{{ t.pop_age_85_plus if t else '85+ jaar' }}</label>
                             <span id="age_85_plus_value" class="text-gray-500">{{ default_params.age_85_plus }}%</span>
                         </div>
                         <input type="range"
@@ -232,16 +246,20 @@
                                class="mt-1 w-full">
                     </div>
                     <div id="age-total" class="text-sm font-medium">
-                        Totaal: <span id="age-total-value" class="text-gray-900">100%</span>
-                        <span id="age-warning" class="text-red-600 ml-2 hidden">Moet 100% zijn!</span>
+                        {{ t.pop_total if t else 'Totaal:' }} <span id="age-total-value" class="text-gray-900">100%</span>
+                        <span id="age-warning" class="text-red-600 ml-2 hidden">{{ t.pop_must_be_100 if t else 'Moet 100% zijn!' }}</span>
                     </div>
                 </div>
                 <!-- Income Distribution -->
-                <h3 class="text-sm font-medium text-gray-700 mb-2 mt-4">Inkomensverdeling</h3>
+                <h3 class="text-sm font-medium text-gray-700 mb-2 mt-4">
+                    {{ t.pop_income_distribution if t else 'Inkomensverdeling' }}
+                </h3>
                 <div class="grid grid-cols-1 gap-3">
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="income_low_pct" class="font-medium text-gray-700">Laag inkomen (&euro;0-30k)</label>
+                            <label for="income_low_pct" class="font-medium text-gray-700">
+                                {{ t.pop_income_low if t else 'Laag inkomen (&euro;0-30k)' }}
+                            </label>
                             <span id="income_low_pct_value" class="text-gray-500">30%</span>
                         </div>
                         <input type="range"
@@ -256,7 +274,9 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="income_middle_pct" class="font-medium text-gray-700">Midden inkomen (&euro;30k-60k)</label>
+                            <label for="income_middle_pct" class="font-medium text-gray-700">
+                                {{ t.pop_income_middle if t else 'Midden inkomen (&euro;30k-60k)' }}
+                            </label>
                             <span id="income_middle_pct_value" class="text-gray-500">50%</span>
                         </div>
                         <input type="range"
@@ -271,7 +291,9 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-sm">
-                            <label for="income_high_pct" class="font-medium text-gray-700">Hoog inkomen (&euro;60k+)</label>
+                            <label for="income_high_pct" class="font-medium text-gray-700">
+                                {{ t.pop_income_high if t else 'Hoog inkomen (&euro;60k+)' }}
+                            </label>
                             <span id="income_high_pct_value" class="text-gray-500">20%</span>
                         </div>
                         <input type="range"
@@ -285,16 +307,20 @@
                                class="mt-1 w-full">
                     </div>
                     <div class="mt-2 text-sm">
-                        <span class="font-medium text-gray-700">Totaal:</span>
+                        <span class="font-medium text-gray-700">{{ t.pop_total if t else 'Totaal:' }}</span>
                         <span id="income-total-value" class="ml-1 font-semibold text-gray-900">100%</span>
-                        <span id="income-warning" class="ml-2 text-red-600 hidden">Moet 100% zijn!</span>
+                        <span id="income-warning" class="ml-2 text-red-600 hidden">{{ t.pop_must_be_100 if t else 'Moet 100% zijn!' }}</span>
                     </div>
                     <!-- Economic Parameters -->
-                    <h3 class="text-base font-medium text-gray-700 mb-3 mt-6">Huisvesting &amp; Economie</h3>
+                    <h3 class="text-base font-medium text-gray-700 mb-3 mt-6">
+                        {{ t.pop_housing_economy if t else 'Huisvesting &amp; Economie' }}
+                    </h3>
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
                             <div class="flex justify-between text-sm">
-                                <label for="zero_income_prob" class="font-medium text-gray-700">Kans op geen inkomen</label>
+                                <label for="zero_income_prob" class="font-medium text-gray-700">
+                                    {{ t.pop_zero_income_prob if t else 'Kans op geen inkomen' }}
+                                </label>
                                 <span id="zero_income_prob_value" class="text-gray-500">{{ default_params.zero_income_prob }}%</span>
                             </div>
                             <input type="range"
@@ -309,7 +335,9 @@
                         </div>
                         <div>
                             <div class="flex justify-between text-sm">
-                                <label for="rent_percentage" class="font-medium text-gray-700">Percentage huurders</label>
+                                <label for="rent_percentage" class="font-medium text-gray-700">
+                                    {{ t.pop_rent_percentage if t else 'Percentage huurders' }}
+                                </label>
                                 <span id="rent_percentage_value" class="text-gray-500">{{ default_params.rent_percentage }}%</span>
                             </div>
                             <input type="range"
@@ -324,7 +352,9 @@
                         </div>
                         <div>
                             <div class="flex justify-between text-sm">
-                                <label for="student_percentage_young" class="font-medium text-gray-700">Studenten (18-30 jaar)</label>
+                                <label for="student_percentage_young" class="font-medium text-gray-700">
+                                    {{ t.pop_students if t else 'Studenten (18-30 jaar)' }}
+                                </label>
                                 <span id="student_percentage_young_value" class="text-gray-500">{{ default_params.student_percentage_young }}%</span>
                             </div>
                             <input type="range"
@@ -343,10 +373,12 @@
         </div>
         <!-- Basic Settings -->
         <div class="bg-white border border-gray-200 rounded-lg p-4">
-            <h3 class="text-base font-medium text-gray-900 mb-3">Basis Instellingen</h3>
+            <h3 class="text-base font-medium text-gray-900 mb-3">{{ t.pop_basic_settings if t else 'Basis Instellingen' }}</h3>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                    <label for="num_people" class="block text-sm font-medium text-gray-700">Aantal personen</label>
+                    <label for="num_people" class="block text-sm font-medium text-gray-700">
+                        {{ t.pop_num_people if t else 'Aantal personen' }}
+                    </label>
                     {% if pop_num_input_type == 'range' %}
                         <input type="range"
                                name="num_people"
@@ -371,29 +403,35 @@
                                max="{{ pop_num_people_max|default(10000) }}"
                                step="{{ pop_num_people_step|default(10) }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                        <p class="mt-1 text-sm text-gray-500">Tussen 10 en {{ '{:,}'.format(pop_num_people_max|default(10000) ) }}</p>
+                        <p class="mt-1 text-sm text-gray-500">
+                            {{ (t.pop_between_and if t else 'Tussen 10 en {max}').format(max='{:,}'.format(pop_num_people_max|default(10000) )) }}
+                        </p>
                     {% endif %}
                 </div>
                 <div>
-                    <label for="simulation_date" class="block text-sm font-medium text-gray-700">Simulatiedatum</label>
+                    <label for="simulation_date" class="block text-sm font-medium text-gray-700">
+                        {{ t.pop_simulation_date if t else 'Simulatiedatum' }}
+                    </label>
                     <input type="date"
                            name="simulation_date"
                            id="simulation_date"
                            value="{{ default_params.simulation_date }}"
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    <p class="mt-1 text-sm text-gray-500">Datum voor wetsevaluatie</p>
+                    <p class="mt-1 text-sm text-gray-500">{{ t.pop_date_for_evaluation if t else 'Datum voor wetsevaluatie' }}</p>
                 </div>
             </div>
         </div>
         {% if pop_show_saved|default(true) %}
             <!-- Opgeslagen Populaties -->
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-gray-900 mb-3">Opgeslagen Populaties</h3>
-                <p class="text-xs text-gray-500 mb-3">Hergebruik een bestaande populatie voor consistente vergelijkingen</p>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">{{ t.pop_saved_populations if t else 'Opgeslagen Populaties' }}</h3>
+                <p class="text-xs text-gray-500 mb-3">
+                    {{ t.pop_saved_desc if t else 'Hergebruik een bestaande populatie voor consistente vergelijkingen' }}
+                </p>
                 <div id="population-selector" class="hidden space-y-2">
                     <select id="population-select"
                             class="block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm py-2 px-3 bg-white hover:border-gray-400 cursor-pointer transition-all">
-                        <option value="">-- Selecteer populatie --</option>
+                        <option value="">{{ t.pop_select_population if t else '-- Selecteer populatie --' }}</option>
                     </select>
                     <div id="selected-population-info"
                          class="hidden p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg text-sm border-2 border-green-200 shadow-sm">
@@ -405,7 +443,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                                 </path>
                             </svg>
-                            Populatie Details
+                            {{ t.pop_population_details if t else 'Populatie Details' }}
                         </div>
                         <div id="population-details"
                              class="text-gray-700 space-y-1.5 text-xs font-medium"></div>
@@ -419,7 +457,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                                 </path>
                             </svg>
-                            Verwijder deze populatie
+                            {{ t.pop_delete_population if t else 'Verwijder deze populatie' }}
                         </button>
                     </div>
                 </div>
@@ -438,7 +476,7 @@
                          viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
-                    Nieuwe Populatie Aanmaken
+                    {{ t.pop_create_new if t else 'Nieuwe Populatie Aanmaken' }}
                 </button>
             </div>
         {% endif %}

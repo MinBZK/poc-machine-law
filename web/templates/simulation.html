@@ -4,10 +4,10 @@
         <!-- Left Panel: Parameters -->
         <div class="w-1/3 bg-white shadow-lg p-6 overflow-y-auto flex-shrink-0">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-gray-900">Simulatie Parameters</h2>
+                <h2 class="text-2xl font-bold text-gray-900">{{ t.sim_parameters if t else 'Simulatie Parameters' }}</h2>
                 <button onclick="showKeyboardHelp()"
                         class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
-                        title="Sneltoetsen (?)">
+                        title="{{ t.sim_shortcuts if t else 'Sneltoetsen (?)' }}">
                     <svg class="w-3.5 h-3.5"
                          fill="none"
                          stroke="currentColor"
@@ -31,9 +31,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                 </path>
                             </svg>
-                            Wetgeving
+                            {{ t.sim_legislation if t else 'Wetgeving' }}
                         </h2>
-                        <p class="text-sm text-gray-600 mt-1 ml-8">Pas de parameters van wetten en regelingen aan</p>
+                        <p class="text-sm text-gray-600 mt-1 ml-8">
+                            {{ t.sim_legislation_desc if t else 'Pas de parameters van wetten en regelingen aan' }}
+                        </p>
                     </div>
                     <div class="p-4 space-y-4">
                         <!-- Law Parameters - Collapsible -->
@@ -41,7 +43,7 @@
                             <button type="button"
                                     onclick="toggleSection('law-parameters-section')"
                                     class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                                <h3 class="text-base font-medium text-gray-900">Parameters van Wetgeving</h3>
+                                <h3 class="text-base font-medium text-gray-900">{{ t.sim_law_parameters if t else 'Parameters van Wetgeving' }}</h3>
                                 <svg id="law-parameters-section-chevron"
                                      class="w-5 h-5 text-gray-500 transform transition-transform"
                                      fill="none"
@@ -113,7 +115,7 @@
                             <button type="button"
                                     onclick="toggleSection('config-section')"
                                     class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                                <h3 class="text-base font-medium text-gray-900">Eigen Configuraties</h3>
+                                <h3 class="text-base font-medium text-gray-900">{{ t.sim_custom_configs if t else 'Eigen Configuraties' }}</h3>
                                 <svg id="config-section-chevron"
                                      class="w-5 h-5 text-gray-500 transform transition-transform"
                                      fill="none"
@@ -124,7 +126,7 @@
                             </button>
                             <div id="config-section" class="px-4 pb-4 hidden">
                                 <p class="text-sm text-gray-600 mb-3 mt-3">
-                                    Sla je huidige configuratie op om later te hergebruiken, of laad een eerder opgeslagen configuratie.
+                                    {{ t.sim_custom_configs_desc if t else 'Sla je huidige configuratie op om later te hergebruiken, of laad een eerder opgeslagen configuratie.' }}
                                 </p>
                                 <div class="flex items-center space-x-3">
                                     <button type="button"
@@ -137,7 +139,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2">
                                             </path>
                                         </svg>
-                                        Configuratie opslaan
+                                        {{ t.sim_save_config if t else 'Configuratie opslaan' }}
                                     </button>
                                     <button type="button"
                                             onclick="loadConfiguration()"
@@ -149,7 +151,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
                                             </path>
                                         </svg>
-                                        Configuratie laden
+                                        {{ t.sim_load_config if t else 'Configuratie laden' }}
                                     </button>
                                 </div>
                                 <div class="mt-4">
@@ -173,7 +175,7 @@
                          fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
                     </svg>
-                    Nieuwe Simulatie
+                    {{ t.sim_new_simulation if t else 'Nieuwe Simulatie' }}
                 </button>
                 <button type="button"
                         id="compare-button"
@@ -186,7 +188,7 @@
                          stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
-                    Vergelijk Simulaties
+                    {{ t.sim_compare_simulations if t else 'Vergelijk Simulaties' }}
                 </button>
             </div>
         </div>
@@ -197,7 +199,9 @@
                 <div class="flex items-start" id="tab-bar">
                     <!-- Tabs will be dynamically added here -->
                     <div id="initial-tab" class="py-4 px-4 text-gray-500">
-                        <p class="text-sm">Configureer de parameters en klik op "Nieuwe Simulatie" om te beginnen</p>
+                        <p class="text-sm">
+                            {{ t.sim_start_hint if t else 'Configureer de parameters en klik op "Nieuwe Simulatie" om te beginnen' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -211,13 +215,16 @@
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
-                        <h3 class="mt-4 text-lg font-medium text-gray-900">Machine Law Simulator</h3>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">{{ t.sim_title if t else 'Machine Law Simulator' }}</h3>
                         <p class="mt-2 text-sm text-gray-600">
-                            Deze simulator genereert een populatie met realistische demografische kenmerken en berekent voor elke persoon
-                            de toepassing van alle beschikbare wetten.
+                            {{ t.sim_description if t else 'Deze simulator genereert een populatie met realistische demografische kenmerken en berekent voor elke persoon de toepassing van alle beschikbare wetten.' }}
                         </p>
-                        <p class="mt-2 text-sm text-gray-600">U kunt de parameters aanpassen om verschillende scenario's te testen.</p>
-                        <p class="mt-6 text-base text-gray-700 font-medium">Klik op "Nieuwe Simulatie" hier links om te beginnen</p>
+                        <p class="mt-2 text-sm text-gray-600">
+                            {{ t.sim_description_2 if t else 'U kunt de parameters aanpassen om verschillende scenario\'s te testen.' }}
+                        </p>
+                        <p class="mt-6 text-base text-gray-700 font-medium">
+                            {{ t.sim_start_hint_2 if t else 'Klik op "Nieuwe Simulatie" hier links om te beginnen' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -341,12 +348,12 @@
                                 <button type="button"
                                         @click="$store.modal.confirmAction()"
                                         class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
-                                    Ja, verwijderen
+                                    {{ t.sim_confirm_delete if t else 'Ja, verwijderen' }}
                                 </button>
                                 <button type="button"
                                         @click="$store.modal.closeModal()"
                                         class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
-                                    Annuleren
+                                    {{ t.sim_cancel if t else 'Annuleren' }}
                                 </button>
                             </div>
                         </template>
@@ -754,7 +761,7 @@ function loadPreset(presetName) {
         // Show notification
         const notification = document.createElement('div');
         notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-pulse';
-        notification.textContent = `Scenario "${presetName}" geladen`;
+        notification.textContent = _t('js_scenario_loaded', 'Scenario "{name}" geladen').replace('{name}', presetName);
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 3000);
     }
@@ -773,7 +780,7 @@ function loadSavedConfigs() {
 
 // Save configuration
 function saveConfiguration() {
-    const name = prompt('Naam voor deze configuratie:');
+    const name = prompt(_t('js_config_name_prompt', 'Naam voor deze configuratie:'));
     if (!name) return;
 
     const config = getCurrentConfiguration();
@@ -789,7 +796,7 @@ function saveConfiguration() {
     // Show notification
     const notification = document.createElement('div');
     notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-    notification.textContent = `Configuratie "${name}" opgeslagen`;
+    notification.textContent = _t('js_config_saved', 'Configuratie "{name}" opgeslagen').replace('{name}', name);
     document.body.appendChild(notification);
     setTimeout(() => notification.remove(), 3000);
 }
@@ -805,7 +812,7 @@ function displaySavedConfigs() {
     const configs = loadSavedConfigs();
 
     if (Object.keys(configs).length === 0) {
-        container.innerHTML = '<p class="text-sm text-gray-500 italic">Geen opgeslagen configuraties</p>';
+        container.innerHTML = '<p class="text-sm text-gray-500 italic">' + _t('js_no_saved_configs', 'Geen opgeslagen configuraties') + '</p>';
         return;
     }
 
@@ -847,14 +854,14 @@ function applySavedConfig(name) {
     // Show notification
     const notification = document.createElement('div');
     notification.className = 'fixed top-4 right-4 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-    notification.textContent = `Configuratie "${name}" geladen`;
+    notification.textContent = _t('js_config_loaded', 'Configuratie "{name}" geladen').replace('{name}', name);
     document.body.appendChild(notification);
     setTimeout(() => notification.remove(), 3000);
 }
 
 // Delete saved configuration
 function deleteSavedConfig(name) {
-    if (!confirm(`Weet je zeker dat je "${name}" wilt verwijderen?`)) return;
+    if (!confirm(_t('js_config_delete_confirm', 'Weet je zeker dat je "{name}" wilt verwijderen?').replace('{name}', name))) return;
 
     const configs = loadSavedConfigs();
     delete configs[name];
@@ -1016,59 +1023,59 @@ function showKeyboardHelp() {
 
     helpModal.innerHTML = `
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Sneltoetsen</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-4">${_t('js_shortcuts_title', 'Sneltoetsen')}</h3>
             <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Nieuwe simulatie</span>
+                    <span class="text-gray-600">${_t('js_shortcut_new_sim', 'Nieuwe simulatie')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + Enter</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Configuratie opslaan</span>
+                    <span class="text-gray-600">${_t('js_shortcut_save_config', 'Configuratie opslaan')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + S</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Configuratie laden</span>
+                    <span class="text-gray-600">${_t('js_shortcut_load_config', 'Configuratie laden')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + O</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Vergelijk simulaties</span>
+                    <span class="text-gray-600">${_t('js_shortcut_compare', 'Vergelijk simulaties')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + K</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Wissel tab</span>
+                    <span class="text-gray-600">${_t('js_shortcut_switch_tab', 'Wissel tab')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + 1-9</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Volgende/Vorige tab</span>
+                    <span class="text-gray-600">${_t('js_shortcut_next_prev_tab', 'Volgende/Vorige tab')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Tab / Shift+Tab</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Sluit huidige tab</span>
+                    <span class="text-gray-600">${_t('js_shortcut_close_tab', 'Sluit huidige tab')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + W</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Export CSV</span>
+                    <span class="text-gray-600">${_t('js_shortcut_export_csv', 'Export CSV')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + E</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Export JSON</span>
+                    <span class="text-gray-600">${_t('js_shortcut_export_json', 'Export JSON')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + Shift + E</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Kopieer als Markdown</span>
+                    <span class="text-gray-600">${_t('js_shortcut_copy_md', 'Kopieer als Markdown')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + C</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Sluit modal</span>
+                    <span class="text-gray-600">${_t('js_shortcut_close_modal', 'Sluit modal')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Esc</kbd>
                 </div>
                 <div class="flex justify-between">
-                    <span class="text-gray-600">Toon deze hulp</span>
+                    <span class="text-gray-600">${_t('js_shortcut_show_help', 'Toon deze hulp')}</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">?</kbd>
                 </div>
             </div>
             <button onclick="document.getElementById('help-modal').remove()" class="mt-6 w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer">
-                Sluiten
+                ${_t('js_close', 'Sluiten')}
             </button>
         </div>
     `;
@@ -1144,7 +1151,7 @@ function createTab(simulationId, params) {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
         </span>
-        <span onclick="switchTab('${simulationId}')" title="${params.num_people} personen, ${params.simulation_date}">${tabName}</span>
+        <span onclick="switchTab('${simulationId}')" title="${params.num_people} ${_t('js_tab_persons', 'personen')}, ${params.simulation_date}">${tabName}</span>
         <button onclick="closeTab('${simulationId}')" class="ml-2 p-0.5 rounded hover:bg-gray-200 cursor-pointer">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -1162,11 +1169,11 @@ function createTab(simulationId, params) {
         <!-- Progress Section -->
         <div id="progress-section-${simulationId}">
             <div class="bg-white shadow rounded-lg p-6">
-                <h2 class="text-lg font-medium text-gray-900 mb-4">Voortgang - Simulatie ${simulationId}</h2>
+                <h2 class="text-lg font-medium text-gray-900 mb-4">${_t('js_progress_title', 'Voortgang - Simulatie')} ${simulationId}</h2>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
                     <div id="progress-bar-${simulationId}" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
-                <p id="progress-text-${simulationId}" class="mt-2 text-sm text-gray-600">Simulatie wordt voorbereid...</p>
+                <p id="progress-text-${simulationId}" class="mt-2 text-sm text-gray-600">${_t('js_progress_preparing', 'Simulatie wordt voorbereid...')}</p>
             </div>
         </div>
         <!-- Results Section -->
@@ -1189,12 +1196,12 @@ function createTab(simulationId, params) {
 
 async function runSimulation() {
     if (!validateAgeDistribution()) {
-        alert('De leeftijdsverdeling moet optellen tot 100%');
+        alert(_t('js_age_must_100', 'De leeftijdsverdeling moet optellen tot 100%'));
         return;
     }
 
     if (!updateIncomeDistribution()) {
-        alert('De inkomensverdeling moet optellen tot 100%');
+        alert(_t('js_income_must_100', 'De inkomensverdeling moet optellen tot 100%'));
         return;
     }
 
@@ -1300,15 +1307,15 @@ async function runSimulation() {
             progressBar.style.width = progress + '%';
 
             if (progress < 15) {
-                progressText.textContent = 'Simulatie wordt gestart...';
+                progressText.textContent = _t('js_progress_starting', 'Simulatie wordt gestart...');
             } else if (progress < 30) {
-                progressText.textContent = 'Parameters worden voorbereid...';
+                progressText.textContent = _t('js_progress_params', 'Parameters worden voorbereid...');
             } else if (progress < 50) {
-                progressText.textContent = 'Populatie wordt gegenereerd...';
+                progressText.textContent = _t('js_progress_generating', 'Populatie wordt gegenereerd...');
             } else if (progress < 75) {
-                progressText.textContent = 'Wetten worden toegepast...';
+                progressText.textContent = _t('js_progress_applying', 'Wetten worden toegepast...');
             } else {
-                progressText.textContent = 'Resultaten worden berekend...';
+                progressText.textContent = _t('js_progress_calculating', 'Resultaten worden berekend...');
             }
         }, 50); // Update frequently for smooth animation
 
@@ -1325,7 +1332,7 @@ async function runSimulation() {
 
         // Set progress to 100% when done
         progressBar.style.width = '100%';
-        progressText.textContent = 'Simulatie voltooid!';
+        progressText.textContent = _t('js_progress_complete', 'Simulatie voltooid!');
 
         if (!response.ok) {
             throw new Error('Simulation failed');
@@ -1340,7 +1347,7 @@ async function runSimulation() {
 
         // Complete progress
         progressBar.style.width = '100%';
-        progressText.textContent = 'Simulatie voltooid!';
+        progressText.textContent = _t('js_progress_complete', 'Simulatie voltooid!');
 
         // Show results immediately
         displayResults(result, simulationId);
@@ -1349,7 +1356,7 @@ async function runSimulation() {
         console.error('Error running simulation:', error);
         console.error('Error stack:', error.stack);
         console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-        alert(`Er is een fout opgetreden bij het uitvoeren van de simulatie:\n\n${error.message}\n\nCheck de browser console voor meer details (F12).`);
+        alert(_t('js_sim_error', 'Er is een fout opgetreden bij het uitvoeren van de simulatie:\n\n{error}\n\nCheck de browser console voor meer details (F12).').replace('{error}', error.message));
         document.getElementById(`progress-section-${simulationId}`).classList.add('hidden');
         closeTab(simulationId);
     }
@@ -1398,10 +1405,10 @@ async function createPopulation() {
             // Refresh population list and auto-select the new population
             await loadPopulations(result.population_id);
         } else {
-            showErrorModal('Fout bij aanmaken populatie', result.message);
+            showErrorModal(_t('js_pop_error_create', 'Fout bij aanmaken populatie'), result.message);
         }
     } catch (error) {
-        showErrorModal('Fout bij aanmaken populatie', error.message);
+        showErrorModal(_t('js_pop_error_create', 'Fout bij aanmaken populatie'), error.message);
     }
 }
 
@@ -1416,13 +1423,13 @@ async function loadPopulations(autoSelectId = null) {
 
             // Update select dropdown
             const select = document.getElementById('population-select');
-            select.innerHTML = '<option value="">-- Selecteer populatie --</option>';
+            select.innerHTML = '<option value="">' + _t('js_pop_select', '-- Selecteer populatie --') + '</option>';
 
             result.populations.forEach(pop => {
                 const option = document.createElement('option');
                 option.value = pop.population_id;
                 const date = new Date(pop.created_at).toLocaleString('nl-NL');
-                option.textContent = `${pop.num_people} personen - ${date}`;
+                option.textContent = `${pop.num_people} ${_t('js_pop_persons', 'personen')} - ${date}`;
                 select.appendChild(option);
             });
 
@@ -1479,12 +1486,12 @@ function showPopulationDetails(populationId) {
                 const date = new Date(pop.created_at).toLocaleDateString('nl-NL');
 
                 details.innerHTML = `
-                    <div>📊 ${pop.num_people} personen</div>
-                    <div>📅 Aangemaakt: ${date}</div>
-                    <div>👤 Gem. leeftijd: ${pop.demographics.avg_age.toFixed(1)} jaar</div>
-                    <div>🏘️ Huurders: ${pop.demographics.renters_pct.toFixed(1)}%</div>
-                    <div>👫 Met partners: ${pop.demographics.with_partners_pct.toFixed(1)}%</div>
-                    <div>🎓 Studenten: ${pop.demographics.students_pct.toFixed(1)}%</div>
+                    <div>📊 ${pop.num_people} ${_t('js_pop_persons', 'personen')}</div>
+                    <div>📅 ${_t('js_pop_created', 'Aangemaakt:')} ${date}</div>
+                    <div>👤 ${_t('js_pop_avg_age', 'Gem. leeftijd:')} ${pop.demographics.avg_age.toFixed(1)} ${_t('js_pop_year', 'jaar')}</div>
+                    <div>🏘️ ${_t('js_pop_renters', 'Huurders:')} ${pop.demographics.renters_pct.toFixed(1)}%</div>
+                    <div>👫 ${_t('js_pop_with_partners', 'Met partners:')} ${pop.demographics.with_partners_pct.toFixed(1)}%</div>
+                    <div>🎓 ${_t('js_pop_students', 'Studenten:')} ${pop.demographics.students_pct.toFixed(1)}%</div>
                 `;
 
                 document.getElementById('selected-population-info').classList.remove('hidden');
@@ -1498,8 +1505,8 @@ async function deleteSelectedPopulation() {
 
     // Use Alpine.js modal instead of confirm()
     showConfirmModal(
-        'Populatie verwijderen?',
-        'Weet je zeker dat je deze populatie wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.',
+        _t('js_pop_delete_title', 'Populatie verwijderen?'),
+        _t('js_pop_delete_confirm', 'Weet je zeker dat je deze populatie wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.'),
         async () => {
             try {
                 const response = await fetch(`/simulation/population/${selectedPopulationId}`, {
@@ -1516,10 +1523,10 @@ async function deleteSelectedPopulation() {
                     // Reload the population list (which will hide selector if empty)
                     await loadPopulations();
                 } else {
-                    showErrorModal('Fout bij verwijderen', result.message);
+                    showErrorModal(_t('js_pop_error_delete', 'Fout bij verwijderen'), result.message);
                 }
             } catch (error) {
-                showErrorModal('Fout bij verwijderen', error.message);
+                showErrorModal(_t('js_pop_error_delete', 'Fout bij verwijderen'), error.message);
             }
         }
     );
@@ -1545,7 +1552,7 @@ function displayResults(data, simulationId) {
                         const paramLabel = getParamDisplayName(param);
                         const formattedValue = formatParamValue(param, value);
                         const defaultFormatted = formatParamValue(param, defaultValue);
-                        changedParams.push(`${getLawDisplayName(law)} - ${paramLabel}: ${formattedValue} (standaard: ${defaultFormatted})`);
+                        changedParams.push(`${getLawDisplayName(law)} - ${paramLabel}: ${formattedValue} (${_t('js_default', 'standaard:')} ${defaultFormatted})`);
                     }
                 }
             });
@@ -1559,7 +1566,7 @@ function displayResults(data, simulationId) {
                             <svg class="w-4 h-4 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
                             </svg>
-                            <span class="text-sm font-medium text-amber-800">${changedParams.length} parameter${changedParams.length > 1 ? 's' : ''} aangepast</span>
+                            <span class="text-sm font-medium text-amber-800">${changedParams.length} ${_t('js_params_adjusted', 'parameter(s) aangepast')}</span>
                         </div>
                         <svg id="param-chevron-${simulationId}" class="w-4 h-4 text-amber-600 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -1577,32 +1584,32 @@ function displayResults(data, simulationId) {
 
     resultsSection.innerHTML = `
         <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Simulatie Resultaten</h2>
+            <h2 class="text-lg font-medium text-gray-900 mb-4">${_t('js_results_title', 'Simulatie Resultaten')}</h2>
             ${parameterInfo}
 
             <!-- Demographics (including income) -->
             <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <h3 class="text-sm font-medium text-blue-900 mb-3">Demografie</h3>
+                <h3 class="text-sm font-medium text-blue-900 mb-3">${_t('js_demographics', 'Demografie')}</h3>
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <!-- Basic Demographics -->
                     <div>
-                        <h4 class="text-xs font-medium text-blue-800 uppercase tracking-wider mb-2">Populatie</h4>
+                        <h4 class="text-xs font-medium text-blue-800 uppercase tracking-wider mb-2">${_t('js_population', 'Populatie')}</h4>
                         <dl class="text-sm text-gray-900 space-y-1">
                             <div>
-                                <dt class="inline text-gray-600">Totaal aantal personen:</dt>
+                                <dt class="inline text-gray-600">${_t('js_total_people', 'Totaal aantal personen:')}</dt>
                                 <dd class="inline ml-1 font-semibold">${data.summary.demographics.total_people}</dd>
                             </div>
                             <div>
-                                <dt class="inline text-gray-600">Gemiddelde leeftijd:</dt>
-                                <dd class="inline ml-1 font-semibold">${data.summary.demographics.avg_age.toFixed(1)} jaar</dd>
+                                <dt class="inline text-gray-600">${_t('js_avg_age', 'Gemiddelde leeftijd:')}</dt>
+                                <dd class="inline ml-1 font-semibold">${data.summary.demographics.avg_age.toFixed(1)} ${_t('js_pop_year', 'jaar')}</dd>
                             </div>
                             <div>
-                                <dt class="inline text-gray-600">Met partner:</dt>
+                                <dt class="inline text-gray-600">${_t('js_with_partner', 'Met partner:')}</dt>
                                 <dd class="inline ml-1 font-semibold">${data.summary.demographics.with_partners_pct.toFixed(1)}%</dd>
                             </div>
                             <div>
-                                <dt class="inline text-gray-600">Huurders:</dt>
+                                <dt class="inline text-gray-600">${_t('js_renters', 'Huurders:')}</dt>
                                 <dd class="inline ml-1 font-semibold">${data.summary.demographics.renters_pct.toFixed(1)}%</dd>
                             </div>
                         </dl>
@@ -1610,14 +1617,14 @@ function displayResults(data, simulationId) {
 
                     <!-- Income as part of Demographics -->
                     <div>
-                        <h4 class="text-xs font-medium text-blue-800 uppercase tracking-wider mb-2">Inkomen</h4>
+                        <h4 class="text-xs font-medium text-blue-800 uppercase tracking-wider mb-2">${_t('js_income', 'Inkomen')}</h4>
                         <dl class="text-sm text-gray-900 space-y-1">
                             <div>
-                                <dt class="inline text-gray-600">Gemiddeld jaarinkomen:</dt>
+                                <dt class="inline text-gray-600">${_t('js_avg_annual_income', 'Gemiddeld jaarinkomen:')}</dt>
                                 <dd class="inline ml-1 font-semibold">€${data.summary.income.avg_annual.toFixed(0)}</dd>
                             </div>
                             <div>
-                                <dt class="inline text-gray-600">Mediaan jaarinkomen:</dt>
+                                <dt class="inline text-gray-600">${_t('js_median_annual_income', 'Mediaan jaarinkomen:')}</dt>
                                 <dd class="inline ml-1 font-semibold">€${data.summary.income.median_annual.toFixed(0)}</dd>
                             </div>
                         </dl>
@@ -1626,16 +1633,16 @@ function displayResults(data, simulationId) {
             </div>
 
             <!-- Laws -->
-            <h3 class="text-sm font-medium text-gray-700 mt-6 mb-2">Wetten & Regelingen</h3>
+            <h3 class="text-sm font-medium text-gray-700 mt-6 mb-2">${_t('js_laws_regulations', 'Wetten & Regelingen')}</h3>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="bg-gray-50 rounded p-3">
                     <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('zorgtoeslagwet', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('zorgtoeslagwet')}Zorgtoeslag</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('zorgtoeslagwet')}${_t('js_law_zorgtoeslag', 'Zorgtoeslag')}</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.zorgtoeslagwet.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.zorgtoeslagwet.avg_amount.toFixed(2)}
+                                    ${_t('js_eligible', 'In aanmerking:')} ${data.summary.laws.zorgtoeslagwet.eligible_pct.toFixed(1)}%<br>
+                                    ${_t('js_avg_amount', 'Gem. bedrag:')} €${data.summary.laws.zorgtoeslagwet.avg_amount.toFixed(2)}
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="zorgtoeslagwet-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1645,7 +1652,7 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="zorgtoeslagwet-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.zorgtoeslagwet.breakdowns ? renderLawBreakdowns(data.summary.laws.zorgtoeslagwet.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.zorgtoeslagwet.breakdowns ? renderLawBreakdowns(data.summary.laws.zorgtoeslagwet.breakdowns) : `<p class="text-gray-500">${_t('js_no_details', 'Geen details beschikbaar')}</p>`}
                         </div>
                     </div>
                 </div>
@@ -1654,10 +1661,10 @@ function displayResults(data, simulationId) {
                     <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('huurtoeslag', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('huurtoeslag')}Huurtoeslag</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('huurtoeslag')}${_t('js_law_huurtoeslag', 'Huurtoeslag')}</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.huurtoeslag.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.huurtoeslag.avg_amount.toFixed(2)}
+                                    ${_t('js_eligible', 'In aanmerking:')} ${data.summary.laws.huurtoeslag.eligible_pct.toFixed(1)}%<br>
+                                    ${_t('js_avg_amount', 'Gem. bedrag:')} €${data.summary.laws.huurtoeslag.avg_amount.toFixed(2)}
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="huurtoeslag-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1667,7 +1674,7 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="huurtoeslag-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.huurtoeslag.breakdowns ? renderLawBreakdowns(data.summary.laws.huurtoeslag.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.huurtoeslag.breakdowns ? renderLawBreakdowns(data.summary.laws.huurtoeslag.breakdowns) : `<p class="text-gray-500">${_t('js_no_details', 'Geen details beschikbaar')}</p>`}
                         </div>
                     </div>
                 </div>
@@ -1676,10 +1683,10 @@ function displayResults(data, simulationId) {
                     <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('algemeneouderdomswet', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('algemeneouderdomswet')}AOW</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('algemeneouderdomswet')}${_t('js_law_aow', 'AOW')}</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.algemeneouderdomswet.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.algemeneouderdomswet.avg_amount.toFixed(2)}
+                                    ${_t('js_eligible', 'In aanmerking:')} ${data.summary.laws.algemeneouderdomswet.eligible_pct.toFixed(1)}%<br>
+                                    ${_t('js_avg_amount', 'Gem. bedrag:')} €${data.summary.laws.algemeneouderdomswet.avg_amount.toFixed(2)}
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="aow-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1689,7 +1696,7 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="aow-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.algemeneouderdomswet.breakdowns ? renderLawBreakdowns(data.summary.laws.algemeneouderdomswet.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.algemeneouderdomswet.breakdowns ? renderLawBreakdowns(data.summary.laws.algemeneouderdomswet.breakdowns) : `<p class="text-gray-500">${_t('js_no_details', 'Geen details beschikbaar')}</p>`}
                         </div>
                     </div>
                 </div>
@@ -1698,10 +1705,10 @@ function displayResults(data, simulationId) {
                     <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('bijstand', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('bijstand')}Bijstand</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('bijstand')}${_t('js_law_bijstand', 'Bijstand')}</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.bijstand.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.bijstand.avg_amount.toFixed(2)}
+                                    ${_t('js_eligible', 'In aanmerking:')} ${data.summary.laws.bijstand.eligible_pct.toFixed(1)}%<br>
+                                    ${_t('js_avg_amount', 'Gem. bedrag:')} €${data.summary.laws.bijstand.avg_amount.toFixed(2)}
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="bijstand-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1711,7 +1718,7 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="bijstand-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.bijstand.breakdowns ? renderLawBreakdowns(data.summary.laws.bijstand.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.bijstand.breakdowns ? renderLawBreakdowns(data.summary.laws.bijstand.breakdowns) : `<p class="text-gray-500">${_t('js_no_details', 'Geen details beschikbaar')}</p>`}
                         </div>
                     </div>
                 </div>
@@ -1720,10 +1727,10 @@ function displayResults(data, simulationId) {
                     <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kinderopvang', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('kinderopvang')}Kinderopvangtoeslag</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('kinderopvang')}${_t('js_law_kinderopvang', 'Kinderopvangtoeslag')}</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.kinderopvang.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.kinderopvang.avg_amount.toFixed(2)}
+                                    ${_t('js_eligible', 'In aanmerking:')} ${data.summary.laws.kinderopvang.eligible_pct.toFixed(1)}%<br>
+                                    ${_t('js_avg_amount', 'Gem. bedrag:')} €${data.summary.laws.kinderopvang.avg_amount.toFixed(2)}
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kinderopvang-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1733,7 +1740,7 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="kinderopvang-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.kinderopvang.breakdowns ? renderLawBreakdowns(data.summary.laws.kinderopvang.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.kinderopvang.breakdowns ? renderLawBreakdowns(data.summary.laws.kinderopvang.breakdowns) : `<p class="text-gray-500">${_t('js_no_details', 'Geen details beschikbaar')}</p>`}
                         </div>
                     </div>
                 </div>
@@ -1742,10 +1749,10 @@ function displayResults(data, simulationId) {
                     <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kindgebonden_budget', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('kindgebonden_budget')}Kindgebonden budget</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('kindgebonden_budget')}${_t('js_law_kindgebonden', 'Kindgebonden budget')}</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.kindgebonden_budget.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.kindgebonden_budget.avg_amount.toFixed(2)}
+                                    ${_t('js_eligible', 'In aanmerking:')} ${data.summary.laws.kindgebonden_budget.eligible_pct.toFixed(1)}%<br>
+                                    ${_t('js_avg_amount', 'Gem. bedrag:')} €${data.summary.laws.kindgebonden_budget.avg_amount.toFixed(2)}
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kindgebonden_budget-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1755,7 +1762,7 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="kindgebonden_budget-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.kindgebonden_budget.breakdowns ? renderLawBreakdowns(data.summary.laws.kindgebonden_budget.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.kindgebonden_budget.breakdowns ? renderLawBreakdowns(data.summary.laws.kindgebonden_budget.breakdowns) : `<p class="text-gray-500">${_t('js_no_details', 'Geen details beschikbaar')}</p>`}
                         </div>
                     </div>
                 </div>
@@ -1764,10 +1771,10 @@ function displayResults(data, simulationId) {
                     <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('ww', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('ww')}WW-uitkering</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('ww')}${_t('js_law_ww', 'WW-uitkering')}</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.ww.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.ww.avg_amount.toFixed(2)}
+                                    ${_t('js_eligible', 'In aanmerking:')} ${data.summary.laws.ww.eligible_pct.toFixed(1)}%<br>
+                                    ${_t('js_avg_amount', 'Gem. bedrag:')} €${data.summary.laws.ww.avg_amount.toFixed(2)}
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="ww-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1777,15 +1784,15 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="ww-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.ww.breakdowns ? renderLawBreakdowns(data.summary.laws.ww.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.ww.breakdowns ? renderLawBreakdowns(data.summary.laws.ww.breakdowns) : `<p class="text-gray-500">${_t('js_no_details', 'Geen details beschikbaar')}</p>`}
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <h4 class="font-medium flex items-center">${getLawIcon('voting_rights')}Kiesrecht</h4>
+                    <h4 class="font-medium flex items-center">${getLawIcon('voting_rights')}${_t('js_law_voting', 'Kiesrecht')}</h4>
                     <p class="text-sm text-gray-600">
-                        Stemgerechtigd: ${data.summary.laws.voting_rights.eligible_pct.toFixed(1)}%
+                        ${_t('js_voting_eligible', 'Stemgerechtigd:')} ${data.summary.laws.voting_rights.eligible_pct.toFixed(1)}%
                     </p>
                 </div>
 
@@ -1793,10 +1800,10 @@ function displayResults(data, simulationId) {
                     <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('inkomstenbelasting', this, '${simulationId}')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('income_tax')}Inkomstenbelasting</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('income_tax')}${_t('js_law_income_tax', 'Inkomstenbelasting')}</h4>
                                 <p class="text-sm text-gray-600">
-                                    Gem. belasting: €${data.summary.laws.inkomstenbelasting.avg_tax.toFixed(0)}<br>
-                                    Belastingtarief: ${data.summary.laws.inkomstenbelasting.avg_tax_rate.toFixed(1)}%
+                                    ${_t('js_avg_tax', 'Gem. belasting:')} €${data.summary.laws.inkomstenbelasting.avg_tax.toFixed(0)}<br>
+                                    ${_t('js_tax_rate', 'Belastingtarief:')} ${data.summary.laws.inkomstenbelasting.avg_tax_rate.toFixed(1)}%
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="inkomstenbelasting-chevron-${simulationId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1806,7 +1813,7 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="inkomstenbelasting-details-${simulationId}" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.inkomstenbelasting.breakdowns ? renderTaxBreakdowns(data.summary.laws.inkomstenbelasting.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.inkomstenbelasting.breakdowns ? renderTaxBreakdowns(data.summary.laws.inkomstenbelasting.breakdowns) : `<p class="text-gray-500">${_t('js_no_details', 'Geen details beschikbaar')}</p>`}
                         </div>
                     </div>
                 </div>
@@ -1821,20 +1828,20 @@ function displayResults(data, simulationId) {
                                 <svg class="h-6 w-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <h3 class="text-lg font-semibold text-gray-900">Besteedbaar Inkomen</h3>
+                                <h3 class="text-lg font-semibold text-gray-900">${_t('js_disposable_income', 'Besteedbaar Inkomen')}</h3>
                             </div>
-                            <p class="text-sm text-gray-600 mb-4">Het uiteindelijke resultaat na toepassing van alle wetten, belastingen en toeslagen</p>
+                            <p class="text-sm text-gray-600 mb-4">${_t('js_disposable_desc', 'Het uiteindelijke resultaat na toepassing van alle wetten, belastingen en toeslagen')}</p>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                 <div class="bg-white rounded-lg p-4">
-                                    <dt class="text-sm text-gray-500">Gemiddeld per maand</dt>
+                                    <dt class="text-sm text-gray-500">${_t('js_avg_per_month', 'Gemiddeld per maand')}</dt>
                                     <dd class="mt-1 text-2xl font-bold text-green-700">€${data.summary.disposable_income.avg_monthly.toFixed(0)}</dd>
                                 </div>
                                 <div class="bg-white rounded-lg p-4">
-                                    <dt class="text-sm text-gray-500">Mediaan per maand</dt>
+                                    <dt class="text-sm text-gray-500">${_t('js_median_per_month', 'Mediaan per maand')}</dt>
                                     <dd class="mt-1 text-2xl font-bold text-green-700">€${data.summary.disposable_income.median_monthly.toFixed(0)}</dd>
                                 </div>
                                 <div class="bg-white rounded-lg p-4">
-                                    <dt class="text-sm text-gray-500">Na woonkosten</dt>
+                                    <dt class="text-sm text-gray-500">${_t('js_after_housing', 'Na woonkosten')}</dt>
                                     <dd class="mt-1 text-2xl font-bold text-green-700">€${data.summary.disposable_income.after_housing_avg.toFixed(0)}</dd>
                                 </div>
                             </div>
@@ -1846,7 +1853,7 @@ function displayResults(data, simulationId) {
                 </div>
                 <div id="besteedbaar-inkomen-details-${simulationId}" class="hidden mt-6 pt-6 border-t border-green-200">
                     <div class="space-y-4">
-                        ${data.summary.disposable_income.breakdowns ? renderDisposableIncomeBreakdowns(data.summary.disposable_income.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                        ${data.summary.disposable_income.breakdowns ? renderDisposableIncomeBreakdowns(data.summary.disposable_income.breakdowns) : `<p class="text-gray-500">${_t('js_no_details', 'Geen details beschikbaar')}</p>`}
                     </div>
                 </div>
             </div>
@@ -1869,7 +1876,7 @@ function displayResults(data, simulationId) {
                     <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
-                    Kopieer
+                    ${_t('js_copy', 'Kopieer')}
                 </button>
             </div>
         </div>
@@ -1905,7 +1912,7 @@ function displayResults(data, simulationId) {
 function exportResults(format) {
     const activeTab = document.querySelector('#tab-bar .bg-blue-50');
     if (!activeTab) {
-        alert('Geen actieve simulatie om te exporteren.');
+        alert(_t('js_no_active_sim', 'Geen actieve simulatie om te exporteren.'));
         return;
     }
 
@@ -1913,7 +1920,7 @@ function exportResults(format) {
     const simulation = simulations[simulationId];
 
     if (!simulation || !simulation.sessionId) {
-        alert('Geen sessie ID gevonden voor deze simulatie.');
+        alert(_t('js_no_session_id', 'Geen sessie ID gevonden voor deze simulatie.'));
         return;
     }
 
@@ -1926,9 +1933,9 @@ function copyResultsAsMarkdown(simulationId) {
     if (!sim || !sim.results) return;
 
     const data = sim.results;
-    let markdown = `# Simulatie Resultaten\n\n`;
-    markdown += `**Datum:** ${new Date().toLocaleDateString('nl-NL')}\n`;
-    markdown += `**Aantal personen:** ${data.summary.demographics.total_people}\n\n`;
+    let markdown = `# ${_t('js_md_title', 'Simulatie Resultaten')}\n\n`;
+    markdown += `**${_t('js_md_date', 'Datum:')}** ${new Date().toLocaleDateString('nl-NL')}\n`;
+    markdown += `**${_t('js_md_num_people', 'Aantal personen:')}** ${data.summary.demographics.total_people}\n\n`;
 
     // Changed parameters
     const changedParamsForExport = [];
@@ -1942,7 +1949,7 @@ function copyResultsAsMarkdown(simulationId) {
                         const paramLabel = getParamDisplayName(param);
                         const formattedValue = formatParamValue(param, value);
                         const defaultFormatted = formatParamValue(param, defaultValue);
-                        changedParamsForExport.push(`- ${getLawDisplayName(law)} - ${paramLabel}: ${formattedValue} (standaard: ${defaultFormatted})`);
+                        changedParamsForExport.push(`- ${getLawDisplayName(law)} - ${paramLabel}: ${formattedValue} (${_t('js_default', 'standaard:')} ${defaultFormatted})`);
                     }
                 }
             });
@@ -1950,24 +1957,24 @@ function copyResultsAsMarkdown(simulationId) {
     }
 
     if (changedParamsForExport.length > 0) {
-        markdown += `## Aangepaste Parameters\n\n`;
+        markdown += `## ${_t('js_md_adjusted_params', 'Aangepaste Parameters')}\n\n`;
         markdown += changedParamsForExport.join('\n');
         markdown += `\n\n`;
     }
 
     // Demographics
-    markdown += `## Demografie\n\n`;
-    markdown += `| Metriek | Waarde |\n`;
+    markdown += `## ${_t('js_md_demographics', 'Demografie')}\n\n`;
+    markdown += `| ${_t('js_md_metric', 'Metriek')} | ${_t('js_md_value', 'Waarde')} |\n`;
     markdown += `|---------|--------|\n`;
-    markdown += `| Gemiddelde leeftijd | ${data.summary.demographics.avg_age.toFixed(1)} jaar |\n`;
-    markdown += `| Met partner | ${data.summary.demographics.with_partners_pct.toFixed(1)}% |\n`;
-    markdown += `| Studenten | ${data.summary.demographics.students_pct.toFixed(1)}% |\n`;
-    markdown += `| Huurders | ${data.summary.demographics.renters_pct.toFixed(1)}% |\n`;
-    markdown += `| Gemiddeld inkomen | €${data.summary.income.avg_annual.toFixed(0)}/jaar |\n\n`;
+    markdown += `| ${_t('js_md_avg_age', 'Gemiddelde leeftijd')} | ${data.summary.demographics.avg_age.toFixed(1)} jaar |\n`;
+    markdown += `| ${_t('js_md_with_partner', 'Met partner')} | ${data.summary.demographics.with_partners_pct.toFixed(1)}% |\n`;
+    markdown += `| ${_t('js_md_students', 'Studenten')} | ${data.summary.demographics.students_pct.toFixed(1)}% |\n`;
+    markdown += `| ${_t('js_md_renters', 'Huurders')} | ${data.summary.demographics.renters_pct.toFixed(1)}% |\n`;
+    markdown += `| ${_t('js_md_avg_income', 'Gemiddeld inkomen')} | €${data.summary.income.avg_annual.toFixed(0)}/jaar |\n\n`;
 
     // Laws
-    markdown += `## Wetten & Regelingen\n\n`;
-    markdown += `| Wet | In aanmerking | Gem. bedrag |\n`;
+    markdown += `## ${_t('js_md_laws', 'Wetten & Regelingen')}\n\n`;
+    markdown += `| ${_t('js_md_law', 'Wet')} | ${_t('js_md_eligible', 'In aanmerking')} | ${_t('js_md_avg_amount', 'Gem. bedrag')} |\n`;
     markdown += `|-----|---------------|-------------|\n`;
 
     const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
@@ -1979,11 +1986,11 @@ function copyResultsAsMarkdown(simulationId) {
             markdown += `| ${getLawDisplayName(law)} | ${lawData.eligible_pct.toFixed(1)}% | - |\n`;
         }
     });
-    markdown += `| Inkomstenbelasting | - | €${data.summary.laws.inkomstenbelasting.avg_tax.toFixed(0)}/maand |\n\n`;
+    markdown += `| ${_t('js_law_income_tax', 'Inkomstenbelasting')} | - | €${data.summary.laws.inkomstenbelasting.avg_tax.toFixed(0)}/maand |\n\n`;
 
     // Disposable income
-    markdown += `## Besteedbaar Inkomen\n\n`;
-    markdown += `**Gemiddeld:** €${data.summary.disposable_income.avg_monthly.toFixed(0)}/maand\n`;
+    markdown += `## ${_t('js_md_disposable', 'Besteedbaar Inkomen')}\n\n`;
+    markdown += `**${_t('js_md_average', 'Gemiddeld:')}** €${data.summary.disposable_income.avg_monthly.toFixed(0)}/maand\n`;
 
     // Copy to clipboard
     navigator.clipboard.writeText(markdown).then(() => {
@@ -1994,12 +2001,12 @@ function copyResultsAsMarkdown(simulationId) {
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
             </svg>
-            Resultaten gekopieerd als Markdown!
+            ${_t('js_md_copied', 'Resultaten gekopieerd als Markdown!')}
         `;
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 3000);
     }).catch(err => {
-        alert('Kopiëren mislukt: ' + err.message);
+        alert(_t('js_copy_failed', 'Kopiëren mislukt:') + ' ' + err.message);
     });
 }
 
@@ -2035,7 +2042,7 @@ function openComparisonView() {
         .map(([id, sim]) => ({id, ...sim}));
 
     if (completedSims.length < 2) {
-        alert('Je hebt minstens 2 voltooide simulaties nodig om te vergelijken.');
+        alert(_t('js_need_2_sims', 'Je hebt minstens 2 voltooide simulaties nodig om te vergelijken.'));
         return;
     }
 
@@ -2050,7 +2057,7 @@ function openComparisonView() {
     // Header
     content.innerHTML = `
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-gray-900">Vergelijk Simulaties</h2>
+            <h2 class="text-xl font-semibold text-gray-900">${_t('js_compare_title', 'Vergelijk Simulaties')}</h2>
             <button onclick="closeComparisonView()" class="text-gray-400 hover:text-gray-500 cursor-pointer">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -2095,40 +2102,40 @@ function exportComparison(format) {
     const comparisons = completedSims.slice(1);
 
     // Create CSV content
-    let csv = 'Metriek,' + baseline.tabName;
+    let csv = _t('js_compare_metric', 'Metriek') + ',' + baseline.tabName;
     comparisons.forEach((sim) => {
-        csv += `,${sim.tabName},Verschil`;
+        csv += `,${sim.tabName},${_t('js_compare_difference', 'Verschil')}`;
     });
     csv += '\n';
 
     // Demographics
-    csv += 'DEMOGRAFIE\n';
-    csv += createCSVRow('Aantal personen', baseline.results.summary.demographics.total_people, comparisons.map(c => c.results.summary.demographics.total_people), 'number');
-    csv += createCSVRow('Gemiddelde leeftijd', baseline.results.summary.demographics.avg_age, comparisons.map(c => c.results.summary.demographics.avg_age), 'decimal');
-    csv += createCSVRow('Met partner (%)', baseline.results.summary.demographics.with_partners_pct, comparisons.map(c => c.results.summary.demographics.with_partners_pct), 'percentage');
-    csv += createCSVRow('Studenten (%)', baseline.results.summary.demographics.students_pct, comparisons.map(c => c.results.summary.demographics.students_pct), 'percentage');
-    csv += createCSVRow('Huurders (%)', baseline.results.summary.demographics.renters_pct, comparisons.map(c => c.results.summary.demographics.renters_pct), 'percentage');
+    csv += _t('js_csv_demographics', 'DEMOGRAFIE') + '\n';
+    csv += createCSVRow(_t('js_compare_num_people', 'Aantal personen'), baseline.results.summary.demographics.total_people, comparisons.map(c => c.results.summary.demographics.total_people), 'number');
+    csv += createCSVRow(_t('js_compare_avg_age', 'Gemiddelde leeftijd'), baseline.results.summary.demographics.avg_age, comparisons.map(c => c.results.summary.demographics.avg_age), 'decimal');
+    csv += createCSVRow(_t('js_compare_with_partner', 'Met partner (%)'), baseline.results.summary.demographics.with_partners_pct, comparisons.map(c => c.results.summary.demographics.with_partners_pct), 'percentage');
+    csv += createCSVRow(_t('js_compare_students', 'Studenten (%)'), baseline.results.summary.demographics.students_pct, comparisons.map(c => c.results.summary.demographics.students_pct), 'percentage');
+    csv += createCSVRow(_t('js_compare_renters', 'Huurders (%)'), baseline.results.summary.demographics.renters_pct, comparisons.map(c => c.results.summary.demographics.renters_pct), 'percentage');
 
     // Income
-    csv += '\nINKOMEN\n';
-    csv += createCSVRow('Gemiddeld jaarinkomen', baseline.results.summary.income.avg_annual, comparisons.map(c => c.results.summary.income.avg_annual), 'currency');
+    csv += '\n' + _t('js_csv_income', 'INKOMEN') + '\n';
+    csv += createCSVRow(_t('js_compare_avg_income', 'Gemiddeld jaarinkomen'), baseline.results.summary.income.avg_annual, comparisons.map(c => c.results.summary.income.avg_annual), 'currency');
 
     // Laws
-    csv += '\nWETTEN & REGELINGEN\n';
+    csv += '\n' + _t('js_csv_laws', 'WETTEN & REGELINGEN') + '\n';
     const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
     laws.forEach(law => {
         const lawName = getLawDisplayName(law);
-        csv += createCSVRow(`${lawName} - In aanmerking (%)`, baseline.results.summary.laws[law].eligible_pct, comparisons.map(c => c.results.summary.laws[law].eligible_pct), 'percentage');
+        csv += createCSVRow(`${lawName} - ${_t('js_md_eligible', 'In aanmerking')} (%)`, baseline.results.summary.laws[law].eligible_pct, comparisons.map(c => c.results.summary.laws[law].eligible_pct), 'percentage');
         if (baseline.results.summary.laws[law].avg_amount !== undefined) {
-            csv += createCSVRow(`${lawName} - Gem. bedrag`, baseline.results.summary.laws[law].avg_amount, comparisons.map(c => c.results.summary.laws[law].avg_amount), 'currency');
+            csv += createCSVRow(`${lawName} - ${_t('js_md_avg_amount', 'Gem. bedrag')}`, baseline.results.summary.laws[law].avg_amount, comparisons.map(c => c.results.summary.laws[law].avg_amount), 'currency');
         }
     });
 
-    csv += createCSVRow('Inkomstenbelasting - Gem. belasting', baseline.results.summary.laws.inkomstenbelasting.avg_tax, comparisons.map(c => c.results.summary.laws.inkomstenbelasting.avg_tax), 'currency');
+    csv += createCSVRow(_t('js_law_income_tax', 'Inkomstenbelasting') + ' - ' + _t('js_avg_tax', 'Gem. belasting:'), baseline.results.summary.laws.inkomstenbelasting.avg_tax, comparisons.map(c => c.results.summary.laws.inkomstenbelasting.avg_tax), 'currency');
 
     // Disposable income
-    csv += '\nBESTEEDBAAR INKOMEN\n';
-    csv += createCSVRow('Gem. besteedbaar inkomen/maand', baseline.results.summary.disposable_income.avg_monthly, comparisons.map(c => c.results.summary.disposable_income.avg_monthly), 'currency');
+    csv += '\n' + _t('js_csv_disposable', 'BESTEEDBAAR INKOMEN') + '\n';
+    csv += createCSVRow(_t('js_csv_avg_disposable', 'Gem. besteedbaar inkomen/maand'), baseline.results.summary.disposable_income.avg_monthly, comparisons.map(c => c.results.summary.disposable_income.avg_monthly), 'currency');
 
     // Download the CSV
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -2181,14 +2188,12 @@ function renderSimulationSelector(simulations) {
     return `
         <div class="mb-6 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
             <p class="text-sm text-yellow-800 mb-3">
-                <strong>Let op:</strong> Er zijn ${simulations.length} simulaties beschikbaar.
-                Momenteel worden de eerste 4 simulaties vergeleken.
-                Selectie van specifieke simulaties komt in een volgende versie.
+                <strong>${_t('js_compare_note', 'Let op:')}</strong> ${_t('js_compare_note_text', 'Er zijn {count} simulaties beschikbaar. Momenteel worden de eerste 4 simulaties vergeleken. Selectie van specifieke simulaties komt in een volgende versie.').replace('{count}', simulations.length)}
             </p>
             <div class="flex flex-wrap gap-2">
                 ${simulations.slice(0, 4).map((sim, idx) => `
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                        Simulatie ${idx + 1}: ${sim.params.num_people} personen
+                        ${_t('js_compare_sim', 'Simulatie')} ${idx + 1}: ${sim.params.num_people} ${_t('js_tab_persons', 'personen')}
                     </span>
                 `).join('')}
             </div>
@@ -2205,10 +2210,10 @@ function renderComparisonContent(simulations) {
 
     let html = `
         <div class="mb-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Vergelijking Simulaties</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-4">${_t('js_compare_comparison', 'Vergelijking Simulaties')}</h3>
             <div class="bg-blue-50 p-4 rounded-lg mb-4">
                 <p class="text-sm text-blue-700">
-                    <strong>${baseline.tabName}:</strong> ${baseline.params.num_people} personen,
+                    <strong>${baseline.tabName}:</strong> ${baseline.params.num_people} ${_t('js_tab_persons', 'personen')},
                     ${baseline.params.simulation_date}
                 </p>
             </div>
@@ -2219,7 +2224,7 @@ function renderComparisonContent(simulations) {
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Metriek
+                            ${_t('js_compare_metric', 'Metriek')}
                         </th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             ${baseline.tabName}
@@ -2229,7 +2234,7 @@ function renderComparisonContent(simulations) {
                                 ${sim.tabName}
                             </th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Verschil
+                                ${_t('js_compare_difference', 'Verschil')}
                             </th>
                         `).join('')}
                     </tr>
@@ -2241,12 +2246,12 @@ function renderComparisonContent(simulations) {
         </div>
 
         <div class="mt-6">
-            <h4 class="text-md font-medium text-gray-900 mb-3">Parameter Verschillen</h4>
+            <h4 class="text-md font-medium text-gray-900 mb-3">${_t('js_compare_param_diffs', 'Parameter Verschillen')}</h4>
             ${renderParameterDifferences(baseline, comparisons)}
         </div>
 
         <div class="mt-8">
-            <h4 class="text-md font-medium text-gray-900 mb-3">Visuele Vergelijking</h4>
+            <h4 class="text-md font-medium text-gray-900 mb-3">${_t('js_compare_visual', 'Visuele Vergelijking')}</h4>
             ${renderComparisonCharts(baseline, comparisons)}
         </div>
     `;
@@ -2267,18 +2272,18 @@ function renderComparisonRows(baseline, comparisons) {
                     <svg id="${demoId}-icon" class="w-4 h-4 mr-2 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                    Demografie
+                    ${_t('js_demographics', 'Demografie')}
                 </div>
             </td>
         </tr>
     `;
 
     const demoMetrics = [
-        {key: 'total_people', label: 'Aantal personen', format: 'number'},
-        {key: 'avg_age', label: 'Gemiddelde leeftijd', format: 'decimal'},
-        {key: 'with_partners_pct', label: 'Met partner (%)', format: 'percentage'},
-        {key: 'students_pct', label: 'Studenten (%)', format: 'percentage'},
-        {key: 'renters_pct', label: 'Huurders (%)', format: 'percentage'}
+        {key: 'total_people', label: _t('js_compare_num_people', 'Aantal personen'), format: 'number'},
+        {key: 'avg_age', label: _t('js_compare_avg_age', 'Gemiddelde leeftijd'), format: 'decimal'},
+        {key: 'with_partners_pct', label: _t('js_compare_with_partner', 'Met partner (%)'), format: 'percentage'},
+        {key: 'students_pct', label: _t('js_compare_students', 'Studenten (%)'), format: 'percentage'},
+        {key: 'renters_pct', label: _t('js_compare_renters', 'Huurders (%)'), format: 'percentage'}
     ];
 
     demoMetrics.forEach(metric => {
@@ -2316,13 +2321,13 @@ function renderComparisonRows(baseline, comparisons) {
     html += `
         <tr class="bg-gray-50">
             <td colspan="${2 + comparisons.length * 2}" class="px-6 py-2 text-sm font-medium text-gray-900">
-                Inkomen
+                ${_t('js_income', 'Inkomen')}
             </td>
         </tr>
     `;
 
     html += renderMetricRow(
-        'Gemiddeld jaarinkomen',
+        _t('js_compare_avg_income', 'Gemiddeld jaarinkomen'),
         baseline.results.summary.income.avg_annual,
         comparisons.map(c => c.results.summary.income.avg_annual),
         'currency'
@@ -2332,7 +2337,7 @@ function renderComparisonRows(baseline, comparisons) {
     html += `
         <tr class="bg-gray-50">
             <td colspan="${2 + comparisons.length * 2}" class="px-6 py-2 text-sm font-medium text-gray-900">
-                Wetten & Regelingen
+                ${_t('js_laws_regulations', 'Wetten & Regelingen')}
             </td>
         </tr>
     `;
@@ -2401,7 +2406,7 @@ function renderComparisonRows(baseline, comparisons) {
 
     // Income tax
     html += renderMetricRow(
-        'Inkomstenbelasting - Gem. belasting',
+        _t('js_law_income_tax', 'Inkomstenbelasting') + ' - ' + _t('js_avg_tax', 'Gem. belasting:'),
         baseline.results.summary.laws.inkomstenbelasting.avg_tax,
         comparisons.map(c => c.results.summary.laws.inkomstenbelasting.avg_tax),
         'currency'
@@ -2411,13 +2416,13 @@ function renderComparisonRows(baseline, comparisons) {
     html += `
         <tr class="bg-green-50">
             <td colspan="${2 + comparisons.length * 2}" class="px-6 py-2 text-sm font-medium text-gray-900">
-                Besteedbaar Inkomen
+                ${_t('js_disposable_income', 'Besteedbaar Inkomen')}
             </td>
         </tr>
     `;
 
     html += renderMetricRow(
-        'Gem. besteedbaar inkomen/maand',
+        _t('js_csv_avg_disposable', 'Gem. besteedbaar inkomen/maand'),
         baseline.results.summary.disposable_income.avg_monthly,
         comparisons.map(c => c.results.summary.disposable_income.avg_monthly),
         'currency',
@@ -2473,15 +2478,15 @@ function formatValue(value, format) {
 
 function getLawDisplayName(law) {
     const names = {
-        'zorgtoeslagwet': 'Zorgtoeslag',
-        'huurtoeslag': 'Huurtoeslag',
-        'algemeneouderdomswet': 'AOW',
-        'bijstand': 'Bijstand',
-        'kinderopvang': 'Kinderopvangtoeslag',
-        'kindgebonden_budget': 'Kindgebonden budget',
-        'ww': 'WW-uitkering',
-        'voting_rights': 'Kiesrecht',
-        'inkomstenbelasting': 'Inkomstenbelasting'
+        'zorgtoeslagwet': _t('js_law_zorgtoeslag', 'Zorgtoeslag'),
+        'huurtoeslag': _t('js_law_huurtoeslag', 'Huurtoeslag'),
+        'algemeneouderdomswet': _t('js_law_aow', 'AOW'),
+        'bijstand': _t('js_law_bijstand', 'Bijstand'),
+        'kinderopvang': _t('js_law_kinderopvang', 'Kinderopvangtoeslag'),
+        'kindgebonden_budget': _t('js_law_kindgebonden', 'Kindgebonden budget'),
+        'ww': _t('js_law_ww', 'WW-uitkering'),
+        'voting_rights': _t('js_law_voting', 'Kiesrecht'),
+        'inkomstenbelasting': _t('js_law_income_tax', 'Inkomstenbelasting')
     };
     return names[law] || law;
 }
@@ -2748,7 +2753,7 @@ function renderLawBreakdowns(breakdowns) {
         html += '</table></div>';
     }
 
-    return html || '<p class="text-gray-500">Geen breakdowns beschikbaar</p>';
+    return html || '<p class="text-gray-500">' + _t('js_no_details', 'Geen details beschikbaar') + '</p>';
 }
 
 function renderTaxBreakdowns(breakdowns) {
@@ -2783,7 +2788,7 @@ function renderTaxBreakdowns(breakdowns) {
         html += '</table></div>';
     }
 
-    return html || '<p class="text-gray-500">Geen breakdowns beschikbaar</p>';
+    return html || '<p class="text-gray-500">' + _t('js_no_details', 'Geen details beschikbaar') + '</p>';
 }
 
 function renderDisposableIncomeBreakdowns(breakdowns) {
@@ -2820,7 +2825,7 @@ function renderDisposableIncomeBreakdowns(breakdowns) {
         html += '</table></div>';
     }
 
-    return html || '<p class="text-gray-500">Geen details beschikbaar</p>';
+    return html || '<p class="text-gray-500">' + _t('js_no_details', 'Geen details beschikbaar') + '</p>';
 }
 
 // Toggle accordion sections in comparison table

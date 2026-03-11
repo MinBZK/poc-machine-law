@@ -9,6 +9,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 from explain.llm_factory import LLMFactory, llm_factory
+from web.demo.translations import get_lang, get_translations
 from web.demo_profiles import get_demo_profile_type
 from web.dependencies import is_demo_mode, templates
 
@@ -54,6 +55,9 @@ _BUSINESS_DEFAULT = [
 @router.get("/")
 async def harmonize_page(request: Request):
     """Render the harmonisatie configuration page."""
+    lang = get_lang(request)
+    t = get_translations(lang)
+
     profile_type = get_demo_profile_type()
     is_business = profile_type == "ondernemer"
 
@@ -94,6 +98,8 @@ async def harmonize_page(request: Request):
             "profile_type": profile_type,
             "available_laws": available_laws,
             "default_selected": default_selected,
+            "t": t,
+            "lang": lang,
         },
     )
 

@@ -1,26 +1,26 @@
 <div class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600"
      id="law-feature-flags"
      x-data="{ openSection: '{{ open_section | default("citizen") }}' }">
-    <h1 class="text-gray-900 text-3xl font-semibold mb-5">Wetten</h1>
-    <p class="mb-5">Schakel specifieke wetten aan of uit voor de applicatie.</p>
+    <h1 class="text-gray-900 text-3xl font-semibold mb-5">{{ t.admin_lff_title if t else 'Wetten' }}</h1>
+    <p class="mb-5">{{ t.admin_lff_description if t else 'Schakel specifieke wetten aan of uit voor de applicatie.' }}</p>
     <div class="space-y-4">
         {% set sections = [
-            {
-                "key": "citizen",
-                "label": "Burger",
-                "color": "blue"
-            },
-            {
-                "key": "business",
-                "label": "Bedrijven",
-                "color": "green"
-            },
-            {
-                "key": "delegation",
-                "label": "Delegatie",
-                "color": "purple"
-            }
-        ] %}
+                    {
+                        "key": "citizen",
+                        "label": t.admin_lff_citizen if t else "Burger",
+                        "color": "blue"
+                    },
+                    {
+                        "key": "business",
+                        "label": t.admin_lff_business if t else "Bedrijven",
+                        "color": "green"
+                    },
+                    {
+                        "key": "delegation",
+                        "label": t.admin_lff_delegation if t else "Delegatie",
+                        "color": "purple"
+                    }
+                ] %}
         {% for section in sections %}
             {% set section_laws = law_flags[section.key] if law_flags[section.key] else {} %}
             <div class="border rounded-lg overflow-hidden">
@@ -29,7 +29,7 @@
                     <span class="font-medium text-lg">{{ section.label }}</span>
                     <div class="flex items-center gap-3">
                         <span class="px-2 py-1 text-sm bg-{{ section.color }}-100 text-{{ section.color }}-800 rounded-full">
-                            {{ section_laws|length }} diensten
+                            {{ section_laws|length }} {{ t.admin_lff_services if t else 'diensten' }}
                         </span>
                         <svg class="w-5 h-5 transition-transform"
                              :class="{ 'rotate-180': openSection === '{{ section.key }}' }"
@@ -71,7 +71,7 @@
                             </div>
                         </div>
                     {% else %}
-                        <p class="text-gray-500 italic">Geen wetten beschikbaar</p>
+                        <p class="text-gray-500 italic">{{ t.admin_lff_no_laws if t else 'Geen wetten beschikbaar' }}</p>
                     {% endfor %}
                 </div>
             </div>

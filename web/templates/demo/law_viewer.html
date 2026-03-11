@@ -5,11 +5,11 @@
         <!-- Sidebar with law list -->
         <aside class="demo-sidebar">
             <div class="sidebar-header">
-                <h2>Beschikbare Wetten</h2>
+                <h2>{{ t.law_available_laws if t else 'Beschikbare Wetten' }}</h2>
                 <input type="text"
                        id="law-search"
                        class="law-search"
-                       placeholder="Zoek wetten...">
+                       placeholder="{{ t.law_search_placeholder if t else 'Zoek wetten...' }}">
             </div>
             <div class="law-list" id="law-list">
                 {% for directory, laws in grouped_laws.items() %}
@@ -45,7 +45,7 @@
             <div class="law-viewer">
                 <!-- Breadcrumb -->
                 <div class="breadcrumb">
-                    <a href="/demo">Wetten</a>
+                    <a href="/demo">{{ t.law_breadcrumb_laws if t else 'Wetten' }}</a>
                     <span class="separator">/</span>
                     <span class="current">{{ law_data.law }}</span>
                 </div>
@@ -55,12 +55,12 @@
                     <div class="law-meta">
                         <span class="badge">{{ law_data.service }}</span>
                         <span class="badge">{{ law_data.law }}</span>
-                        <span class="badge">Geldig vanaf: {{ law_data.valid_from }}</span>
+                        <span class="badge">{{ t.law_valid_from if t else 'Geldig vanaf:' }} {{ law_data.valid_from }}</span>
                     </div>
                 </div>
                 <!-- Toolbar -->
                 <div class="law-toolbar">
-                    <button class="btn btn-secondary" onclick="collapseAll()">Alles inklappen</button>
+                    <button class="btn btn-secondary" onclick="collapseAll()">{{ t.law_collapse_all if t else 'Alles inklappen' }}</button>
                 </div>
                 <!-- YAML content -->
                 <div class="yaml-content">{{ yaml_html | safe }}</div>

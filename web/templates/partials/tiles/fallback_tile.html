@@ -7,7 +7,7 @@
                     <div class="mb-2">
                         <span class="font-medium">{{ key|replace('_', ' ') |title }}:</span>
                         {% if value is boolean %}
-                            {{ 'Ja' if value else 'Nee' }}
+                            {{ (t.tile_yes if t else 'Ja') if value else (t.tile_no if t else 'Nee') }}
                         {% else %}
                             {{ value }}
                         {% endif %}

@@ -15,7 +15,7 @@
             {% if missing_required %}
                 <div class="space-y-4">
                     <p class="text-sm text-gray-600">
-                        Er ontbreken gegevens om te bepalen of de jaarrekening deponeringsplicht van toepassing is.
+                        {{ t.kvk_missing_data if t else 'Er ontbreken gegevens om te bepalen of de jaarrekening deponeringsplicht van toepassing is.' }}
                     </p>
                 </div>
             {% elif result and result.heeft_deponeringsplicht %}
@@ -26,12 +26,12 @@
                              viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span class="font-medium">Deponeringsplicht van toepassing</span>
+                        <span class="font-medium">{{ t.kvk_applicable if t else 'Deponeringsplicht van toepassing' }}</span>
                         <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
                                 hx-target="#shared-application-panel"
                                 hx-swap="innerHTML"
                                 class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
-                            waarom?
+                            {{ t.tile_why if t else 'waarom?' }}
                         </button>
                     </div>
                     {% if result.volgende_deadline %}
@@ -45,11 +45,11 @@
                                 </svg>
                                 <div>
                                     <p class="text-sm font-medium text-amber-800">
-                                        Deponeer uw jaarrekening voor
+                                        {{ t.kvk_deposit_before if t else 'Deponeer uw jaarrekening voor' }}
                                         <span class="font-bold">{{ result.volgende_deadline|format_date }}</span>
                                     </p>
                                     {% if result.rapportage_methode %}
-                                        <p class="text-sm text-amber-700 mt-1">Via: {{ result.rapportage_methode }}</p>
+                                        <p class="text-sm text-amber-700 mt-1">{{ t.rvo_via if t else 'Via:' }} {{ result.rapportage_methode }}</p>
                                     {% endif %}
                                 </div>
                             </div>
@@ -64,18 +64,20 @@
                              viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                         </svg>
-                        <span class="font-medium">Niet van toepassing</span>
+                        <span class="font-medium">{{ t.kvk_not_applicable if t else 'Niet van toepassing' }}</span>
                         <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
                                 hx-target="#shared-application-panel"
                                 hx-swap="innerHTML"
                                 class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
-                            waarom?
+                            {{ t.tile_why if t else 'waarom?' }}
                         </button>
                     </div>
                     {% if result and result.reden_vrijstelling %}
                         <p class="text-sm text-gray-500">{{ result.reden_vrijstelling }}</p>
                     {% else %}
-                        <p class="text-sm text-gray-500">Uw organisatie is een eenmanszaak en daarmee vrijgesteld van de deponeringsplicht.</p>
+                        <p class="text-sm text-gray-500">
+                            {{ t.kvk_exemption_reason if t else 'Uw organisatie is een eenmanszaak en daarmee vrijgesteld van de deponeringsplicht.' }}
+                        </p>
                     {% endif %}
                 </div>
             {% endif %}
@@ -84,15 +86,15 @@
         {% if missing_required %}
             <div class="mt-6 pt-4 border-t border-gray-100">
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <h4 class="font-medium text-gray-900 mb-2">Gegevens aanleveren</h4>
+                    <h4 class="font-medium text-gray-900 mb-2">{{ t.haccp_provide_data if t else 'Gegevens aanleveren' }}</h4>
                     <p class="text-sm text-gray-600 mb-4">
-                        Vul uw bedrijfsgegevens in om te bepalen of de deponeringsplicht op u van toepassing is.
+                        {{ t.kvk_provide_data_desc if t else 'Vul uw bedrijfsgegevens in om te bepalen of de deponeringsplicht op u van toepassing is.' }}
                     </p>
                     <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=application"
                             hx-target="#shared-application-panel"
                             hx-swap="innerHTML"
                             class="w-full px-4 py-2 bg-gray-600 text-white text-center rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
-                        Gegevens aanleveren
+                        {{ t.haccp_provide_data if t else 'Gegevens aanleveren' }}
                     </button>
                 </div>
             </div>
@@ -103,11 +105,13 @@
                             hx-target="#shared-application-panel"
                             hx-swap="innerHTML"
                             class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
-                        Jaarrekening deponeren
+                        {{ t.kvk_deposit if t else 'Jaarrekening deponeren' }}
                     </button>
                 {% elif current_case.status == 'SUBMITTED' %}
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                        <p class="text-sm text-blue-800">Uw jaarrekening is ontvangen en wordt verwerkt door de KVK.</p>
+                        <p class="text-sm text-blue-800">
+                            {{ t.kvk_received if t else 'Uw jaarrekening is ontvangen en wordt verwerkt door de KVK.' }}
+                        </p>
                     </div>
                 {% elif current_case.status == 'DECIDED' and current_case.approved %}
                     <div class="bg-green-50 border border-green-100 rounded-lg p-4">
@@ -117,7 +121,7 @@
                                  viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                             </svg>
-                            <span class="font-medium">Uw jaarrekening is gedeponeerd bij de KVK</span>
+                            <span class="font-medium">{{ t.kvk_deposited if t else 'Uw jaarrekening is gedeponeerd bij de KVK' }}</span>
                         </div>
                     </div>
                 {% endif %}
