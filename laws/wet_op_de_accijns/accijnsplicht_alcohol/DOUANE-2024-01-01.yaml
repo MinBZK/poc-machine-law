@@ -1,0 +1,751 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.7/schema.json
+uuid: d4e8f2a1-7c3b-4a9e-b5d1-6f8e2c4a3b7d
+name: Accijnsplicht en tarief alcoholhoudende dranken
+law: wet_op_de_accijns/accijnsplicht_alcohol
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "AANSLAG"
+discoverable: "BUSINESS"
+requires_manual_approval: true
+valid_from: 2024-01-01
+service: "DOUANE"
+description: >
+  Bepaling van de accijnsplicht en het verschuldigde accijnstarief voor alcoholhoudende dranken
+  op grond van de Wet op de accijns. Op basis van het type product, het alcoholpercentage en
+  de hoeveelheid wordt bepaald of accijns verschuldigd is en wat het tarief is. De accijns wordt
+  verschuldigd ter zake van de uitslag tot verbruik (artikel 1 lid 2). Productie en opslag van
+  accijnsgoederen buiten een accijnsgoederenplaats (AGP) is verboden (artikel 5).
+
+legal_basis:
+  law: "Wet op de accijns"
+  bwb_id: "BWBR0005251"
+  article: "1"
+  url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+  juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 1 lid 1 bepaalt dat onder de naam accijns een belasting wordt geheven van bier, wijn, tussenproducten, overige alcoholhoudende producten, minerale olien en tabaksproducten"
+
+references:
+  - law: "Wet op de accijns"
+    article: "1"
+    url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+  - law: "Wet op de accijns"
+    article: "2"
+    url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel2"
+  - law: "Wet op de accijns"
+    article: "5"
+    url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel5"
+  - law: "Wet op de accijns"
+    article: "7"
+    url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel7"
+  - law: "Wet op de accijns"
+    article: "10"
+    url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel10"
+  - law: "Wet op de accijns"
+    article: "11d"
+    url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel11d"
+  - law: "Wet op de accijns"
+    article: "13"
+    url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel13"
+
+properties:
+  parameters:
+    - name: "KVK_NUMMER"
+      description: "KvK-nummer van de organisatie"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "1"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Identificatie van het bedrijf dat accijnsgoederen uitslaat tot verbruik"
+
+    - name: "TYPE_PRODUCT"
+      description: "Type alcoholhoudend product"
+      type: "enum"
+      type_spec:
+        enum: ["bier", "wijn_niet_mousserend", "wijn_mousserend", "tussenproduct_niet_mousserend", "tussenproduct_mousserend", "overige_alcohol"]
+        enum_labels:
+          bier: "Bier"
+          wijn_niet_mousserend: "Wijn (niet-mousserend)"
+          wijn_mousserend: "Wijn (mousserend)"
+          tussenproduct_niet_mousserend: "Tussenproduct (niet-mousserend)"
+          tussenproduct_mousserend: "Tussenproduct (mousserend)"
+          overige_alcohol: "Overige alcoholhoudende producten"
+      required: true
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "1"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 1 lid 1 onderscheidt de accijnscategorieen: bier (a), wijn (b), tussenproducten (c), overige alcoholhoudende producten (d)"
+
+    - name: "ALCOHOLPERCENTAGE"
+      description: "Alcoholgehalte van het product in volumeprocenten bij 20 graden Celsius"
+      type: "number"
+      required: true
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "7"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel7"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=7&z=2024-01-01&g=2024-01-01"
+        explanation: "Het alcoholgehalte is bepalend voor de tariefberekening bij bier en overige alcoholhoudende producten"
+
+    - name: "HOEVEELHEID_HECTOLITER"
+      description: "Hoeveelheid product in hectoliter"
+      type: "number"
+      required: true
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "7"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel7"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=7&z=2024-01-01&g=2024-01-01"
+        explanation: "De accijns wordt berekend per hectoliter"
+
+    - name: "IS_KLEINE_BROUWERIJ"
+      description: "Of het bedrijf een kleine brouwerij is met een jaarproductie van niet meer dan 200.000 hectoliter"
+      type: "boolean"
+      required: false
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "7"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel7"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=7&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7 lid 2 voorziet in een verlaagd tarief voor bier dat is geproduceerd door een kleine brouwerij met een jaarproductie van niet meer dan 200.000 hectoliter"
+
+    - name: "ACTIVITEIT"
+      description: "Activiteit met betrekking tot accijnsgoederen"
+      type: "enum"
+      type_spec:
+        enum: ["productie", "opslag", "invoer", "handel"]
+        enum_labels:
+          productie: "Productie"
+          opslag: "Opslag"
+          invoer: "Invoer"
+          handel: "Handel"
+      required: true
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "5"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=5&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5 verbiedt productie en verwerking buiten een accijnsgoederenplaats; de activiteit bepaalt of een AGP-vergunning vereist is"
+
+  sources:
+    - name: "SBI_CODE"
+      description: "SBI-code (Standaard Bedrijfsindeling) van de organisatie uit het handelsregister"
+      type: "string"
+      required: true
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "KVK"
+        table: "organisaties"
+        field: "sbi_code"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK-nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "9"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel9"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=9&z=2024-01-01&g=2024-01-01"
+        explanation: "De SBI-code wordt gebruikt om te bepalen of het bedrijf activiteiten verricht met accijnsgoederen"
+
+    - name: "HEEFT_AGP_VERGUNNING"
+      description: "Of het bedrijf beschikt over een vergunning voor een accijnsgoederenplaats"
+      type: "boolean"
+      required: false
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "DOUANE"
+        table: "agp_vergunningen"
+        field: "heeft_agp_vergunning"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK-nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "40"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukIII_Afdeling1_Artikel40"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=40&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 40 bepaalt dat voor het hebben van een accijnsgoederenplaats een vergunning van de inspecteur is vereist"
+
+  output:
+    - name: "is_accijnsgoed"
+      description: "Of het product kwalificeert als accijnsgoed in de zin van artikel 1 lid 1 Wet op de accijns"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "1"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 1 lid 1 somt de goederen op waarover accijns wordt geheven: bier, wijn, tussenproducten, overige alcoholhoudende producten, minerale olien en tabaksproducten"
+
+    - name: "accijnscategorie"
+      description: "De accijnscategorie waaronder het product valt volgens Hoofdstuk II Wet op de accijns"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "1"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Hoofdstuk II onderscheidt de accijnscategorieen met elk eigen definities en tarieven"
+
+    - name: "tarief_per_hectoliter"
+      description: "Het accijnstarief in euro per hectoliter conform de toepasselijke tariefbepaling"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "7"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel7"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=7&z=2024-01-01&g=2024-01-01"
+        explanation: "De tarieven zijn vastgelegd in de artikelen 7 (bier), 10 (wijn), 11d (tussenproducten) en 13 (overige alcoholhoudende producten)"
+
+    - name: "verschuldigde_accijns"
+      description: "Het totaalbedrag aan verschuldigde accijns in euro"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "1"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 1 lid 2 bepaalt dat de accijns verschuldigd wordt ter zake van de uitslag tot verbruik"
+
+    - name: "agp_vergunning_vereist"
+      description: "Of een vergunning voor een accijnsgoederenplaats vereist is op grond van artikel 40"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "40"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukIII_Afdeling1_Artikel40"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=40&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 40: voor het hebben van een accijnsgoederenplaats is een vergunning van de inspecteur vereist; dit geldt voor productie en opslag onder schorsing"
+
+    - name: "heeft_agp_vergunning"
+      description: "Of het bedrijf beschikt over de vereiste AGP-vergunning"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "40"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukIII_Afdeling1_Artikel40"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=40&z=2024-01-01&g=2024-01-01"
+        explanation: "De vergunningsstatus wordt gecontroleerd in het register van de Douane"
+
+    - name: "voldoet_aan_vergunningsplicht"
+      description: "Of het bedrijf voldoet aan de vergunningsplicht: geen AGP-vergunning nodig, of AGP-vergunning aanwezig"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet op de accijns"
+        bwb_id: "BWBR0005251"
+        article: "5"
+        url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0005251&artikel=5&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5 verbiedt productie en opslag van accijnsgoederen buiten een accijnsgoederenplaats; bij overtreding is er sprake van een strafbaar feit"
+
+  definitions:
+    # Accijnscategorieen conform artikel 1 lid 1
+    TYPE_BIER: "bier"
+    TYPE_WIJN_NIET_MOUSSEREND: "wijn_niet_mousserend"
+    TYPE_WIJN_MOUSSEREND: "wijn_mousserend"
+    TYPE_TUSSENPRODUCT_NIET_MOUSSEREND: "tussenproduct_niet_mousserend"
+    TYPE_TUSSENPRODUCT_MOUSSEREND: "tussenproduct_mousserend"
+    TYPE_OVERIGE_ALCOHOL: "overige_alcohol"
+
+    # Tarieven per 1 januari 2024 conform de wet
+    # Artikel 7 lid 1: biertarief per hectoliter per volumeprocent alcohol
+    TARIEF_BIER_PER_HL_PER_PROCENT: 8.12
+    # Artikel 7 lid 1: minimumtarief bier per hectoliter
+    TARIEF_BIER_MINIMUM_PER_HL: 26.13
+    # Artikel 7 lid 2: verlaagd biertarief kleine brouwerij per hectoliter per volumeprocent
+    TARIEF_BIER_KLEIN_PER_HL_PER_PROCENT: 7.51
+    # Artikel 10: wijntarief niet-mousserend, alcoholgehalte t/m 8,5%
+    TARIEF_WIJN_LAAG_PER_HL: 47.95
+    # Artikel 10: wijntarief niet-mousserend, alcoholgehalte boven 8,5%
+    TARIEF_WIJN_HOOG_PER_HL: 95.69
+    # Artikel 10: wijntarief mousserend, alcoholgehalte t/m 8,5%
+    TARIEF_WIJN_MOUSSEREND_LAAG_PER_HL: 47.95
+    # Artikel 10: wijntarief mousserend, alcoholgehalte boven 8,5%
+    TARIEF_WIJN_MOUSSEREND_HOOG_PER_HL: 95.69
+    # Artikel 11d: tussenproducten niet-mousserend, t/m 15%
+    TARIEF_TUSSEN_LAAG_PER_HL: 114.85
+    # Artikel 11d: tussenproducten niet-mousserend, boven 15%
+    TARIEF_TUSSEN_HOOG_PER_HL: 161.80
+    # Artikel 11d: tussenproducten mousserend, t/m 15%
+    TARIEF_TUSSEN_MOUSSEREND_LAAG_PER_HL: 114.85
+    # Artikel 11d: tussenproducten mousserend, boven 15%
+    TARIEF_TUSSEN_MOUSSEREND_HOOG_PER_HL: 161.80
+    # Artikel 13: overige alcoholhoudende producten per hectoliter per volumeprocent
+    TARIEF_OVERIGE_PER_HL_PER_PROCENT: 18.27
+
+    # Grenswaarden alcoholpercentage
+    GRENS_WIJN_ALCOHOL: 8.5
+    GRENS_TUSSEN_ALCOHOL: 15
+
+    # Activiteiten die een AGP-vergunning vereisen (artikel 5 jo. artikel 40)
+    ACTIVITEIT_PRODUCTIE: "productie"
+    ACTIVITEIT_OPSLAG: "opslag"
+    ACTIVITEIT_INVOER: "invoer"
+    ACTIVITEIT_HANDEL: "handel"
+
+variables: []
+
+requirements:
+  - all:
+      # Het product moet een erkend type accijnsgoed zijn (artikel 1 lid 1)
+      - subject: "$TYPE_PRODUCT"
+        operation: IN
+        values:
+          - "$TYPE_BIER"
+          - "$TYPE_WIJN_NIET_MOUSSEREND"
+          - "$TYPE_WIJN_MOUSSEREND"
+          - "$TYPE_TUSSENPRODUCT_NIET_MOUSSEREND"
+          - "$TYPE_TUSSENPRODUCT_MOUSSEREND"
+          - "$TYPE_OVERIGE_ALCOHOL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "1"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Het product moet vallen onder een van de in artikel 1 lid 1 genoemde categorieen van accijnsgoederen"
+
+      # Alcoholpercentage moet boven 0 liggen
+      - subject: "$ALCOHOLPERCENTAGE"
+        operation: GREATER_THAN
+        value: 0
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "6"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel6"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=6&z=2024-01-01&g=2024-01-01"
+          explanation: "Accijns is alleen verschuldigd over producten met een alcoholgehalte van meer dan 0,5 volumeprocent (bier) of meer dan 1,2 volumeprocent (wijn en overige)"
+
+      # Hoeveelheid moet positief zijn
+      - subject: "$HOEVEELHEID_HECTOLITER"
+        operation: GREATER_THAN
+        value: 0
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "1"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Accijns wordt geheven over een positieve hoeveelheid accijnsgoederen bij uitslag tot verbruik"
+
+actions:
+  # Stap 1: Bepaal of het product een accijnsgoed is (artikel 1 lid 1)
+  - output: "is_accijnsgoed"
+    value: true
+    legal_basis:
+      law: "Wet op de accijns"
+      bwb_id: "BWBR0005251"
+      article: "1"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+      juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Het product valt onder een van de categorieen van artikel 1 lid 1 en kwalificeert als accijnsgoed"
+
+  # Stap 2: Bepaal de accijnscategorie
+  - output: "accijnscategorie"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$TYPE_PRODUCT"
+          operation: EQUALS
+          value: "$TYPE_BIER"
+        then: "bier"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "6"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel6"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=6&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 6: onder bier wordt verstaan elk product van GN-code 2203 en bepaalde producten van GN-code 2206"
+      - test:
+          operation: OR
+          values:
+            - operation: EQUALS
+              subject: "$TYPE_PRODUCT"
+              value: "$TYPE_WIJN_NIET_MOUSSEREND"
+            - operation: EQUALS
+              subject: "$TYPE_PRODUCT"
+              value: "$TYPE_WIJN_MOUSSEREND"
+        then: "wijn"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "8"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel8"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=8&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikelen 8 en 8a: onderscheid tussen niet-mousserende en mousserende wijn"
+      - test:
+          operation: OR
+          values:
+            - operation: EQUALS
+              subject: "$TYPE_PRODUCT"
+              value: "$TYPE_TUSSENPRODUCT_NIET_MOUSSEREND"
+            - operation: EQUALS
+              subject: "$TYPE_PRODUCT"
+              value: "$TYPE_TUSSENPRODUCT_MOUSSEREND"
+        then: "tussenproducten"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "11a"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel11a"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=11a&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikelen 11a-11d: tussenproducten met een alcoholgehalte van meer dan 1,2 maar niet meer dan 22 volumeprocent"
+      - test:
+          subject: "$TYPE_PRODUCT"
+          operation: EQUALS
+          value: "$TYPE_OVERIGE_ALCOHOL"
+        then: "overige_alcoholhoudende_producten"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "12"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel12"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=12&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 12: overige alcoholhoudende producten (gedistilleerd) met een alcoholgehalte van meer dan 1,2 volumeprocent"
+      - else: "onbekend"
+    legal_basis:
+      law: "Wet op de accijns"
+      bwb_id: "BWBR0005251"
+      article: "1"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+      juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Indeling in accijnscategorie op basis van het type product conform Hoofdstuk II"
+
+  # Stap 3: Bereken het tarief per hectoliter
+  - output: "tarief_per_hectoliter"
+    operation: IF
+    conditions:
+      # Bier - kleine brouwerij (artikel 7 lid 2)
+      - test:
+          operation: AND
+          values:
+            - operation: EQUALS
+              subject: "$TYPE_PRODUCT"
+              value: "$TYPE_BIER"
+            - operation: EQUALS
+              subject: "$IS_KLEINE_BROUWERIJ"
+              value: true
+        then:
+          operation: MAX
+          values:
+            - operation: MULTIPLY
+              values:
+                - "$TARIEF_BIER_KLEIN_PER_HL_PER_PROCENT"
+                - "$ALCOHOLPERCENTAGE"
+            - "$TARIEF_BIER_MINIMUM_PER_HL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "7"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel7"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=7&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 7 lid 2: verlaagd tarief van 7,51 euro per hectoliter per volumeprocent voor kleine brouwerijen met jaarproductie van niet meer dan 200.000 hectoliter"
+
+      # Bier - normaal tarief (artikel 7 lid 1)
+      - test:
+          subject: "$TYPE_PRODUCT"
+          operation: EQUALS
+          value: "$TYPE_BIER"
+        then:
+          operation: MAX
+          values:
+            - operation: MULTIPLY
+              values:
+                - "$TARIEF_BIER_PER_HL_PER_PROCENT"
+                - "$ALCOHOLPERCENTAGE"
+            - "$TARIEF_BIER_MINIMUM_PER_HL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "7"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel7"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=7&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 7 lid 1: tarief van 8,12 euro per hectoliter per volumeprocent alcohol, met een minimum van 26,13 euro per hectoliter"
+
+      # Wijn niet-mousserend - laag alcoholgehalte (artikel 10)
+      - test:
+          operation: AND
+          values:
+            - operation: EQUALS
+              subject: "$TYPE_PRODUCT"
+              value: "$TYPE_WIJN_NIET_MOUSSEREND"
+            - operation: LESS_OR_EQUAL
+              subject: "$ALCOHOLPERCENTAGE"
+              value: "$GRENS_WIJN_ALCOHOL"
+        then: "$TARIEF_WIJN_LAAG_PER_HL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "10"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel10"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=10&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 10: tarief van 47,95 euro per hectoliter voor niet-mousserende wijn met een alcoholgehalte van niet meer dan 8,5 volumeprocent"
+
+      # Wijn niet-mousserend - hoog alcoholgehalte (artikel 10)
+      - test:
+          subject: "$TYPE_PRODUCT"
+          operation: EQUALS
+          value: "$TYPE_WIJN_NIET_MOUSSEREND"
+        then: "$TARIEF_WIJN_HOOG_PER_HL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "10"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel10"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=10&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 10: tarief van 95,69 euro per hectoliter voor niet-mousserende wijn met een alcoholgehalte van meer dan 8,5 volumeprocent"
+
+      # Wijn mousserend - laag alcoholgehalte (artikel 10)
+      - test:
+          operation: AND
+          values:
+            - operation: EQUALS
+              subject: "$TYPE_PRODUCT"
+              value: "$TYPE_WIJN_MOUSSEREND"
+            - operation: LESS_OR_EQUAL
+              subject: "$ALCOHOLPERCENTAGE"
+              value: "$GRENS_WIJN_ALCOHOL"
+        then: "$TARIEF_WIJN_MOUSSEREND_LAAG_PER_HL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "10"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel10"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=10&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 10: tarief van 47,95 euro per hectoliter voor mousserende wijn met een alcoholgehalte van niet meer dan 8,5 volumeprocent"
+
+      # Wijn mousserend - hoog alcoholgehalte (artikel 10)
+      - test:
+          subject: "$TYPE_PRODUCT"
+          operation: EQUALS
+          value: "$TYPE_WIJN_MOUSSEREND"
+        then: "$TARIEF_WIJN_MOUSSEREND_HOOG_PER_HL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "10"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel10"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=10&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 10: tarief van 95,69 euro per hectoliter voor mousserende wijn met een alcoholgehalte van meer dan 8,5 volumeprocent"
+
+      # Tussenproduct niet-mousserend - laag (artikel 11d)
+      - test:
+          operation: AND
+          values:
+            - operation: EQUALS
+              subject: "$TYPE_PRODUCT"
+              value: "$TYPE_TUSSENPRODUCT_NIET_MOUSSEREND"
+            - operation: LESS_OR_EQUAL
+              subject: "$ALCOHOLPERCENTAGE"
+              value: "$GRENS_TUSSEN_ALCOHOL"
+        then: "$TARIEF_TUSSEN_LAAG_PER_HL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "11d"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel11d"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=11d&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 11d: tarief van 114,85 euro per hectoliter voor niet-mousserende tussenproducten met een alcoholgehalte van niet meer dan 15 volumeprocent"
+
+      # Tussenproduct niet-mousserend - hoog (artikel 11d)
+      - test:
+          subject: "$TYPE_PRODUCT"
+          operation: EQUALS
+          value: "$TYPE_TUSSENPRODUCT_NIET_MOUSSEREND"
+        then: "$TARIEF_TUSSEN_HOOG_PER_HL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "11d"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel11d"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=11d&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 11d: tarief van 161,80 euro per hectoliter voor niet-mousserende tussenproducten met een alcoholgehalte van meer dan 15 volumeprocent"
+
+      # Tussenproduct mousserend - laag (artikel 11d)
+      - test:
+          operation: AND
+          values:
+            - operation: EQUALS
+              subject: "$TYPE_PRODUCT"
+              value: "$TYPE_TUSSENPRODUCT_MOUSSEREND"
+            - operation: LESS_OR_EQUAL
+              subject: "$ALCOHOLPERCENTAGE"
+              value: "$GRENS_TUSSEN_ALCOHOL"
+        then: "$TARIEF_TUSSEN_MOUSSEREND_LAAG_PER_HL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "11d"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel11d"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=11d&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 11d: tarief van 114,85 euro per hectoliter voor mousserende tussenproducten met een alcoholgehalte van niet meer dan 15 volumeprocent"
+
+      # Tussenproduct mousserend - hoog (artikel 11d)
+      - test:
+          subject: "$TYPE_PRODUCT"
+          operation: EQUALS
+          value: "$TYPE_TUSSENPRODUCT_MOUSSEREND"
+        then: "$TARIEF_TUSSEN_MOUSSEREND_HOOG_PER_HL"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "11d"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel11d"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=11d&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 11d: tarief van 161,80 euro per hectoliter voor mousserende tussenproducten met een alcoholgehalte van meer dan 15 volumeprocent"
+
+      # Overige alcoholhoudende producten (artikel 13)
+      - test:
+          subject: "$TYPE_PRODUCT"
+          operation: EQUALS
+          value: "$TYPE_OVERIGE_ALCOHOL"
+        then:
+          operation: MULTIPLY
+          values:
+            - "$TARIEF_OVERIGE_PER_HL_PER_PROCENT"
+            - "$ALCOHOLPERCENTAGE"
+        legal_basis:
+          law: "Wet op de accijns"
+          bwb_id: "BWBR0005251"
+          article: "13"
+          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel13"
+          juriconnect: "jci1.3:c:BWBR0005251&artikel=13&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 13: tarief van 18,27 euro per hectoliter per volumeprocent alcohol voor overige alcoholhoudende producten"
+
+      - else: 0
+    legal_basis:
+      law: "Wet op de accijns"
+      bwb_id: "BWBR0005251"
+      article: "7"
+      url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel7"
+      juriconnect: "jci1.3:c:BWBR0005251&artikel=7&z=2024-01-01&g=2024-01-01"
+      explanation: "Tariefbepaling op basis van het type product, alcoholgehalte en toepasselijke tariefbepaling uit Hoofdstuk II"
+
+  # Stap 4: Bereken verschuldigde accijns
+  - output: "verschuldigde_accijns"
+    operation: MULTIPLY
+    values:
+      - "$tarief_per_hectoliter"
+      - "$HOEVEELHEID_HECTOLITER"
+    legal_basis:
+      law: "Wet op de accijns"
+      bwb_id: "BWBR0005251"
+      article: "1"
+      paragraph: "2"
+      url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel1"
+      juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Verschuldigde accijns = tarief per hectoliter x hoeveelheid in hectoliter"
+
+  # Stap 5: Bepaal of AGP-vergunning vereist is (artikel 5 jo. artikel 40)
+  - output: "agp_vergunning_vereist"
+    operation: IN
+    subject: "$ACTIVITEIT"
+    values:
+      - "$ACTIVITEIT_PRODUCTIE"
+      - "$ACTIVITEIT_OPSLAG"
+    legal_basis:
+      law: "Wet op de accijns"
+      bwb_id: "BWBR0005251"
+      article: "5"
+      url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel5"
+      juriconnect: "jci1.3:c:BWBR0005251&artikel=5&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 5 lid 1 onder a: het is niet toegestaan een accijnsgoed te produceren of verwerken buiten een accijnsgoederenplaats; een AGP-vergunning is vereist voor productie en opslag onder schorsing"
+
+  # Stap 6: Controleer AGP-vergunning
+  - output: "heeft_agp_vergunning"
+    value: "$HEEFT_AGP_VERGUNNING"
+    legal_basis:
+      law: "Wet op de accijns"
+      bwb_id: "BWBR0005251"
+      article: "40"
+      url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukIII_Afdeling1_Artikel40"
+      juriconnect: "jci1.3:c:BWBR0005251&artikel=40&z=2024-01-01&g=2024-01-01"
+      explanation: "De vergunningsstatus wordt gecontroleerd in het register van de Douane"
+
+  # Stap 7: Voldoet aan vergunningsplicht
+  - output: "voldoet_aan_vergunningsplicht"
+    operation: OR
+    values:
+      # Geen AGP-vergunning nodig (handel/invoer)
+      - operation: NOT_IN
+        subject: "$ACTIVITEIT"
+        values:
+          - "$ACTIVITEIT_PRODUCTIE"
+          - "$ACTIVITEIT_OPSLAG"
+      # AGP-vergunning is aanwezig
+      - operation: EQUALS
+        subject: "$HEEFT_AGP_VERGUNNING"
+        value: true
+    legal_basis:
+      law: "Wet op de accijns"
+      bwb_id: "BWBR0005251"
+      article: "5"
+      url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukI_Artikel5"
+      juriconnect: "jci1.3:c:BWBR0005251&artikel=5&z=2024-01-01&g=2024-01-01"
+      explanation: "Het bedrijf voldoet aan de vergunningsplicht als geen AGP-vergunning nodig is of als de vergunning aanwezig is"

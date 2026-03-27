@@ -2165,6 +2165,72 @@ class LawSimulator:
         has_terrace = (type_bedrijf == "horecabedrijf") and random.random() < 0.70
         terras_oppervlakte = round(vloeroppervlakte * random.uniform(0.3, 0.8), 1) if has_terrace else 0.0
 
+        # Annual revenue correlated with business type and floor area
+        area_factor = vloeroppervlakte / 50.0  # normalize around typical size
+        if type_bedrijf == "horecabedrijf":
+            jaaromzet = max(50000, np.random.lognormal(mean=12.5, sigma=0.5) * area_factor)
+        elif type_bedrijf == "slijtersbedrijf":
+            jaaromzet = max(30000, np.random.lognormal(mean=12.0, sigma=0.5) * area_factor)
+        else:
+            jaaromzet = max(30000, np.random.lognormal(mean=12.8, sigma=0.7) * area_factor)
+        jaaromzet = min(round(jaaromzet, 0), 5000000)
+
+        # Number of employees correlated with revenue
+        if jaaromzet < 100000:
+            aantal_werknemers = max(1, int(np.random.poisson(2)))
+        elif jaaromzet < 500000:
+            aantal_werknemers = max(1, int(np.random.poisson(5)))
+        else:
+            aantal_werknemers = max(2, int(np.random.poisson(12)))
+
+        # Average gross salary per employee (€24k-€45k range)
+        bruto_loon_per_werknemer = round(random.uniform(24000, 45000), 0)
+
+        # Alcohol production/trade: accijns is verschuldigd bij uitslag tot verbruik (art. 1 lid 2)
+        # Horeca en slijterijen handelen vrijwel altijd in accijnsgoederen (inkoop/verkoop)
+        # Overige bedrijven kunnen ook importeren/handelen (bijv. groothandel)
+        produceert_alcohol = False
+        hoeveelheid_hectoliter = 0.0
+        alcoholpercentage = 0.0
+        type_alcohol_product = "geen"
+        if type_bedrijf == "horecabedrijf" and random.random() < 0.80:
+            produceert_alcohol = True
+            # Art. 1 lid 1: verdeling over alle accijnscategorieen
+            type_alcohol_product = random.choices(
+                ["bier", "wijn_niet_mousserend", "wijn_mousserend", "overige_alcohol"],
+                weights=[0.45, 0.30, 0.10, 0.15],
+            )[0]
+            if type_alcohol_product == "bier":
+                alcoholpercentage = round(random.uniform(4.0, 12.0), 1)
+                hoeveelheid_hectoliter = round(max(5, np.random.lognormal(mean=4.5, sigma=1.2)), 1)
+            elif type_alcohol_product in ("wijn_niet_mousserend", "wijn_mousserend"):
+                alcoholpercentage = round(random.uniform(5.0, 14.0), 1)
+                hoeveelheid_hectoliter = round(max(2, np.random.lognormal(mean=3.5, sigma=1.0)), 1)
+            else:
+                alcoholpercentage = round(random.uniform(15.0, 40.0), 1)
+                hoeveelheid_hectoliter = round(max(1, np.random.lognormal(mean=3.0, sigma=1.0)), 1)
+        elif type_bedrijf == "slijtersbedrijf" and random.random() < 0.90:
+            produceert_alcohol = True
+            type_alcohol_product = random.choices(
+                ["wijn_niet_mousserend", "wijn_mousserend", "overige_alcohol", "tussenproduct_niet_mousserend"],
+                weights=[0.35, 0.15, 0.35, 0.15],
+            )[0]
+            if type_alcohol_product in ("wijn_niet_mousserend", "wijn_mousserend"):
+                alcoholpercentage = round(random.uniform(8.0, 14.0), 1)
+                hoeveelheid_hectoliter = round(max(5, np.random.lognormal(mean=4.0, sigma=0.8)), 1)
+            elif type_alcohol_product == "tussenproduct_niet_mousserend":
+                alcoholpercentage = round(random.uniform(12.0, 20.0), 1)
+                hoeveelheid_hectoliter = round(max(2, np.random.lognormal(mean=3.0, sigma=0.8)), 1)
+            else:
+                alcoholpercentage = round(random.uniform(20.0, 40.0), 1)
+                hoeveelheid_hectoliter = round(max(1, np.random.lognormal(mean=2.5, sigma=0.8)), 1)
+        elif type_bedrijf == "overig" and random.random() < 0.05:
+            # Groothandel/importeur die incidenteel accijnsgoederen invoert
+            produceert_alcohol = True
+            type_alcohol_product = random.choice(["wijn_niet_mousserend", "overige_alcohol", "bier"])
+            alcoholpercentage = round(random.uniform(5.0, 40.0), 1)
+            hoeveelheid_hectoliter = round(max(10, np.random.lognormal(mean=5.0, sigma=1.5)), 1)
+
         return {
             "kvk_nummer": kvk_nummer,
             "sbi_code": sbi_code,
@@ -2184,6 +2250,13 @@ class LawSimulator:
             "heeft_actief_incident": heeft_actief_incident,
             "has_terrace": has_terrace,
             "terras_oppervlakte": terras_oppervlakte,
+            "jaaromzet": jaaromzet,
+            "aantal_werknemers": aantal_werknemers,
+            "bruto_loon_per_werknemer": bruto_loon_per_werknemer,
+            "produceert_alcohol": produceert_alcohol,
+            "hoeveelheid_hectoliter": hoeveelheid_hectoliter,
+            "alcoholpercentage": alcoholpercentage,
+            "type_alcohol_product": type_alcohol_product,
         }
 
     def create_business_population(self, num_businesses: int) -> list[dict]:
@@ -2246,6 +2319,37 @@ class LawSimulator:
             round(b["terras_oppervlakte"] * precario_tarief_per_m2, 2) if precariobelasting_eligible else 0.0
         )
 
+        # 8. Accijns alcohol: tarief × hoeveelheid voor producenten/importeurs
+        accijns_eligible = b["produceert_alcohol"] and b["hoeveelheid_hectoliter"] > 0
+        accijns_amount = 0.0
+        if accijns_eligible:
+            tp = b["type_alcohol_product"]
+            alc = b["alcoholpercentage"]
+            hl = b["hoeveelheid_hectoliter"]
+            if tp == "bier":
+                tarief = max(8.12 * alc, 26.13)  # art 7 lid 1
+            elif tp in ("wijn_niet_mousserend", "wijn_mousserend"):
+                tarief = 47.95 if alc <= 8.5 else 95.69  # art 10
+            elif tp in ("tussenproduct_niet_mousserend", "tussenproduct_mousserend"):
+                tarief = 114.85 if alc <= 15 else 161.80  # art 11d
+            elif tp == "overige_alcohol":
+                tarief = 18.27 * alc  # art 13
+            else:
+                tarief = 0.0
+            accijns_amount = round(tarief * hl, 2)
+
+        # 9. ZVW werkgeversbijdrage: 6.57% over loon tot max €71.624 per werknemer
+        zvw_eligible = b["aantal_werknemers"] > 0
+        zvw_amount = 0.0
+        if zvw_eligible:
+            zvw_pct = 0.0657
+            max_bijdrage_inkomen = 71624.0
+            for _ in range(b["aantal_werknemers"]):
+                loon = b["bruto_loon_per_werknemer"]
+                bijdrage_inkomen = min(loon, max_bijdrage_inkomen)
+                zvw_amount += bijdrage_inkomen * zvw_pct
+            zvw_amount = round(zvw_amount, 2)
+
         return {
             **b,
             "alcoholwet_eligible": alcoholwet_eligible,
@@ -2262,6 +2366,10 @@ class LawSimulator:
             "nvwa_meldplicht_amount": 0,
             "precariobelasting_eligible": precariobelasting_eligible,
             "precariobelasting_amount": round(precariobelasting_amount, 2),
+            "accijns_eligible": accijns_eligible,
+            "accijns_amount": accijns_amount,
+            "zvw_werkgeversbijdrage_eligible": zvw_eligible,
+            "zvw_werkgeversbijdrage_amount": zvw_amount,
         }
 
     def run_business_simulation(self, num_businesses: int = 500) -> pd.DataFrame:

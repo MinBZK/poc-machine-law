@@ -32,22 +32,14 @@ _CITIZEN_LAWS = [
 _CITIZEN_DEFAULT = ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"]
 
 _BUSINESS_LAWS = [
-    {"id": "alcoholwet", "label": "Alcoholwet", "group": "Vergunningen"},
-    {"id": "haccp", "label": "HACCP Voedselveiligheid", "group": "Verplichtingen"},
-    {"id": "energie_informatieplicht", "label": "Informatieplicht Energiebesparing", "group": "Verplichtingen"},
-    {"id": "precariobelasting", "label": "Precariobelasting", "group": "Belastingen"},
-    {"id": "cbs_enquete", "label": "CBS Statistiekverplichting", "group": "Rapportageverplichtingen"},
-    {"id": "kvk_jaarrekening", "label": "Jaarrekening Deponeringsplicht", "group": "Rapportageverplichtingen"},
-    {"id": "nvwa_meldplicht", "label": "Meldplicht Voedselveiligheid", "group": "Rapportageverplichtingen"},
+    {"id": "precariobelasting", "label": "Precariobelasting", "group": "Belastingen & Heffingen"},
+    {"id": "accijns", "label": "Accijns alcohol", "group": "Belastingen & Heffingen"},
+    {"id": "zvw_werkgeversbijdrage", "label": "ZVW werkgeversbijdrage", "group": "Belastingen & Heffingen"},
 ]
 _BUSINESS_DEFAULT = [
-    "alcoholwet",
-    "haccp",
-    "energie_informatieplicht",
     "precariobelasting",
-    "cbs_enquete",
-    "kvk_jaarrekening",
-    "nvwa_meldplicht",
+    "accijns",
+    "zvw_werkgeversbijdrage",
 ]
 
 

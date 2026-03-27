@@ -4,10 +4,13 @@ Parametric Formula Learner for Law Synthesis
 Automatically derives a parametric formula structure from YAML law definitions,
 then fits parameters via scipy optimization on simulation data.
 
-Each law-component follows the pattern:
+Citizen mode (benefits, declining with income):
     component = max(0, BASE[partner] - RATE[partner] * max(0, income - THRESHOLD[partner]))
 
-The total benefit is the sum of all components.
+Business mode (costs, increasing with revenue):
+    component = BASE + RATE * max(0, revenue - THRESHOLD)
+
+The total is the sum of all components.
 """
 
 from dataclasses import dataclass, field
@@ -37,6 +40,7 @@ class FormulaTemplate:
     """Template for the full parametric formula."""
 
     components: list[FormulaComponent]
+    cost_mode: bool = False  # True for business costs (increasing), False for citizen benefits (declining)
 
     def param_count(self) -> int:
         """Number of fittable parameters."""
@@ -75,27 +79,38 @@ class FormulaTemplate:
         """Get optimization bounds for each parameter."""
         bounds = []
         for c in self.components:
-            # base_single, rate_single, threshold_single
-            bounds.extend(
-                [
-                    (0, 2000),  # base: 0 to €2000/month
-                    (0, 1.0),  # rate: 0 to 100%
-                    (0, 100000),  # threshold: 0 to €100k
-                ]
-            )
-            if c.has_partner_variant:
+            if self.cost_mode:
+                # Business costs: base=fixed cost, rate=marginal cost/€ revenue, threshold=exempt revenue
                 bounds.extend(
                     [
-                        (0, 2000),
-                        (0, 1.0),
-                        (0, 100000),
+                        (0, 50000),  # base: 0 to €50k fixed cost
+                        (0, 0.5),  # rate: 0 to 50% of revenue above threshold
+                        (0, 2000000),  # threshold: 0 to €2M revenue
                     ]
                 )
+            else:
+                # Citizen benefits: base=max benefit, rate=phase-out %, threshold=income start
+                bounds.extend(
+                    [
+                        (0, 2000),  # base: 0 to €2000/month
+                        (0, 1.0),  # rate: 0 to 100%
+                        (0, 100000),  # threshold: 0 to €100k
+                    ]
+                )
+            if c.has_partner_variant:
+                if self.cost_mode:
+                    bounds.extend([(0, 50000), (0, 0.5), (0, 2000000)])
+                else:
+                    bounds.extend([(0, 2000), (0, 1.0), (0, 100000)])
         return bounds
 
-    def evaluate(self, params_vec: np.ndarray, income: np.ndarray, has_partner: np.ndarray) -> np.ndarray:
-        """Evaluate the formula for arrays of income and partner status."""
-        total = np.zeros_like(income, dtype=float)
+    def evaluate(self, params_vec: np.ndarray, primary: np.ndarray, grouping: np.ndarray) -> np.ndarray:
+        """Evaluate the formula for arrays of primary variable and grouping variable.
+
+        For citizens: primary=income, grouping=has_partner
+        For business: primary=jaaromzet, grouping=zeros (no grouping)
+        """
+        total = np.zeros_like(primary, dtype=float)
         idx = 0
         for c in self.components:
             base_s = params_vec[idx]
@@ -113,12 +128,17 @@ class FormulaTemplate:
                 rate_p = rate_s
                 thresh_p = thresh_s
 
-            # Select per-person parameters based on partner status
-            base = np.where(has_partner, base_p, base_s)
-            rate = np.where(has_partner, rate_p, rate_s)
-            thresh = np.where(has_partner, thresh_p, thresh_s)
+            # Select per-person parameters based on grouping
+            base = np.where(grouping, base_p, base_s)
+            rate = np.where(grouping, rate_p, rate_s)
+            thresh = np.where(grouping, thresh_p, thresh_s)
 
-            component = np.maximum(0, base - rate * np.maximum(0, income - thresh))
+            if self.cost_mode:
+                # Business: cost = base + rate * max(0, revenue - threshold)
+                component = base + rate * np.maximum(0, primary - thresh)
+            else:
+                # Citizen: benefit = max(0, base - rate * max(0, income - threshold))
+                component = np.maximum(0, base - rate * np.maximum(0, primary - thresh))
             total += component
 
         return np.maximum(0, total)
@@ -163,8 +183,23 @@ class ParametricLearner:
         """Prepare data, same interface as SynthesisLearner."""
         return prepare_synthesis_data(df)
 
+    def _detect_primary_feature(self, df: pd.DataFrame) -> tuple[str, bool]:
+        """Detect the primary continuous feature and whether this is a cost model.
+
+        Returns:
+            (primary_column_name, cost_mode)
+        """
+        if "income" in df.columns:
+            return "income", False
+        if "jaaromzet" in df.columns:
+            return "jaaromzet", True
+        if "vloeroppervlakte" in df.columns:
+            return "vloeroppervlakte", True
+        return "income", False
+
     def build_template(self, df: pd.DataFrame, selected_laws: list[str]) -> FormulaTemplate:
         """Build formula template with initial parameter estimates from data."""
+        primary_col, cost_mode = self._detect_primary_feature(df)
         components = []
 
         for law_name in selected_laws:
@@ -180,8 +215,8 @@ class ParametricLearner:
             if eligible.sum() == 0:
                 continue
 
-            # Check if partner variant exists in data
-            has_partner_col = "has_partner" in df.columns
+            # Check if partner variant exists in data (only for citizen mode)
+            has_partner_col = "has_partner" in df.columns and not cost_mode
             has_partner_variant = False
 
             if has_partner_col:
@@ -190,13 +225,16 @@ class ParametricLearner:
                 elig_without = eligible & ~partner_mask
                 has_partner_variant = elig_with.sum() > 5 and elig_without.sum() > 5
 
-            income = df.get("income", pd.Series(dtype=float))
+            primary = df.get(primary_col, pd.Series(dtype=float))
 
-            if has_partner_variant:
-                base_s, rate_s, thresh_s = self._estimate_params(income[elig_without], amounts[elig_without])
-                base_p, rate_p, thresh_p = self._estimate_params(income[elig_with], amounts[elig_with])
+            if cost_mode:
+                base_s, rate_s, thresh_s = self._estimate_cost_params(primary[eligible], amounts[eligible])
+                base_p, rate_p, thresh_p = base_s, rate_s, thresh_s
+            elif has_partner_variant:
+                base_s, rate_s, thresh_s = self._estimate_benefit_params(primary[elig_without], amounts[elig_without])
+                base_p, rate_p, thresh_p = self._estimate_benefit_params(primary[elig_with], amounts[elig_with])
             else:
-                base_s, rate_s, thresh_s = self._estimate_params(income[eligible], amounts[eligible])
+                base_s, rate_s, thresh_s = self._estimate_benefit_params(primary[eligible], amounts[eligible])
                 base_p, rate_p, thresh_p = base_s, rate_s, thresh_s
 
             components.append(
@@ -213,47 +251,91 @@ class ParametricLearner:
             )
 
         if not components:
-            # Fallback: single generic component
-            components.append(
-                FormulaComponent(
-                    name="generic",
-                    base_single=200.0,
-                    base_partner=150.0,
-                    rate_single=0.05,
-                    rate_partner=0.05,
-                    threshold_single=20000.0,
-                    threshold_partner=25000.0,
+            if cost_mode:
+                components.append(
+                    FormulaComponent(
+                        name="generic",
+                        base_single=500.0,
+                        base_partner=500.0,
+                        rate_single=0.01,
+                        rate_partner=0.01,
+                        threshold_single=50000.0,
+                        threshold_partner=50000.0,
+                        has_partner_variant=False,
+                    )
                 )
-            )
+            else:
+                components.append(
+                    FormulaComponent(
+                        name="generic",
+                        base_single=200.0,
+                        base_partner=150.0,
+                        rate_single=0.05,
+                        rate_partner=0.05,
+                        threshold_single=20000.0,
+                        threshold_partner=25000.0,
+                    )
+                )
 
-        return FormulaTemplate(components=components)
+        return FormulaTemplate(components=components, cost_mode=cost_mode)
 
-    def _estimate_params(self, income: pd.Series, amounts: pd.Series) -> tuple[float, float, float]:
-        """Estimate base, rate, threshold from income-amount data."""
-        if len(income) < 5:
+    def _estimate_benefit_params(self, primary: pd.Series, amounts: pd.Series) -> tuple[float, float, float]:
+        """Estimate base, rate, threshold for declining benefit model."""
+        if len(primary) < 5:
             return 200.0, 0.05, 20000.0
 
         # Base: maximum typical amount (90th percentile)
         base = float(np.percentile(amounts[amounts > 0], 90)) if (amounts > 0).sum() > 0 else 200.0
 
-        # Threshold: income where benefit starts declining
-        # Approximate: income at which amount drops below 80% of base
+        # Threshold: primary value where benefit starts declining
         high_benefit = amounts > base * 0.8
-        threshold = float(income[high_benefit].max()) if high_benefit.sum() > 0 else float(income.median())
+        threshold = float(primary[high_benefit].max()) if high_benefit.sum() > 0 else float(primary.median())
 
         # Rate: approximate decline rate above threshold
-        above_thresh = income > threshold
+        above_thresh = primary > threshold
         if above_thresh.sum() > 5:
-            avg_income_above = float(income[above_thresh].mean())
+            avg_primary_above = float(primary[above_thresh].mean())
             avg_amount_above = float(amounts[above_thresh].mean())
-            income_diff = avg_income_above - threshold
-            if income_diff > 0 and base > avg_amount_above:
-                rate = (base - avg_amount_above) / income_diff
+            diff = avg_primary_above - threshold
+            if diff > 0 and base > avg_amount_above:
+                rate = (base - avg_amount_above) / diff
                 rate = max(0.001, min(1.0, rate))
             else:
                 rate = 0.05
         else:
             rate = 0.05
+
+        return base, rate, threshold
+
+    def _estimate_cost_params(self, primary: pd.Series, amounts: pd.Series) -> tuple[float, float, float]:
+        """Estimate base, rate, threshold for increasing cost model."""
+        if len(primary) < 5:
+            return 500.0, 0.01, 50000.0
+
+        positive = amounts > 0
+        if positive.sum() < 3:
+            return 0.0, 0.01, 50000.0
+
+        # Base: minimum typical cost (10th percentile of positive amounts)
+        base = float(np.percentile(amounts[positive], 10))
+
+        # Threshold: primary value below which cost is roughly constant at base
+        low_cost = amounts <= base * 1.2
+        threshold = float(primary[low_cost & positive].median()) if (low_cost & positive).sum() > 0 else 0.0
+
+        # Rate: approximate cost increase per unit of primary above threshold
+        above_thresh = primary > threshold
+        if above_thresh.sum() > 5 and positive.sum() > 5:
+            avg_primary_above = float(primary[above_thresh & positive].mean())
+            avg_amount_above = float(amounts[above_thresh & positive].mean())
+            diff = avg_primary_above - threshold
+            if diff > 0 and avg_amount_above > base:
+                rate = (avg_amount_above - base) / diff
+                rate = max(0.0001, min(0.5, rate))
+            else:
+                rate = 0.01
+        else:
+            rate = 0.01
 
         return base, rate, threshold
 
@@ -271,23 +353,28 @@ class ParametricLearner:
         template = self.build_template(df, selected_laws)
         initial_params = template.to_vector()
 
+        primary_col, _ = self._detect_primary_feature(df)
+
         # Scale initial bases so their sum ≈ mean total amount for eligible people
         eligible_mask_init = y_eligible == 1
         if eligible_mask_init.sum() > 0:
             mean_total = float(y_amount[eligible_mask_init].mean())
             base_sum = sum(c.base_single for c in template.components)
             if base_sum > 0:
+                max_base = 50000.0 if template.cost_mode else 2000.0
                 scale = mean_total / base_sum
                 for c in template.components:
-                    c.base_single = min(c.base_single * scale, 2000.0)
-                    c.base_partner = min(c.base_partner * scale, 2000.0)
+                    c.base_single = min(c.base_single * scale, max_base)
+                    c.base_partner = min(c.base_partner * scale, max_base)
                 initial_params = template.to_vector()
 
-        income = X["income"].values if "income" in X.columns else np.zeros(len(X))
-        has_partner = X["has_partner"].values if "has_partner" in X.columns else np.zeros(len(X))
+        primary = X[primary_col].values if primary_col in X.columns else np.zeros(len(X))
+        grouping = (
+            X["has_partner"].values if "has_partner" in X.columns and not template.cost_mode else np.zeros(len(X))
+        )
 
         def objective(params):
-            predictions = template.evaluate(params, income, has_partner)
+            predictions = template.evaluate(params, primary, grouping)
             return np.mean(np.abs(y_amount.values - predictions))
 
         bounds = template.get_bounds()
@@ -326,7 +413,7 @@ class ParametricLearner:
         rounded_params = self._round_params(fitted_params, template)
 
         # Evaluate
-        predictions = template.evaluate(rounded_params, income, has_partner)
+        predictions = template.evaluate(rounded_params, primary, grouping)
         y_elig_pred = (predictions > 0.5).astype(int)
 
         from sklearn.metrics import accuracy_score
@@ -383,10 +470,13 @@ class ParametricLearner:
         """Evaluate model on data."""
         X, y_eligible, y_amount = self.prepare_data(df)
 
-        income = X["income"].values if "income" in X.columns else np.zeros(len(X))
-        has_partner = X["has_partner"].values if "has_partner" in X.columns else np.zeros(len(X))
+        primary_col, _ = self._detect_primary_feature(df)
+        primary = X[primary_col].values if primary_col in X.columns else np.zeros(len(X))
+        grouping = (
+            X["has_partner"].values if "has_partner" in X.columns and not model.template.cost_mode else np.zeros(len(X))
+        )
 
-        predictions = model.template.evaluate(model.fitted_params, income, has_partner)
+        predictions = model.template.evaluate(model.fitted_params, primary, grouping)
         y_elig_pred = (predictions > 0.5).astype(int)
 
         from sklearn.metrics import accuracy_score
