@@ -44,11 +44,8 @@ DEMO_PROFILES: dict[str, dict] = {
         # Graaf analyse: no whitelist = show all non-hidden laws
         "graph_laws": None,
         # Pre-select the detentiestatus → zorgtoeslag → verzekeringsstatus chain (UUIDs)
-        "graph_selected_laws": [
-            "292c11ff-8318-4b7a-bb11-3ea545b04c8e",  # Bepalen detentiestatus
-            "60e71675-38bc-4297-87ac-0c145613e481",  # Zorgtoeslag
-            "aba2b8fa-4b34-420f-883a-e78da326a8f4",  # Bepalen verzekeringsstatus
-        ],
+        # Cleared: UUIDs may change across schema versions; empty list selects all laws
+        "graph_selected_laws": [],
         # Laws disabled for the portal/burger tab (feature flags)
         "disabled_laws": {
             "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw"],
@@ -112,16 +109,8 @@ DEMO_PROFILES: dict[str, dict] = {
         # Graaf analyse: no whitelist = show all non-hidden laws
         "graph_laws": None,
         # Pre-select the horeca Rotterdam law chain (UUIDs)
-        "graph_selected_laws": [
-            "7c2e8f4a-3b9d-4e1f-a5c2-9d8b7e6f4a3c",  # Alcoholwet Rotterdam
-            "8a3f9b5c-4d2e-4f0a-b6c3-1e9d8f7a5b4c",  # Alcoholvergunning (nationaal)
-            "3e7f9b2a-5d8c-4a1e-9f6b-8c2d4e7a3b1f",  # Terrasvergunning
-            "b5d8e2f4-3a6c-4b9e-a7d1-9c4f2e8b1a53",  # Precariobelasting
-            "8a3f4b2c-7d1e-4f8a-9c3b-5e6d7f8a9b0c",  # Exploitatievergunning
-            "9c4e8f2a-7d3b-4e1f-8a5c-6f9d2e3a7b4c",  # BAG register
-            "8b59ef92-03f8-4294-bce9-4eaac01ba0ed",  # Bepalen ondernemerschap
-            "1b3c8d9e-5f2a-4c7b-8e1d-9a2b3c4d5e6f",  # Bedrijfsgegevens organisatie
-        ],
+        # Cleared: UUIDs may change across schema versions; empty list selects all laws
+        "graph_selected_laws": [],
         # Laws disabled for the portal tab (feature flags)
         "disabled_laws": {
             "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw"],

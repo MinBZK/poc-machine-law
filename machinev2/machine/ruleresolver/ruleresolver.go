@@ -9,6 +9,7 @@ import (
 	"time"
 
 	// "github.com/goccy/go-yaml"
+	"github.com/looplab/eventhorizon/uuid"
 	"gopkg.in/yaml.v3"
 )
 
@@ -92,6 +93,251 @@ func New() (resolver *RuleResolve, err error) {
 	}, nil
 }
 
+// isV050Format detects whether raw YAML data is in v0.5.0 article-based format
+func isV050Format(data map[string]interface{}) bool {
+	_, hasArticles := data["articles"]
+	_, hasSchema := data["$schema"]
+	return hasArticles || hasSchema
+}
+
+// unwrapDefinitionValue extracts the raw value from a v0.5.0 definition.
+// Definitions in v0.5.0 can be wrapped as {value: X}; this unwraps them.
+func unwrapDefinitionValue(v interface{}) interface{} {
+	if m, ok := v.(map[string]interface{}); ok {
+		if val, hasValue := m["value"]; hasValue {
+			return val
+		}
+	}
+	return v
+}
+
+// convertV050SourceToServiceReference converts a v0.5.0 source block to a ServiceReference
+func convertV050SourceToServiceReference(src *V050Source) ServiceReference {
+	if src == nil {
+		return ServiceReference{}
+	}
+	sr := ServiceReference{
+		Service: src.Service,
+		Field:   src.Output,
+		Law:     src.Regulation,
+	}
+	if len(src.Parameters) > 0 {
+		params := make([]Parameter, 0, len(src.Parameters))
+		for name, ref := range src.Parameters {
+			params = append(params, Parameter{
+				Name:      name,
+				Reference: ref,
+			})
+		}
+		sr.Parameters = params
+	}
+	return sr
+}
+
+// convertV050InputToFlat converts v0.5.0 input fields to the flat RuleSpec format.
+// Input fields with a source block become InputField entries with ServiceReference populated.
+// Input fields with a source_reference block become SourceField entries.
+func convertV050InputToFlat(inputs []InputField) ([]InputField, []SourceField) {
+	var flatInputs []InputField
+	var flatSources []SourceField
+
+	for _, inp := range inputs {
+		if inp.Source != nil {
+			// Convert v0.5.0 source to ServiceReference
+			flatInp := InputField{
+				BaseField:       inp.BaseField,
+				ServiceReference: convertV050SourceToServiceReference(inp.Source),
+			}
+			flatInputs = append(flatInputs, flatInp)
+		} else if inp.SourceReference != nil {
+			// Convert to SourceField
+			flatSrc := SourceField{
+				BaseField:       inp.BaseField,
+				SourceReference: inp.SourceReference,
+			}
+			flatSources = append(flatSources, flatSrc)
+		} else if inp.ServiceReference.Service != "" || inp.ServiceReference.Law != "" {
+			// Already has a v0.4.x style ServiceReference
+			flatInputs = append(flatInputs, inp)
+		} else {
+			// No source info; keep as input
+			flatInputs = append(flatInputs, inp)
+		}
+	}
+
+	return flatInputs, flatSources
+}
+
+// flattenV050 converts an ArticleBasedSpec to a flat RuleSpec by merging all articles
+func flattenV050(spec ArticleBasedSpec) (RuleSpec, error) {
+	validFrom, err := time.Parse("2006-01-02", spec.ValidFrom)
+	if err != nil {
+		return RuleSpec{}, fmt.Errorf("invalid valid_from date %q: %w", spec.ValidFrom, err)
+	}
+
+	uuidVal, err := parseUUID(spec.UUID)
+	if err != nil {
+		return RuleSpec{}, fmt.Errorf("invalid uuid %q: %w", spec.UUID, err)
+	}
+
+	rule := RuleSpec{
+		UUID:      uuidVal,
+		Name:      spec.Name,
+		Law:       spec.ID,
+		LawType:   strPtr(spec.RegulatoryLayer),
+		ValidFrom: validFrom,
+		Service:   spec.Service,
+	}
+
+	if spec.Discoverable != "" {
+		rule.Discoverable = &spec.Discoverable
+	}
+
+	// Merge definitions, parameters, inputs, outputs, actions, requirements from all articles
+	allDefinitions := make(map[string]any)
+	var allParameters []ParameterField
+	var allInputs []InputField
+	var allOutputs []OutputField
+	var allActions []Action
+	var allRequirements []Requirement
+
+	paramsSeen := make(map[string]bool)
+	inputsSeen := make(map[string]bool)
+	outputsSeen := make(map[string]bool)
+
+	for _, article := range spec.Articles {
+		if article.MachineReadable == nil {
+			continue
+		}
+
+		mr := article.MachineReadable
+
+		// Merge definitions (unwrap {value: X} format)
+		for k, v := range mr.Definitions {
+			allDefinitions[k] = unwrapDefinitionValue(v)
+		}
+
+		if mr.Execution == nil {
+			continue
+		}
+
+		exec := mr.Execution
+
+		// Extract legal_character and decision_type from first article that has them
+		if exec.Produces != nil {
+			if rule.LegalCharacter == nil && exec.Produces.LegalCharacter != "" {
+				rule.LegalCharacter = strPtr(exec.Produces.LegalCharacter)
+			}
+			if rule.DecisionType == nil && exec.Produces.DecisionType != "" {
+				rule.DecisionType = strPtr(exec.Produces.DecisionType)
+			}
+		}
+
+		// Merge parameters (deduplicate by name)
+		for _, p := range exec.Parameters {
+			if !paramsSeen[p.Name] {
+				paramsSeen[p.Name] = true
+				allParameters = append(allParameters, p)
+			}
+		}
+
+		// Merge inputs (deduplicate by name)
+		for _, inp := range exec.Input {
+			if !inputsSeen[inp.Name] {
+				inputsSeen[inp.Name] = true
+				allInputs = append(allInputs, inp)
+			}
+		}
+
+		// Merge outputs (deduplicate by name)
+		for _, out := range exec.Output {
+			if !outputsSeen[out.Name] {
+				outputsSeen[out.Name] = true
+				allOutputs = append(allOutputs, out)
+			}
+		}
+
+		// Merge actions
+		allActions = append(allActions, exec.Actions...)
+
+		// Merge requirements (convert from []interface{} to []Requirement)
+		for _, reqRaw := range exec.Requirements {
+			req, convertErr := convertRequirement(reqRaw)
+			if convertErr != nil {
+				fmt.Printf("Warning: could not convert requirement: %v\n", convertErr)
+				continue
+			}
+			allRequirements = append(allRequirements, req)
+		}
+	}
+
+	// Convert v0.5.0 input fields to flat format (split into inputs and sources)
+	flatInputs, flatSources := convertV050InputToFlat(allInputs)
+
+	rule.Properties = Properties{
+		Parameters:  allParameters,
+		Input:       flatInputs,
+		Sources:     flatSources,
+		Output:      allOutputs,
+		Definitions: allDefinitions,
+	}
+	rule.Actions = allActions
+	rule.Requirements = allRequirements
+
+	return rule, nil
+}
+
+// convertRequirement converts a raw interface{} (from v0.5.0 requirements) to a Requirement.
+// It re-marshals to YAML and then unmarshals into the typed Requirement struct.
+func convertRequirement(raw interface{}) (Requirement, error) {
+	data, err := yaml.Marshal(raw)
+	if err != nil {
+		return Requirement{}, fmt.Errorf("marshal requirement: %w", err)
+	}
+	var req Requirement
+	if err := yaml.Unmarshal(data, &req); err != nil {
+		return Requirement{}, fmt.Errorf("unmarshal requirement: %w", err)
+	}
+	return req, nil
+}
+
+// parseUUID parses a UUID string. It uses the looplab UUID package.
+func parseUUID(s string) (uuid.UUID, error) {
+	return uuid.Parse(s)
+}
+
+// strPtr returns a pointer to the given string, or nil if empty
+func strPtr(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
+}
+
+// parseRuleFromData parses raw YAML data into a RuleSpec, detecting v0.5.0 format automatically
+func parseRuleFromData(data []byte) (RuleSpec, error) {
+	// First, check if this is v0.5.0 format
+	var raw map[string]interface{}
+	if err := yaml.Unmarshal(data, &raw); err != nil {
+		return RuleSpec{}, fmt.Errorf("error parsing raw YAML: %w", err)
+	}
+
+	if isV050Format(raw) {
+		var articleSpec ArticleBasedSpec
+		if err := yaml.Unmarshal(data, &articleSpec); err != nil {
+			return RuleSpec{}, fmt.Errorf("error parsing v0.5.0 YAML: %w", err)
+		}
+		return flattenV050(articleSpec)
+	}
+
+	// Fall back to v0.4.x format
+	var rule RuleSpec
+	if err := yaml.Unmarshal(data, &rule); err != nil {
+		return RuleSpec{}, fmt.Errorf("error parsing v0.4.x YAML: %w", err)
+	}
+	return rule, nil
+}
+
 func rulesLoad(dir string) ([]RuleSpec, map[string]map[string]struct{}, map[string]map[string]map[string]struct{}, error) {
 	// Clear existing data
 	lawsByService := make(map[string]map[string]struct{})
@@ -137,8 +383,8 @@ func rulesLoad(dir string) ([]RuleSpec, map[string]map[string]struct{}, map[stri
 			continue
 		}
 
-		rule := RuleSpec{}
-		if err := yaml.Unmarshal(data, &rule); err != nil {
+		rule, err := parseRuleFromData(data)
+		if err != nil {
 			fmt.Printf("Error parsing YAML from %s: %v\n", path, err)
 			continue
 		}
@@ -274,12 +520,13 @@ func (r *RuleResolve) GetRuleSpec(law string, referenceDate time.Time, service s
 		return RuleSpec{}, fmt.Errorf("error reading rule file: %w", err)
 	}
 
-	// Parse to map
-	var result RuleSpec
-	if err := yaml.Unmarshal(data, &result); err != nil {
+	// Parse using format-aware parser (supports both v0.4.x and v0.5.0)
+	result, err := parseRuleFromData(data)
+	if err != nil {
 		return RuleSpec{}, fmt.Errorf("error parsing rule YAML: %w", err)
 	}
 
+	result.Path = rule.Path
 	ruleSpecCache.Store(rule.Path, result)
 
 	return result, nil

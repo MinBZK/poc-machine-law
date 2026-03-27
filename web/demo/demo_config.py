@@ -10,173 +10,178 @@ This module defines:
 
 # Demo collapse configuration per law file
 DEMO_COLLAPSE_CONFIG = {
-    # Zorgtoeslag - Show full calculation path for partners
+    # Zorgtoeslag - Show full calculation path for partners (v0.5.0 article-based)
     "zorgtoeslagwet/TOESLAGEN-2025-01-01": {
         "expand_paths": [
-            "references.Wet op de zorgtoeslag",
-            "references.zvw",
-            "properties.parameters",
-            "properties.parameters.BSN",
-            "properties.output.is_verzekerde_zorgtoeslag",
-            "properties.output.hoogte_toeslag",
-            "properties.input.IS_VERZEKERDE",
-            "properties.input.IS_VERZEKERDE.service_reference",
-            "requirements.Item 1",
-            "requirements.Item 1.all",
-            "requirements.Item 1.all.$LEEFTIJD",
-            "requirements.Item 1.all.$IS_VERZEKERDE",
-            "actions.hoogte_toeslag",
-            "actions.hoogte_toeslag.conditions",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true",  # Second condition (partner = true)
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else",  # Third item (else block)
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values.ADD",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values.ADD.values",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values.ADD.values.$INKOMEN",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values.ADD.values.$PARTNER_INKOMEN",
-            "actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values.$DREMPELINKOMEN_TOESLAGPARTNER",
+            "articles",
+            "articles.2",  # Article number "2"
+            "articles.2.machine_readable",
+            "articles.2.machine_readable.definitions",
+            "articles.2.machine_readable.execution",
+            "articles.2.machine_readable.execution.parameters",
+            "articles.2.machine_readable.execution.parameters.BSN",
+            "articles.2.machine_readable.execution.output",
+            "articles.2.machine_readable.execution.output.is_verzekerde_zorgtoeslag",
+            "articles.2.machine_readable.execution.output.hoogte_toeslag",
+            "articles.2.machine_readable.execution.input",
+            "articles.2.machine_readable.execution.input.IS_VERZEKERDE",
+            "articles.2.machine_readable.execution.input.IS_VERZEKERDE.source",
+            "articles.2.machine_readable.execution.requirements",
+            "articles.2.machine_readable.execution.requirements.Item 1",
+            "articles.2.machine_readable.execution.requirements.Item 1.all",
+            "articles.2.machine_readable.execution.requirements.Item 1.all.$LEEFTIJD",
+            "articles.2.machine_readable.execution.requirements.Item 1.all.$IS_VERZEKERDE",
+            "articles.2.machine_readable.execution.actions",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values.ADD",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values.ADD.values",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values.ADD.values.$INKOMEN",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values.ADD.values.$PARTNER_INKOMEN",
+            "articles.2.machine_readable.execution.actions.hoogte_toeslag.conditions.$HEEFT_PARTNER=true.then.conditions.else.else.values.ADD.values.IF.conditions.GREATER_THAN.then.values.SUBTRACT.values.$DREMPELINKOMEN_TOESLAGPARTNER",
         ],
         "collapse_all_except_expanded": True,
     },
-    # Zorgverzekeringswet - Show actions and specific input
+    # Zorgverzekeringswet - Show actions and specific input (v0.5.0 article-based)
     "zvw/RVZ-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.input",
-            "properties.input.IS_GEDETINEERD",  # Specific input item
-            "properties.input.IS_GEDETINEERD.service_reference",
-            "actions",
-            "actions.is_verzekerde",  # Specific action (note: lowercase in YAML)
-            "actions.is_verzekerde.values",  # values array
-            "actions.is_verzekerde.values.OR",  # First item (operation: OR)
-            "actions.is_verzekerde.values.OR.values",  # Nested values
-            "actions.is_verzekerde.values.OR.values.$heeft_verzekering",  # First nested value
-            "actions.is_verzekerde.values.OR.values.$heeft_verdragsverzekering",  # Second nested value
-            "actions.is_verzekerde.values.$IS_GEDETINEERD",  # Second item
+            "articles",
+            "articles.1",  # Article number "1"
+            "articles.1.machine_readable",
+            "articles.1.machine_readable.execution",
+            "articles.1.machine_readable.execution.input",
+            "articles.1.machine_readable.execution.input.IS_GEDETINEERD",
+            "articles.1.machine_readable.execution.input.IS_GEDETINEERD.source",
+            "articles.1.machine_readable.execution.actions",
+            "articles.1.machine_readable.execution.actions.is_verzekerde",
+            "articles.1.machine_readable.execution.actions.is_verzekerde.values",
+            "articles.1.machine_readable.execution.actions.is_verzekerde.values.OR",
+            "articles.1.machine_readable.execution.actions.is_verzekerde.values.OR.values",
+            "articles.1.machine_readable.execution.actions.is_verzekerde.values.OR.values.$heeft_verzekering",
+            "articles.1.machine_readable.execution.actions.is_verzekerde.values.OR.values.$heeft_verdragsverzekering",
+            "articles.1.machine_readable.execution.actions.is_verzekerde.values.$IS_GEDETINEERD",
         ],
         "collapse_all_except_expanded": True,
     },
-    # Penitentiaire Beginselenwet - Only show specific action
+    # Penitentiaire Beginselenwet - Only show specific action (v0.5.0 article-based)
     "penitentiaire_beginselenwet/DJI-2022-01-01": {
         "expand_paths": [
-            "actions",
-            "actions.is_gedetineerd",  # Specific action (lowercase)
-            "actions.is_gedetineerd.values",  # values array
-            "actions.is_gedetineerd.values.$INRICHTING_TYPE",  # First item (subject: $INRICHTING_TYPE)
-            "actions.is_gedetineerd.values.$INRICHTING_TYPE.values",  # Values for INRICHTING_TYPE
-            "actions.is_gedetineerd.values.$DETENTIESTATUS",  # Second item (subject: $DETENTIESTATUS)
-            "actions.is_gedetineerd.values.$DETENTIESTATUS.values",  # Values for DETENTIESTATUS
+            "articles",
+            "articles.2",  # Article number "2"
+            "articles.2.machine_readable",
+            "articles.2.machine_readable.execution",
+            "articles.2.machine_readable.execution.actions",
+            "articles.2.machine_readable.execution.actions.is_gedetineerd",
+            "articles.2.machine_readable.execution.actions.is_gedetineerd.values",
+            "articles.2.machine_readable.execution.actions.is_gedetineerd.values.$INRICHTING_TYPE",
+            "articles.2.machine_readable.execution.actions.is_gedetineerd.values.$INRICHTING_TYPE.values",
+            "articles.2.machine_readable.execution.actions.is_gedetineerd.values.$DETENTIESTATUS",
+            "articles.2.machine_readable.execution.actions.is_gedetineerd.values.$DETENTIESTATUS.values",
         ],
         "collapse_all_except_expanded": True,
     },
-    # AWB Bezwaar - Show properties and actions structure
+    # AWB Bezwaar - Show definitions and actions structure (v0.5.0 article-based)
     "awb/bezwaar/JenV-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.applies",
-            "properties.applies.ZAAK",
-            "properties.definitions",
-            "properties.definitions.EXCLUDED_DECISION_TYPES",
-            "properties.definitions.REQUIRED_LEGAL_CHARACTER",
-            "actions",
-            "actions.bezwaar_mogelijk",
-            "actions.bezwaar_mogelijk.values",
-            "actions.bezwaar_mogelijk.values.$WET.decision_type",
-            "actions.bezwaar_mogelijk.values.$WET.legal_character",
-            "actions.bezwaar_mogelijk.values.EQUALS",
-            "actions.bezwaar_mogelijk.values.EQUALS.values",
-            "actions.bezwaar_mogelijk.values.EQUALS.values.$GEBEURTENISSEN",
+            "articles",
+            "articles.7:1",  # Article number "7:1"
+            "articles.7:1.machine_readable",
+            "articles.7:1.machine_readable.definitions",
+            "articles.7:1.machine_readable.definitions.EXCLUDED_DECISION_TYPES",
+            "articles.7:1.machine_readable.definitions.REQUIRED_LEGAL_CHARACTER",
+            "articles.7:1.machine_readable.execution",
+            "articles.7:1.machine_readable.execution.actions",
+            "articles.7:1.machine_readable.execution.actions.bezwaar_mogelijk",
+            "articles.7:1.machine_readable.execution.actions.bezwaar_mogelijk.values",
+            "articles.7:1.machine_readable.execution.actions.bezwaar_mogelijk.values.$WET.decision_type",
+            "articles.7:1.machine_readable.execution.actions.bezwaar_mogelijk.values.$WET.legal_character",
+            "articles.7:1.machine_readable.execution.actions.bezwaar_mogelijk.values.EQUALS",
+            "articles.7:1.machine_readable.execution.actions.bezwaar_mogelijk.values.EQUALS.values",
+            "articles.7:1.machine_readable.execution.actions.bezwaar_mogelijk.values.EQUALS.values.$GEBEURTENISSEN",
         ],
         "collapse_all_except_expanded": True,
     },
-    # Alcoholwet - Collapse most sections, show only key info
+    # Alcoholwet - Collapse most sections, show articles
     "alcoholwet/vergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.output",
+            "articles",
         ],
         "collapse_all_except_expanded": True,
     },
     "alcoholwet/vergunning/VWS-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.output",
+            "articles",
         ],
         "collapse_all_except_expanded": True,
     },
     # Exploitatievergunning - Collapse most sections
     "algemene_plaatselijke_verordening/exploitatievergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.output",
+            "articles",
         ],
         "collapse_all_except_expanded": True,
     },
     # Terrasvergunning - Collapse most sections
     "algemene_plaatselijke_verordening/terrassen/GEMEENTE_ROTTERDAM-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.output",
+            "articles",
         ],
         "collapse_all_except_expanded": True,
     },
     # Geluidsontheffing - Collapse most sections
     "algemene_plaatselijke_verordening/ontheffingspas_geluid/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.output",
+            "articles",
         ],
         "collapse_all_except_expanded": True,
     },
-    # Informatieplicht Energiebesparing - Show properties and output
+    # Informatieplicht Energiebesparing - Show articles
     "omgevingswet/energiebesparing/informatieplicht/RVO-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.output",
+            "articles",
         ],
         "collapse_all_except_expanded": True,
     },
-    # HACCP Voedselveiligheid - Show properties and output
+    # HACCP Voedselveiligheid - Show articles
     "warenwet/haccp/NVWA-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.output",
+            "articles",
         ],
         "collapse_all_except_expanded": True,
     },
-    # CBS Statistiekverplichting - Show properties and output
+    # CBS Statistiekverplichting - Show articles
     "wet_op_het_centraal_bureau_voor_de_statistiek/enquete/CBS-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.output",
+            "articles",
         ],
         "collapse_all_except_expanded": True,
     },
-    # KVK Jaarrekening Deponeringsplicht - Show properties and output
+    # KVK Jaarrekening Deponeringsplicht - Show articles
     "handelsregisterwet/jaarrekening/KVK-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.output",
+            "articles",
         ],
         "collapse_all_except_expanded": True,
     },
-    # NVWA Meldplicht Voedselveiligheidsincident - Show properties and output
+    # NVWA Meldplicht Voedselveiligheidsincident - Show articles
     "warenwet/meldplicht/NVWA-2024-01-01": {
         "expand_paths": [
-            "properties",
-            "properties.output",
+            "articles",
         ],
         "collapse_all_except_expanded": True,
     },

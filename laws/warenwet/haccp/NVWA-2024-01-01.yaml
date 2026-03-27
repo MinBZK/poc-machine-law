@@ -1,431 +1,231 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.7/schema.json
-uuid: a7f3b2c1-8d4e-4f6a-9c5b-3e1d7a2f8b04
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$id: warenwet/haccp
+regulatory_layer: WET
+publication_date: '2024-01-01'
+valid_from: '2024-01-01'
 name: HACCP Voedselveiligheid
-law: warenwet/haccp
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "ANDERE_HANDELING"
-discoverable: "BUSINESS"
-requires_manual_approval: false
-valid_from: 2024-01-01
-service: "NVWA"
-description: >
-  Bepaling van de HACCP-verplichting op grond van de Warenwet en het Warenwetbesluit hygiëne van
-  levensmiddelen. Op basis van de SBI-code uit het handelsregister en/of activiteiten van de ondernemer
-  wordt bepaald of een bedrijf kwalificeert als levensmiddelenbedrijf. Levensmiddelenbedrijven zijn
-  verplicht een HACCP-systeem (eigen plan of goedgekeurde hygiënecode) te implementeren en zich te
-  registreren bij de NVWA conform Verordening (EG) 852/2004.
-
-legal_basis:
-  law: "Warenwetbesluit hygiëne van levensmiddelen"
-  bwb_id: "BWBR0018823"
-  article: "2"
-  url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-  juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-  explanation: "Het Warenwetbesluit hygiëne van levensmiddelen is van toepassing op levensmiddelenbedrijven en verwijst naar de HACCP-verplichtingen uit Verordening (EG) 852/2004"
-
-references:
-  - law: "Warenwet"
-    article: "2"
-    url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukII_Artikel2"
-  - law: "Warenwet"
-    article: "4"
-    url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukII_Artikel4"
-  - law: "Warenwetbesluit hygiëne van levensmiddelen"
-    article: "3"
-    url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3"
-  - law: "Warenwetbesluit hygiëne van levensmiddelen"
-    article: "4"
-    url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel4"
-
-properties:
-  parameters:
-    - name: "KVK_NUMMER"
-      description: "KvK-nummer van de organisatie"
-      type: "string"
-      required: true
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-        explanation: "Identificatie van het bedrijf via het KvK-nummer"
-
-    - name: "BEREIDT_OF_SERVEERT_VOEDSEL"
-      description: "Of het bedrijf voedsel bereidt, verwerkt of serveert (opgave ondernemer)"
-      type: "boolean"
-      required: true
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-        explanation: "De ondernemer geeft aan of het bedrijf levensmiddelen bereidt, verwerkt of serveert, als aanvulling op de SBI-classificatie"
-
-  sources:
-    - name: "SBI_CODE"
-      description: "SBI-code (Standaard Bedrijfsindeling) van de organisatie uit het handelsregister"
-      type: "string"
-      required: true
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "KVK"
-        table: "organisaties"
-        field: "sbi_code"
-        select_on:
-          - name: "kvk_nummer"
-            description: "KvK-nummer van de organisatie"
-            type: "string"
-            value: "$KVK_NUMMER"
-      legal_basis:
-        law: "Handelsregisterwet 2007"
-        bwb_id: "BWBR0021777"
-        article: "9"
-        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel9"
-        juriconnect: "jci1.3:c:BWBR0021777&artikel=9&z=2024-01-01&g=2024-01-01"
-        explanation: "De SBI-code wordt gebruikt om te bepalen of het bedrijf levensmiddelen-gerelateerde activiteiten uitvoert"
-
-    - name: "IS_GEREGISTREERD_NVWA"
-      description: "Of het bedrijf geregistreerd is bij de NVWA"
-      type: "boolean"
-      required: false
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "NVWA"
-        table: "nvwa_registratie"
-        field: "is_geregistreerd_nvwa"
-        select_on:
-          - name: "kvk_nummer"
-            description: "KvK-nummer van de organisatie"
-            type: "string"
-            value: "$KVK_NUMMER"
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-        explanation: "Levensmiddelenbedrijven moeten geregistreerd zijn bij de NVWA conform artikel 6 van Verordening (EG) 852/2004"
-
-    - name: "HEEFT_HACCP_SYSTEEM"
-      description: "Of er een HACCP-plan of goedgekeurde hygiënecode is geïmplementeerd"
-      type: "boolean"
-      required: false
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "NVWA"
-        table: "nvwa_registratie"
-        field: "heeft_haccp_systeem"
-        select_on:
-          - name: "kvk_nummer"
-            description: "KvK-nummer van de organisatie"
-            type: "string"
-            value: "$KVK_NUMMER"
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "3"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01"
-        explanation: "Levensmiddelenbedrijven moeten procedures gebaseerd op HACCP-beginselen toepassen conform artikel 5 van Verordening (EG) 852/2004"
-
-    - name: "TYPE_HACCP_SYSTEEM"
-      description: "Type HACCP-systeem: 'hygienecode' (goedgekeurde hygiënecode) of 'eigen_haccp_plan'"
-      type: "string"
-      required: false
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "NVWA"
-        table: "nvwa_registratie"
-        field: "type_haccp_systeem"
-        select_on:
-          - name: "kvk_nummer"
-            description: "KvK-nummer van de organisatie"
-            type: "string"
-            value: "$KVK_NUMMER"
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "3"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01"
-        explanation: "Kleine horecabedrijven mogen een goedgekeurde hygiënecode gebruiken in plaats van een volledig eigen HACCP-plan"
-
-  output:
-    - name: "is_levensmiddelenbedrijf"
-      description: "Of het bedrijf kwalificeert als levensmiddelenbedrijf op basis van SBI-code en/of activiteiten"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-        explanation: "Een levensmiddelenbedrijf is elke onderneming die levensmiddelen bereidt, verwerkt, vervoert, opslaat of verkoopt, conform Verordening (EG) 178/2002 artikel 3 lid 2"
-
-    - name: "heeft_haccp_verplichting"
-      description: "Of de HACCP-verplichting van toepassing is op dit bedrijf"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-        explanation: "De HACCP-verplichting geldt voor alle levensmiddelenbedrijven"
-
-    - name: "is_geregistreerd"
-      description: "Of het bedrijf geregistreerd is bij de NVWA"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-        explanation: "Registratie bij de NVWA is verplicht voor alle levensmiddelenbedrijven conform Verordening (EG) 852/2004 artikel 6"
-
-    - name: "heeft_haccp_systeem"
-      description: "Of er een geldig HACCP-systeem is geïmplementeerd"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "3"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01"
-        explanation: "Levensmiddelenbedrijven moeten HACCP-procedures toepassen conform artikel 5 van Verordening (EG) 852/2004"
-
-    - name: "voldoet_aan_verplichting"
-      description: "Of het bedrijf aan alle voedselveiligheidseisen voldoet"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "3"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01"
-        explanation: "Een bedrijf voldoet wanneer het geregistreerd is bij de NVWA en een geldig HACCP-systeem heeft geïmplementeerd"
-
-    - name: "type_haccp_systeem"
-      description: "Type HACCP-systeem dat wordt gebruikt"
-      type: "string"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: secondary
-      legal_basis:
-        law: "Warenwetbesluit hygiëne van levensmiddelen"
-        bwb_id: "BWBR0018823"
-        article: "3"
-        url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3"
-        juriconnect: "jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01"
-        explanation: "Het type systeem bepaalt de omvang van de HACCP-documentatie"
-
-    - name: "toezichthouder"
-      description: "De toezichthoudende instantie"
-      type: "string"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: secondary
-      legal_basis:
-        law: "Warenwet"
-        bwb_id: "BWBR0001969"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukII_Artikel2"
-        juriconnect: "jci1.3:c:BWBR0001969&artikel=2&z=2024-01-01&g=2024-01-01"
-        explanation: "De NVWA is belast met het toezicht op de naleving van de Warenwet"
-
-  definitions:
-    # SBI-codes die levensmiddelenbedrijven identificeren
-    # 1011-1089: Vervaardiging van voedingsmiddelen
-    # 1101-1107: Vervaardiging van dranken
-    # 4711: Supermarkten
-    # 4721-4729: Winkels in voedings- en genotmiddelen
-    # 5610: Restaurants en mobiele eetgelegenheden
-    # 56101: Restaurants
-    # 56102: Cafés
-    # 5621: Eventcatering
-    # 5629: Overige catering
-    # 5630: Cafés
-    SBI_LEVENSMIDDELEN:
-      - "1011"
-      - "1012"
-      - "1013"
-      - "1020"
-      - "1031"
-      - "1032"
-      - "1039"
-      - "1041"
-      - "1042"
-      - "1051"
-      - "1052"
-      - "1061"
-      - "1062"
-      - "1071"
-      - "1072"
-      - "1073"
-      - "1081"
-      - "1082"
-      - "1083"
-      - "1084"
-      - "1085"
-      - "1086"
-      - "1089"
-      - "1101"
-      - "1102"
-      - "1103"
-      - "1104"
-      - "1105"
-      - "1106"
-      - "1107"
-      - "4711"
-      - "4721"
-      - "4722"
-      - "4723"
-      - "4724"
-      - "4725"
-      - "4726"
-      - "4729"
-      - "5610"
-      - "56101"
-      - "56102"
-      - "5621"
-      - "5629"
-      - "5630"
-    TOEZICHTHOUDER: "NVWA"
-
-variables: []
-
-requirements:
-  - or:
-      - subject: "$SBI_CODE"
-        operation: IN
-        value: "$SBI_LEVENSMIDDELEN"
-        legal_basis:
-          law: "Warenwetbesluit hygiëne van levensmiddelen"
-          bwb_id: "BWBR0018823"
-          article: "2"
-          url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-          juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-          explanation: "De SBI-code van het bedrijf valt in een categorie die levensmiddelen bereidt, verwerkt of verkoopt"
-
-      - subject: "$BEREIDT_OF_SERVEERT_VOEDSEL"
-        operation: EQUALS
+bwb_id: BWBR0018823
+url: https://wetten.overheid.nl/BWBR0018823/2024-01-01
+service: NVWA
+uuid: a7f3b2c1-8d4e-4f6a-9c5b-3e1d7a2f8b04
+discoverable: BUSINESS
+articles:
+- number: '2'
+  text: ''
+  url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
+  machine_readable:
+    definitions:
+      SBI_LEVENSMIDDELEN:
+        value:
+        - '1011'
+        - '1012'
+        - '1013'
+        - '1020'
+        - '1031'
+        - '1032'
+        - '1039'
+        - '1041'
+        - '1042'
+        - '1051'
+        - '1052'
+        - '1061'
+        - '1062'
+        - '1071'
+        - '1072'
+        - '1073'
+        - '1081'
+        - '1082'
+        - '1083'
+        - '1084'
+        - '1085'
+        - '1086'
+        - '1089'
+        - '1101'
+        - '1102'
+        - '1103'
+        - '1104'
+        - '1105'
+        - '1106'
+        - '1107'
+        - '4711'
+        - '4721'
+        - '4722'
+        - '4723'
+        - '4724'
+        - '4725'
+        - '4726'
+        - '4729'
+        - '5610'
+        - '56101'
+        - '56102'
+        - '5621'
+        - '5629'
+        - '5630'
+      TOEZICHTHOUDER:
+        value: NVWA
+    execution:
+      produces:
+        legal_character: BESCHIKKING
+        decision_type: ANDERE_HANDELING
+      parameters:
+      - name: KVK_NUMMER
+        type: string
+        required: true
+      - name: BEREIDT_OF_SERVEERT_VOEDSEL
+        type: boolean
+        required: true
+      input:
+      - name: SBI_CODE
+        type: string
+        source_reference:
+          source_type: KVK
+          table: organisaties
+          field: sbi_code
+          select_on:
+          - name: kvk_nummer
+            description: KvK-nummer van de organisatie
+            type: string
+            value: $KVK_NUMMER
+      - name: IS_GEREGISTREERD_NVWA
+        type: boolean
+        source_reference:
+          source_type: NVWA
+          table: nvwa_registratie
+          field: is_geregistreerd_nvwa
+          select_on:
+          - name: kvk_nummer
+            description: KvK-nummer van de organisatie
+            type: string
+            value: $KVK_NUMMER
+      - name: HEEFT_HACCP_SYSTEEM
+        type: boolean
+        source_reference:
+          source_type: NVWA
+          table: nvwa_registratie
+          field: heeft_haccp_systeem
+          select_on:
+          - name: kvk_nummer
+            description: KvK-nummer van de organisatie
+            type: string
+            value: $KVK_NUMMER
+      - name: TYPE_HACCP_SYSTEEM
+        type: string
+        source_reference:
+          source_type: NVWA
+          table: nvwa_registratie
+          field: type_haccp_systeem
+          select_on:
+          - name: kvk_nummer
+            description: KvK-nummer van de organisatie
+            type: string
+            value: $KVK_NUMMER
+      output:
+      - name: is_levensmiddelenbedrijf
+        type: boolean
+      - name: heeft_haccp_verplichting
+        type: boolean
+      - name: is_geregistreerd
+        type: boolean
+      - name: heeft_haccp_systeem
+        type: boolean
+      - name: voldoet_aan_verplichting
+        type: boolean
+      - name: type_haccp_systeem
+        type: string
+      - name: toezichthouder
+        type: string
+      requirements:
+      - or:
+        - subject: $SBI_CODE
+          operation: IN
+          value: $SBI_LEVENSMIDDELEN
+          legal_basis:
+            law: Warenwetbesluit hygiëne van levensmiddelen
+            bwb_id: BWBR0018823
+            article: '2'
+            url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
+            juriconnect: jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01
+            explanation: De SBI-code van het bedrijf valt in een categorie die levensmiddelen bereidt, verwerkt of verkoopt
+        - subject: $BEREIDT_OF_SERVEERT_VOEDSEL
+          operation: EQUALS
+          value: true
+          legal_basis:
+            law: Warenwetbesluit hygiëne van levensmiddelen
+            bwb_id: BWBR0018823
+            article: '2'
+            url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
+            juriconnect: jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01
+            explanation: Het bedrijf geeft aan levensmiddelen te bereiden, verwerken of serveren, ongeacht de SBI-classificatie
+      actions:
+      - output: is_levensmiddelenbedrijf
         value: true
         legal_basis:
-          law: "Warenwetbesluit hygiëne van levensmiddelen"
-          bwb_id: "BWBR0018823"
-          article: "2"
-          url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-          juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-          explanation: "Het bedrijf geeft aan levensmiddelen te bereiden, verwerken of serveren, ongeacht de SBI-classificatie"
-
-actions:
-  - output: "is_levensmiddelenbedrijf"
-    value: true
-    legal_basis:
-      law: "Warenwetbesluit hygiëne van levensmiddelen"
-      bwb_id: "BWBR0018823"
-      article: "2"
-      url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-      juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-      explanation: "Het bedrijf kwalificeert als levensmiddelenbedrijf op basis van SBI-code en/of activiteiten"
-
-  - output: "heeft_haccp_verplichting"
-    value: true
-    legal_basis:
-      law: "Warenwetbesluit hygiëne van levensmiddelen"
-      bwb_id: "BWBR0018823"
-      article: "2"
-      url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-      juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-      explanation: "Het bedrijf is een levensmiddelenbedrijf; de HACCP-verplichting is van toepassing"
-
-  - output: "is_geregistreerd"
-    value: "$IS_GEREGISTREERD_NVWA"
-    legal_basis:
-      law: "Warenwetbesluit hygiëne van levensmiddelen"
-      bwb_id: "BWBR0018823"
-      article: "2"
-      url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-      juriconnect: "jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01"
-      explanation: "Registratiestatus bij de NVWA wordt overgenomen uit het registratiesysteem"
-
-  - output: "heeft_haccp_systeem"
-    value: "$HEEFT_HACCP_SYSTEEM"
-    legal_basis:
-      law: "Warenwetbesluit hygiëne van levensmiddelen"
-      bwb_id: "BWBR0018823"
-      article: "3"
-      url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3"
-      juriconnect: "jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01"
-      explanation: "HACCP-systeemstatus wordt overgenomen uit het registratiesysteem"
-
-  - output: "voldoet_aan_verplichting"
-    operation: AND
-    values:
-      - operation: EQUALS
-        subject: "$IS_GEREGISTREERD_NVWA"
+          law: Warenwetbesluit hygiëne van levensmiddelen
+          bwb_id: BWBR0018823
+          article: '2'
+          url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
+          juriconnect: jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01
+          explanation: Het bedrijf kwalificeert als levensmiddelenbedrijf op basis van SBI-code en/of activiteiten
+      - output: heeft_haccp_verplichting
         value: true
-      - operation: EQUALS
-        subject: "$HEEFT_HACCP_SYSTEEM"
-        value: true
-    legal_basis:
-      law: "Warenwetbesluit hygiëne van levensmiddelen"
-      bwb_id: "BWBR0018823"
-      article: "3"
-      url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3"
-      juriconnect: "jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01"
-      explanation: "Een bedrijf voldoet aan de verplichting wanneer het geregistreerd is bij de NVWA en een geldig HACCP-systeem heeft"
-
-  - output: "type_haccp_systeem"
-    value: "$TYPE_HACCP_SYSTEEM"
-    legal_basis:
-      law: "Warenwetbesluit hygiëne van levensmiddelen"
-      bwb_id: "BWBR0018823"
-      article: "3"
-      url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3"
-      juriconnect: "jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01"
-      explanation: "Het type HACCP-systeem wordt overgenomen uit het registratiesysteem"
-
-  - output: "toezichthouder"
-    value: "$TOEZICHTHOUDER"
-    legal_basis:
-      law: "Warenwet"
-      bwb_id: "BWBR0001969"
-      article: "2"
-      url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukII_Artikel2"
-      juriconnect: "jci1.3:c:BWBR0001969&artikel=2&z=2024-01-01&g=2024-01-01"
-      explanation: "De NVWA is de aangewezen toezichthouder voor de Warenwet"
+        legal_basis:
+          law: Warenwetbesluit hygiëne van levensmiddelen
+          bwb_id: BWBR0018823
+          article: '2'
+          url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
+          juriconnect: jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01
+          explanation: Het bedrijf is een levensmiddelenbedrijf; de HACCP-verplichting is van toepassing
+      - output: is_geregistreerd
+        value: $IS_GEREGISTREERD_NVWA
+        legal_basis:
+          law: Warenwetbesluit hygiëne van levensmiddelen
+          bwb_id: BWBR0018823
+          article: '2'
+          url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
+          juriconnect: jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01
+          explanation: Registratiestatus bij de NVWA wordt overgenomen uit het registratiesysteem
+      - output: heeft_haccp_systeem
+        value: $HEEFT_HACCP_SYSTEEM
+        legal_basis:
+          law: Warenwetbesluit hygiëne van levensmiddelen
+          bwb_id: BWBR0018823
+          article: '3'
+          url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3
+          juriconnect: jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01
+          explanation: HACCP-systeemstatus wordt overgenomen uit het registratiesysteem
+      - output: voldoet_aan_verplichting
+        value:
+          operation: AND
+          values:
+          - operation: EQUALS
+            subject: $IS_GEREGISTREERD_NVWA
+            value: true
+          - operation: EQUALS
+            subject: $HEEFT_HACCP_SYSTEEM
+            value: true
+        legal_basis:
+          law: Warenwetbesluit hygiëne van levensmiddelen
+          bwb_id: BWBR0018823
+          article: '3'
+          url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3
+          juriconnect: jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01
+          explanation: Een bedrijf voldoet aan de verplichting wanneer het geregistreerd is bij de NVWA en een geldig HACCP-systeem
+            heeft
+      - output: type_haccp_systeem
+        value: $TYPE_HACCP_SYSTEEM
+        legal_basis:
+          law: Warenwetbesluit hygiëne van levensmiddelen
+          bwb_id: BWBR0018823
+          article: '3'
+          url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3
+          juriconnect: jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01
+          explanation: Het type HACCP-systeem wordt overgenomen uit het registratiesysteem
+      - output: toezichthouder
+        value: $TOEZICHTHOUDER
+        legal_basis:
+          law: Warenwet
+          bwb_id: BWBR0001969
+          article: '2'
+          url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukII_Artikel2
+          juriconnect: jci1.3:c:BWBR0001969&artikel=2&z=2024-01-01&g=2024-01-01
+          explanation: De NVWA is de aangewezen toezichthouder voor de Warenwet
