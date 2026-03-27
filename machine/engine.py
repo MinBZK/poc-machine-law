@@ -186,7 +186,7 @@ class RulesEngine:
         """Evaluate rules using service context and sources"""
         parameters = parameters or {}
         for p in self.parameter_specs:
-            if p["required"] and p["name"] not in parameters:
+            if p.get("required", False) and p["name"] not in parameters:
                 logger.warning(f"Required parameter {p} not found in {parameters}")
 
         logger.debug(f"Evaluating rules for {self.service_name} {self.law} ({calculation_date} {requested_output})")
@@ -472,8 +472,16 @@ class RulesEngine:
         "AND": all,
         "MIN": min,
         "MAX": max,
-        "ADD": sum,
-        "CONCAT": lambda vals: "".join(str(x) for x in vals),
+        "ADD": lambda vals: (
+            sum(x for v in vals for x in (v if isinstance(v, list) else [v]))
+            if any(isinstance(v, list) for v in vals)
+            else sum(vals)
+        ),
+        "CONCAT": lambda vals: (
+            "".join(str(x) for x in (x for v in vals for x in (v if isinstance(v, list) else [v])))
+            if any(isinstance(v, (list, str)) for v in vals)
+            else "".join(str(x) for x in vals)
+        ),
         "MULTIPLY": lambda vals: functools.reduce(
             lambda x, y: int(x * y) if isinstance(y, int) and y < 1 else x * y,
             vals[1:],

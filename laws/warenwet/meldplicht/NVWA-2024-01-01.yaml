@@ -1,268 +1,134 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.7/schema.json
-uuid: a4c7e9f1-2b5d-4e8a-93f6-5a1c9b7e2d40
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$id: warenwet/meldplicht
+regulatory_layer: WET
+publication_date: '2024-01-01'
+valid_from: '2024-01-01'
 name: Warenwet - Meldplicht Voedselveiligheidsincident
-law: warenwet/meldplicht
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "ANDERE_HANDELING"
-discoverable: "BUSINESS"
-requires_manual_approval: false
-valid_from: 2024-01-01
-service: "NVWA"
-description: >
-  Bepaling van de meldplicht bij voedselveiligheidsincidenten op grond van artikel 19 van
-  Verordening (EG) 178/2002 (General Food Law) en de Warenwet. Levensmiddelenbedrijven die
-  constateren dat een door hen geleverd product niet aan de voedselveiligheidseisen voldoet,
-  zijn verplicht dit binnen 4 uur te melden bij de NVWA. Dit is een event-driven verplichting
-  die alleen actief wordt bij een daadwerkelijk incident.
-
-legal_basis:
-  law: "Warenwet"
-  bwb_id: "BWBR0001969"
-  article: "21"
-  url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-  juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-  explanation: "Artikel 21 Warenwet geeft de minister bevoegdheid regels te stellen over de meldplicht bij voedselveiligheidsincidenten, in lijn met de Europese General Food Law"
-
-references:
-  - law: "Warenwet"
-    article: "2"
-    url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukII_Artikel2"
-  - law: "Warenwetbesluit hygiëne van levensmiddelen"
-    article: "2"
-    url: "https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2"
-
-properties:
-  parameters:
-    - name: "KVK_NUMMER"
-      description: "KvK-nummer van de organisatie"
-      type: "string"
-      required: true
-      legal_basis:
-        law: "Warenwet"
-        bwb_id: "BWBR0001969"
-        article: "21"
-        url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-        juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-        explanation: "Identificatie van het bedrijf via het KvK-nummer voor de meldplicht voedselveiligheid"
-
-  sources:
-    - name: "IS_LEVENSMIDDELENBEDRIJF"
-      description: "Of het bedrijf kwalificeert als levensmiddelenbedrijf"
-      type: "boolean"
-      required: true
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "NVWA"
-        table: "nvwa_registratie"
-        field: "is_levensmiddelenbedrijf"
-        select_on:
-          - name: "kvk_nummer"
-            description: "KvK-nummer van de organisatie"
-            type: "string"
-            value: "$KVK_NUMMER"
-      legal_basis:
-        law: "Warenwet"
-        bwb_id: "BWBR0001969"
-        article: "21"
-        url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-        juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-        explanation: "De meldplicht geldt alleen voor levensmiddelenbedrijven conform de definitie uit Verordening (EG) 178/2002"
-
-    - name: "HEEFT_ACTIEF_INCIDENT"
-      description: "Of er momenteel een actief voedselveiligheidsincident is"
-      type: "boolean"
-      required: false
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "NVWA"
-        table: "nvwa_meldplicht"
-        field: "heeft_actief_incident"
-        select_on:
-          - name: "kvk_nummer"
-            description: "KvK-nummer van de organisatie"
-            type: "string"
-            value: "$KVK_NUMMER"
-      legal_basis:
-        law: "Warenwet"
-        bwb_id: "BWBR0001969"
-        article: "21"
-        url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-        juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-        explanation: "De meldplicht wordt geactiveerd wanneer een levensmiddelenbedrijf constateert dat een product niet aan de voedselveiligheidseisen voldoet"
-
-  output:
-    - name: "heeft_meldplicht"
-      description: "Of de meldplicht voedselveiligheidsincidenten van toepassing is op dit bedrijf"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Warenwet"
-        bwb_id: "BWBR0001969"
-        article: "21"
-        url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-        juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-        explanation: "De meldplicht geldt voor alle levensmiddelenbedrijven"
-
-    - name: "heeft_actief_incident"
-      description: "Of er momenteel een actief incident is dat gemeld moet worden"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Warenwet"
-        bwb_id: "BWBR0001969"
-        article: "21"
-        url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-        juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-        explanation: "Geeft aan of er een lopend incident is waarvoor de meldplicht is geactiveerd"
-
-    - name: "melding_deadline_uren"
-      description: "Aantal uren waarbinnen een incident gemeld moet worden"
-      type: "number"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Warenwet"
-        bwb_id: "BWBR0001969"
-        article: "21"
-        url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-        juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-        explanation: "Voedselveiligheidsincidenten moeten binnen 4 uur worden gemeld bij de NVWA"
-
-    - name: "rapportage_methode"
-      description: "De wijze waarop een incident gemeld moet worden"
-      type: "string"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Warenwet"
-        bwb_id: "BWBR0001969"
-        article: "21"
-        url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-        juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-        explanation: "Melding geschiedt via het NVWA-meldformulier voor voedselveiligheidsincidenten"
-
-    - name: "is_event_driven"
-      description: "Of deze verplichting event-driven is (alleen bij incident)"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: secondary
-      legal_basis:
-        law: "Warenwet"
-        bwb_id: "BWBR0001969"
-        article: "21"
-        url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-        juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-        explanation: "De meldplicht is event-driven: zij treedt alleen in werking bij constatering van een voedselveiligheidsincident"
-
-    - name: "toezichthouder"
-      description: "De toezichthoudende instantie"
-      type: "string"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: secondary
-      legal_basis:
-        law: "Warenwet"
-        bwb_id: "BWBR0001969"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukII_Artikel2"
-        juriconnect: "jci1.3:c:BWBR0001969&artikel=2&z=2024-01-01&g=2024-01-01"
-        explanation: "De NVWA is belast met het toezicht op naleving van de Warenwet en voedselveiligheidsregelgeving"
-
-  definitions:
-    MELDING_DEADLINE_UREN: 4
-    RAPPORTAGE_METHODE: "NVWA meldformulier (nvwa.nl/melden)"
-    TOEZICHTHOUDER: "NVWA"
-
-variables: []
-
-requirements:
-  - all:
-      - subject: "$IS_LEVENSMIDDELENBEDRIJF"
-        operation: EQUALS
+bwb_id: BWBR0001969
+url: https://wetten.overheid.nl/BWBR0001969/2024-01-01
+service: NVWA
+uuid: a4c7e9f1-2b5d-4e8a-93f6-5a1c9b7e2d40
+discoverable: BUSINESS
+articles:
+- number: '21'
+  text: ''
+  url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#Artikel21
+  machine_readable:
+    definitions:
+      MELDING_DEADLINE_UREN:
+        value: 4
+      RAPPORTAGE_METHODE:
+        value: NVWA meldformulier (nvwa.nl/melden)
+      TOEZICHTHOUDER:
+        value: NVWA
+    execution:
+      produces:
+        legal_character: BESCHIKKING
+        decision_type: ANDERE_HANDELING
+      parameters:
+      - name: KVK_NUMMER
+        type: string
+        required: true
+      input:
+      - name: IS_LEVENSMIDDELENBEDRIJF
+        type: boolean
+        source_reference:
+          source_type: NVWA
+          table: nvwa_registratie
+          field: is_levensmiddelenbedrijf
+          select_on:
+          - name: kvk_nummer
+            description: KvK-nummer van de organisatie
+            type: string
+            value: $KVK_NUMMER
+      - name: HEEFT_ACTIEF_INCIDENT
+        type: boolean
+        source_reference:
+          source_type: NVWA
+          table: nvwa_meldplicht
+          field: heeft_actief_incident
+          select_on:
+          - name: kvk_nummer
+            description: KvK-nummer van de organisatie
+            type: string
+            value: $KVK_NUMMER
+      output:
+      - name: heeft_meldplicht
+        type: boolean
+      - name: heeft_actief_incident
+        type: boolean
+      - name: melding_deadline_uren
+        type: number
+      - name: rapportage_methode
+        type: string
+      - name: is_event_driven
+        type: boolean
+      - name: toezichthouder
+        type: string
+      requirements:
+      - all:
+        - subject: $IS_LEVENSMIDDELENBEDRIJF
+          operation: EQUALS
+          value: true
+          legal_basis:
+            law: Warenwet
+            bwb_id: BWBR0001969
+            article: '21'
+            url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21
+            juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
+            explanation: De meldplicht geldt alleen voor levensmiddelenbedrijven
+      actions:
+      - output: heeft_meldplicht
         value: true
         legal_basis:
-          law: "Warenwet"
-          bwb_id: "BWBR0001969"
-          article: "21"
-          url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-          juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-          explanation: "De meldplicht geldt alleen voor levensmiddelenbedrijven"
-
-actions:
-  - output: "heeft_meldplicht"
-    value: true
-    legal_basis:
-      law: "Warenwet"
-      bwb_id: "BWBR0001969"
-      article: "21"
-      url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-      juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-      explanation: "Het bedrijf is een levensmiddelenbedrijf; de meldplicht is van toepassing"
-
-  - output: "heeft_actief_incident"
-    value: "$HEEFT_ACTIEF_INCIDENT"
-    legal_basis:
-      law: "Warenwet"
-      bwb_id: "BWBR0001969"
-      article: "21"
-      url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-      juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-      explanation: "Incidentstatus wordt overgenomen uit het NVWA-systeem"
-
-  - output: "melding_deadline_uren"
-    value: "$MELDING_DEADLINE_UREN"
-    legal_basis:
-      law: "Warenwet"
-      bwb_id: "BWBR0001969"
-      article: "21"
-      url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-      juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-      explanation: "Incidenten moeten binnen 4 uur worden gemeld bij de NVWA"
-
-  - output: "rapportage_methode"
-    value: "$RAPPORTAGE_METHODE"
-    legal_basis:
-      law: "Warenwet"
-      bwb_id: "BWBR0001969"
-      article: "21"
-      url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-      juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-      explanation: "Melding geschiedt via het NVWA-meldformulier"
-
-  - output: "is_event_driven"
-    value: true
-    legal_basis:
-      law: "Warenwet"
-      bwb_id: "BWBR0001969"
-      article: "21"
-      url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21"
-      juriconnect: "jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01"
-      explanation: "De meldplicht is event-driven en treedt alleen in werking bij een daadwerkelijk incident"
-
-  - output: "toezichthouder"
-    value: "$TOEZICHTHOUDER"
-    legal_basis:
-      law: "Warenwet"
-      bwb_id: "BWBR0001969"
-      article: "2"
-      url: "https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukII_Artikel2"
-      juriconnect: "jci1.3:c:BWBR0001969&artikel=2&z=2024-01-01&g=2024-01-01"
-      explanation: "De NVWA is de aangewezen toezichthouder"
+          law: Warenwet
+          bwb_id: BWBR0001969
+          article: '21'
+          url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21
+          juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
+          explanation: Het bedrijf is een levensmiddelenbedrijf; de meldplicht is van toepassing
+      - output: heeft_actief_incident
+        value: $HEEFT_ACTIEF_INCIDENT
+        legal_basis:
+          law: Warenwet
+          bwb_id: BWBR0001969
+          article: '21'
+          url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21
+          juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
+          explanation: Incidentstatus wordt overgenomen uit het NVWA-systeem
+      - output: melding_deadline_uren
+        value: $MELDING_DEADLINE_UREN
+        legal_basis:
+          law: Warenwet
+          bwb_id: BWBR0001969
+          article: '21'
+          url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21
+          juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
+          explanation: Incidenten moeten binnen 4 uur worden gemeld bij de NVWA
+      - output: rapportage_methode
+        value: $RAPPORTAGE_METHODE
+        legal_basis:
+          law: Warenwet
+          bwb_id: BWBR0001969
+          article: '21'
+          url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21
+          juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
+          explanation: Melding geschiedt via het NVWA-meldformulier
+      - output: is_event_driven
+        value: true
+        legal_basis:
+          law: Warenwet
+          bwb_id: BWBR0001969
+          article: '21'
+          url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21
+          juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
+          explanation: De meldplicht is event-driven en treedt alleen in werking bij een daadwerkelijk incident
+      - output: toezichthouder
+        value: $TOEZICHTHOUDER
+        legal_basis:
+          law: Warenwet
+          bwb_id: BWBR0001969
+          article: '2'
+          url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukII_Artikel2
+          juriconnect: jci1.3:c:BWBR0001969&artikel=2&z=2024-01-01&g=2024-01-01
+          explanation: De NVWA is de aangewezen toezichthouder
