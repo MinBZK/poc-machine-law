@@ -290,6 +290,58 @@ FEATURE_REGISTRY: list[FeatureSpec] = [
         laws=["precariobelasting"],
         is_grouping=True,
     ),
+    # --- Accijns alcohol ---
+    FeatureSpec(
+        sim_column="produceert_alcohol",
+        display_name="Produceert alcohol",
+        yaml_inputs=["ACTIVITEIT"],
+        laws=["accijns"],
+        is_grouping=True,
+    ),
+    FeatureSpec(
+        sim_column="type_alcohol_product",
+        display_name="Type alcoholproduct",
+        yaml_inputs=["TYPE_PRODUCT"],
+        laws=["accijns"],
+        is_grouping=True,
+    ),
+    FeatureSpec(
+        sim_column="hoeveelheid_hectoliter",
+        display_name="Hoeveelheid (hectoliter)",
+        yaml_inputs=["HOEVEELHEID_HECTOLITER"],
+        laws=["accijns"],
+        is_continuous=True,
+    ),
+    FeatureSpec(
+        sim_column="alcoholpercentage",
+        display_name="Alcoholpercentage",
+        yaml_inputs=["ALCOHOLPERCENTAGE"],
+        laws=["accijns"],
+        is_continuous=True,
+    ),
+    # --- ZVW werkgeversbijdrage ---
+    FeatureSpec(
+        sim_column="aantal_werknemers",
+        display_name="Aantal werknemers",
+        yaml_inputs=["AANTAL_WERKNEMERS"],
+        laws=["zvw_werkgeversbijdrage"],
+        is_continuous=True,
+    ),
+    FeatureSpec(
+        sim_column="bruto_loon_per_werknemer",
+        display_name="Bruto loon per werknemer",
+        yaml_inputs=["BRUTO_LOON"],
+        laws=["zvw_werkgeversbijdrage"],
+        is_continuous=True,
+    ),
+    # --- Jaaromzet (shared across payment laws) ---
+    FeatureSpec(
+        sim_column="jaaromzet",
+        display_name="Jaaromzet",
+        yaml_inputs=["JAAROMZET"],
+        laws=["precariobelasting", "accijns", "zvw_werkgeversbijdrage"],
+        is_continuous=True,
+    ),
 ]
 
 
