@@ -493,6 +493,11 @@ class RuleContext:
         return None
 
     def _resolve_from_service(self, path, service_ref, spec):
+        # Guard: if service_ref has no service and no law, we can't resolve
+        if not service_ref.get("service") and not service_ref.get("law"):
+            logger.warning(f"Service reference for '{path}' has no service and no law - cannot resolve")
+            return None
+
         parameters = copy(self.parameters)
         if "parameters" in service_ref:
             parameters.update({p["name"]: self.resolve_value(p["reference"]) for p in service_ref["parameters"]})
