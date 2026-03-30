@@ -129,6 +129,9 @@ type SourceField struct {
 type InputField struct {
 	BaseField        `yaml:",inline"`
 	ServiceReference ServiceReference `yaml:"service_reference"`
+	// v0.5.0 fields
+	Source          *V050Source      `yaml:"source,omitempty"`
+	SourceReference *SourceReference `yaml:"source_reference,omitempty"`
 }
 
 // OutputField extends BaseField for output
@@ -505,6 +508,62 @@ const (
 	OperationIsNull         OperationType = "IS_NULL"
 	OperationNotNull        OperationType = "NOT_NULL"
 )
+
+// v0.5.0 Article-based structure
+
+// ArticleBasedSpec represents the root structure of a v0.5.0 article-based YAML
+type ArticleBasedSpec struct {
+	Schema          string    `yaml:"$schema"`
+	ID              string    `yaml:"$id"`
+	RegulatoryLayer string    `yaml:"regulatory_layer"`
+	Service         string    `yaml:"service"`
+	Name            string    `yaml:"name"`
+	ValidFrom       string    `yaml:"valid_from"`
+	PublicationDate string    `yaml:"publication_date"`
+	BwbID           string    `yaml:"bwb_id"`
+	URL             string    `yaml:"url"`
+	UUID            string    `yaml:"uuid"`
+	Discoverable    string    `yaml:"discoverable"`
+	Articles        []Article `yaml:"articles"`
+}
+
+// Article represents a single article in the v0.5.0 format
+type Article struct {
+	Number          string           `yaml:"number"`
+	Text            string           `yaml:"text"`
+	URL             string           `yaml:"url"`
+	MachineReadable *MachineReadable `yaml:"machine_readable"`
+}
+
+// MachineReadable represents the machine-readable section of an article
+type MachineReadable struct {
+	Definitions map[string]interface{} `yaml:"definitions"`
+	Execution   *Execution             `yaml:"execution"`
+}
+
+// Execution represents the execution section of a machine-readable article
+type Execution struct {
+	Produces     *Produces        `yaml:"produces"`
+	Parameters   []ParameterField `yaml:"parameters"`
+	Input        []InputField     `yaml:"input"`
+	Output       []OutputField    `yaml:"output"`
+	Actions      []Action         `yaml:"actions"`
+	Requirements []interface{}    `yaml:"requirements"`
+}
+
+// Produces represents the legal character and decision type produced by an article
+type Produces struct {
+	LegalCharacter string `yaml:"legal_character"`
+	DecisionType   string `yaml:"decision_type"`
+}
+
+// V050Source represents a source reference in v0.5.0 format input fields
+type V050Source struct {
+	Regulation string            `yaml:"regulation"`
+	Output     string            `yaml:"output"`
+	Service    string            `yaml:"service"`
+	Parameters map[string]string `yaml:"parameters,omitempty"`
+}
 
 // Helper functions for validation
 
