@@ -32,6 +32,10 @@ build:
         manual:
           - src: "**/*.py"
             dest: /app
+    - image: wallet-verifier-image
+      context: wallet
+      docker:
+        dockerfile: verification_server.Dockerfile
 
 manifests:
   kustomize:

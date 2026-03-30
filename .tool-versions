@@ -4,3 +4,4 @@ golang        1.25.3
 golangci-lint 2.1.5
 ruff          0.11.9
 k3d           5.8.3
+skaffold      2.17.0

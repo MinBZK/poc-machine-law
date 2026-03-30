@@ -1,0 +1,47 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      WALLET_VERIFIER_REQUESTER_URL: http://wallet-verifier:3010
+      WALLET_VERIFIER_WALLET_URL: http://localhost:3009
+      WALLET_RETURN_URL: http://localhost:8000
+      FEATURE_WALLET: "true"
+    depends_on:
+      wallet-verifier:
+        condition: service_started
+
+  wallet-verifier:
+    build:
+      context: wallet
+      dockerfile: verification_server.Dockerfile
+    ports:
+      - "3009:3009"
+      - "3010:3010"
+    environment:
+      # URL the wallet mobile app uses to reach this server — must be reachable from outside Docker
+      WALLET_REACHABLE_URL: http://192.168.68.50:3009/
+      VERIFICATION_SERVER__STORAGE__URL: postgres://postgres:postgres@postgres:5432/verification_server
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: verification_server
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

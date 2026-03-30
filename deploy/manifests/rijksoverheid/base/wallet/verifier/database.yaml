@@ -1,0 +1,20 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: db
+spec:
+  enablePDB: false
+  storage:
+    size: 10Gi
+  affinity:
+    podAntiAffinityType: preferred
+  bootstrap:
+    initdb:
+      database: verifier
+      encoding: UTF8
+      localeCType: C
+      localeCollate: C
+      owner: verifier
+      postInitSQL:
+        - create extension if not exists "uuid-ossp" with schema public;

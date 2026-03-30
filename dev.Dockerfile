@@ -49,7 +49,13 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS release
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    locales \
+    && echo "nl_NL.UTF-8 UTF-8" >> /etc/locale.gen \
+    && locale-gen \
     && rm -rf /var/lib/apt/lists/*
+
+ENV LANG=nl_NL.UTF-8
+ENV LC_ALL=nl_NL.UTF-8
 
 # Set working directory
 WORKDIR /app

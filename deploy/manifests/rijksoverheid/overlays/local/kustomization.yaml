@@ -29,6 +29,15 @@ patches:
         value: burger.127-0-0-1.nip.io
       - op: remove
         path: /spec/tls
+  - target:
+      kind: Ingress
+      name: wallet-verifier-ing
+    patch: |
+      - op: replace
+        path: /spec/rules/0/host
+        value: wallet-verifier.127-0-0-1.nip.io
+      - op: remove
+        path: /spec/tls
 
 configMapGenerator:
   - name: frontend-cm
