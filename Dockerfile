@@ -55,16 +55,32 @@ RUN cp /wallet/nl-wallet/wallet_web/dist/nl-wallet-web.iife.js .
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS release
 
 # Install the Dutch locale
-RUN apt-get update && apt-get install -y locales locales-all
+RUN apt-get update && apt-get install -y locales locales-all && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY --from=node_builder /analysis-laws/build analysis/laws/build
 COPY --from=node_builder /analysis-graph/build analysis/graph/build
 COPY --from=node_builder /importer/build importer/build
 COPY --from=wallet_builder /wallet-files nl-wallet-files
 
+RUN useradd -g 0 --create-home appuser
+
+WORKDIR /app
+
 ADD . .
 
+ENV UV_CACHE_DIR=/tmp/uv-cache
+RUN mkdir -p /tmp/uv-cache && \
+    chgrp -R 0 /app /tmp/uv-cache && \
+    chmod -R g+rwX /app /tmp/uv-cache
+
+USER appuser
+
 RUN uv sync --no-dev
+
+USER root
+RUN chmod -R g+rwX /app /tmp/uv-cache
+USER appuser
 
 EXPOSE 8000
 
