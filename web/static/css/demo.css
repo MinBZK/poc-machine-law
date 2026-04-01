@@ -1818,7 +1818,7 @@ body {
 .title-slide h1 {
     font-size: 12rem;
     font-weight: 300;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
     letter-spacing: -0.02em;
 }
 
@@ -1838,6 +1838,35 @@ body {
     font-size: 2.5rem;
     font-weight: 300;
     margin-bottom: 0.8rem;
+}
+
+.slide-flow-indent {
+    text-align: left;
+    padding-left: 45%;
+}
+
+.slide-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2rem 0;
+    gap: 1rem;
+}
+
+.qr-code {
+    width: 300px;
+    height: 300px;
+}
+
+.qr-link {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.5rem;
+    text-decoration: none;
+    font-weight: 300;
+}
+
+.qr-link:hover {
+    text-decoration: underline;
 }
 
 .slide-footer {
@@ -1934,8 +1963,8 @@ body {
 }
 
 .centered-content p {
-    font-size: 4rem;
-    margin-bottom: 2rem;
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
     font-weight: 300;
 }
 

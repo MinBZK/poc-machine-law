@@ -4,16 +4,18 @@
     {% if result.uitkeringsbedrag and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
         {% if result.uitkeringsbedrag != current_case.claimed_result.uitkeringsbedrag %}
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h4 class="font-medium text-gray-900 mb-2">Verschil met eerdere aanvraag</h4>
+                <h4 class="font-medium text-gray-900 mb-2">
+                    {{ t.tile_difference_with_earlier if t else 'Verschil met eerdere aanvraag' }}
+                </h4>
                 <p class="text-sm text-gray-600 mb-4">
-                    U vroeg eerder {{ (current_case.claimed_result.uitkeringsbedrag / 100) | format_currency }} bijstand aan.
+                    {{ t.tile_you_requested_earlier.format(amount=(current_case.claimed_result.uitkeringsbedrag / 100) | format_currency ~ ' bijstand') if t else 'U vroeg eerder ' ~ ((current_case.claimed_result.uitkeringsbedrag / 100) | format_currency) ~ ' bijstand aan.' }}
                 </p>
                 <button type="button"
                         hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
                         hx-target="#shared-application-panel"
                         hx-swap="innerHTML"
                         class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
-                    Wijzig aanvraag
+                    {{ t.tile_change_application if t else 'Wijzig aanvraag' }}
                 </button>
             </div>
         {% endif %}
@@ -25,7 +27,7 @@
                 hx-target="#shared-application-panel"
                 hx-swap="innerHTML"
                 class="w-full px-6 py-3 bg-purple-600 text-white text-center rounded-md hover:bg-purple-700 transition-colors cursor-pointer">
-            Bijstand aanvragen
+            {{ t.tile_apply_bijstand if t else 'Bijstand aanvragen' }}
         </button>
     {% else %}
         {% include "partials/tiles/components/minor_blocked_message.html" %}
@@ -33,16 +35,16 @@
 {% endblock %}
 {% block submitted_status %}
     <p class="text-sm text-gray-600 text-center">
-        Heeft u vragen? Bel 14 020 of kijk op <a href="https://amsterdam.nl/bijstand">amsterdam.nl/bijstand</a>.
+        {{ t.tile_questions_call_14020 if t else 'Heeft u vragen? Bel 14 020 of kijk op' }} <a href="https://amsterdam.nl/bijstand">amsterdam.nl/bijstand</a>.
     </p>
 {% endblock %}
 {% block approved_status %}
     <p class="text-sm text-green-600 text-center">
-        Uw aanvraag is goedgekeurd, uw bijstand zal maandelijks worden uitgekeerd.
+        {{ t.tile_approved_monthly.format(benefit='bijstand') if t else 'Uw aanvraag is goedgekeurd, uw bijstand zal maandelijks worden uitgekeerd.' }}
     </p>
 {% endblock %}
 {% block not_eligible_questions %}
     <p class="text-sm text-gray-600 text-center">
-        Heeft u vragen? Bel 14 020 of kijk op <a href="https://amsterdam.nl/bijstand">amsterdam.nl/bijstand</a>.
+        {{ t.tile_questions_call_14020 if t else 'Heeft u vragen? Bel 14 020 of kijk op' }} <a href="https://amsterdam.nl/bijstand">amsterdam.nl/bijstand</a>.
     </p>
 {% endblock %}

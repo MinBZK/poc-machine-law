@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from jinja2 import TemplateNotFound
 
 from explain.llm_factory import llm_factory
+from web.demo.translations import get_lang, get_translations
 from web.demo_profiles import DemoProfiles
 from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_engine_id, get_machine_service, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
@@ -237,6 +238,9 @@ async def execute_law(
 ):
     """Execute a law and render its result"""
 
+    lang = get_lang(request)
+    t = get_translations(lang)
+
     logger.warn(f"[LAWS] execute {service} {law} (can_submit_claims={can_submit_claims}, kvk={kvk})")
 
     try:
@@ -264,6 +268,8 @@ async def execute_law(
                 "rule_spec": {"name": law.split("/")[-1].replace("_", " ").title()},
                 "error": True,
                 "message": str(e),
+                "t": t,
+                "lang": lang,
             },
         )
 
@@ -308,6 +314,8 @@ async def execute_law(
             "current_case": existing_case,
             "can_submit_claims": can_submit_claims,
             "profile_data": profile_data,
+            "t": t,
+            "lang": lang,
         },
     )
 
@@ -325,6 +333,8 @@ async def submit_case(
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Submit a new case"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     law = unquote(law)
 
     # Get kvk from query params if not provided directly
@@ -410,6 +420,8 @@ async def submit_case(
             "missing_required": result.missing_required,
             "current_case": case,
             "profile_data": profile_data,
+            "t": t,
+            "lang": lang,
         },
     )
 
@@ -428,6 +440,8 @@ async def objection_case(
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Submit an objection for an existing case"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     law = unquote(law)
 
     if not kvk:
@@ -465,6 +479,8 @@ async def objection_case(
             "input": result.input,
             "requirements_met": result.requirements_met,
             "current_case": case_manager.get_case_by_id(case_id),
+            "t": t,
+            "lang": lang,
         },
     )
 
@@ -497,6 +513,8 @@ async def explanation(
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Get a citizen-friendly explanation of the rule evaluation path"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     try:
         print(f"Explanation requested for {service}, {law}, with provider: {provider}")
         law = unquote(law)
@@ -576,6 +594,8 @@ async def explanation(
                 "providers": providers,
                 "current_provider": current_provider,
                 "id": "explanation-panel",  # needed for HTMX targeting
+                "t": t,
+                "lang": lang,
             },
         )
 
@@ -586,12 +606,17 @@ async def explanation(
             "partials/tiles/components/explanation.html",
             {
                 "request": request,
-                "error": "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
+                "error": t.get(
+                    "error_generating_explanation",
+                    "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
+                ),
                 "service": service,
                 "law": law,
                 "bsn": bsn,
                 "providers": [],  # Empty list to avoid further errors
                 "id": "explanation-panel",  # needed for HTMX targeting
+                "t": t,
+                "lang": lang,
             },
         )
 
@@ -609,6 +634,8 @@ async def application_panel(
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Get the application panel with tabs"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     try:
         law = unquote(law)
         law, result, parameters = evaluate_law(
@@ -663,6 +690,8 @@ async def application_panel(
                 "wallet_enabled": is_wallet_enabled(),
                 "current_engine_id": get_engine_id(),
                 "profile_data": profile_data,
+                "t": t,
+                "lang": lang,
             },
         )
     except Exception as e:
@@ -671,10 +700,15 @@ async def application_panel(
             "partials/tiles/components/application_panel.html",
             {
                 "request": request,
-                "error": "Er is een fout opgetreden bij het genereren van het aanvraagformulier. Probeer het later opnieuw.",
+                "error": t.get(
+                    "error_generating_application",
+                    "Er is een fout opgetreden bij het genereren van het aanvraagformulier. Probeer het later opnieuw.",
+                ),
                 "service": service,
                 "law": law,
                 "current_engine_id": get_engine_id(),
+                "t": t,
+                "lang": lang,
             },
         )
 
@@ -691,6 +725,8 @@ async def update_profile_table(
     case_manager: CaseManagerInterface = Depends(get_case_manager),
 ) -> JSONResponse:
     """Update a profile data table in memory (for editable profile data like energy measures)."""
+    lang = get_lang(request)
+    t = get_translations(lang)
     law = unquote(law)
     body = await request.json()
     rows = body.get("rows", [])
@@ -741,5 +777,7 @@ async def update_profile_table(
             "missing_required": result.missing_required,
             "current_case": existing_case,
             "profile_data": profile_data,
+            "t": t,
+            "lang": lang,
         },
     )

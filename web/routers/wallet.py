@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ValidationError
 
+from web.demo.translations import get_lang, get_translations
 from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_engine_id, get_machine_service, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from web.feature_flags import is_wallet_enabled
@@ -139,6 +140,8 @@ async def get_attributes(
     Returns:
         TemplateResponse with application panel for HTMX targeting
     """
+    lang = get_lang(request)
+    t = get_translations(lang)
 
     # Make HTTP GET request to the verification_server
     try:
@@ -241,6 +244,8 @@ async def get_attributes(
                 "missing_required": result.missing_required,
                 "wallet_enabled": is_wallet_enabled(),
                 "current_engine_id": get_engine_id(),
+                "t": t,
+                "lang": lang,
             },
         )
     except Exception as e:

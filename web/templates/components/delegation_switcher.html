@@ -29,7 +29,7 @@
                 </div>
                 <div class="flex-grow truncate">
                     <div class="text-xs font-medium {% if delegation_context.subject_type == 'BUSINESS' %}text-amber-600{% else %}text-blue-600{% endif %}">
-                        Handelend namens
+                        {{ t.deleg_acting_on_behalf if t else 'Handelend namens' }}
                     </div>
                     <div class="font-semibold truncate">{{ delegation_context.subject_name }}</div>
                 </div>
@@ -45,8 +45,8 @@
                     </svg>
                 </div>
                 <div class="flex-grow truncate">
-                    <div class="text-xs text-gray-500">Handelen als</div>
-                    <div class="font-semibold">Mezelf</div>
+                    <div class="text-xs text-gray-500">{{ t.deleg_acting_as if t else 'Handelen als' }}</div>
+                    <div class="font-semibold">{{ t.deleg_myself if t else 'Mezelf' }}</div>
                 </div>
             {% endif %}
             <div class="flex-shrink-0">
@@ -64,7 +64,9 @@
              @click.away="delegationOpen = false"
              class="absolute right-0 mt-2 w-[350px] bg-white rounded-md shadow-lg z-50 py-1 text-sm max-h-96 overflow-y-auto">
             <!-- Header -->
-            <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">Handelen namens</div>
+            <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">
+                {{ t.deleg_act_on_behalf if t else 'Handelen namens' }}
+            </div>
             <!-- Delegations -->
             {% for delegation in delegations %}
                 {% if delegation.subject_type == 'SELF' %}
@@ -83,8 +85,8 @@
                                 </svg>
                             </div>
                             <div class="ml-3 flex-grow">
-                                <div class="font-medium text-gray-900">Mezelf</div>
-                                <div class="text-xs text-gray-500">Mijn eigen zaken</div>
+                                <div class="font-medium text-gray-900">{{ t.deleg_myself if t else 'Mezelf' }}</div>
+                                <div class="text-xs text-gray-500">{{ t.deleg_my_own_cases if t else 'Mijn eigen zaken' }}</div>
                             </div>
                             {% if not delegation_context %}
                                 <div class="ml-auto">

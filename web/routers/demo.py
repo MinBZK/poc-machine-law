@@ -11,6 +11,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from web.demo.demo_config import configure_demo_feature_flags
 from web.demo.feature_parser import discover_feature_files, parse_feature_file
 from web.demo.feature_renderer import render_feature_to_html
+from web.demo.translations import get_translations
 from web.demo.yaml_renderer import discover_laws, parse_law_yaml, render_yaml_to_html
 from web.demo_profiles import DemoProfiles
 from web.dependencies import templates
@@ -28,6 +29,12 @@ _active_tasks: set[asyncio.Task] = set()
 
 # Configure demo feature flags on module load
 configure_demo_feature_flags()
+
+
+def _get_lang(request: Request) -> str:
+    """Extract language preference from query param or cookie."""
+    lang = request.query_params.get("lang") or request.cookies.get("lang") or "nl"
+    return lang if lang in ("nl", "en") else "nl"
 
 
 def _filter_sidebar_laws(grouped_laws: dict[str, list]) -> dict[str, list]:
@@ -143,9 +150,20 @@ async def _run_behave_async(run_id: str, feature_path: str, line_number: int | N
             }
 
 
+@router.get("/api/translations/{lang}", response_class=JSONResponse)
+async def get_translations_api(lang: str) -> JSONResponse:
+    """Get translations for a language as JSON (used by Alpine.js toggle)."""
+    if lang not in ("nl", "en"):
+        lang = "nl"
+    return JSONResponse(content=get_translations(lang))
+
+
 @router.get("/", response_class=HTMLResponse)
 async def demo_index(request: Request) -> HTMLResponse:
     """Show tabbed workspace interface."""
+    lang = _get_lang(request)
+    t = get_translations(lang)
+
     # Read VERSION file
     version_file = Path("VERSION")
     version = version_file.read_text().strip() if version_file.exists() else "unknown"
@@ -165,6 +183,8 @@ async def demo_index(request: Request) -> HTMLResponse:
             "active_profile_config": active_profile_config,
             "demo_profiles": DemoProfiles.get_all_profiles(),
             "active_profile": DemoProfiles.get_active_profile_name(),
+            "lang": lang,
+            "t": t,
         },
     )
 
@@ -180,6 +200,8 @@ async def workspace_laws(request: Request) -> HTMLResponse:
 @router.get("/workspace/features", response_class=HTMLResponse)
 async def workspace_features(request: Request) -> HTMLResponse:
     """Get features tab content (defaults to active profile's feature)."""
+    lang = _get_lang(request)
+    t = get_translations(lang)
     active_profile = DemoProfiles.get_active_profile()
     feature_path = active_profile["default_feature_path"]
     feature_file = Path(feature_path)
@@ -189,7 +211,7 @@ async def workspace_features(request: Request) -> HTMLResponse:
 
     try:
         parsed_feature = parse_feature_file(feature_file)
-        feature_html = render_feature_to_html(parsed_feature)
+        feature_html = render_feature_to_html(parsed_feature, lang=lang)
 
         base_dirs = [FEATURES_DIR]
         if LAWS_DIR.exists():
@@ -204,6 +226,8 @@ async def workspace_features(request: Request) -> HTMLResponse:
                 "feature_data": parsed_feature,
                 "feature_html": feature_html,
                 "grouped_features": grouped_features,
+                "lang": lang,
+                "t": t,
             },
         )
     except Exception as e:
@@ -213,6 +237,8 @@ async def workspace_features(request: Request) -> HTMLResponse:
 @router.get("/workspace/law/{law_path:path}", response_class=HTMLResponse)
 async def workspace_law(request: Request, law_path: str) -> HTMLResponse:
     """Get specific law content for workspace tab."""
+    lang = _get_lang(request)
+    t = get_translations(lang)
     yaml_file = LAWS_DIR / f"{law_path}.yaml"
 
     if not yaml_file.exists():
@@ -221,7 +247,7 @@ async def workspace_law(request: Request, law_path: str) -> HTMLResponse:
     try:
         law_data = parse_law_yaml(yaml_file, law_dir=LAWS_DIR, law_path=law_path)
         grouped_laws = _filter_sidebar_laws(discover_laws(LAWS_DIR, grouped=True))
-        yaml_html = render_yaml_to_html(law_data)
+        yaml_html = render_yaml_to_html(law_data, lang=lang)
 
         return templates.TemplateResponse(
             "demo/law_viewer_partial.html",
@@ -231,6 +257,8 @@ async def workspace_law(request: Request, law_path: str) -> HTMLResponse:
                 "law_data": law_data,
                 "grouped_laws": grouped_laws,
                 "yaml_html": yaml_html,
+                "lang": lang,
+                "t": t,
             },
         )
     except Exception as e:
@@ -240,6 +268,8 @@ async def workspace_law(request: Request, law_path: str) -> HTMLResponse:
 @router.get("/workspace/feature/{feature_path:path}", response_class=HTMLResponse)
 async def workspace_feature(request: Request, feature_path: str) -> HTMLResponse:
     """Get specific feature content for workspace tab."""
+    lang = _get_lang(request)
+    t = get_translations(lang)
     # Try to find feature file
     feature_file = None
     if Path(feature_path).exists():
@@ -254,7 +284,7 @@ async def workspace_feature(request: Request, feature_path: str) -> HTMLResponse
 
     try:
         parsed_feature = parse_feature_file(feature_file)
-        feature_html = render_feature_to_html(parsed_feature)
+        feature_html = render_feature_to_html(parsed_feature, lang=lang)
 
         base_dirs = [FEATURES_DIR]
         if LAWS_DIR.exists():
@@ -269,6 +299,8 @@ async def workspace_feature(request: Request, feature_path: str) -> HTMLResponse
                 "feature_data": parsed_feature,
                 "feature_html": feature_html,
                 "grouped_features": grouped_features,
+                "lang": lang,
+                "t": t,
             },
         )
     except Exception as e:
@@ -289,6 +321,8 @@ async def get_laws() -> JSONResponse:
 @router.get("/law/{law_path:path}", response_class=HTMLResponse)
 async def view_law(request: Request, law_path: str) -> HTMLResponse:
     """View a specific law YAML file with collapsible sections."""
+    lang = _get_lang(request)
+    t = get_translations(lang)
     yaml_file = LAWS_DIR / f"{law_path}.yaml"
 
     if not yaml_file.exists():
@@ -299,7 +333,7 @@ async def view_law(request: Request, law_path: str) -> HTMLResponse:
         grouped_laws = _filter_sidebar_laws(discover_laws(LAWS_DIR, grouped=True))
 
         # Render YAML to HTML
-        yaml_html = render_yaml_to_html(law_data)
+        yaml_html = render_yaml_to_html(law_data, lang=lang)
 
         return templates.TemplateResponse(
             "demo/law_viewer.html",
@@ -310,6 +344,8 @@ async def view_law(request: Request, law_path: str) -> HTMLResponse:
                 "grouped_laws": grouped_laws,
                 "yaml_html": yaml_html,
                 "active_tab": "laws",
+                "lang": lang,
+                "t": t,
             },
         )
     except Exception as e:
@@ -406,6 +442,8 @@ async def get_run_status(run_id: str) -> JSONResponse:
 @router.get("/feature/{feature_path:path}", response_class=HTMLResponse)
 async def view_feature(request: Request, feature_path: str) -> HTMLResponse:
     """View a specific feature file with parsed Gherkin and collapsible scenarios."""
+    lang = _get_lang(request)
+    t = get_translations(lang)
     # Try to find feature file
     feature_file = None
     if Path(feature_path).exists():
@@ -423,7 +461,7 @@ async def view_feature(request: Request, feature_path: str) -> HTMLResponse:
         parsed_feature = parse_feature_file(feature_file)
 
         # Render to HTML
-        feature_html = render_feature_to_html(parsed_feature)
+        feature_html = render_feature_to_html(parsed_feature, lang=lang)
 
         # Get all features for sidebar
         base_dirs = [FEATURES_DIR]
@@ -440,6 +478,8 @@ async def view_feature(request: Request, feature_path: str) -> HTMLResponse:
                 "feature_html": feature_html,
                 "grouped_features": grouped_features,
                 "active_tab": "features",
+                "lang": lang,
+                "t": t,
             },
         )
     except Exception as e:

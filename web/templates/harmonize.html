@@ -3,14 +3,12 @@
     <div class="flex h-full w-full" x-data="synthesizeApp()">
         <!-- Left Panel: Configuration -->
         <div class="w-1/3 bg-white shadow-lg p-6 overflow-y-auto flex-shrink-0">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Harmonisatie</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ t.harm_title if t else 'Harmonisatie' }}</h2>
             <p class="text-sm text-gray-600 mb-6">
                 {% if profile_type == "ondernemer" %}
-                    Combineer meerdere ondernemerswetten tot een
-                    vereenvoudigd compliance-overzicht.
+                    {{ t.harm_description_business if t else 'Combineer meerdere ondernemerswetten tot een vereenvoudigd compliance-overzicht.' }}
                 {% else %}
-                    Combineer meerdere toeslagen en uitkeringen tot een
-                    vereenvoudigde, geharmoniseerde wet.
+                    {{ t.harm_description_citizen if t else 'Combineer meerdere toeslagen en uitkeringen tot een vereenvoudigde, geharmoniseerde wet.' }}
                 {% endif %}
             </p>
             <form id="harmonisatie-form" @submit.prevent="train()" class="space-y-5">
@@ -27,9 +25,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                 </path>
                             </svg>
-                            Wetselectie
+                            {{ t.harm_law_selection if t else 'Wetselectie' }}
                             <span class="ml-2 text-xs font-normal text-gray-500"
-                                  x-text="'(' + selectedLaws.length + ' geselecteerd)'"></span>
+                                  x-text="'(' + selectedLaws.length + ' {{ t.harm_selected if t else 'geselecteerd' }})'"></span>
                         </h3>
                         <svg class="w-5 h-5 text-gray-500 transform transition-transform"
                              :class="showWetSelectie ? 'rotate-180' : ''"
@@ -40,7 +38,9 @@
                         </svg>
                     </button>
                     <div x-show="showWetSelectie" x-cloak class="p-4 space-y-3">
-                        <p class="text-xs text-gray-500 mb-2">Selecteer welke wetten geharmoniseerd worden:</p>
+                        <p class="text-xs text-gray-500 mb-2">
+                            {{ t.harm_select_laws if t else 'Selecteer welke wetten geharmoniseerd worden:' }}
+                        </p>
                         <template x-for="group in [...new Set(availableLaws.map(l => l.group))]"
                                   :key="group">
                             <div>
@@ -73,7 +73,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
                                 </path>
                             </svg>
-                            Populatiebeheer
+                            {{ t.harm_population if t else 'Populatiebeheer' }}
                         </h3>
                         <svg class="w-5 h-5 text-gray-500 transform transition-transform"
                              :class="showPopulatie ? 'rotate-180' : ''"
@@ -110,7 +110,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
                                 </path>
                             </svg>
-                            Methode
+                            {{ t.harm_method if t else 'Methode' }}
                             <span class="ml-2 text-xs font-normal text-gray-500"
                                   x-text="methodLabels[config.method]"></span>
                         </h3>
@@ -150,7 +150,7 @@
                                 </path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            Harmonisatie Instellingen
+                            {{ t.harm_settings if t else 'Harmonisatie Instellingen' }}
                         </h3>
                         <svg class="w-5 h-5 text-gray-500 transform transition-transform"
                              :class="showInstellingen ? 'rotate-180' : ''"
@@ -165,8 +165,10 @@
                         <template x-if="config.method === 'tree'">
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Maximale diepte beslisboom</label>
-                                    <span class="block text-xs text-gray-400 mb-1">Hoe dieper, hoe complexer de regels. Lager = eenvoudiger.</span>
+                                    <label class="block text-sm font-medium text-gray-700">
+                                        {{ t.harm_max_depth if t else 'Maximale diepte beslisboom' }}
+                                    </label>
+                                    <span class="block text-xs text-gray-400 mb-1">{{ t.harm_max_depth_desc if t else 'Hoe dieper, hoe complexer de regels. Lager = eenvoudiger.' }}</span>
                                     <input type="range"
                                            x-model.number="config.max_depth"
                                            min="1"
@@ -180,8 +182,10 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Minimum aantal personen per regel</label>
-                                    <span class="block text-xs text-gray-400 mb-1">Hoeveel personen er minstens onder een regel moeten vallen.</span>
+                                    <label class="block text-sm font-medium text-gray-700">
+                                        {{ t.harm_min_samples if t else 'Minimum aantal personen per regel' }}
+                                    </label>
+                                    <span class="block text-xs text-gray-400 mb-1">{{ t.harm_min_samples_desc if t else 'Hoeveel personen er minstens onder een regel moeten vallen.' }}</span>
                                     <input type="range"
                                            x-model.number="config.min_samples"
                                            min="10"
@@ -195,7 +199,9 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Maximaal aantal regels</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        {{ t.harm_max_rules if t else 'Maximaal aantal regels' }}
+                                    </label>
                                     <input type="range"
                                            x-model.number="config.max_rules"
                                            min="1"
@@ -215,10 +221,10 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700"
-                                           x-text="profileType === 'ondernemer' ? 'Aantal oppervlakteschijven' : 'Aantal inkomensschijven'">
-                                        Aantal inkomensschijven
+                                           x-text="profileType === 'ondernemer' ? '{{ t.harm_num_surface_brackets if t else 'Aantal oppervlakteschijven' }}' : '{{ t.harm_num_income_brackets if t else 'Aantal inkomensschijven' }}'">
+                                        {{ t.harm_num_income_brackets if t else 'Aantal inkomensschijven' }}
                                     </label>
-                                    <span class="block text-xs text-gray-400 mb-1">Meer schijven = fijnmaziger, maar complexer.</span>
+                                    <span class="block text-xs text-gray-400 mb-1">{{ t.harm_brackets_desc if t else 'Meer schijven = fijnmaziger, maar complexer.' }}</span>
                                     <input type="range"
                                            x-model.number="config.n_brackets"
                                            min="3"
@@ -237,8 +243,7 @@
                         <template x-if="config.method === 'parametric'">
                             <div>
                                 <p class="text-sm text-gray-600">
-                                    De parametrische formule wordt automatisch afgeleid uit de geselecteerde wetten.
-                                    Geen aanvullende instellingen nodig.
+                                    {{ t.harm_parametric_auto if t else 'De parametrische formule wordt automatisch afgeleid uit de geselecteerde wetten. Geen aanvullende instellingen nodig.' }}
                                 </p>
                             </div>
                         </template>
@@ -247,7 +252,7 @@
                 <!-- Train Button -->
                 <button type="submit"
                         class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors cursor-pointer">
-                    <span>Trainen</span>
+                    <span>{{ t.harm_train if t else 'Trainen' }}</span>
                     <span x-show="loadingCount > 0"
                           x-cloak
                           class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-indigo-400 text-white rounded-full">
@@ -267,7 +272,7 @@
                 <button @click="validate()"
                         :disabled="validating"
                         class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer">
-                    <span x-show="!validating">Valideer model</span>
+                    <span x-show="!validating">{{ t.harm_validate if t else 'Valideer model' }}</span>
                     <span x-show="validating" class="flex items-center justify-center">
                         <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
                              fill="none"
@@ -276,19 +281,19 @@
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                             </path>
                         </svg>
-                        Valideren...
+                        {{ t.harm_validating if t else 'Valideren...' }}
                     </span>
                 </button>
                 <button @click="downloadYaml()"
                         class="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer">
-                    Download wetspecificatie (YAML)
+                    {{ t.harm_download_yaml if t else 'Download wetspecificatie (YAML)' }}
                 </button>
             </div>
             <!-- Compare button (shown when 2+ runs completed) -->
             <div x-show="canCompare" x-cloak class="mt-3">
                 <button @click="activeTab = 'comparison'"
                         class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer">
-                    Vergelijk runs
+                    {{ t.harm_compare_runs if t else 'Vergelijk runs' }}
                 </button>
             </div>
         </div>
@@ -352,7 +357,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                         </path>
                     </svg>
-                    Vergelijking
+                    {{ t.harm_comparison if t else 'Vergelijking' }}
                 </button>
             </div>
             <!-- Tab Content Area -->
@@ -367,8 +372,10 @@
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        <p class="text-lg font-medium">Geen resultaten</p>
-                        <p class="text-sm mt-1">Configureer de parameters en klik op "Trainen" om te beginnen.</p>
+                        <p class="text-lg font-medium">{{ t.harm_no_results if t else 'Geen resultaten' }}</p>
+                        <p class="text-sm mt-1">
+                            {{ t.harm_no_results_hint if t else 'Configureer de parameters en klik op "Trainen" om te beginnen.' }}
+                        </p>
                     </div>
                 </div>
                 <!-- Per-run Loading State (shown when active tab is a run without result) -->

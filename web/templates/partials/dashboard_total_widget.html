@@ -15,11 +15,11 @@
                             <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
                         </svg>
                     </div>
-                    <h2 class="text-xl font-bold text-white">Uw financieel overzicht</h2>
+                    <h2 class="text-xl font-bold text-white">{{ t.dash_financial_overview if t else 'Uw financieel overzicht' }}</h2>
                 </div>
                 <button @click="showBreakdown = !showBreakdown"
                         class="text-white/80 hover:text-white transition-colors cursor-pointer text-sm flex items-center space-x-1">
-                    <span x-text="showBreakdown ? 'Verberg details' : 'Bekijk details'"></span>
+                    <span x-text="showBreakdown ? '{{ t.dash_hide_details if t else "Verberg details" }}' : '{{ t.dash_show_details if t else "Bekijk details" }}'"></span>
                     <svg xmlns="http://www.w3.org/2000/svg"
                          class="h-4 w-4 transition-transform duration-200"
                          :class="{ 'rotate-180': showBreakdown }"
@@ -34,7 +34,9 @@
         <div class="p-8">
             <!-- Net Income Display -->
             <div class="text-center mb-6">
-                <div class="text-sm font-medium text-gray-600 mb-2">Netto resultaat per maand</div>
+                <div class="text-sm font-medium text-gray-600 mb-2">
+                    {{ t.dash_net_result_month if t else 'Netto resultaat per maand' }}
+                </div>
                 {% if net_income_monthly_cents >= 0 %}
                     <div class="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-green-500 mb-2 animate-fade-in">
                         {{ (net_income_monthly_cents / 100) | format_currency }}
@@ -44,14 +46,16 @@
                         {{ (net_income_monthly_cents / 100) | format_currency }}
                     </div>
                 {% endif %}
-                <div class="text-lg text-gray-500">(ongeveer {{ (net_income_yearly_cents / 100) | format_currency }} per jaar)</div>
+                <div class="text-lg text-gray-500">
+                    ({{ t.dash_approx if t else 'ongeveer' }} {{ (net_income_yearly_cents / 100) | format_currency }} {{ t.dash_per_year if t else 'per jaar' }})
+                </div>
             </div>
             <!-- Visual Bar Chart -->
             <div class="mb-6">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center space-x-2">
                         <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span class="text-sm font-medium text-gray-700">Toeslagen & Uitkeringen</span>
+                        <span class="text-sm font-medium text-gray-700">{{ t.dash_benefits_title if t else 'Toeslagen & Uitkeringen' }}</span>
                     </div>
                     <span class="text-sm font-bold text-green-600">{{ (total_benefits_monthly_cents / 100) | format_currency }} /mnd</span>
                 </div>
@@ -66,7 +70,7 @@
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center space-x-2">
                         <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                        <span class="text-sm font-medium text-gray-700">Belastingen</span>
+                        <span class="text-sm font-medium text-gray-700">{{ t.dash_taxes_title if t else 'Belastingen' }}</span>
                     </div>
                     <span class="text-sm font-bold text-blue-600">{{ (total_taxes_monthly_cents / 100) | format_currency }} /mnd</span>
                 </div>
@@ -81,20 +85,20 @@
             <!-- Quick Stats -->
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-white rounded-lg p-4 border border-gray-200">
-                    <div class="text-sm text-gray-600 mb-1">Totaal ontvangen</div>
+                    <div class="text-sm text-gray-600 mb-1">{{ t.dash_total_received if t else 'Totaal ontvangen' }}</div>
                     <div class="text-2xl font-bold text-green-600">{{ (total_benefits_monthly_cents / 100) | format_currency }}</div>
                     <div class="text-xs text-gray-500 mt-1">
                         {% if benefits|length > 0 %}
-                            {{ benefits|length }} {{ 'regelingen' if benefits|length != 1 else 'regeling' }} (per maand)
+                            {{ benefits|length }} {{ (t.dash_schemes if t else 'regelingen') if benefits|length != 1 else (t.dash_scheme if t else 'regeling') }} ({{ t.dash_per_month if t else 'per maand' }})
                         {% else %}
-                            Geen regelingen
+                            {{ t.dash_no_schemes if t else 'Geen regelingen' }}
                         {% endif %}
                     </div>
                 </div>
                 <div class="bg-white rounded-lg p-4 border border-gray-200">
-                    <div class="text-sm text-gray-600 mb-1">Totaal verschuldigd</div>
+                    <div class="text-sm text-gray-600 mb-1">{{ t.dash_total_owed if t else 'Totaal verschuldigd' }}</div>
                     <div class="text-2xl font-bold text-blue-600">{{ (total_taxes_monthly_cents / 100) | format_currency }}</div>
-                    <div class="text-xs text-gray-500 mt-1">Belastingen (per maand)</div>
+                    <div class="text-xs text-gray-500 mt-1">{{ t.dash_taxes_per_month if t else 'Belastingen (per maand)' }}</div>
                 </div>
             </div>
         </div>
@@ -118,7 +122,7 @@
                             <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd" />
                         </svg>
-                        Toeslagen & Uitkeringen
+                        {{ t.dash_benefits_title if t else 'Toeslagen & Uitkeringen' }}
                     </h3>
                     {% if benefits %}
                         <div class="space-y-3">
@@ -128,28 +132,28 @@
                                         <div class="font-medium text-gray-900">{{ benefit.name }}</div>
                                         <div class="text-xs text-gray-600">
                                             {% if benefit.per_month %}
-                                                {{ (benefit.amount_cents / 100) | format_currency }} per maand ({{ (benefit.yearly_amount_cents / 100) | format_currency }} per jaar)
+                                                {{ (benefit.amount_cents / 100) | format_currency }} {{ t.dash_per_month if t else 'per maand' }} ({{ (benefit.yearly_amount_cents / 100) | format_currency }} {{ t.dash_per_year if t else 'per jaar' }})
                                             {% else %}
-                                                {{ (benefit.amount_cents / 100) | format_currency }} per jaar
+                                                {{ (benefit.amount_cents / 100) | format_currency }} {{ t.dash_per_year if t else 'per jaar' }}
                                             {% endif %}
                                         </div>
                                     </div>
                                     <div class="text-right">
                                         <div class="font-bold text-green-700">{{ (benefit.yearly_amount_cents / 12 / 100) | format_currency }}</div>
-                                        <div class="text-xs text-gray-500">per maand</div>
+                                        <div class="text-xs text-gray-500">{{ t.dash_per_month if t else 'per maand' }}</div>
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
                         <div class="mt-4 pt-4 border-t border-green-200">
                             <div class="flex justify-between items-center">
-                                <span class="font-semibold text-gray-900">Totaal ontvangen</span>
+                                <span class="font-semibold text-gray-900">{{ t.dash_total_received if t else 'Totaal ontvangen' }}</span>
                                 <span class="text-xl font-bold text-green-700">{{ (total_benefits_monthly_cents / 100) | format_currency }}</span>
                             </div>
-                            <div class="text-xs text-gray-500 text-right mt-1">per maand</div>
+                            <div class="text-xs text-gray-500 text-right mt-1">{{ t.dash_per_month if t else 'per maand' }}</div>
                         </div>
                     {% else %}
-                        <p class="text-gray-500 text-sm">Geen toeslagen of uitkeringen</p>
+                        <p class="text-gray-500 text-sm">{{ t.dash_no_benefits if t else 'Geen toeslagen of uitkeringen' }}</p>
                     {% endif %}
                 </div>
                 <!-- Taxes Column -->
@@ -161,7 +165,7 @@
                              fill="currentColor">
                             <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                         </svg>
-                        Belastingen
+                        {{ t.dash_taxes_title if t else 'Belastingen' }}
                     </h3>
                     {% if taxes %}
                         <div class="space-y-3">
@@ -171,28 +175,28 @@
                                         <div class="font-medium text-gray-900">{{ tax.name }}</div>
                                         <div class="text-xs text-gray-600">
                                             {% if tax.per_month %}
-                                                {{ (tax.amount_cents / 100) | format_currency }} per maand ({{ (tax.yearly_amount_cents / 100) | format_currency }} per jaar)
+                                                {{ (tax.amount_cents / 100) | format_currency }} {{ t.dash_per_month if t else 'per maand' }} ({{ (tax.yearly_amount_cents / 100) | format_currency }} {{ t.dash_per_year if t else 'per jaar' }})
                                             {% else %}
-                                                {{ (tax.amount_cents / 100) | format_currency }} per jaar
+                                                {{ (tax.amount_cents / 100) | format_currency }} {{ t.dash_per_year if t else 'per jaar' }}
                                             {% endif %}
                                         </div>
                                     </div>
                                     <div class="text-right">
                                         <div class="font-bold text-blue-700">{{ (tax.yearly_amount_cents / 12 / 100) | format_currency }}</div>
-                                        <div class="text-xs text-gray-500">per maand</div>
+                                        <div class="text-xs text-gray-500">{{ t.dash_per_month if t else 'per maand' }}</div>
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
                         <div class="mt-4 pt-4 border-t border-blue-200">
                             <div class="flex justify-between items-center">
-                                <span class="font-semibold text-gray-900">Totaal verschuldigd</span>
+                                <span class="font-semibold text-gray-900">{{ t.dash_total_owed if t else 'Totaal verschuldigd' }}</span>
                                 <span class="text-xl font-bold text-blue-700">{{ (total_taxes_monthly_cents / 100) | format_currency }}</span>
                             </div>
-                            <div class="text-xs text-gray-500 text-right mt-1">per maand</div>
+                            <div class="text-xs text-gray-500 text-right mt-1">{{ t.dash_per_month if t else 'per maand' }}</div>
                         </div>
                     {% else %}
-                        <p class="text-gray-500 text-sm">Geen belastingen</p>
+                        <p class="text-gray-500 text-sm">{{ t.dash_no_taxes if t else 'Geen belastingen' }}</p>
                     {% endif %}
                 </div>
             </div>
@@ -200,14 +204,18 @@
             <div class="mt-6 pt-6 border-t-2 border-gray-300">
                 <div class="flex items-center justify-between p-4 bg-gradient-to-r {% if net_income_monthly_cents >= 0 %}from-emerald-50 to-green-50 border-emerald-200{% else %}from-amber-50 to-orange-50 border-amber-200{% endif %} rounded-lg border-2">
                     <div>
-                        <div class="text-sm font-medium text-gray-600">Netto resultaat (toeslagen - belastingen)</div>
-                        <div class="text-xs text-gray-500 mt-1">Na aftrek van alle belastingen en inclusief alle toeslagen</div>
+                        <div class="text-sm font-medium text-gray-600">
+                            {{ t.dash_net_result if t else 'Netto resultaat (toeslagen - belastingen)' }}
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                            {{ t.dash_net_result_desc if t else 'Na aftrek van alle belastingen en inclusief alle toeslagen' }}
+                        </div>
                     </div>
                     <div class="text-right">
                         <div class="text-3xl font-bold {% if net_income_monthly_cents >= 0 %}text-emerald-700{% else %}text-amber-700{% endif %}">
                             {{ (net_income_monthly_cents / 100) | format_currency }}
                         </div>
-                        <div class="text-sm text-gray-600 mt-1">per maand</div>
+                        <div class="text-sm text-gray-600 mt-1">{{ t.dash_per_month if t else 'per maand' }}</div>
                     </div>
                 </div>
             </div>
