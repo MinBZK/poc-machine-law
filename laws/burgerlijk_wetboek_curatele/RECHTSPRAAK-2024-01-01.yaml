@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.8/schema.json
 uuid: b270d49d-f98d-4f3a-bff7-1043dbd5dacb
 name: Bepalen curatele en vertegenwoordigingsbevoegdheid curator
 law: burgerlijk_wetboek_curatele
@@ -7,7 +7,8 @@ legal_character: "BESCHIKKING"
 decision_type: "ANDERE_HANDELING"
 valid_from: 2024-01-01
 service: "RECHTSPRAAK"
-discoverable: "DELEGATION_PROVIDER"
+discoverable: "REPRESENTATION_PROVIDER"
+legal_category: "VERTEGENWOORDIGING_VAN_RECHTSWEGE"
 legal_basis:
   law: "Burgerlijk Wetboek Boek 1"
   bwb_id: "BWBR0002656"
