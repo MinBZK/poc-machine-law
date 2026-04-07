@@ -17,6 +17,7 @@ from .http_engine import MachineService as HTTPMachineService
 from .py_engine import CaseManager as PythonCaseManager
 from .py_engine import ClaimManager as PythonClaimManager
 from .py_engine import PythonMachineService
+from .regelrecht_engine import RegelrechtMachineService
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ class MachineType(Enum):
 
     INTERNAL = "internal"
     HTTP = "http"
+    REGELRECHT = "regelrecht"
 
 
 config_loader = ConfigLoader()
@@ -297,6 +299,12 @@ class MachineFactory:
             if engine.service_routing:
                 logger.info(f"[MachineFactory] Service routing config: enabled={engine.service_routing.enabled}")
             return HTTPMachineService(base_url=engine.domain, service_routing_config=engine.service_routing)
+        elif engine_type == MachineType.REGELRECHT:
+            binary_path = engine.domain  # Reuse domain field for binary path
+            logger.info(
+                f"[MachineFactory] Creating RegelrechtMachineService for engine: {engine_id}, binary: {binary_path}"
+            )
+            return RegelrechtMachineService(binary_path=binary_path, services=services)
         else:
             raise ValueError(f"Unknown machine type: {engine_type}")
 
@@ -324,7 +332,7 @@ class CaseManagerFactory:
         engine = config_loader.get_engine(engine_id)
         engine_type = MachineType(engine.type)
 
-        if engine_type == MachineType.INTERNAL:
+        if engine_type in (MachineType.INTERNAL, MachineType.REGELRECHT):
             if services is None:
                 raise ValueError("Services instance is required for internal Python implementation")
             logger.info(f"[CaseManagerFactory] Creating PythonCaseManager for engine: {engine_id}")
@@ -363,7 +371,7 @@ class ClaimManagerFactory:
         engine = config_loader.get_engine(engine_id)
         engine_type = MachineType(engine.type)
 
-        if engine_type == MachineType.INTERNAL:
+        if engine_type in (MachineType.INTERNAL, MachineType.REGELRECHT):
             if services is None:
                 raise ValueError("Services instance is required for internal Python implementation")
             logger.info(f"[ClaimManagerFactory] Creating PythonClaimManager for engine: {engine_id}")
