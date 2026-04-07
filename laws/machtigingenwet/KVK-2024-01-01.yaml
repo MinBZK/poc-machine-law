@@ -238,3 +238,8 @@ articles:
           url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel18
           juriconnect: jci1.3:c:BWBR0021777&artikel=18&z=2024-01-01&g=2024-01-01
           explanation: Uitschrijvingsdatum uit Handelsregister, null indien nog actief
+    untranslatables:
+    - construct: iteratie over variabel aantal functionarissen en bevoegdheden
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal functionarissen en bevoegdheden per rechtspersoon is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal functionarissen tot een vast maximum
+      accepted: true

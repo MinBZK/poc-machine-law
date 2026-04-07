@@ -201,3 +201,8 @@ articles:
           url: https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel149
           juriconnect: jci1.3:c:BWBR0002761&boek=4&artikel=149&z=2024-01-01&g=2024-01-01
           explanation: Einddatum executeurschap, null indien nog actief
+    untranslatables:
+    - construct: iteratie over variabel aantal executeurschap-registraties
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve executeurschappen is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
+      accepted: true

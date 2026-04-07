@@ -152,3 +152,8 @@ articles:
               - $start_date
             combine: ADD
           - $uren_per_dag
+    untranslatables:
+    - construct: iteratie over variabel aantal dienstverband- en uitkeringsperiodes
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal periodes is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal periodes tot een vast maximum
+      accepted: true

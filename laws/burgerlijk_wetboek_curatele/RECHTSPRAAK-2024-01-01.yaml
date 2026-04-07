@@ -197,3 +197,8 @@ articles:
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling4_Artikel389
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=389&z=2024-01-01&g=2024-01-01
           explanation: Einddatum curatele, null indien nog actief
+    untranslatables:
+    - construct: iteratie over variabel aantal curatele-registraties
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve curatele-registraties is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
+      accepted: true

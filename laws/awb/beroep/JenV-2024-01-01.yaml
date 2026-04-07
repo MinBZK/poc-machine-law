@@ -328,3 +328,8 @@ articles:
           url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk3_Afdeling3.3_Artikel3:11
           juriconnect: jci1.3:c:BWBR0005537&artikel=3:11&lid=2&z=2024-01-01&g=2024-01-01
           explanation: Artikel 3:11 lid 2 Awb bepaalt de reden voor direct beroep
+    untranslatables:
+    - construct: iteratie over variabel aantal gebeurtenissen voor beroepscheck
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal zaakgebeurtenissen is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal gebeurtenissen tot een vast maximum
+      accepted: true

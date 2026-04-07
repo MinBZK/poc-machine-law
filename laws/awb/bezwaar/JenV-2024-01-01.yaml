@@ -218,3 +218,8 @@ articles:
           url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.2_Artikel7:10
           juriconnect: jci1.3:c:BWBR0005537&artikel=7:10&lid=3&z=2024-01-01&g=2024-01-01
           explanation: Artikel 7:10 lid 3 Awb bepaalt de verdagingstermijn
+    untranslatables:
+    - construct: iteratie over variabel aantal gebeurtenissen voor bezwaarcheck
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal zaakgebeurtenissen is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal gebeurtenissen tot een vast maximum
+      accepted: true

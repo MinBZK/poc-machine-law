@@ -570,3 +570,8 @@ articles:
           url: https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf3_Artikel21
           juriconnect: jci1.3:c:BWBR0008659&artikel=21&z=2025-01-01&g=2025-01-01
           explanation: De hoogte van de huurtoeslag wordt berekend volgens de formule in artikel 21
+    untranslatables:
+    - construct: iteratie over variabel aantal huishoudleden en kinderen voor inkomenstoets
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal huishoudleden en kinderen is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal huishoudleden tot een vast maximum
+      accepted: true

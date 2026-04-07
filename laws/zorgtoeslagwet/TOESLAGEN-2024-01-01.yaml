@@ -315,3 +315,15 @@ articles:
                           - $drempelinkomen_toeslagpartner
                         - $afbouwpercentage_boven_drempel
                     default: 0
+- number: '4'
+  text: |-
+    Onze Minister stelt jaarlijks, uiterlijk 22 dagen voorafgaande aan het berekeningsjaar, bij regeling de standaardpremie voor dat berekeningsjaar vast.
+  url: https://wetten.overheid.nl/BWBR0018451/2024-01-01#Artikel4
+  machine_readable:
+    open_terms:
+    - id: standaardpremie
+      type: amount
+      required: true
+      delegated_to: minister
+      delegation_type: MINISTERIELE_REGELING
+      description: De standaardpremie, bedoeld in artikel 4
