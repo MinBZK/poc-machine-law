@@ -760,7 +760,20 @@ func deBeoordelaarDeAanvraagAfwijstMetReden(ctx context.Context, reason string) 
 		verifiedResult = result.Output
 	}
 
-	return ctx, cm.CompleteManualReview(ctx, caseID, "BEOORDELAAR", false, reason, verifiedResult)
+	if err := cm.CompleteManualReview(ctx, caseID, "BEOORDELAAR", false, reason, verifiedResult); err != nil {
+		return ctx, err
+	}
+
+	// AWB art. 7:1, 6:7, 7:10: bezwaar mogelijk binnen 6 weken na besluit
+	possible := true
+	objectionPeriod := 6
+	decisionPeriod := 6
+	extensionPeriod := 6
+	if err := cm.DetermineObjectionStatus(caseID, &possible, "", &objectionPeriod, &decisionPeriod, &extensionPeriod); err != nil {
+		return ctx, err
+	}
+
+	return ctx, nil
 }
 
 func deBeoordelaarHetBezwaarBeoordeeldMetReden(ctx context.Context, approve string, reason string) (context.Context, error) {
@@ -779,7 +792,42 @@ func deBeoordelaarHetBezwaarBeoordeeldMetReden(ctx context.Context, approve stri
 		verifiedResult = result.Output
 	}
 
-	return ctx, cm.CompleteManualReview(ctx, caseID, "BEOORDELAAR", approved, reason, verifiedResult)
+	if err := cm.CompleteManualReview(ctx, caseID, "BEOORDELAAR", approved, reason, verifiedResult); err != nil {
+		return ctx, err
+	}
+
+	if !approved {
+		// Na afwijzing bezwaar: geen nieuw bezwaar mogelijk, wel beroep
+		notPossible := false
+		notPossibleReason := "er is al eerder bezwaar gemaakt tegen dit besluit"
+		if err := cm.DetermineObjectionStatus(caseID, &notPossible, notPossibleReason, nil, nil, nil); err != nil {
+			return ctx, err
+		}
+
+		// AWB art. 8:1: beroep mogelijk na afwijzing bezwaar
+		possible := true
+		appealPeriod := 6
+		courtType := "RECHTBANK"
+		competentCourt := ""
+
+		// Try to get competent court from awb/beroep evaluation
+		services, svcOk := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
+		params, paramsOk := ctx.Value(paramsCtxKey{}).(map[string]any)
+		if svcOk && services != nil && paramsOk {
+			result, err := services.Evaluate(ctx, "JenV", "awb/beroep", params, nil, nil, nil, "", true)
+			if err == nil && result != nil && result.Output != nil {
+				if court, ok := result.Output["bevoegde_rechtbank"].(string); ok {
+					competentCourt = court
+				}
+			}
+		}
+
+		if err := cm.DetermineAppealStatus(caseID, &possible, "", &appealPeriod, nil, "", competentCourt, courtType); err != nil {
+			return ctx, err
+		}
+	}
+
+	return ctx, nil
 }
 
 func deBurgerBezwaarMaaktMetReden(ctx context.Context, reason string) (context.Context, error) {
