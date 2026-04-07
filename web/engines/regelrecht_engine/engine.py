@@ -5,10 +5,12 @@ import subprocess
 from datetime import date, datetime
 from typing import Any
 
+import numpy as np
 import pandas as pd
 import yaml
 from fastapi import HTTPException
 
+from machine.context import TypeSpec
 from machine.profile_loader import get_project_root, load_profiles_from_yaml
 from machine.service import Services
 from machine.utils import RuleResolver
@@ -90,8 +92,7 @@ class RegelrechtMachineService(EngineInterface):
         with open(rule.path) as f:
             yaml_content = f.read()
 
-        # Collect cross-law dependencies
-        extra_laws = self._collect_extra_laws(yaml_content, reference_date)
+        parsed_yaml = yaml.safe_load(yaml_content)
 
         # Build params dict from parameters
         params = dict(parameters)
@@ -102,36 +103,44 @@ class RegelrechtMachineService(EngineInterface):
                 if isinstance(section_values, dict):
                     params.update(section_values)
 
+        # Pre-evaluate cross-law dependencies using the Python engine
+        dep_outputs = self._pre_evaluate_dependencies(
+            parsed_yaml, reference_date, parameters, overwrite_input, approved
+        )
+        params.update(dep_outputs)
+
         # Pre-resolve source_reference fields from services' DataFrames
         source_params = self._pre_resolve_sources(yaml_content, params)
         params.update(source_params)
 
+        # Strip source references so the CLI uses params for all input values
+        stripped_yaml = self._strip_sources(yaml_content)
+
         # Get output field names from the YAML spec
-        parsed_yaml = yaml.safe_load(yaml_content)
         output_names = self._get_output_names(parsed_yaml)
 
         if requested_output:
             output_names = [requested_output]
 
         # Call CLI for each output field and merge results
-        merged_outputs = {}
-        merged_resolved_inputs = {}
+        merged_outputs: dict[str, Any] = {}
+        merged_resolved_inputs: dict[str, Any] = {}
         last_uuid = rule.uuid
         had_error = False
         missing_required = False
 
         for output_name in output_names:
             cli_result = self._call_cli(
-                yaml_content=yaml_content,
+                yaml_content=stripped_yaml,
                 output_name=output_name,
-                params=params,
+                params=_convert_to_native(params),
                 reference_date=reference_date,
-                extra_laws=extra_laws,
+                extra_laws=[],
             )
 
             if "error" in cli_result:
                 error_msg = cli_result["error"]
-                logger.warning(f"Regelrecht CLI error for {law}/{output_name}: {error_msg}")
+                logger.warning("Regelrecht CLI error for %s/%s: %s", law, output_name, error_msg)
                 if "missing" in error_msg.lower() or "variable" in error_msg.lower():
                     missing_required = True
                 had_error = True
@@ -149,11 +158,22 @@ class RegelrechtMachineService(EngineInterface):
             if "law_uuid" in cli_result:
                 last_uuid = cli_result["law_uuid"]
 
-        enriched_output = {}
+        # Strip voldoet_aan_voorwaarden from outputs and use it for requirements_met
+        voldoet = merged_outputs.pop("voldoet_aan_voorwaarden", None)
+        if voldoet is not None:
+            requirements_met = bool(voldoet) and not had_error
+        else:
+            requirements_met = bool(merged_outputs) and not had_error
+
+        # Enforce output type specs (precision, min/max, eurocent conversion)
+        output_specs = _build_output_specs(parsed_yaml)
+        for key in list(merged_outputs.keys()):
+            if key in output_specs:
+                merged_outputs[key] = output_specs[key].enforce(merged_outputs[key])
+
+        enriched_output: dict[str, Any] = {}
         for name, value in merged_outputs.items():
             enriched_output[name] = value
-
-        requirements_met = bool(merged_outputs) and not had_error
 
         return RuleResult(
             output=enriched_output,
@@ -250,51 +270,90 @@ class RegelrechtMachineService(EngineInterface):
             logger.error(f"Failed to parse CLI output as JSON: {e}")
             return {"error": f"Invalid JSON from CLI: {e}"}
 
-    # ---- Cross-law dependency collection ----
+    # ---- Dependency pre-evaluation via Python engine ----
 
-    def _collect_extra_laws(self, yaml_content: str, reference_date: str) -> list[str]:
-        """Scan YAML for source.regulation references and collect those law YAML files.
+    def _pre_evaluate_dependencies(
+        self,
+        parsed_yaml: dict,
+        reference_date: str,
+        parameters: dict[str, Any],
+        overwrite_input: dict[str, Any] | None,
+        approved: bool,
+    ) -> dict[str, Any]:
+        """Pre-evaluate dependency laws using the Python engine.
 
-        Recursively resolves dependencies so that transitive references are also included.
+        Walks the main law's input fields looking for source.regulation references,
+        evaluates each referenced law via the Python Services instance, and maps the
+        output to the input name expected by the main law.
         """
+        if not self.services:
+            return {}
+
+        resolved: dict[str, Any] = {}
+
+        for article in parsed_yaml.get("articles", []):
+            mr = article.get("machine_readable", {})
+            execution = mr.get("execution", {})
+            for inp in execution.get("input", []):
+                input_name = inp.get("name")
+                source = inp.get("source", {})
+                if not source or not input_name:
+                    continue
+
+                regulation = source.get("regulation")
+                output_name = source.get("output")
+                dep_service = source.get("service")
+                if not regulation or not output_name:
+                    continue
+
+                if input_name in resolved:
+                    continue
+
+                # Resolve temporal reference to adjust the reference_date
+                dep_reference_date = _resolve_temporal_reference(inp, reference_date)
+
+                try:
+                    dep_result = self.services.evaluate(
+                        service=dep_service or "UNKNOWN",
+                        law=regulation,
+                        parameters=parameters,
+                        reference_date=dep_reference_date,
+                        overwrite_input=overwrite_input,
+                        requested_output=output_name,
+                        approved=approved,
+                    )
+                    if dep_result and dep_result.output:
+                        value = dep_result.output.get(output_name)
+                        if value is not None:
+                            resolved[input_name] = value
+                except Exception as e:
+                    logger.debug(
+                        "Failed to pre-evaluate dependency %s/%s: %s",
+                        regulation,
+                        output_name,
+                        e,
+                    )
+
+        return resolved
+
+    @staticmethod
+    def _strip_sources(yaml_content: str) -> str:
+        """Strip source/source_reference from inputs so CLI uses params."""
         data = yaml.safe_load(yaml_content)
-        regulations: set[str] = set()
-        _find_regulations(data, regulations)
-
-        extra_yamls: list[str] = []
-        visited: set[str] = set()
-
-        # Use a work queue for recursive resolution
-        queue = list(regulations)
-        while queue:
-            reg = queue.pop()
-            if reg in visited:
-                continue
-            visited.add(reg)
-
-            try:
-                rule = self.resolver.find_rule(reg, reference_date)
-            except ValueError:
-                logger.debug(f"Referenced law not found: {reg}")
-                continue
-
-            if not rule:
-                continue
-
-            with open(rule.path) as f:
-                extra_yaml = f.read()
-
-            extra_yamls.append(extra_yaml)
-
-            # Scan this dependency for further references
-            dep_data = yaml.safe_load(extra_yaml)
-            dep_regulations: set[str] = set()
-            _find_regulations(dep_data, dep_regulations)
-            for dep_reg in dep_regulations:
-                if dep_reg not in visited:
-                    queue.append(dep_reg)
-
-        return extra_yamls
+        changed = False
+        for article in data.get("articles", []):
+            mr = article.get("machine_readable", {})
+            execution = mr.get("execution", {})
+            for inp in execution.get("input", []):
+                if "source" in inp:
+                    del inp["source"]
+                    changed = True
+                if "source_reference" in inp:
+                    del inp["source_reference"]
+                    changed = True
+        if changed:
+            return yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
+        return yaml_content
 
     # ---- Source reference pre-resolution ----
 
@@ -450,13 +509,70 @@ class RegelrechtMachineService(EngineInterface):
         return specs
 
 
-def _find_regulations(data: Any, regulations: set[str]) -> None:
-    """Recursively find all source.regulation references in a YAML structure."""
-    if isinstance(data, dict):
-        if "regulation" in data and isinstance(data["regulation"], str):
-            regulations.add(data["regulation"])
-        for value in data.values():
-            _find_regulations(value, regulations)
-    elif isinstance(data, list):
-        for item in data:
-            _find_regulations(item, regulations)
+def _resolve_temporal_reference(input_spec: dict, reference_date: str) -> str:
+    """Resolve temporal reference on an input spec to get the adjusted reference_date.
+
+    For example, if the input has temporal.reference = $prev_january_first and the
+    reference_date is 2025-02-01, the resolved date is 2024-01-01.
+    """
+    temporal = input_spec.get("temporal", {})
+    ref = temporal.get("reference")
+    if not ref or not isinstance(ref, str) or not ref.startswith("$"):
+        return reference_date
+
+    ref_name = ref[1:]
+    calc_date = datetime.strptime(reference_date, "%Y-%m-%d").date()
+
+    if ref_name == "prev_january_first":
+        return calc_date.replace(month=1, day=1, year=calc_date.year - 1).isoformat()
+    elif ref_name == "january_first":
+        return calc_date.replace(month=1, day=1).isoformat()
+    elif ref_name in ("calculation_date", "year"):
+        return reference_date
+
+    return reference_date
+
+
+def _build_output_specs(data: dict) -> dict[str, TypeSpec]:
+    """Build mapping of output names to their TypeSpec from parsed YAML.
+
+    This mirrors the BDD wrapper so the web adapter can enforce the same
+    precision/min/max/eurocent constraints.
+    """
+    specs: dict[str, TypeSpec] = {}
+    for article in data.get("articles", []):
+        mr = article.get("machine_readable", {})
+        execution = mr.get("execution", {})
+        for out in execution.get("output", []):
+            name = out.get("name")
+            if name:
+                ts = out.get("type_spec", {})
+                specs[name] = TypeSpec(
+                    type=out.get("type"),
+                    unit=ts.get("unit"),
+                    precision=ts.get("precision"),
+                    min=ts.get("min"),
+                    max=ts.get("max"),
+                )
+    return specs
+
+
+def _convert_to_native(obj: Any) -> Any:
+    """Recursively convert numpy/pandas types to native Python types for JSON serialization."""
+    if isinstance(obj, dict):
+        return {k: _convert_to_native(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_convert_to_native(v) for v in obj]
+    if isinstance(obj, (np.integer,)):
+        return int(obj)
+    if isinstance(obj, (np.floating,)):
+        return float(obj)
+    if isinstance(obj, (np.bool_,)):
+        return bool(obj)
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, pd.Timestamp):
+        return obj.isoformat()
+    if pd.isna(obj) if isinstance(obj, float) else False:
+        return None
+    return obj
