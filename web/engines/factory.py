@@ -11,9 +11,6 @@ from web.config_loader import ConfigLoader
 from .case_manager_interface import CaseManagerInterface
 from .claim_manager_interface import ClaimManagerInterface
 from .engine_interface import EngineInterface
-from .http_engine import CaseManager as HTTPCaseManager
-from .http_engine import ClaimManager as HTTPClaimManager
-from .http_engine import MachineService as HTTPMachineService
 from .py_engine import CaseManager as PythonCaseManager
 from .py_engine import ClaimManager as PythonClaimManager
 from .py_engine import PythonMachineService
@@ -26,7 +23,6 @@ class MachineType(Enum):
     """Enum to specify which machine implementation to use."""
 
     INTERNAL = "internal"
-    HTTP = "http"
     REGELRECHT = "regelrecht"
 
 
@@ -273,15 +269,10 @@ class MachineFactory:
         Create a machine service of the specified type.
 
         Args:
-            machine_type: The type of machine implementation to use
-            services: The Services instance (required for PYTHON type)
-            go_api_url: The URL for the Go API (used for GO type)
+            engine_id: The engine identifier from config
 
         Returns:
-            An instance of a EngineInterface implementation
-
-        Raises:
-            ValueError: If machine_type is PYTHON and services is None
+            An instance of an EngineInterface implementation
         """
 
         engine = config_loader.get_engine(engine_id)
@@ -292,13 +283,6 @@ class MachineFactory:
                 raise ValueError("Services instance is required for internal Python implementation")
             logger.info(f"[MachineFactory] Creating PythonMachineService for engine: {engine_id}")
             return PythonMachineService(services)
-        elif engine_type == MachineType.HTTP:
-            logger.info(
-                f"[MachineFactory] Creating HTTPMachineService for engine: {engine_id}, domain: {engine.domain}"
-            )
-            if engine.service_routing:
-                logger.info(f"[MachineFactory] Service routing config: enabled={engine.service_routing.enabled}")
-            return HTTPMachineService(base_url=engine.domain, service_routing_config=engine.service_routing)
         elif engine_type == MachineType.REGELRECHT:
             binary_path = engine.domain  # Reuse domain field for binary path
             logger.info(
@@ -318,15 +302,10 @@ class CaseManagerFactory:
         Create a case manager of the specified type.
 
         Args:
-            machine_type: The type of machine implementation to use
-            services: The Services instance (required for PYTHON type)
-            go_api_url: The URL for the Go API (used for GO type)
+            engine_id: The engine identifier from config
 
         Returns:
             An instance of a CaseManagerInterface implementation
-
-        Raises:
-            ValueError: If machine_type is PYTHON and services is None
         """
 
         engine = config_loader.get_engine(engine_id)
@@ -337,13 +316,6 @@ class CaseManagerFactory:
                 raise ValueError("Services instance is required for internal Python implementation")
             logger.info(f"[CaseManagerFactory] Creating PythonCaseManager for engine: {engine_id}")
             return PythonCaseManager(services)
-        elif engine_type == MachineType.HTTP:
-            logger.info(
-                f"[CaseManagerFactory] Creating HTTPCaseManager for engine: {engine_id}, domain: {engine.domain}"
-            )
-            if engine.service_routing:
-                logger.info(f"[CaseManagerFactory] Service routing config: enabled={engine.service_routing.enabled}")
-            return HTTPCaseManager(base_url=engine.domain, service_routing_config=engine.service_routing)
         else:
             raise ValueError(f"Unknown machine type: {engine_type}")
 
@@ -354,18 +326,13 @@ class ClaimManagerFactory:
     @staticmethod
     def create_claim_manager(engine_id: str) -> ClaimManagerInterface:
         """
-        Create a case manager of the specified type.
+        Create a claim manager of the specified type.
 
         Args:
-            machine_type: The type of machine implementation to use
-            services: The Services instance (required for PYTHON type)
-            go_api_url: The URL for the Go API (used for GO type)
+            engine_id: The engine identifier from config
 
         Returns:
             An instance of a ClaimManagerInterface implementation
-
-        Raises:
-            ValueError: If machine_type is PYTHON and services is None
         """
 
         engine = config_loader.get_engine(engine_id)
@@ -376,12 +343,5 @@ class ClaimManagerFactory:
                 raise ValueError("Services instance is required for internal Python implementation")
             logger.info(f"[ClaimManagerFactory] Creating PythonClaimManager for engine: {engine_id}")
             return PythonClaimManager(services)
-        elif engine_type == MachineType.HTTP:
-            logger.info(
-                f"[ClaimManagerFactory] Creating HTTPClaimManager for engine: {engine_id}, domain: {engine.domain}"
-            )
-            if engine.service_routing:
-                logger.info(f"[ClaimManagerFactory] Service routing config: enabled={engine.service_routing.enabled}")
-            return HTTPClaimManager(base_url=engine.domain, service_routing_config=engine.service_routing)
         else:
             raise ValueError(f"Unknown machine type: {engine_type}")

@@ -17,7 +17,6 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from web.dependencies import get_case_manager, get_claim_manager, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface
-from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
 from web.feature_flags import is_auto_approve_claims_enabled
 
 router = APIRouter(prefix="/edit", tags=["edit"])
@@ -524,21 +523,10 @@ async def update_situation(
             bsn=bsn,
             service=service,
             law=law,
-            parameters=parameters
-            | {
-                "BSN": bsn
-            },  # The Go engine expects the BSN to be present (with uppercase) in the case parameters, so we add it
+            parameters=parameters | {"BSN": bsn},
             claimed_result=parameters,  # IMPROVE: other value?
             approved_claims_only=False,  # IMPROVE: or True?
             effective_date=effective_date,
-        )
-    except UnexpectedStatus as e:
-        return JSONResponse(
-            {
-                "status": "error",
-                "message": f"Server error: {e.status_code}. Response: {e.content.decode('utf-8') if e.content else 'No response content'}",
-            },
-            status_code=500,
         )
     except json.JSONDecodeError as e:
         return JSONResponse(

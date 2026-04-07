@@ -23,7 +23,6 @@ simulation_summary.txt
 .aider*
 .env
 
-machinev2/backend/backend
 __debug_bin*
 
 .claude

@@ -54,7 +54,6 @@ Feature: Aanvraag Zorgtoeslag
     And is de aanvraag toegekend
 
 
-  @skip-go
   Scenario: Burger gaat in bezwaar, krijgt geen gelijk, en kan in beroep gaan
     Given de volgende RvIG personen gegevens:
       | bsn       | geboortedatum | verblijfsadres | land_verblijf |

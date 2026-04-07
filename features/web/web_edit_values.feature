@@ -1,10 +1,10 @@
-@ui @skip-go
+@ui
 Feature: Edit values through web interface
   As a citizen
   I want to edit my income values through the web interface
   So that benefit calculations are updated with my actual situation
 
-  @ui @skip-go
+  @ui
   Scenario: Edit form captures value changes correctly
     Given the web server is running
     When I start requesting "huurtoeslag" for BSN "100000001"

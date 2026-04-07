@@ -233,7 +233,7 @@ class EngineInterface(ABC):
 
         Returns:
             Services instance if available (internal Python engine),
-            None if not available (HTTP engine).
+            None if not available.
         """
         return None
 

@@ -1,20 +1,26 @@
 # Machine Law Interface
 
-This package provides interfaces to interact with the law evaluation engine in a uniform way, regardless of whether you're using the embedded Python implementation or the Go HTTP service.
+This package provides interfaces to interact with the law evaluation engine in a uniform way, regardless of whether you're using the embedded Python implementation or the Regelrecht Rust engine.
 
 ## Usage
 
 ### Basic Configuration
 
-The interfaces are configured through environment variables:
+The interfaces are configured through `web/config/config.yaml`:
 
-```bash
-# Use the Python embedded implementation (default)
-export MACHINE_TYPE=python
-
-# Use the Go HTTP service
-export MACHINE_TYPE=go
-export GO_API_URL=http://localhost:8081/v0
+```yaml
+engines:
+  - id: regelrecht
+    name: Regelrecht engine
+    description: regelrecht Rust engine (default)
+    type: regelrecht
+    default: true
+    domain: bin/evaluate-v0.2.0
+  - id: py
+    name: Python engine
+    description: Python processing engine (fallback)
+    type: internal
+    default: false
 ```
 
 ### Using the Interfaces
@@ -65,23 +71,3 @@ async def get_discoverable_laws(
 - `EngineInterface`: Interface for law evaluation functionality
 - `MachineType`: Enum to specify which machine implementation to use
 - `CaseManagerFactory` and `MachineFactory`: Factories to create instances of the interfaces
-
-## Switching Implementations at Runtime
-
-You can switch implementations at runtime by reconfiguring the factories:
-
-```python
-from engine.factory import CaseManagerFactory, MachineFactory, MachineType
-
-# Switch to Go implementation
-case_manager = CaseManagerFactory.create_case_manager(
-    machine_type=MachineType.GO,
-    go_api_url="http://localhost:8081/v0"
-)
-
-# Switch to Python implementation
-machine_service = MachineFactory.create_machine_service(
-    machine_type=MachineType.PYTHON,
-    services=services
-)
-```

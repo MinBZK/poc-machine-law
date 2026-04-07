@@ -1,4 +1,3 @@
-@skip-go
 Feature: Bepalen precariobelasting voor terras op openbare grond Rotterdam
   Als horecaondernemer in Rotterdam
   Wil ik weten of en hoeveel precariobelasting ik verschuldigd ben

@@ -1,4 +1,3 @@
-@skip-go
 Feature: Kernenergiewet Vergunningverlening Splijtstoffen
   Als nucleaire operator
   Wil ik weten of ik een vergunning nodig heb en kan krijgen

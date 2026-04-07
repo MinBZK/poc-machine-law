@@ -4,6 +4,8 @@ regulatory_layer: GEMEENTELIJKE_VERORDENING
 publication_date: '2024-01-01'
 valid_from: '2024-01-01'
 name: Verordening Precariobelasting Rotterdam 2024
+gemeente_code: GM0599
+officiele_titel: Verordening Precariobelasting Rotterdam 2024
 url: https://lokaleregelgeving.overheid.nl/CVDR719500/1
 service: GEMEENTE_ROTTERDAM
 uuid: b5d8e2f4-3a6c-4b9e-a7d1-9c4f2e8b1a53
@@ -160,5 +162,4 @@ articles:
           article: '5'
           paragraph: b
           url: https://lokaleregelgeving.overheid.nl/CVDR704478/1
-          explanation: Precariobelasting = € 36,10 per jaar voor elke m² die de oppervlakte van het terras van 50 m² te boven
-            gaat
+          explanation: Precariobelasting = € 36,10 per jaar voor elke m² die de oppervlakte van het terras van 50 m² te boven gaat

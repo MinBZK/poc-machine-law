@@ -4,6 +4,8 @@ regulatory_layer: GEMEENTELIJKE_VERORDENING
 publication_date: '2024-01-01'
 valid_from: '2024-01-01'
 name: Terrasvergunning APV Rotterdam 2024
+gemeente_code: GM0599
+officiele_titel: Terrasvergunning APV Rotterdam 2024
 url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
 service: GEMEENTE_ROTTERDAM
 uuid: 3e7f9b2a-5d8c-4a1e-9f6b-8c2d4e7a3b1f
@@ -547,8 +549,7 @@ articles:
           law: Terrassenbeleid Rotterdam 2023
           article: '5'
           url: https://lokaleregelgeving.overheid.nl/CVDR717301/1
-          explanation: De vergunde sluitingstijd doordeweeks (zo-do) is het minimum van de aangevraagde en maximaal toegestane
-            tijd
+          explanation: De vergunde sluitingstijd doordeweeks (zo-do) is het minimum van de aangevraagde en maximaal toegestane tijd
       - output: vergunde_sluitingstijd_weekend
         value:
           operation: MIN
@@ -559,8 +560,7 @@ articles:
           law: Terrassenbeleid Rotterdam 2023
           article: '5'
           url: https://lokaleregelgeving.overheid.nl/CVDR717301/1
-          explanation: De vergunde sluitingstijd weekend (vr-za) is het minimum van de aangevraagde en maximaal toegestane
-            tijd
+          explanation: De vergunde sluitingstijd weekend (vr-za) is het minimum van de aangevraagde en maximaal toegestane tijd
       - output: precariobelasting_verschuldigd
         value: $LOCATIE_OP_OPENBARE_WEG
         legal_basis:

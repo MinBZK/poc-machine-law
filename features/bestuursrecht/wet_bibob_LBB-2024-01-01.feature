@@ -1,4 +1,3 @@
-@skip-go
 Feature: Bibob-advies Landelijk Bureau Bibob
   Als bestuursorgaan
   Wil ik een Bibob-advies opvragen bij het LBB

@@ -1,4 +1,5 @@
 import locale
+import logging
 from datetime import date, datetime
 from importlib.metadata import version as get_version
 from pathlib import Path
@@ -8,6 +9,8 @@ from engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from engines.factory import CaseManagerFactory, ClaimManagerFactory, MachineFactory
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
+
+logger = logging.getLogger(__name__)
 
 
 def get_app_version() -> str:
@@ -93,6 +96,20 @@ def set_engine_id(id: str):
 engine = config_loader.config.get_default_engine()
 if engine is None:
     raise ValueError("Default engine not set")
+
+# If the default engine is regelrecht, verify the binary exists; fall back to Python if not
+if engine.type == "regelrecht":
+    binary_path = Path(engine.domain) if engine.domain else Path("bin/evaluate-v0.2.0")
+    if not binary_path.is_absolute():
+        binary_path = Path(__file__).resolve().parent.parent / binary_path
+    if not binary_path.exists():
+        logger.warning(f"Regelrecht binary not found at {binary_path}, falling back to Python engine")
+        fallback = config_loader.config.get_engine_by_id("py")
+        if fallback is None:
+            raise ValueError("Regelrecht binary not found and no Python engine configured as fallback")
+        engine = fallback
+    else:
+        logger.info(f"Using regelrecht engine with binary at {binary_path}")
 
 set_engine_id(engine.id)
 

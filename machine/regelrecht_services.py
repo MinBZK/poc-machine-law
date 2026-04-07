@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from machine.context import PathNode
+from machine.context import PathNode, TypeSpec
 from machine.service import RuleResult, Services
 from machine.utils import RuleResolver
 
@@ -158,6 +158,13 @@ class RegelrechtServices:
             if "law_uuid" in cli_result:
                 last_uuid = cli_result["law_uuid"]
 
+        # Detect unevaluated CLI outputs (e.g. FOREACH operations returned as dicts).
+        # Remove them so the Python fallback can fill them in.
+        unevaluated_keys = [k for k, v in merged_outputs.items() if isinstance(v, dict) and "operation" in v]
+        for k in unevaluated_keys:
+            logger.debug("CLI returned unevaluated operation for %s/%s, will use Python fallback", law, k)
+            del merged_outputs[k]
+
         # The CLI does not enforce requirements blocks, so we evaluate them
         # using the Python engine to get the correct requirements_met flag.
         py_result = self._evaluate_requirements_via_python(
@@ -177,11 +184,25 @@ class RegelrechtServices:
         # When requirements are not met, clear outputs (Python engine would not produce them)
         if not requirements_met:
             merged_outputs = {}
-        elif not merged_outputs and py_result.output:
-            # CLI produced no outputs (likely due to unsupported features like
-            # array/FOREACH operations). Fall back to Python engine outputs.
-            merged_outputs = py_result.output
-            merged_resolved_inputs = py_result.input
+        elif py_result.output:
+            if not merged_outputs:
+                # CLI produced no outputs at all. Fall back to Python engine outputs.
+                merged_outputs = py_result.output
+                merged_resolved_inputs = py_result.input
+            else:
+                # Fill in any outputs that the CLI couldn't evaluate (e.g. FOREACH)
+                # with values from the Python engine.
+                for key, value in py_result.output.items():
+                    if key not in merged_outputs:
+                        logger.debug("Using Python fallback for output %s/%s", law, key)
+                        merged_outputs[key] = value
+
+        # Enforce output type specs (precision, min/max, eurocent conversion)
+        # to match the Python engine behaviour.
+        output_specs = _build_output_specs(parsed_yaml)
+        for key in list(merged_outputs.keys()):
+            if key in output_specs:
+                merged_outputs[key] = output_specs[key].enforce(merged_outputs[key])
 
         return RuleResult(
             output=merged_outputs,
@@ -624,3 +645,27 @@ def _get_output_names(data: dict) -> list[str]:
             if name and name not in names:
                 names.append(name)
     return names
+
+
+def _build_output_specs(data: dict) -> dict[str, TypeSpec]:
+    """Build mapping of output names to their TypeSpec from parsed YAML.
+
+    This mirrors RuleEngine._build_output_specs so the regelrecht wrapper
+    can enforce the same precision/min/max/eurocent constraints.
+    """
+    specs: dict[str, TypeSpec] = {}
+    for article in data.get("articles", []):
+        mr = article.get("machine_readable", {})
+        execution = mr.get("execution", {})
+        for out in execution.get("output", []):
+            name = out.get("name")
+            if name:
+                ts = out.get("type_spec", {})
+                specs[name] = TypeSpec(
+                    type=out.get("type"),
+                    unit=ts.get("unit"),
+                    precision=ts.get("precision"),
+                    min=ts.get("min"),
+                    max=ts.get("max"),
+                )
+    return specs

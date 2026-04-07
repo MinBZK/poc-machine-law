@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Capture baseline BDD test results for regression comparison.
 
-Runs every BDD scenario (excluding @ui and @skip-go-only scenarios) through
+Runs every BDD scenario (excluding @ui scenarios) through
 the Python engine and records the full engine output for each scenario.
 The result is a JSON file that serves as a regression baseline: any future
 engine change can be diffed against it.
