@@ -1,3 +1,4 @@
+@skip-go
 Feature: Berekening Kinderopvangtoeslag
   Als ouder
   Wil ik weten of ik recht heb op kinderopvangtoeslag

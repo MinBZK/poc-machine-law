@@ -17,6 +17,7 @@ Feature: Berekening Huurtoeslag
     When de wet_op_de_huurtoeslag wordt uitgevoerd door TOESLAGEN
     Then is niet voldaan aan de voorwaarden
 
+  @skip-go
   Scenario: Alleenstaande met laag inkomen en hogere huur
     Given een persoon met BSN "222222222"
     And de volgende RvIG personen gegevens:

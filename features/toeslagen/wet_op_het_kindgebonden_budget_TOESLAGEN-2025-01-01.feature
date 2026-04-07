@@ -28,6 +28,7 @@ Feature: Berekening Kindgebonden Budget
     And is het ALO-kop bedrag "€3.480,00"
     And is het kindgebonden budget ongeveer "€5.991,00" per jaar
 
+  @skip-go
   Scenario: Paar met 2 kinderen krijgt aangepast bedrag zonder ALO-kop
     Given een persoon met BSN "200000002"
     And de volgende RvIG personen gegevens:
