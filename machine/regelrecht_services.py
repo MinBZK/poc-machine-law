@@ -10,8 +10,10 @@ dependencies that require table access. To work around this, we pre-evaluate all
 dependency laws using the Python engine and strip source references from the YAML
 before sending it to the CLI, passing all resolved values as params.
 
-Additionally, the CLI does not enforce requirement blocks, so we evaluate requirements
-using the Python engine and use its requirements_met flag.
+The CLI does not enforce requirements blocks. The YAML files now contain a
+`voldoet_aan_voorwaarden` boolean output action that models requirements as
+explicit computed output, but the Python engine is still used for requirements_met
+evaluation in the adapter to ensure correctness.
 """
 
 import json
@@ -164,6 +166,10 @@ class RegelrechtServices:
         for k in unevaluated_keys:
             logger.debug("CLI returned unevaluated operation for %s/%s, will use Python fallback", law, k)
             del merged_outputs[k]
+
+        # Strip voldoet_aan_voorwaarden from CLI outputs — the Python engine
+        # handles requirements evaluation via the reconstructed requirements list.
+        merged_outputs.pop("voldoet_aan_voorwaarden", None)
 
         # The CLI does not enforce requirements blocks, so we evaluate them
         # using the Python engine to get the correct requirements_met flag.

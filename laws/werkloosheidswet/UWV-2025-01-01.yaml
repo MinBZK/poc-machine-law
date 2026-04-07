@@ -169,6 +169,8 @@ articles:
           output: is_gedetineerd
           service: DJI
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: heeft_recht_op_ww
         type: boolean
       - name: ww_dagloon
@@ -189,132 +191,47 @@ articles:
           precision: 0
           min: 3
           max: 24
-      requirements:
-      - all:
-        - subject: $leeftijd
-          operation: GREATER_THAN_OR_EQUAL
-          value: $minimum_leeftijd
-          legal_basis:
-            law: Werkloosheidswet
-            bwb_id: BWBR0004045
-            article: '16'
-            url: https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Artikel16
-            juriconnect: jci1.3:c:BWBR0004045&artikel=16&z=2025-01-01&g=2025-01-01
-            explanation: Minimum leeftijd voor WW is 18 jaar
-        - subject: $leeftijd
-          operation: LESS_THAN
-          value: $pensioenleeftijd
-          legal_basis:
-            law: Werkloosheidswet
-            bwb_id: BWBR0004045
-            article: '19'
-            paragraph: '1'
-            sentence: f
-            url: https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19
-            juriconnect: jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 19 lid 1 onder f sluit personen boven pensioenleeftijd uit
-        - operation: GREATER_THAN_OR_EQUAL
-          legal_basis:
-            law: Werkloosheidswet
-            bwb_id: BWBR0004045
-            article: '16'
-            paragraph: '1'
-            sentence: a
-            url: https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Artikel16
-            juriconnect: jci1.3:c:BWBR0004045&artikel=16&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 16 lid 1 onder a definieert werkloosheid als minimaal 5 arbeidsuren minder
-          values:
-          - operation: SUBTRACT
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $leeftijd
+            operation: GREATER_THAN_OR_EQUAL
+            value: $minimum_leeftijd
+          - subject: $leeftijd
+            operation: LESS_THAN
+            value: $pensioenleeftijd
+          - operation: GREATER_THAN_OR_EQUAL
             values:
-            - $gemiddeld_arbeidsuren_per_week
-            - $huidige_arbeidsuren_per_week
-          - $minimum_urenvermindering
-        - subject: $gewerkte_weken_in_refperiode
-          operation: GREATER_THAN_OR_EQUAL
-          value: $minimum_gewerkte_weken
-          legal_basis:
-            law: Werkloosheidswet
-            bwb_id: BWBR0004045
-            article: '17'
-            paragraph: '1'
-            sentence: a
-            url: https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel17
-            juriconnect: jci1.3:c:BWBR0004045&artikel=17&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 17 lid 1 onder a vereist minimaal 26 uit 36 weken gewerkt
-        - or:
-          - subject: $heeft_nederlandse_nationaliteit
+            - operation: SUBTRACT
+              values:
+              - $gemiddeld_arbeidsuren_per_week
+              - $huidige_arbeidsuren_per_week
+            - $minimum_urenvermindering
+          - subject: $gewerkte_weken_in_refperiode
+            operation: GREATER_THAN_OR_EQUAL
+            value: $minimum_gewerkte_weken
+          - operation: OR
+            conditions:
+            - subject: $heeft_nederlandse_nationaliteit
+              operation: EQUALS
+              value: true
+            - operation: IN
+              subject: $verblijfsvergunning_type
+              values: $geldige_verblijfsvergunningen
+          - subject: $woont_in_nederland
             operation: EQUALS
             value: true
-            legal_basis:
-              law: Werkloosheidswet
-              bwb_id: BWBR0004045
-              article: '19'
-              paragraph: '1'
-              sentence: c
-              url: https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19
-              juriconnect: jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 19 lid 1 onder c geeft Nederlanders recht op WW
-          - operation: IN
-            subject: $verblijfsvergunning_type
-            values: $geldige_verblijfsvergunningen
-            legal_basis:
-              law: Werkloosheidswet
-              bwb_id: BWBR0004045
-              article: '19'
-              paragraph: '1'
-              sentence: d
-              url: https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19
-              juriconnect: jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 19 lid 1 onder d vereist rechtmatig verblijf voor vreemdelingen
-        - subject: $woont_in_nederland
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Werkloosheidswet
-            bwb_id: BWBR0004045
-            article: '19'
-            paragraph: '1'
-            sentence: b
-            url: https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19
-            juriconnect: jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 19 lid 1 onder b vereist woonplaats in Nederland
-        - subject: $ontvangt_ziektewet
-          operation: EQUALS
-          value: false
-          legal_basis:
-            law: Werkloosheidswet
-            bwb_id: BWBR0004045
-            article: '19'
-            paragraph: '1'
-            sentence: a
-            url: https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19
-            juriconnect: jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 19 lid 1 onder a sluit personen met ziektewetuitkering uit
-        - subject: $ontvangt_wia
-          operation: EQUALS
-          value: false
-          legal_basis:
-            law: Werkloosheidswet
-            bwb_id: BWBR0004045
-            article: '19'
-            paragraph: '1'
-            sentence: a
-            url: https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19
-            juriconnect: jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 19 lid 1 onder a sluit personen met arbeidsongeschiktheidsuitkering uit
-        - subject: $is_gedetineerd
-          operation: EQUALS
-          value: false
-          legal_basis:
-            law: Werkloosheidswet
-            bwb_id: BWBR0004045
-            article: '19'
-            paragraph: '1'
-            sentence: e
-            url: https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19
-            juriconnect: jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 19 lid 1 onder e sluit gedetineerden uit
-      actions:
+          - subject: $ontvangt_ziektewet
+            operation: EQUALS
+            value: false
+          - subject: $ontvangt_wia
+            operation: EQUALS
+            value: false
+          - subject: $is_gedetineerd
+            operation: EQUALS
+            value: false
       - output: heeft_recht_op_ww
         value: true
         legal_basis:

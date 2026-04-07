@@ -173,6 +173,8 @@ articles:
             type: string
             value: $bsn
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_gerechtigd
         type: boolean
       - name: categorie_zelfstandige
@@ -196,168 +198,87 @@ articles:
           min: 0
       - name: bedrijfskapitaal_type
         type: string
-      requirements:
-      - all:
-        - subject: $is_actieve_ondernemer
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Besluit bijstandverlening zelfstandigen 2004
-            bwb_id: BWBR0015711
-            article: '1'
-            paragraph: '1'
-            sentence: b
-            url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1
-            juriconnect: jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 1 lid 1 onder b vereist dat de persoon arbeid verricht in eigen bedrijf
-        - subject: $leeftijd
-          operation: GREATER_THAN_OR_EQUAL
-          value: $minimum_leeftijd
-          legal_basis:
-            law: Besluit bijstandverlening zelfstandigen 2004
-            bwb_id: BWBR0015711
-            article: '1'
-            paragraph: '1'
-            sentence: b
-            url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1
-            juriconnect: jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 1 lid 1 onder b bepaalt minimumleeftijd van 18 jaar
-        - subject: $leeftijd
-          operation: LESS_THAN
-          value: $pensioenleeftijd
-          legal_basis:
-            law: Besluit bijstandverlening zelfstandigen 2004
-            bwb_id: BWBR0015711
-            article: '1'
-            paragraph: '1'
-            sentence: b
-            url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1
-            juriconnect: jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 1 lid 1 onder b bepaalt maximumleeftijd als pensioengerechtigde leeftijd
-        - operation: GREATER_THAN_OR_EQUAL
-          legal_basis:
-            law: Besluit bijstandverlening zelfstandigen 2004
-            bwb_id: BWBR0015711
-            article: '1'
-            paragraph: '1'
-            sentence: b
-            url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1
-            juriconnect: jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 1 lid 1 onder b vereist voldoen aan urencriterium (art 3.6 Wet IB 2001)
-          values:
-          - operation: MULTIPLY
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $is_actieve_ondernemer
+            operation: EQUALS
+            value: true
+          - subject: $leeftijd
+            operation: GREATER_THAN_OR_EQUAL
+            value: $minimum_leeftijd
+          - subject: $leeftijd
+            operation: LESS_THAN
+            value: $pensioenleeftijd
+          - operation: GREATER_THAN_OR_EQUAL
             values:
-            - $bbz_aanvraag.uren_per_week
-            - 52
-          - $urencriterium_per_jaar
-        - or:
-          - operation: AND
+            - operation: MULTIPLY
+              values:
+              - $bbz_aanvraag.uren_per_week
+              - 52
+            - $urencriterium_per_jaar
+          - operation: OR
             conditions:
-            - subject: $bbz_aanvraag.type_zelfstandige
-              operation: EQUALS
-              value: OUDER
+            - operation: AND
+              conditions:
+              - subject: $bbz_aanvraag.type_zelfstandige
+                operation: EQUALS
+                value: OUDER
+              - operation: LESS_THAN_OR_EQUAL
+                values:
+                - $vermogen
+                - $vermogensgrens_ouder
             - operation: LESS_THAN_OR_EQUAL
               values:
               - $vermogen
-              - $vermogensgrens_ouder
-            legal_basis:
-              law: Besluit bijstandverlening zelfstandigen 2004
-              bwb_id: BWBR0015711
-              article: '3'
-              paragraph: '2'
-              url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel3
-              juriconnect: jci1.3:c:BWBR0015711&artikel=3&lid=2&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 3 lid 2 bepaalt vermogensgrens €170.725 voor oudere zelfstandigen
-          - operation: LESS_THAN_OR_EQUAL
-            values:
-            - $vermogen
-            - $vermogensgrens_algemeen
-            legal_basis:
-              law: Besluit bijstandverlening zelfstandigen 2004
-              bwb_id: BWBR0015711
-              article: '3'
-              paragraph: '1'
-              url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel3
-              juriconnect: jci1.3:c:BWBR0015711&artikel=3&lid=1&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 3 lid 1 bepaalt algemene vermogensgrens €243.892
-        - or:
-          - operation: AND
+              - $vermogensgrens_algemeen
+          - operation: OR
             conditions:
-            - subject: $bbz_aanvraag.type_zelfstandige
-              operation: EQUALS
-              value: GEVESTIGD
-            - subject: $bbz_aanvraag.bedrijf_levensvatbaar
-              operation: EQUALS
-              value: true
-            legal_basis:
-              law: Besluit bijstandverlening zelfstandigen 2004
-              bwb_id: BWBR0015711
-              article: '18'
-              paragraph: '1'
-              url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf1_Artikel18
-              juriconnect: jci1.3:c:BWBR0015711&artikel=18&lid=1&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 18 lid 1 vereist levensvatbaar bedrijf voor gevestigde zelfstandigen
-          - operation: AND
-            conditions:
-            - subject: $bbz_aanvraag.type_zelfstandige
-              operation: EQUALS
-              value: BEGINNEND
-            - subject: $heeft_ww_uitkering
-              operation: EQUALS
-              value: true
-            - subject: $bbz_aanvraag.bedrijf_levensvatbaar
-              operation: EQUALS
-              value: true
-            legal_basis:
-              law: Besluit bijstandverlening zelfstandigen 2004
-              bwb_id: BWBR0015711
-              article: '23'
-              paragraph: '1'
-              url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf2_Artikel23
-              juriconnect: jci1.3:c:BWBR0015711&artikel=23&lid=1&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 23 lid 1 vereist WW-uitkering en levensvatbaar bedrijf voor beginnende zelfstandigen
-          - operation: AND
-            conditions:
-            - subject: $bbz_aanvraag.type_zelfstandige
-              operation: EQUALS
-              value: OUDER
-            - subject: $geboortedatum
-              operation: LESS_THAN
-              value: $geboren_voor_datum
-            - subject: $bbz_aanvraag.bedrijf_levensvatbaar
-              operation: EQUALS
-              value: false
-            - operation: GREATER_THAN_OR_EQUAL
-              values:
-              - $bbz_aanvraag.jaren_ondernemerschap
-              - 10
-            legal_basis:
-              law: Besluit bijstandverlening zelfstandigen 2004
-              bwb_id: BWBR0015711
-              article: '25'
-              paragraph: '1'
-              url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf3_Artikel25
-              juriconnect: jci1.3:c:BWBR0015711&artikel=25&lid=1&z=2025-01-01&g=2025-01-01
-              explanation: 'Artikel 25 lid 1 stelt eisen voor oudere zelfstandigen: geboren voor 1960, niet-levensvatbaar,
-                10 jaar ondernemerschap'
-          - operation: AND
-            conditions:
-            - subject: $bbz_aanvraag.type_zelfstandige
-              operation: EQUALS
-              value: BEEINDIGEND
-            - operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $bbz_aanvraag.beeindigingsdatum
-            legal_basis:
-              law: Besluit bijstandverlening zelfstandigen 2004
-              bwb_id: BWBR0015711
-              article: '27'
-              paragraph: '1'
-              url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf4_Artikel27
-              juriconnect: jci1.3:c:BWBR0015711&artikel=27&lid=1&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 27 lid 1 vereist beëindiging binnen 12 maanden voor beëindigende zelfstandigen
-      actions:
+            - operation: AND
+              conditions:
+              - subject: $bbz_aanvraag.type_zelfstandige
+                operation: EQUALS
+                value: GEVESTIGD
+              - subject: $bbz_aanvraag.bedrijf_levensvatbaar
+                operation: EQUALS
+                value: true
+            - operation: AND
+              conditions:
+              - subject: $bbz_aanvraag.type_zelfstandige
+                operation: EQUALS
+                value: BEGINNEND
+              - subject: $heeft_ww_uitkering
+                operation: EQUALS
+                value: true
+              - subject: $bbz_aanvraag.bedrijf_levensvatbaar
+                operation: EQUALS
+                value: true
+            - operation: AND
+              conditions:
+              - subject: $bbz_aanvraag.type_zelfstandige
+                operation: EQUALS
+                value: OUDER
+              - subject: $geboortedatum
+                operation: LESS_THAN
+                value: $geboren_voor_datum
+              - subject: $bbz_aanvraag.bedrijf_levensvatbaar
+                operation: EQUALS
+                value: false
+              - operation: GREATER_THAN_OR_EQUAL
+                values:
+                - $bbz_aanvraag.jaren_ondernemerschap
+                - 10
+            - operation: AND
+              conditions:
+              - subject: $bbz_aanvraag.type_zelfstandige
+                operation: EQUALS
+                value: BEEINDIGEND
+              - operation: NOT
+                value:
+                  operation: IS_NULL
+                  subject: $bbz_aanvraag.beeindigingsdatum
       - output: is_gerechtigd
         value: true
         legal_basis:

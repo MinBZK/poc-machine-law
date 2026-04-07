@@ -11,15 +11,9 @@ uuid: 9c5d8e7a-4b2f-4d6e-8a1c-3e5b7d9a2f4c
 discoverable: BUSINESS
 articles:
 - number: '18.14'
-  text: '1 De emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit in kalenderjaargemiddelde
-    per reizigerskilometer wordt berekend door de emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke
-    mobiliteit in het kalenderjaar te delen door het aantal reizigerskilometers voor woon-werkmobiliteit respectievelijk zakelijke
-    mobiliteit in het kalenderjaar.
+  text: '1 De emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit in kalenderjaargemiddelde per reizigerskilometer wordt berekend door de emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit in het kalenderjaar te delen door het aantal reizigerskilometers voor woon-werkmobiliteit respectievelijk zakelijke mobiliteit in het kalenderjaar.
 
-    2 De emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit, bedoeld in het eerste lid,
-    wordt berekend door voor elke reismodaliteit het aantal in het kalenderjaar gereisde kilometers voor woon-werkmobiliteit
-    respectievelijk zakelijke mobiliteit te vermenigvuldigen met de bij ministeriële regeling vastgestelde emissiefactor voor
-    die reismodaliteit en de uitkomsten bij elkaar op te tellen.'
+    2 De emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit, bedoeld in het eerste lid, wordt berekend door voor elke reismodaliteit het aantal in het kalenderjaar gereisde kilometers voor woon-werkmobiliteit respectievelijk zakelijke mobiliteit te vermenigvuldigen met de bij ministeriële regeling vastgestelde emissiefactor voor die reismodaliteit en de uitkomsten bij elkaar op te tellen.'
   url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Artikel18.14
   machine_readable:
     definitions:
@@ -94,6 +88,8 @@ articles:
             type: string
             value: $kvk_nummer
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: woon_werk_auto_benzine
         type: number
       - name: woon_werk_auto_diesel
@@ -106,20 +102,14 @@ articles:
         type: number
       - name: co2_uitstoot_totaal
         type: number
-      requirements:
-      - all:
-        - operation: EQUALS
-          subject: true
-          value: true
-          legal_basis:
-            law: Besluit activiteiten leefomgeving
-            bwb_id: BWBR0041330
-            article: '18.14'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14
-            juriconnect: jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01
-            explanation: Gegevensverzameling is altijd mogelijk voor organisaties die rapportageverplichting hebben
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - operation: EQUALS
+            subject: true
+            value: true
       - output: woon_werk_auto_benzine
         value: $woon_werk_auto_benzine
         legal_basis:

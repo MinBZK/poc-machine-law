@@ -141,6 +141,8 @@ articles:
             type: string
             value: $bsn
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_gerechtigd
         type: boolean
       - name: uitkeringsbedrag
@@ -161,27 +163,31 @@ articles:
           unit: eurocent
           precision: 0
           min: 0
-      requirements:
-      - all:
-        - subject: $voldoet_aan_landelijke_voorwaarden
-          operation: EQUALS
-          value: true
-        - or:
-          - subject: $heeft_vast_adres
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $voldoet_aan_landelijke_voorwaarden
             operation: EQUALS
             value: true
-          - operation: IN
-            subject: $postadres
-            values: $geldige_post_adressen
-        - or:
-          - operation: IN
-            subject: $arbeidsvermogen.arbeidsvermogen
-            values: $volledige_ontheffing_redenen
-          - operation: NOT
-            value:
-              operation: IS_NULL
-              subject: $arbeidsvermogen.re_integratie_traject
-      actions:
+          - operation: OR
+            conditions:
+            - subject: $heeft_vast_adres
+              operation: EQUALS
+              value: true
+            - operation: IN
+              subject: $postadres
+              values: $geldige_post_adressen
+          - operation: OR
+            conditions:
+            - operation: IN
+              subject: $arbeidsvermogen.arbeidsvermogen
+              values: $volledige_ontheffing_redenen
+            - operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $arbeidsvermogen.re_integratie_traject
       - output: is_gerechtigd
         value: true
       - output: uitkeringsbedrag

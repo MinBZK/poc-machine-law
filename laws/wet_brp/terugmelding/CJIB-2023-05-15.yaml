@@ -57,17 +57,21 @@ articles:
             type: string
             value: $bsn
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: heeft_gerede_twijfel_adres
         type: boolean
       - name: twijfel_reden
         type: string
-      requirements:
-      - all:
-        - operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $adres
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - operation: NOT
+            value:
+              operation: IS_NULL
+              subject: $adres
       - output: heeft_gerede_twijfel_adres
         value:
           operation: EQUALS

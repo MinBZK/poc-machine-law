@@ -223,6 +223,8 @@ articles:
             type: string
             value: $bsn
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_gepensioneerd
         type: boolean
       - name: pensioenkapitaal
@@ -249,15 +251,17 @@ articles:
           unit: years
           precision: 0
           min: 60
-      requirements:
-      - all:
-        - subject: $leeftijd
-          operation: GREATER_THAN_OR_EQUAL
-          value: $pensioen_leeftijd_fonds
-        - subject: $pensioenkapitaal
-          operation: GREATER_THAN
-          value: 0
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $leeftijd
+            operation: GREATER_THAN_OR_EQUAL
+            value: $pensioen_leeftijd_fonds
+          - subject: $pensioenkapitaal
+            operation: GREATER_THAN
+            value: 0
       - output: is_gepensioneerd
         value: true
         legal_basis:

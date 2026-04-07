@@ -66,35 +66,23 @@ articles:
             type: string
             value: $kvk_nummer
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: rapportageverplichting
         type: boolean
       - name: aantal_werknemers
         type: number
-      requirements:
-      - all:
-        - subject: $verstrekt_mobiliteitsvergoeding
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Besluit activiteiten leefomgeving
-            bwb_id: BWBR0041330
-            article: '18.11'
-            paragraph: '2'
-            url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.11
-            juriconnect: jci1.3:c:BWBR0041330&artikel=18.11&lid=2&z=2024-07-01&g=2024-07-01
-            explanation: Organisaties moeten mobiliteitsvergoeding verstrekken om onder rapportageverplichting te vallen
-        - operation: GREATER_THAN_OR_EQUAL
-          subject: $aantal_werknemers
-          value: $werknemers_drempel
-          legal_basis:
-            law: Besluit activiteiten leefomgeving
-            bwb_id: BWBR0041330
-            article: '18.11'
-            paragraph: '2'
-            url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.11
-            juriconnect: jci1.3:c:BWBR0041330&artikel=18.11&lid=2&z=2024-07-01&g=2024-07-01
-            explanation: Nederlandse ondernemingen moeten minimaal 100 werknemers hebben voor rapportageverplichting
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $verstrekt_mobiliteitsvergoeding
+            operation: EQUALS
+            value: true
+          - operation: GREATER_THAN_OR_EQUAL
+            subject: $aantal_werknemers
+            value: $werknemers_drempel
       - output: rapportageverplichting
         value: true
         legal_basis:

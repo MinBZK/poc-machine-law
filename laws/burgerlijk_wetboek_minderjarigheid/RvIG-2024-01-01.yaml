@@ -51,6 +51,8 @@ articles:
             type: string
             value: $bsn
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_minderjarig
         type: boolean
       - name: leeftijd
@@ -77,19 +79,13 @@ articles:
         type: array
       - name: valid_until_dates
         type: array
-      requirements:
-      - operation: NOT
-        value:
-          operation: IS_NULL
-          subject: $persoonsgegevens
-        legal_basis:
-          law: Wet basisregistratie personen
-          bwb_id: BWBR0033715
-          article: '2.7'
-          url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7
-          juriconnect: jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01
-          explanation: Persoon moet geregistreerd zijn in de BRP
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $persoonsgegevens
       - output: leeftijd
         value:
           operation: AGE
@@ -234,7 +230,7 @@ articles:
           explanation: Rechten afhankelijk van minderjarigheid
       - output: valid_from_dates
         value:
-        - null
+        -
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -244,7 +240,7 @@ articles:
           explanation: SELF delegatie heeft geen ingangsdatum
       - output: valid_until_dates
         value:
-        - null
+        -
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

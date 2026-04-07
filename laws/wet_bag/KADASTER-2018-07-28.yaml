@@ -68,6 +68,8 @@ articles:
             type: string
             value: $adres
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: gebruiksdoel
         type: string
       - name: oppervlakte
@@ -79,20 +81,15 @@ articles:
         type: string
       - name: is_woonfunctie
         type: boolean
-      requirements:
-      - all:
-        - operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $adres
-          legal_basis:
-            law: Wet basisregistratie adressen en gebouwen
-            bwb_id: BWBR0023466
-            article: '1'
-            url: https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1
-            juriconnect: jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28
-            explanation: Artikel 1 vereist adresgegevens voor opzoeken verblijfsobject
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - operation: NOT
+            value:
+              operation: IS_NULL
+              subject: $adres
       - output: gebruiksdoel
         value: $verblijfsobject.gebruiksdoel
         legal_basis:

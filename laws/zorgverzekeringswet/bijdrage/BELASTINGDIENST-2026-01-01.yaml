@@ -87,6 +87,8 @@ articles:
           type: period
           period_type: year
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: bijdrage_type
         type: string
       - name: is_aow_gerechtigd
@@ -109,12 +111,14 @@ articles:
           unit: eurocent
           precision: 0
           min: 0
-      requirements:
-      - all:
-        - subject: $inkomen_loon
-          operation: GREATER_THAN
-          value: 0
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $inkomen_loon
+            operation: GREATER_THAN
+            value: 0
       - output: is_aow_gerechtigd
         value:
           operation: GREATER_THAN_OR_EQUAL

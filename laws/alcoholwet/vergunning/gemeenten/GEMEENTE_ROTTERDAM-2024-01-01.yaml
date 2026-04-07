@@ -151,58 +151,37 @@ articles:
             type: string
             value: $kvk_nummer
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: heeft_recht_op_vergunning
         type: boolean
       - name: heeft_actieve_vergunning
         type: boolean
       - name: weigeringsgrond
         type: string
-      requirements:
-      - all:
-        - subject: $bedrijf_status
-          operation: EQUALS
-          value: Actief
-          legal_basis:
-            law: Handelsregisterwet 2007
-            bwb_id: BWBR0021777
-            article: '2'
-            url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Artikel2
-            explanation: De onderneming moet actief geregistreerd zijn
-        - subject: $svh_registratie_geldig
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Alcoholwet
-            bwb_id: BWBR0002458
-            article: '8'
-            paragraph: '4'
-            url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8
-            explanation: Leidinggevenden moeten ingeschreven staan in het Register Sociale Hygiëne
-        - subject: $voldoet_aan_nationale_eisen
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Alcoholwet
-            bwb_id: BWBR0002458
-            article: '27'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27
-            explanation: Moet voldoen aan alle nationale eisen uit artikel 8 en 10
-        - or:
-          - subject: $bibob_mate_van_gevaar
-            operation: IS_NULL
-          - operation: NOT
-            value:
-              operation: EQUALS
-              subject: $bibob_mate_van_gevaar
-              value: $bibob_ernstig_gevaar
-          legal_basis:
-            law: Wet bevordering integriteitsbeoordelingen door het openbaar bestuur
-            bwb_id: BWBR0013798
-            article: '3'
-            url: https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3
-            explanation: Bij ernstig gevaar volgens Bibob-advies moet de vergunning worden geweigerd
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $bedrijf_status
+            operation: EQUALS
+            value: Actief
+          - subject: $svh_registratie_geldig
+            operation: EQUALS
+            value: true
+          - subject: $voldoet_aan_nationale_eisen
+            operation: EQUALS
+            value: true
+          - operation: OR
+            conditions:
+            - subject: $bibob_mate_van_gevaar
+              operation: IS_NULL
+            - operation: NOT
+              value:
+                operation: EQUALS
+                subject: $bibob_mate_van_gevaar
+                value: $bibob_ernstig_gevaar
       - output: heeft_recht_op_vergunning
         value: true
         legal_basis:

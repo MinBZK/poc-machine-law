@@ -106,24 +106,27 @@ articles:
             financiele_zekerheid_bedrag: $financiele_zekerheid_bedrag
             aantal_deskundigen: $aantal_deskundigen
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: vergunning_vereist
         type: boolean
       - name: vergunning_toegestaan
         type: boolean
       - name: weigeringsgronden
         type: array
-      requirements:
-      - subject: $activiteit_type
-        operation: IN
-        values:
-        - transport
-        - bezit
-        - invoer
-        - uitvoer
-        - inrichting_oprichten
-        - inrichting_exploiteren
-        - kernvoortstuwing
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          subject: $activiteit_type
+          operation: IN
+          values:
+          - transport
+          - bezit
+          - invoer
+          - uitvoer
+          - inrichting_oprichten
+          - inrichting_exploiteren
+          - kernvoortstuwing
       - output: vergunning_vereist
         value: true
         legal_basis:

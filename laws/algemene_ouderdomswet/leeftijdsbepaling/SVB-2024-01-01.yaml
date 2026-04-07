@@ -99,19 +99,23 @@ articles:
           type: point_in_time
           reference: $calculation_date
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: pensioenleeftijd
         type: number
         type_spec:
           unit: years
           precision: 2
           min: 65
-      requirements:
-      - all:
-        - operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $geboortedatum
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - operation: NOT
+            value:
+              operation: IS_NULL
+              subject: $geboortedatum
       - output: pensioenleeftijd
         value:
           operation: ADD

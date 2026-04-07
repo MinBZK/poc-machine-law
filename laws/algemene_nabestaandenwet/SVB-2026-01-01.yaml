@@ -138,6 +138,8 @@ articles:
             type: string
             value: $bsn
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_gerechtigd
         type: boolean
       - name: bruto_uitkering
@@ -158,26 +160,29 @@ articles:
           unit: eurocent
           precision: 0
           min: 0
-      requirements:
-      - all:
-        - subject: $was_partner_verzekerd
-          operation: EQUALS
-          value: true
-        - operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $overlijdensdatum_partner
-        - subject: $leeftijd
-          operation: LESS_THAN
-          value: $pensioenleeftijd
-        - or:
-          - subject: $heeft_kinderen_onder_18
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $was_partner_verzekerd
             operation: EQUALS
             value: true
-          - subject: $arbeidsongeschiktheidspercentage
-            operation: GREATER_THAN_OR_EQUAL
-            value: $ao_drempel
-      actions:
+          - operation: NOT
+            value:
+              operation: IS_NULL
+              subject: $overlijdensdatum_partner
+          - subject: $leeftijd
+            operation: LESS_THAN
+            value: $pensioenleeftijd
+          - operation: OR
+            conditions:
+            - subject: $heeft_kinderen_onder_18
+              operation: EQUALS
+              value: true
+            - subject: $arbeidsongeschiktheidspercentage
+              operation: GREATER_THAN_OR_EQUAL
+              value: $ao_drempel
       - output: is_gerechtigd
         value: true
         legal_basis:

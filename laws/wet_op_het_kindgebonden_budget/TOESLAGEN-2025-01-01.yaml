@@ -164,6 +164,8 @@ articles:
           type: point_in_time
           reference: $prev_january_first
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: heeft_recht_op_kindgebonden_budget
         type: boolean
       - name: kindgebonden_budget_jaar
@@ -178,58 +180,36 @@ articles:
           unit: eurocent
           precision: 0
           min: 0
-      requirements:
-      - all:
-        - subject: $ontvangt_kinderbijslag
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Wet op het kindgebonden budget
-            bwb_id: BWBR0022751
-            article: '2'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2
-            juriconnect: jci1.3:c:BWBR0022751&artikel=2&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 2 lid 1 vereist dat ouder kinderbijslag ontvangt
-        - subject: $aantal_kinderen
-          operation: GREATER_THAN
-          value: 0
-          legal_basis:
-            law: Wet op het kindgebonden budget
-            bwb_id: BWBR0022751
-            article: '2'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2
-            juriconnect: jci1.3:c:BWBR0022751&artikel=2&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 2 lid 1 bepaalt dat kindgebonden budget geldt per kind
-        - operation: IF
-          legal_basis:
-            law: Wet op het kindgebonden budget
-            bwb_id: BWBR0022751
-            article: '3'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel3
-            juriconnect: jci1.3:c:BWBR0022751&artikel=3&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 3 lid 1 bepaalt de vermogensgrenzen
-          cases:
-          - when:
-              subject: $heeft_partner
-              operation: EQUALS
-              value: true
-            then:
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $ontvangt_kinderbijslag
+            operation: EQUALS
+            value: true
+          - subject: $aantal_kinderen
+            operation: GREATER_THAN
+            value: 0
+          - operation: IF
+            cases:
+            - when:
+                subject: $heeft_partner
+                operation: EQUALS
+                value: true
+              then:
+                operation: LESS_THAN
+                values:
+                - operation: ADD
+                  values:
+                  - $vermogen
+                  - $partner_vermogen
+                - $vermogensgrens_partner
+            default:
               operation: LESS_THAN
               values:
-              - operation: ADD
-                values:
-                - $vermogen
-                - $partner_vermogen
-              - $vermogensgrens_partner
-          default:
-            operation: LESS_THAN
-            values:
-            - $vermogen
-            - $vermogensgrens_alleenstaand
-      actions:
+              - $vermogen
+              - $vermogensgrens_alleenstaand
       - output: leeftijdstoeslagen
         value:
           operation: FOREACH

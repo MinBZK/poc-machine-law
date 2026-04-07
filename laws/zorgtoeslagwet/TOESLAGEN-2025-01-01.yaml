@@ -145,6 +145,8 @@ articles:
           output: standaardpremie
           service: VWS
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_verzekerde_zorgtoeslag
         type: boolean
       - name: hoogte_toeslag
@@ -153,15 +155,17 @@ articles:
           unit: eurocent
           precision: 0
           min: 0
-      requirements:
-      - all:
-        - subject: $leeftijd
-          operation: GREATER_THAN_OR_EQUAL
-          value: $minimum_leeftijd
-        - subject: $is_verzekerde
-          operation: EQUALS
-          value: true
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $leeftijd
+            operation: GREATER_THAN_OR_EQUAL
+            value: $minimum_leeftijd
+          - subject: $is_verzekerde
+            operation: EQUALS
+            value: true
       - output: is_verzekerde_zorgtoeslag
         value: true
       - output: hoogte_toeslag

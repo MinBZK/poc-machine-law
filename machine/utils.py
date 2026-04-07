@@ -15,7 +15,11 @@ except ImportError:
 
 BASE_DIR = "laws"
 
-# Mapping from v0.5.0 regulatory_layer to v0.1.x law_type
+# TODO: remove v0.5.0→flat conversion code below once the Python engine fallback
+# (machine/regelrecht_services.py → RulesEngine) reads v0.5.1 YAML natively.
+# Until then, load_yaml_cached flattens article-based YAML so the old engine works.
+
+# Mapping from v0.5.0 regulatory_layer to v0.1.x law_type (used by _flatten_v050)
 REGULATORY_LAYER_TO_LAW_TYPE = {
     "GRONDWET": "GRONDWET",
     "WET": "FORMELE_WET",
@@ -36,7 +40,7 @@ REGULATORY_LAYER_TO_LAW_TYPE = {
 _yaml_cache = {}
 
 
-def _is_v050_format(data) -> bool:
+def _is_v050_format(data: dict) -> bool:
     """Detect if a YAML law file uses the v0.5.x article-based schema."""
     if not isinstance(data, dict):
         return False
@@ -211,20 +215,31 @@ def _flatten_v050(data: dict) -> dict:
         "definitions": merged_definitions,
     }
 
-    # Extract _voldoet_aan_voorwaarden action as requirements (converter moved them)
+    # Extract voldoet_aan_voorwaarden / _voldoet_aan_voorwaarden actions as requirements.
+    # The YAML files store eligibility logic as a boolean output action; the Python
+    # engine still needs it as a requirements list.
+    _VAV_NAMES = {"_voldoet_aan_voorwaarden", "voldoet_aan_voorwaarden"}
     final_actions = []
     for action in merged_actions:
-        if action.get("output") == "_voldoet_aan_voorwaarden":
+        if action.get("output") in _VAV_NAMES:
             # Convert the action's value/operation back to a requirements list
             val = action.get("value", action)
             if isinstance(val, dict) and val.get("operation") == "AND":
                 # AND conditions become individual requirements in an all block
                 conditions = val.get("conditions", val.get("values", []))
                 merged_requirements.append({"all": conditions})
+            elif isinstance(val, dict) and val.get("operation") == "OR":
+                # OR conditions become an or block
+                conditions = val.get("conditions", val.get("values", []))
+                merged_requirements.append({"or": conditions})
             elif isinstance(val, dict) and "operation" in val:
                 merged_requirements.append(val)
         else:
             final_actions.append(action)
+
+    # Strip voldoet_aan_voorwaarden from output — the Python engine handles
+    # eligibility via the requirements list, not as a computed output.
+    flat["properties"]["output"] = [o for o in merged_output if o.get("name") not in _VAV_NAMES]
 
     flat["requirements"] = merged_requirements
     flat["actions"] = final_actions

@@ -93,6 +93,8 @@ articles:
             type: string
             value: $adres.huisnummer
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: genereer_signaal
         type: boolean
       - name: signaal_type
@@ -107,20 +109,15 @@ articles:
         type_spec:
           unit: months
           precision: 0
-      requirements:
-      - all:
-        - operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $adres
-          legal_basis:
-            law: Besluit basisregistratie personen
-            bwb_id: BWBR0034306
-            article: 28f
-            url: https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28f
-            juriconnect: jci1.3:c:BWBR0034306&artikel=28f&z=2024-04-01&g=2024-04-01
-            explanation: Artikel 28f vereist minimaal adresgegevens voor signalering
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - operation: NOT
+            value:
+              operation: IS_NULL
+              subject: $adres
       - output: genereer_signaal
         value:
           operation: OR

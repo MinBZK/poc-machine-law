@@ -137,6 +137,8 @@ articles:
           type: period
           period_type: month
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_gerechtigd
         type: boolean
       - name: sociaal_minimum
@@ -157,27 +159,32 @@ articles:
           unit: eurocent
           precision: 0
           min: 0
-      requirements:
-      - all:
-        - subject: $leeftijd
-          operation: GREATER_THAN_OR_EQUAL
-          value: $pensioenleeftijd
-        - any:
-          - all:
-            - subject: $heeft_partner
-              operation: EQUALS
-              value: false
-            - subject: $vermogen
-              operation: LESS_THAN
-              value: $vermogensgrens_alleenstaand
-          - all:
-            - subject: $heeft_partner
-              operation: EQUALS
-              value: true
-            - subject: $vermogen
-              operation: LESS_THAN
-              value: $vermogensgrens_gehuwden
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $leeftijd
+            operation: GREATER_THAN_OR_EQUAL
+            value: $pensioenleeftijd
+          - operation: OR
+            conditions:
+            - operation: AND
+              conditions:
+              - subject: $heeft_partner
+                operation: EQUALS
+                value: false
+              - subject: $vermogen
+                operation: LESS_THAN
+                value: $vermogensgrens_alleenstaand
+            - operation: AND
+              conditions:
+              - subject: $heeft_partner
+                operation: EQUALS
+                value: true
+              - subject: $vermogen
+                operation: LESS_THAN
+                value: $vermogensgrens_gehuwden
       - output: is_gerechtigd
         value: true
         legal_basis:

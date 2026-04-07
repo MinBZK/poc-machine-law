@@ -125,6 +125,8 @@ articles:
             type: string
             value: $kvk_nummer
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_levensmiddelenbedrijf
         type: boolean
       - name: heeft_haccp_verplichting
@@ -139,29 +141,17 @@ articles:
         type: string
       - name: toezichthouder
         type: string
-      requirements:
-      - or:
-        - subject: $sbi_code
-          operation: IN
-          value: $sbi_levensmiddelen
-          legal_basis:
-            law: Warenwetbesluit hygiëne van levensmiddelen
-            bwb_id: BWBR0018823
-            article: '2'
-            url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
-            juriconnect: jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01
-            explanation: De SBI-code van het bedrijf valt in een categorie die levensmiddelen bereidt, verwerkt of verkoopt
-        - subject: $bereidt_of_serveert_voedsel
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Warenwetbesluit hygiëne van levensmiddelen
-            bwb_id: BWBR0018823
-            article: '2'
-            url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
-            juriconnect: jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01
-            explanation: Het bedrijf geeft aan levensmiddelen te bereiden, verwerken of serveren, ongeacht de SBI-classificatie
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: OR
+          conditions:
+          - subject: $sbi_code
+            operation: IN
+            value: $sbi_levensmiddelen
+          - subject: $bereidt_of_serveert_voedsel
+            operation: EQUALS
+            value: true
       - output: is_levensmiddelenbedrijf
         value: true
         legal_basis:
@@ -214,8 +204,7 @@ articles:
           article: '3'
           url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3
           juriconnect: jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01
-          explanation: Een bedrijf voldoet aan de verplichting wanneer het geregistreerd is bij de NVWA en een geldig HACCP-systeem
-            heeft
+          explanation: Een bedrijf voldoet aan de verplichting wanneer het geregistreerd is bij de NVWA en een geldig HACCP-systeem heeft
       - output: type_haccp_systeem
         value: $type_haccp_systeem
         legal_basis:

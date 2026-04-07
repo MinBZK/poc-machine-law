@@ -91,6 +91,8 @@ articles:
             type: string
             value: $kvk_nummer
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: heeft_energiebesparingsplicht
         type: boolean
       - name: heeft_informatieplicht
@@ -105,43 +107,22 @@ articles:
         type: string
       - name: bevoegd_gezag
         type: string
-      requirements:
-      - all:
-        - subject: $is_woonfunctie
-          operation: EQUALS
-          value: false
-          legal_basis:
-            law: Besluit activiteiten leefomgeving
-            bwb_id: BWBR0041330
-            article: '5.15'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
-            juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01
-            explanation: Gebouwen met uitsluitend een woonfunctie zijn uitgezonderd van de energiebesparingsplicht
-        - or:
-          - subject: $jaarlijks_elektriciteitsverbruik_kwh
-            operation: GREATER_THAN_OR_EQUAL
-            value: $drempel_elektriciteit_kwh
-            legal_basis:
-              law: Besluit activiteiten leefomgeving
-              bwb_id: BWBR0041330
-              article: '5.15'
-              paragraph: '1'
-              url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
-              juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01
-              explanation: Drempelwaarde van 50.000 kWh elektriciteitsverbruik per jaar
-          - subject: $jaarlijks_gasverbruik_m3
-            operation: GREATER_THAN_OR_EQUAL
-            value: $drempel_gas_m3
-            legal_basis:
-              law: Besluit activiteiten leefomgeving
-              bwb_id: BWBR0041330
-              article: '5.15'
-              paragraph: '1'
-              url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
-              juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01
-              explanation: Drempelwaarde van 25.000 m³ aardgasequivalenten per jaar
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $is_woonfunctie
+            operation: EQUALS
+            value: false
+          - operation: OR
+            conditions:
+            - subject: $jaarlijks_elektriciteitsverbruik_kwh
+              operation: GREATER_THAN_OR_EQUAL
+              value: $drempel_elektriciteit_kwh
+            - subject: $jaarlijks_gasverbruik_m3
+              operation: GREATER_THAN_OR_EQUAL
+              value: $drempel_gas_m3
       - output: heeft_energiebesparingsplicht
         value: true
         legal_basis:
@@ -151,8 +132,7 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
           juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: De organisatie voldoet aan de drempelwaarden en heeft geen woonfunctie; de energiebesparingsplicht
-            is van toepassing
+          explanation: De organisatie voldoet aan de drempelwaarden en heeft geen woonfunctie; de energiebesparingsplicht is van toepassing
       - output: heeft_informatieplicht
         value: true
         legal_basis:

@@ -199,6 +199,8 @@ articles:
             type: string
             value: $bsn
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_gerechtigd
         type: boolean
       - name: basisbedrag
@@ -219,19 +221,21 @@ articles:
           unit: eurocent
           precision: 0
           min: 0
-      requirements:
-      - all:
-        - subject: $leeftijd
-          operation: GREATER_THAN_OR_EQUAL
-          value: $pensioenleeftijd
-        - operation: GREATER_THAN
-          values:
-          - operation: ADD
-            values:
-            - $woonachtige_verzekerde_jaren
-            - $werkzame_verzekerde_jaren
-          - 0
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $leeftijd
+            operation: GREATER_THAN_OR_EQUAL
+            value: $pensioenleeftijd
+          - operation: GREATER_THAN
+            values:
+            - operation: ADD
+              values:
+              - $woonachtige_verzekerde_jaren
+              - $werkzame_verzekerde_jaren
+            - 0
       - output: is_gerechtigd
         value: true
         legal_basis:

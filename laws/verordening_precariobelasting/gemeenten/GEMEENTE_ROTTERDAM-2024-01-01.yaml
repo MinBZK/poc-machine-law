@@ -86,6 +86,8 @@ articles:
             type: string
             value: $vestigingsadres
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_belastingplichtig
         type: boolean
       - name: belasting_per_jaar
@@ -94,33 +96,20 @@ articles:
         type: number
       - name: heffingsmaatstaf_m2
         type: number
-      requirements:
-      - all:
-        - subject: $heeft_terras
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Verordening precariobelasting Rotterdam 2024
-            article: '2'
-            url: https://lokaleregelgeving.overheid.nl/CVDR719500/1
-            explanation: Het bedrijf moet een terras (voorwerp) op gemeentegrond hebben
-        - subject: $locatie_op_openbare_weg
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Verordening precariobelasting Rotterdam 2024
-            article: '2'
-            url: https://lokaleregelgeving.overheid.nl/CVDR719500/1
-            explanation: Het terras moet zich bevinden op voor de openbare dienst bestemde gemeentegrond
-        - subject: $heeft_actieve_vergunning
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Verordening precariobelasting Rotterdam 2024
-            article: '2'
-            url: https://lokaleregelgeving.overheid.nl/CVDR719500/1
-            explanation: Precariobelasting is verschuldigd voor terrassen waarvoor een terrasvergunning is verleend
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $heeft_terras
+            operation: EQUALS
+            value: true
+          - subject: $locatie_op_openbare_weg
+            operation: EQUALS
+            value: true
+          - subject: $heeft_actieve_vergunning
+            operation: EQUALS
+            value: true
       - output: is_belastingplichtig
         value: true
         legal_basis:

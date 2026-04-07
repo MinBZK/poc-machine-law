@@ -334,6 +334,8 @@ articles:
             type: string
             value: terras
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: heeft_recht_op_terrasvergunning
         type: boolean
       - name: weigeringsgrond
@@ -350,84 +352,44 @@ articles:
         type: number
       - name: precariobelasting_verschuldigd
         type: boolean
-      requirements:
-      - all:
-        - subject: $heeft_exploitatievergunning
-          operation: EQUALS
-          value: true
-          legal_basis:
-            law: Algemene plaatselijke verordening Rotterdam 2012
-            article: '2:28'
-            url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
-            explanation: Een terras vereist eerst een exploitatievergunning voor het horecabedrijf
-        - subject: $bag_gebruiksdoel
-          operation: IN
-          values: $toegestane_gebruiksdoelen
-          legal_basis:
-            law: Wet basisregistratie adressen en gebouwen
-            bwb_id: BWBR0023466
-            article: '6'
-            url: https://wetten.overheid.nl/BWBR0023466/2022-01-01#Hoofdstuk2_Artikel6
-            explanation: Het pand moet een horecafunctie hebben volgens BAG
-        - operation: GREATER_THAN_OR_EQUAL
-          values:
-          - $obstakelvrije_ruimte
-          - $minimale_obstakelvrije_ruimte
-          legal_basis:
-            law: Algemene plaatselijke verordening Rotterdam 2012
-            article: 2:30b
-            paragraph: '3'
-            url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
-            explanation: Er moet minimaal 1,8 meter obstakelvrije ruimte blijven voor voetgangers en hulpdiensten
-        - operation: LESS_THAN_OR_EQUAL
-          values:
-          - $terras_oppervlakte
-          - $bgt_oppervlakte_beschikbaar
-          legal_basis:
-            law: Algemene plaatselijke verordening Rotterdam 2012
-            article: 2:30b
-            url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
-            explanation: De gevraagde oppervlakte mag niet groter zijn dan de beschikbare ruimte
-        - subject: $bgt_functie_oppervlak
-          operation: IN
-          values: $toegestane_bgt_functies
-          legal_basis:
-            law: Algemene plaatselijke verordening Rotterdam 2012
-            article: 2:30b
-            url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
-            explanation: Een terras mag alleen op daarvoor geschikte oppervlakken worden geplaatst
-        - operation: LESS_THAN_OR_EQUAL
-          values:
-          - $gewenste_sluitingstijd_doordeweeks
-          - $maximale_sluitingstijd_doordeweeks
-          legal_basis:
-            law: Algemene plaatselijke verordening Rotterdam 2012
-            article: '2:29'
-            url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
-            explanation: Terrassen mogen doordeweeks (zo-do) maximaal tot 01:00 uur open zijn
-        - operation: LESS_THAN_OR_EQUAL
-          values:
-          - $gewenste_sluitingstijd_weekend
-          - $maximale_sluitingstijd_weekend
-          legal_basis:
-            law: Algemene plaatselijke verordening Rotterdam 2012
-            article: '2:29'
-            url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
-            explanation: Terrassen mogen in het weekend (vr-za) maximaal tot 02:00 uur open zijn
-        - or:
-          - subject: $schenkt_alcohol
-            operation: EQUALS
-            value: false
-          - subject: $heeft_alcoholvergunning
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $heeft_exploitatievergunning
             operation: EQUALS
             value: true
-          legal_basis:
-            law: Alcoholwet
-            bwb_id: BWBR0002458
-            article: '3'
-            url: https://wetten.overheid.nl/BWBR0002458/2025-02-12#Paragraaf2_Artikel3
-            explanation: Voor het schenken van alcohol op het terras is een alcoholvergunning vereist
-      actions:
+          - subject: $bag_gebruiksdoel
+            operation: IN
+            values: $toegestane_gebruiksdoelen
+          - operation: GREATER_THAN_OR_EQUAL
+            values:
+            - $obstakelvrije_ruimte
+            - $minimale_obstakelvrije_ruimte
+          - operation: LESS_THAN_OR_EQUAL
+            values:
+            - $terras_oppervlakte
+            - $bgt_oppervlakte_beschikbaar
+          - subject: $bgt_functie_oppervlak
+            operation: IN
+            values: $toegestane_bgt_functies
+          - operation: LESS_THAN_OR_EQUAL
+            values:
+            - $gewenste_sluitingstijd_doordeweeks
+            - $maximale_sluitingstijd_doordeweeks
+          - operation: LESS_THAN_OR_EQUAL
+            values:
+            - $gewenste_sluitingstijd_weekend
+            - $maximale_sluitingstijd_weekend
+          - operation: OR
+            conditions:
+            - subject: $schenkt_alcohol
+              operation: EQUALS
+              value: false
+            - subject: $heeft_alcoholvergunning
+              operation: EQUALS
+              value: true
       - output: heeft_recht_op_terrasvergunning
         value:
           operation: AND

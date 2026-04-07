@@ -117,6 +117,8 @@ articles:
         source_reference:
           source_type: claim
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_gerechtigd
         type: boolean
       - name: jaarbedrag
@@ -125,24 +127,26 @@ articles:
           unit: eurocent
           precision: 0
           min: 0
-      requirements:
-      - all:
-        - operation: OR
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
           conditions:
-          - subject: $partner_bsn
-            operation: IS_NULL
           - operation: OR
             conditions:
-            - subject: $partner_gewerkte_uren
-              operation: GREATER_THAN_OR_EQUAL
-              value: $min_hours_partner
-            - subject: $verwachte_partner_uren
-              operation: GREATER_THAN_OR_EQUAL
-              value: $min_hours_per_week
-        - subject: $gewerkte_uren
-          operation: GREATER_THAN
-          value: 0
-      actions:
+            - subject: $partner_bsn
+              operation: IS_NULL
+            - operation: OR
+              conditions:
+              - subject: $partner_gewerkte_uren
+                operation: GREATER_THAN_OR_EQUAL
+                value: $min_hours_partner
+              - subject: $verwachte_partner_uren
+                operation: GREATER_THAN_OR_EQUAL
+                value: $min_hours_per_week
+          - subject: $gewerkte_uren
+            operation: GREATER_THAN
+            value: 0
       - output: is_gerechtigd
         value: true
       - output: jaarbedrag

@@ -51,6 +51,8 @@ articles:
             type: string
             value: $bsn
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: heeft_delegaties
         type: boolean
       - name: subject_ids
@@ -67,19 +69,13 @@ articles:
         type: array
       - name: valid_until_dates
         type: array
-      requirements:
-      - operation: NOT
-        value:
-          operation: IS_NULL
-          subject: $curatele_registraties
-        legal_basis:
-          law: Burgerlijk Wetboek Boek 1
-          bwb_id: BWBR0002656
-          article: '391'
-          url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling4_Artikel391
-          juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=391&z=2024-01-01&g=2024-01-01
-          explanation: Persoon moet als curator zijn geregistreerd in het CCBR
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $curatele_registraties
       - output: actieve_curatele
         value:
           operation: FOREACH

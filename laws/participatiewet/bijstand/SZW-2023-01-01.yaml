@@ -207,6 +207,8 @@ articles:
           parameters:
             bsn: $bsn
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: is_gerechtigd
         type: boolean
       - name: basisbedrag
@@ -221,200 +223,82 @@ articles:
           precision: 2
           min: 0
           max: 1
-      requirements:
-      - all:
-        - subject: $leeftijd
-          operation: GREATER_THAN_OR_EQUAL
-          value: $minimum_leeftijd
-          legal_basis:
-            law: Participatiewet
-            bwb_id: BWBR0015703
-            article: '9'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel9
-            juriconnect: jci1.3:c:BWBR0015703&artikel=9&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 9 lid 1 bepaalt de minimumleeftijd van 18 jaar
-        - subject: $leeftijd
-          operation: LESS_THAN
-          value: $pensioenleeftijd
-          legal_basis:
-            law: Participatiewet
-            bwb_id: BWBR0015703
-            article: '9'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel9
-            juriconnect: jci1.3:c:BWBR0015703&artikel=9&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 9 lid 1 bepaalt de maximumleeftijd als de pensioengerechtigde leeftijd
-        - or:
-          - subject: $heeft_nederlandse_nationaliteit
-            operation: EQUALS
-            value: true
-            legal_basis:
-              law: Participatiewet
-              bwb_id: BWBR0015703
-              article: '11'
-              paragraph: '1'
-              url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11
-              juriconnect: jci1.3:c:BWBR0015703&artikel=11&lid=1&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 11 lid 1 geeft Nederlanders recht op bijstand
-          - operation: IN
-            subject: $verblijfsvergunning_type
-            values: $geldige_verblijfsvergunningen
-            legal_basis:
-              law: Participatiewet
-              bwb_id: BWBR0015703
-              article: '11'
-              paragraph: '2'
-              url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11
-              juriconnect: jci1.3:c:BWBR0015703&artikel=11&lid=2&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 11 lid 2 geeft vreemdelingen met rechtmatig verblijf recht op bijstand
-        - operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $verblijfsadres
-          legal_basis:
-            law: Participatiewet
-            bwb_id: BWBR0015703
-            article: '11'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11
-            juriconnect: jci1.3:c:BWBR0015703&artikel=11&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 11 lid 1 vereist dat men in Nederland verblijft
-        - or:
-          - subject: $is_student
-            operation: EQUALS
-            value: false
-            legal_basis:
-              law: Participatiewet
-              bwb_id: BWBR0015703
-              article: '13'
-              paragraph: '2'
-              sentence: h
-              url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel13
-              juriconnect: jci1.3:c:BWBR0015703&artikel=13&lid=2&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 13 lid 2 onder h sluit studenten uit
-          - subject: $ontvangt_studiefinanciering
-            operation: EQUALS
-            value: false
-            legal_basis:
-              law: Participatiewet
-              bwb_id: BWBR0015703
-              article: '13'
-              paragraph: '2'
-              sentence: h
-              url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel13
-              juriconnect: jci1.3:c:BWBR0015703&artikel=13&lid=2&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 13 lid 2 onder h sluit personen met studiefinanciering uit
-        - subject: $is_gedetineerde
-          operation: EQUALS
-          value: false
-          legal_basis:
-            law: Participatiewet
-            bwb_id: BWBR0015703
-            article: '13'
-            paragraph: '1'
-            sentence: a
-            url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel13
-            juriconnect: jci1.3:c:BWBR0015703&artikel=13&lid=1&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 13 lid 1 onder a sluit gedetineerden uit van bijstand
-        - operation: IF
-          legal_basis:
-            law: Participatiewet
-            bwb_id: BWBR0015703
-            article: '34'
-            url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel34
-            juriconnect: jci1.3:c:BWBR0015703&artikel=34&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 34 bepaalt de vermogenstoets voor het recht op bijstand
-          cases:
-          - when:
-              subject: $heeft_partner
-              operation: EQUALS
-              value: true
-            then:
-              operation: LESS_THAN
-              legal_basis:
-                law: Participatiewet
-                bwb_id: BWBR0015703
-                article: '34'
-                paragraph: '3'
-                url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel34
-                juriconnect: jci1.3:c:BWBR0015703&artikel=34&lid=3&z=2025-01-01&g=2025-01-01
-                explanation: Artikel 34 lid 3 bepaalt de vermogensgrens voor gehuwden
-              values:
-              - operation: ADD
-                legal_basis:
-                  law: Participatiewet
-                  bwb_id: BWBR0015703
-                  article: '34'
-                  paragraph: '2'
-                  url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel34
-                  juriconnect: jci1.3:c:BWBR0015703&artikel=34&lid=2&z=2025-01-01&g=2025-01-01
-                  explanation: Artikel 34 lid 2 bepaalt dat vermogen van beide partners meetelt
-                values:
-                - $bezittingen
-                - $partner_bezittingen
-              - $vermogensgrens_partner
-          default:
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $leeftijd
+            operation: GREATER_THAN_OR_EQUAL
+            value: $minimum_leeftijd
+          - subject: $leeftijd
             operation: LESS_THAN
-            legal_basis:
-              law: Participatiewet
-              bwb_id: BWBR0015703
-              article: '34'
-              paragraph: '3'
-              url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel34
-              juriconnect: jci1.3:c:BWBR0015703&artikel=34&lid=3&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 34 lid 3 bepaalt de vermogensgrens voor alleenstaanden
-            values:
-            - $bezittingen
-            - $vermogensgrens_alleenstaand
-        - operation: IF
-          legal_basis:
-            law: Participatiewet
-            bwb_id: BWBR0015703
-            article: '19'
-            url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.1_Artikel19
-            juriconnect: jci1.3:c:BWBR0015703&artikel=19&z=2025-01-01&g=2025-01-01
-            explanation: |-
-              Artikel 19 bepaalt dat bijstand wordt verleend voor zover de belanghebbende niet over voldoende middelen beschikt om in de noodzakelijke kosten van het bestaan te voorzien
-          cases:
-          - when:
-              subject: $heeft_partner
+            value: $pensioenleeftijd
+          - operation: OR
+            conditions:
+            - subject: $heeft_nederlandse_nationaliteit
               operation: EQUALS
               value: true
-            then:
+            - operation: IN
+              subject: $verblijfsvergunning_type
+              values: $geldige_verblijfsvergunningen
+          - operation: NOT
+            value:
+              operation: IS_NULL
+              subject: $verblijfsadres
+          - operation: OR
+            conditions:
+            - subject: $is_student
+              operation: EQUALS
+              value: false
+            - subject: $ontvangt_studiefinanciering
+              operation: EQUALS
+              value: false
+          - subject: $is_gedetineerde
+            operation: EQUALS
+            value: false
+          - operation: IF
+            cases:
+            - when:
+                subject: $heeft_partner
+                operation: EQUALS
+                value: true
+              then:
+                operation: LESS_THAN
+                values:
+                - operation: ADD
+                  values:
+                  - $bezittingen
+                  - $partner_bezittingen
+                - $vermogensgrens_partner
+            default:
               operation: LESS_THAN
-              legal_basis:
-                law: Participatiewet
-                bwb_id: BWBR0015703
-                article: '31'
-                paragraph: '2'
-                url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel31
-                juriconnect: jci1.3:c:BWBR0015703&artikel=31&lid=2&z=2025-01-01&g=2025-01-01
-                explanation: Artikel 31 lid 2 bepaalt dat het inkomen van beide partners in aanmerking wordt genomen
+              values:
+              - $bezittingen
+              - $vermogensgrens_alleenstaand
+          - operation: IF
+            cases:
+            - when:
+                subject: $heeft_partner
+                operation: EQUALS
+                value: true
+              then:
+                operation: LESS_THAN
+                values:
+                - operation: ADD
+                  values:
+                  - $inkomen
+                  - $bedrijfsinkomen
+                  - $partner_inkomen
+                - $basisbedrag_partners_21_plus
+            default:
+              operation: LESS_THAN
               values:
               - operation: ADD
                 values:
                 - $inkomen
                 - $bedrijfsinkomen
-                - $partner_inkomen
-              - $basisbedrag_partners_21_plus
-          default:
-            operation: LESS_THAN
-            legal_basis:
-              law: Participatiewet
-              bwb_id: BWBR0015703
-              article: '31'
-              paragraph: '2'
-              url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel31
-              juriconnect: jci1.3:c:BWBR0015703&artikel=31&lid=2&z=2025-01-01&g=2025-01-01
-              explanation: Artikel 31 lid 2 bepaalt welke inkomsten in aanmerking worden genomen voor de bijstandsberekening
-            values:
-            - operation: ADD
-              values:
-              - $inkomen
-              - $bedrijfsinkomen
-            - $basisbedrag_alleenstaand_21_plus
-      actions:
+              - $basisbedrag_alleenstaand_21_plus
       - output: is_gerechtigd
         value: true
         legal_basis:

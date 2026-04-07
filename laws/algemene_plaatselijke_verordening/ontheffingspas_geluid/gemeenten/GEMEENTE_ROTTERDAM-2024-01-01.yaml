@@ -81,6 +81,8 @@ articles:
             type: string
             value: $kvk_nummer
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: komt_in_aanmerking_voor_geluidsontheffing
         type: boolean
       - name: aantal_verleende_ontheffingen_dit_jaar
@@ -95,50 +97,32 @@ articles:
         type: boolean
       - name: maximale_eindtijd
         type: string
-      requirements:
-      - all:
-        - operation: EQUALS
-          subject: $kvk_status
-          value: Actief
-          legal_basis:
-            law: Algemene plaatselijke verordening Rotterdam 2012
-            article: '4:2'
-            url: https://lokaleregelgeving.overheid.nl/CVDR373493
-            explanation: Het bedrijf moet actief zijn in het Handelsregister
-        - operation: EQUALS
-          subject: $heeft_geluidsklachten
-          value: false
-          legal_basis:
-            law: Algemene plaatselijke verordening Rotterdam 2012
-            article: '4:2'
-            url: https://lokaleregelgeving.overheid.nl/CVDR373493
-            explanation: Er mogen geen bekende geluidsklachten zijn over het bedrijf
-        - operation: LESS_THAN
-          subject:
-            operation: LENGTH
-            subject: $verleende_ontheffingen_dit_jaar
-          value: $max_ontheffingen_per_jaar
-          legal_basis:
-            law: Algemene plaatselijke verordening Rotterdam 2012
-            article: '4:2'
-            url: https://lokaleregelgeving.overheid.nl/CVDR373493
-            explanation: Er mogen maximaal 12 geluidsontheffingen per kalenderjaar worden verleend
-        - operation: GREATER_THAN_OR_EQUAL
-          subject:
-            operation: SUBTRACT_DATE
-            values:
-            - operation: COMBINE_DATETIME
-              date: $activiteitsdatum
-              time: $activiteitsstarttijd
-            - $calculation_date
-            unit: hours
-          value: $min_aanvraagtermijn_uren
-          legal_basis:
-            law: Algemene plaatselijke verordening Rotterdam 2012
-            article: '4:2'
-            url: https://lokaleregelgeving.overheid.nl/CVDR373493
-            explanation: De aanvraag moet minimaal 48 uur voor het begin van de activiteit worden ingediend
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - operation: EQUALS
+            subject: $kvk_status
+            value: Actief
+          - operation: EQUALS
+            subject: $heeft_geluidsklachten
+            value: false
+          - operation: LESS_THAN
+            subject:
+              operation: LENGTH
+              subject: $verleende_ontheffingen_dit_jaar
+            value: $max_ontheffingen_per_jaar
+          - operation: GREATER_THAN_OR_EQUAL
+            subject:
+              operation: SUBTRACT_DATE
+              values:
+              - operation: COMBINE_DATETIME
+                date: $activiteitsdatum
+                time: $activiteitsstarttijd
+              - $calculation_date
+              unit: hours
+            value: $min_aanvraagtermijn_uren
       - output: aantal_verleende_ontheffingen_dit_jaar
         value:
           operation: LENGTH

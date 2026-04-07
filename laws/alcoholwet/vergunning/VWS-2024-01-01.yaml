@@ -55,6 +55,8 @@ articles:
         type: string
         required: true
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: voldoet_aan_leeftijdseis
         type: boolean
       - name: voldoet_aan_curatele_eis
@@ -71,61 +73,37 @@ articles:
         type: boolean
       - name: weigeringsgrond_nationaal
         type: string
-      requirements:
-      - all:
-        - operation: GREATER_THAN_OR_EQUAL
-          subject: $leeftijd_leidinggevende
-          value: $minimale_leeftijd
-          legal_basis:
-            law: Alcoholwet
-            bwb_id: BWBR0002458
-            article: '8'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8
-            explanation: 'Artikel 8 lid 1 onder a: leidinggevenden moeten de leeftijd van eenentwintig jaar hebben bereikt'
-        - subject: $is_onder_curatele
-          operation: EQUALS
-          value: false
-          legal_basis:
-            law: Alcoholwet
-            bwb_id: BWBR0002458
-            article: '8'
-            paragraph: '1'
-            url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8
-            explanation: 'Artikel 8 lid 1 onder c: leidinggevenden mogen niet onder curatele staan'
-        - or:
-          - operation: NOT
-            value:
-              operation: EQUALS
-              subject: $type_bedrijf
-              value: $type_horecabedrijf
-          - operation: GREATER_THAN_OR_EQUAL
-            subject: $vloeroppervlakte
-            value: $minimale_vloeroppervlakte_horeca
-          legal_basis:
-            law: Alcoholwet
-            bwb_id: BWBR0002458
-            article: '10'
-            paragraph: '2'
-            url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10
-            explanation: 'Artikel 10 lid 2: een horecalokaliteit moet ten minste 35 m² vloeroppervlakte hebben'
-        - or:
-          - operation: NOT
-            value:
-              operation: EQUALS
-              subject: $type_bedrijf
-              value: $type_slijtersbedrijf
-          - operation: GREATER_THAN_OR_EQUAL
-            subject: $vloeroppervlakte
-            value: $minimale_vloeroppervlakte_slijterij
-          legal_basis:
-            law: Alcoholwet
-            bwb_id: BWBR0002458
-            article: '10'
-            paragraph: '2'
-            url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10
-            explanation: 'Artikel 10 lid 2: een slijtlokaliteit moet ten minste 15 m² vloeroppervlakte hebben'
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - operation: GREATER_THAN_OR_EQUAL
+            subject: $leeftijd_leidinggevende
+            value: $minimale_leeftijd
+          - subject: $is_onder_curatele
+            operation: EQUALS
+            value: false
+          - operation: OR
+            conditions:
+            - operation: NOT
+              value:
+                operation: EQUALS
+                subject: $type_bedrijf
+                value: $type_horecabedrijf
+            - operation: GREATER_THAN_OR_EQUAL
+              subject: $vloeroppervlakte
+              value: $minimale_vloeroppervlakte_horeca
+          - operation: OR
+            conditions:
+            - operation: NOT
+              value:
+                operation: EQUALS
+                subject: $type_bedrijf
+                value: $type_slijtersbedrijf
+            - operation: GREATER_THAN_OR_EQUAL
+              subject: $vloeroppervlakte
+              value: $minimale_vloeroppervlakte_slijterij
       - output: voldoet_aan_leeftijdseis
         value:
           operation: GREATER_THAN_OR_EQUAL

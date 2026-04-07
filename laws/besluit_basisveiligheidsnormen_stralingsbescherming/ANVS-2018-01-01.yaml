@@ -62,6 +62,8 @@ articles:
           precision: 2
           min: 0
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: verwachte_dosis_bevolking
         type: number
         type_spec:
@@ -73,11 +75,12 @@ articles:
         type: boolean
       - name: overschreden_limieten
         type: array
-      requirements:
-      - subject: $verwachte_dosis_jaar
-        operation: GREATER_THAN_OR_EQUAL
-        value: 0
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          subject: $verwachte_dosis_jaar
+          operation: GREATER_THAN_OR_EQUAL
+          value: 0
       - output: verwachte_dosis_bevolking
         value: $verwachte_dosis_jaar
         legal_basis:

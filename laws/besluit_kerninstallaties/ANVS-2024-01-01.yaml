@@ -100,6 +100,8 @@ articles:
           precision: 0
           min: 0
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: financiele_zekerheid_gesteld
         type: boolean
       - name: beveiligingsplan_voldoet
@@ -110,11 +112,12 @@ articles:
         type: boolean
       - name: administratieve_eisen_voldaan
         type: boolean
-      requirements:
-      - subject: $financiele_zekerheid_bedrag
-        operation: GREATER_THAN_OR_EQUAL
-        value: 0
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          subject: $financiele_zekerheid_bedrag
+          operation: GREATER_THAN_OR_EQUAL
+          value: 0
       - output: financiele_zekerheid_gesteld
         value:
           operation: IF

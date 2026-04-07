@@ -71,27 +71,24 @@ articles:
             description: Type verkiezing
             type: string
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: heeft_stemrecht
         type: boolean
-      requirements:
-      - legal_basis:
-          law: Kieswet
-          bwb_id: BWBR0004627
-          article: B1
-          url: https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1
-          juriconnect: jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12
-          explanation: De vereisten voor kiesrecht zijn bepaald in artikel B1 en B3 van de Kieswet
-        all:
-        - subject: $nationaliteit
-          operation: EQUALS
-          value: true
-        - subject: $leeftijd
-          operation: GREATER_THAN_OR_EQUAL
-          value: $minimum_leeftijd
-        - subject: $gerechtelijke_uitsluiting
-          operation: EQUALS
-          value: false
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $nationaliteit
+            operation: EQUALS
+            value: true
+          - subject: $leeftijd
+            operation: GREATER_THAN_OR_EQUAL
+            value: $minimum_leeftijd
+          - subject: $gerechtelijke_uitsluiting
+            operation: EQUALS
+            value: false
       - output: heeft_stemrecht
         value:
           operation: AND

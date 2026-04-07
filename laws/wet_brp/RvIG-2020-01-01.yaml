@@ -162,6 +162,8 @@ articles:
             description: Huisnummer van het adres van de persoon
             type: string
       output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
       - name: leeftijd
         type: number
         type_spec:
@@ -205,13 +207,15 @@ articles:
         type: array
       - name: heeft_kinderen_onder_12
         type: boolean
-      requirements:
-      - all:
-        - operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $geboortedatum
       actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - operation: NOT
+            value:
+              operation: IS_NULL
+              subject: $geboortedatum
       - output: geboortedatum
         value: $geboortedatum
       - output: partner_geboortedatum
@@ -399,7 +403,7 @@ articles:
                 subject: $huishouden
             then: $huishouden
           default:
-            value: null
+            value:
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -418,7 +422,7 @@ articles:
                 subject: $kinderen_gegevens
             then: $kinderen_gegevens
           default:
-            value: null
+            value:
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
