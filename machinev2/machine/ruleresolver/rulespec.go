@@ -187,6 +187,12 @@ type Parameter struct {
 	Reference string `yaml:"reference"`
 }
 
+// Case represents a case in the new IF format (cases/when/then + default)
+type Case struct {
+	When *Action      `yaml:"when,omitempty"`
+	Then *ActionValue `yaml:"then,omitempty"`
+}
+
 // Action defines an action to be performed
 type Action struct {
 	Output     string        `yaml:"output"`
@@ -197,6 +203,62 @@ type Action struct {
 	Combine    *string       `yaml:"combine,omitempty"`
 	Values     *ActionValues `yaml:"values,omitempty"`
 	Conditions []Condition   `yaml:"conditions,omitempty"`
+	// v0.5.0 IF with cases/when/default
+	Cases   []Case       `yaml:"cases,omitempty"`
+	Default *ActionValue `yaml:"default,omitempty"`
+	// v0.5.0 AGE operation
+	DateOfBirth *ActionValue `yaml:"date_of_birth,omitempty"`
+	RefDate     *ActionValue `yaml:"reference_date,omitempty"`
+	// v0.5.0 DATE_ADD with named parameters
+	Date   *ActionValue `yaml:"date,omitempty"`
+	Years  *ActionValue `yaml:"years,omitempty"`
+	Months *ActionValue `yaml:"months,omitempty"`
+	Weeks  *ActionValue `yaml:"weeks,omitempty"`
+	Days   *ActionValue `yaml:"days,omitempty"`
+	// v0.5.0 DATE operation
+	Year  *ActionValue `yaml:"year,omitempty"`
+	Month *ActionValue `yaml:"month,omitempty"`
+	Day   *ActionValue `yaml:"day,omitempty"`
+	// v0.5.0 LIST operation
+	Items []ActionValue `yaml:"items,omitempty"`
+}
+
+// UnmarshalYAML custom unmarshaler for Action that handles the dual meaning of
+// "conditions" (old-style IF test/then/else vs new-style AND/OR action list)
+func (a *Action) UnmarshalYAML(unmarshal func(any) error) error {
+	// Use an alias to avoid infinite recursion
+	type actionAlias Action
+	var alias actionAlias
+	if err := unmarshal(&alias); err != nil {
+		return err
+	}
+	*a = Action(alias)
+
+	// If operation is AND or OR and Values is nil but Conditions is set,
+	// check if conditions contain operations (not test/then/else).
+	// In v0.5.0 AND/OR, "conditions" is a list of operations, not Condition structs.
+	if a.Operation != nil && (*a.Operation == "AND" || *a.Operation == "OR") && a.Values == nil && len(a.Conditions) > 0 {
+		// The conditions were parsed as []Condition but they are really operations.
+		// Re-parse from raw YAML to get them as ActionValues.
+		var raw map[string]interface{}
+		if err := unmarshal(&raw); err == nil {
+			if condRaw, ok := raw["conditions"]; ok {
+				if condList, ok := condRaw.([]interface{}); ok {
+					// Re-marshal and unmarshal as ActionValues
+					condData, err := yaml.Marshal(condList)
+					if err == nil {
+						var avs []ActionValue
+						if err := yaml.Unmarshal(condData, &avs); err == nil {
+							a.Values = &ActionValues{ActionValues: &avs}
+							a.Conditions = nil
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 func (a Action) IsEmpty() bool {
@@ -207,7 +269,20 @@ func (a Action) IsEmpty() bool {
 		a.Unit == nil &&
 		a.Combine == nil &&
 		a.Values == nil &&
-		a.Conditions == nil
+		a.Conditions == nil &&
+		a.Cases == nil &&
+		a.Default == nil &&
+		a.DateOfBirth == nil &&
+		a.RefDate == nil &&
+		a.Date == nil &&
+		a.Years == nil &&
+		a.Months == nil &&
+		a.Weeks == nil &&
+		a.Days == nil &&
+		a.Year == nil &&
+		a.Month == nil &&
+		a.Day == nil &&
+		a.Items == nil
 }
 
 func (a Action) GetValue() any {
@@ -505,8 +580,14 @@ const (
 	OperationForeach        OperationType = "FOREACH"
 	OperationSubtractDate   OperationType = "SUBTRACT_DATE"
 	OperationAddDate        OperationType = "ADD_DATE"
-	OperationIsNull         OperationType = "IS_NULL"
-	OperationNotNull        OperationType = "NOT_NULL"
+	OperationIsNull                OperationType = "IS_NULL"
+	OperationNotNull               OperationType = "NOT_NULL"
+	OperationGreaterThanOrEqual    OperationType = "GREATER_THAN_OR_EQUAL"
+	OperationLessThanOrEqual       OperationType = "LESS_THAN_OR_EQUAL"
+	OperationAge                   OperationType = "AGE"
+	OperationDateAdd               OperationType = "DATE_ADD"
+	OperationDate                  OperationType = "DATE"
+	OperationList                  OperationType = "LIST"
 )
 
 // v0.5.0 Article-based structure

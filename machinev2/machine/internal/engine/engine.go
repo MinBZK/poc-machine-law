@@ -295,6 +295,55 @@ func analyzeDependencies(action ruleresolver.Action) map[string]struct{} {
 		for i := range v.Conditions {
 			traverseCondition(v.Conditions[i])
 		}
+		// v0.5.0 cases/when/default
+		for _, c := range v.Cases {
+			if c.When != nil {
+				traverseAction(*c.When)
+			}
+			if c.Then != nil {
+				traverseActionValue(*c.Then)
+			}
+		}
+		if v.Default != nil {
+			traverseActionValue(*v.Default)
+		}
+		// v0.5.0 AGE fields
+		if v.DateOfBirth != nil {
+			traverseActionValue(*v.DateOfBirth)
+		}
+		if v.RefDate != nil {
+			traverseActionValue(*v.RefDate)
+		}
+		// v0.5.0 DATE_ADD named params
+		if v.Date != nil {
+			traverseActionValue(*v.Date)
+		}
+		if v.Years != nil {
+			traverseActionValue(*v.Years)
+		}
+		if v.Months != nil {
+			traverseActionValue(*v.Months)
+		}
+		if v.Weeks != nil {
+			traverseActionValue(*v.Weeks)
+		}
+		if v.Days != nil {
+			traverseActionValue(*v.Days)
+		}
+		// v0.5.0 DATE fields
+		if v.Year != nil {
+			traverseActionValue(*v.Year)
+		}
+		if v.Month != nil {
+			traverseActionValue(*v.Month)
+		}
+		if v.Day != nil {
+			traverseActionValue(*v.Day)
+		}
+		// v0.5.0 LIST items
+		for i := range v.Items {
+			traverseActionValue(v.Items[i])
+		}
 	}
 
 	traverse = func(obj any) {
@@ -790,7 +839,7 @@ func (re *RulesEngine) evaluateRequirements(
 	return true, nil
 }
 
-// evaluateIfOperation evaluates an IF operation
+// evaluateIfOperation evaluates an IF operation (supports both old and new format)
 func (re *RulesEngine) evaluateIfOperation(
 	ctx context.Context,
 	operation ruleresolver.Action,
@@ -809,62 +858,98 @@ func (re *RulesEngine) evaluateIfOperation(
 	var result any
 	conditionResults := make([]any, 0)
 
-	for i, condition := range operation.Conditions {
-		conditionResult := map[string]any{
-			"condition_index": i,
-		}
-
-		if condition.Test != nil {
-			conditionResult["type"] = "test"
-
-			testResult, err := re.evaluateOperation(ctx, *condition.Test, ruleCtx)
-			if err != nil {
-				return nil, err
+	if len(operation.Cases) > 0 {
+		// New format: cases/when/then + default
+		matched := false
+		for i, c := range operation.Cases {
+			conditionResult := map[string]any{
+				"condition_index": i,
 			}
 
-			conditionResult["test_result"] = testResult
+			if c.When != nil {
+				conditionResult["type"] = "when"
 
-			// Convert to boolean
-			test := false
-			switch v := testResult.(type) {
-			case bool:
-				test = v
-			case int:
-				test = v != 0
-			case int64:
-				test = v != 0
-			case float64:
-				test = v != 0
-			default:
-				test = testResult != nil
-			}
-
-			if test {
-				thenVal, err := re.evaluateActionValue(ctx, ruleCtx, *condition.Then)
+				testResult, err := re.evaluateOperation(ctx, *c.When, ruleCtx)
 				if err != nil {
 					return nil, err
 				}
 
-				result = thenVal
-				conditionResult["then_value"] = result
-				conditionResults = append(conditionResults, conditionResult)
-				break
-			}
-		} else if condition.Else != nil {
-			conditionResult["type"] = "else"
+				conditionResult["test_result"] = testResult
 
-			val, err := re.evaluateActionValue(ctx, ruleCtx, *condition.Else)
+				if isTruthy(testResult) && c.Then != nil {
+					thenVal, err := re.evaluateActionValue(ctx, ruleCtx, *c.Then)
+					if err != nil {
+						return nil, err
+					}
+
+					result = thenVal
+					conditionResult["then_value"] = result
+					conditionResults = append(conditionResults, conditionResult)
+					matched = true
+					break
+				}
+			}
+
+			conditionResults = append(conditionResults, conditionResult)
+		}
+
+		if !matched && operation.Default != nil {
+			// No case matched, use default
+			val, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Default)
 			if err != nil {
 				return nil, err
 			}
 
 			result = val
-			conditionResult["else_value"] = result
-			conditionResults = append(conditionResults, conditionResult)
-			break
+			conditionResults = append(conditionResults, map[string]any{
+				"type":          "default",
+				"default_value": result,
+			})
 		}
+	} else {
+		// Old format: conditions/test/then/else
+		for i, condition := range operation.Conditions {
+			conditionResult := map[string]any{
+				"condition_index": i,
+			}
 
-		conditionResults = append(conditionResults, conditionResult)
+			if condition.Test != nil {
+				conditionResult["type"] = "test"
+
+				testResult, err := re.evaluateOperation(ctx, *condition.Test, ruleCtx)
+				if err != nil {
+					return nil, err
+				}
+
+				conditionResult["test_result"] = testResult
+
+				if isTruthy(testResult) {
+					thenVal, err := re.evaluateActionValue(ctx, ruleCtx, *condition.Then)
+					if err != nil {
+						return nil, err
+					}
+
+					result = thenVal
+					conditionResult["then_value"] = result
+					conditionResults = append(conditionResults, conditionResult)
+					break
+				}
+			} else if condition.Else != nil {
+				conditionResult["type"] = "else"
+
+				val, err := re.evaluateActionValue(ctx, ruleCtx, *condition.Else)
+				if err != nil {
+					return nil, err
+				}
+
+				result = val
+				conditionResult["else_value"] = result
+				conditionResults = append(conditionResults, conditionResult)
+				break
+			}
+
+			conditionResults = append(conditionResults, conditionResult)
+		}
 	}
 
 	ifNode.Details["condition_results"] = conditionResults
@@ -1015,6 +1100,42 @@ var comparisonOps = map[string]func(a, b any) (bool, error){
 
 		return c <= 0, nil
 	},
+	// v0.5.0 aliases
+	"GREATER_THAN_OR_EQUAL": func(a, b any) (bool, error) {
+		c, err := utils.Compare(a, b)
+		if err != nil {
+			return false, err
+		}
+
+		return c >= 0, nil
+	},
+	"LESS_THAN_OR_EQUAL": func(a, b any) (bool, error) {
+		c, err := utils.Compare(a, b)
+		if err != nil {
+			return false, err
+		}
+
+		return c <= 0, nil
+	},
+}
+
+// toInt converts various numeric types to int (best-effort, returns 0 on failure)
+func toInt(v any) int {
+	switch val := v.(type) {
+	case int:
+		return val
+	case int64:
+		return int(val)
+	case float64:
+		return int(val)
+	case string:
+		if i, err := strconv.Atoi(val); err == nil {
+			return i
+		}
+		return 0
+	default:
+		return 0
+	}
 }
 
 // Helper to convert various types to float64
@@ -1273,9 +1394,9 @@ func (re *RulesEngine) evaluateComparison(ctx context.Context, op string, left, 
 			return leftTime.After(rightTime), nil
 		case "LESS_THAN":
 			return leftTime.Before(rightTime), nil
-		case "GREATER_OR_EQUAL":
+		case "GREATER_OR_EQUAL", "GREATER_THAN_OR_EQUAL":
 			return leftTime.After(rightTime) || leftTime.Equal(rightTime), nil
-		case "LESS_OR_EQUAL":
+		case "LESS_OR_EQUAL", "LESS_THAN_OR_EQUAL":
 			return leftTime.Before(rightTime) || leftTime.Equal(rightTime), nil
 		}
 	}
@@ -1559,7 +1680,20 @@ func (re *RulesEngine) evaluateOperation(
 			return nil, err
 		}
 
-		result = subject == nil
+		// Treat nil and empty collections as null (matches EXISTS semantics:
+		// an empty list/map is semantically "no data" in the legal domain)
+		isNull := subject == nil
+		if !isNull {
+			switch v := subject.(type) {
+			case []any:
+				isNull = len(v) == 0
+			case map[string]any:
+				isNull = len(v) == 0
+			case map[any]any:
+				isNull = len(v) == 0
+			}
+		}
+		result = isNull
 		node.Details["subject_value"] = subject
 	case "EXISTS":
 		subject, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
@@ -1704,7 +1838,8 @@ func (re *RulesEngine) evaluateOperation(
 		node.Details["evaluated_values"] = values
 		node.Details["unit"] = unit
 
-	case "EQUALS", "NOT_EQUALS", "GREATER_THAN", "LESS_THAN", "GREATER_OR_EQUAL", "LESS_OR_EQUAL":
+	case "EQUALS", "NOT_EQUALS", "GREATER_THAN", "LESS_THAN", "GREATER_OR_EQUAL", "LESS_OR_EQUAL",
+		"GREATER_THAN_OR_EQUAL", "LESS_THAN_OR_EQUAL":
 		// Get values to compare
 		var subject, value any
 
@@ -1782,6 +1917,199 @@ func (re *RulesEngine) evaluateOperation(
 		node.Details["raw_values"] = operation.Values.GetValue()
 		node.Details["evaluated_values"] = values
 		node.Details["arithmetic_type"] = *operation.Operation
+
+	case "NOT":
+		// Negate a boolean value
+		if operation.Value != nil {
+			val, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Value)
+			if err != nil {
+				return nil, err
+			}
+			if val == nil {
+				result = nil
+			} else {
+				result = !isTruthy(val)
+			}
+			node.Details["value"] = val
+		} else {
+			result = nil
+		}
+		logr.Debugf("NOT result: %v", result)
+
+	case "AGE":
+		// Calculate complete years between date_of_birth and reference_date
+		if operation.DateOfBirth == nil || operation.RefDate == nil {
+			logr.WithIndent().Warningf("AGE: missing date_of_birth or reference_date fields")
+			result = nil
+		} else {
+			dob, err := re.evaluateActionValue(ctx, ruleCtx, *operation.DateOfBirth)
+			if err != nil {
+				return nil, err
+			}
+			ref, err := re.evaluateActionValue(ctx, ruleCtx, *operation.RefDate)
+			if err != nil {
+				return nil, err
+			}
+
+			if dob == nil || ref == nil {
+				ruleCtx.MissingRequired = true
+				logr.WithIndent().Warningf("AGE: missing date_of_birth (%v) or reference_date (%v)", dob, ref)
+				result = nil
+			} else {
+				dobTime, err := convertToTime(dob)
+				if err != nil {
+					logr.WithIndent().Warningf("AGE: cannot parse date_of_birth: %v", err)
+					result = nil
+				} else {
+					refTime, err := convertToTime(ref)
+					if err != nil {
+						logr.WithIndent().Warningf("AGE: cannot parse reference_date: %v", err)
+						result = nil
+					} else {
+						years := refTime.Year() - dobTime.Year()
+						if refTime.Month() < dobTime.Month() ||
+							(refTime.Month() == dobTime.Month() && refTime.Day() < dobTime.Day()) {
+							years--
+						}
+						result = years
+						logr.Debugf("AGE(%v, %v) = %d", dob, ref, years)
+					}
+				}
+			}
+			node.Details["date_of_birth"] = dob
+			node.Details["reference_date"] = ref
+		}
+
+	case "DATE_ADD":
+		// DATE_ADD with named parameters (v0.5.0) or positional values (old format)
+		if operation.Date != nil {
+			// v0.5.0 named-parameter format: date, years, months, weeks, days
+			baseDate, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Date)
+			if err != nil {
+				return nil, err
+			}
+			if baseDate == nil {
+				ruleCtx.MissingRequired = true
+				logr.WithIndent().Warningf("DATE_ADD: missing base date")
+				result = nil
+			} else {
+				baseDateT, err := convertToTime(baseDate)
+				if err != nil {
+					logr.WithIndent().Warningf("DATE_ADD: cannot parse base date: %v", err)
+					result = nil
+				} else {
+					years := 0
+					months := 0
+					weeks := 0
+					days := 0
+					if operation.Years != nil {
+						v, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Years)
+						if err != nil {
+							return nil, err
+						}
+						years = toInt(v)
+					}
+					if operation.Months != nil {
+						v, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Months)
+						if err != nil {
+							return nil, err
+						}
+						months = toInt(v)
+					}
+					if operation.Weeks != nil {
+						v, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Weeks)
+						if err != nil {
+							return nil, err
+						}
+						weeks = toInt(v)
+					}
+					if operation.Days != nil {
+						v, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Days)
+						if err != nil {
+							return nil, err
+						}
+						days = toInt(v)
+					}
+
+					resultDate := baseDateT.AddDate(years, months, weeks*7+days)
+					result = resultDate.Format("2006-01-02")
+					logr.Debugf("DATE_ADD(%v, y=%d, m=%d, w=%d, d=%d) = %s", baseDate, years, months, weeks, days, result)
+				}
+			}
+			node.Details["date"] = baseDate
+		} else if operation.Values != nil {
+			// Old positional format
+			var values []any
+			for _, v := range *operation.Values.ActionValues {
+				val, err := re.evaluateActionValue(ctx, ruleCtx, v)
+				if err != nil {
+					return nil, err
+				}
+				values = append(values, val)
+			}
+
+			unit := "days"
+			if operation.Unit != nil {
+				unit = *operation.Unit
+			}
+
+			dateResult, err := re.evaluateDateOperation(ctx, "ADD_DATE", values, unit)
+			if err != nil {
+				return nil, err
+			}
+			result = dateResult
+			node.Details["evaluated_values"] = values
+			node.Details["unit"] = unit
+		}
+
+	case "DATE":
+		// Construct a date from year, month, day
+		if operation.Year != nil && operation.Month != nil && operation.Day != nil {
+			yearVal, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Year)
+			if err != nil {
+				return nil, err
+			}
+			monthVal, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Month)
+			if err != nil {
+				return nil, err
+			}
+			dayVal, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Day)
+			if err != nil {
+				return nil, err
+			}
+
+			y := toInt(yearVal)
+			m := toInt(monthVal)
+			d := toInt(dayVal)
+			if y > 0 && m > 0 && d > 0 {
+				result = time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.UTC)
+				logr.Debugf("DATE(%d, %d, %d) = %v", y, m, d, result)
+			} else {
+				logr.WithIndent().Warningf("DATE: invalid components y=%d, m=%d, d=%d", y, m, d)
+				result = nil
+			}
+			node.Details["year"] = yearVal
+			node.Details["month"] = monthVal
+			node.Details["day"] = dayVal
+		} else {
+			logr.WithIndent().Warningf("DATE: missing year, month, or day")
+			result = nil
+		}
+
+	case "LIST":
+		// Construct a list from items
+		items := make([]any, 0, len(operation.Items))
+		for _, item := range operation.Items {
+			val, err := re.evaluateActionValue(ctx, ruleCtx, item)
+			if err != nil {
+				return nil, err
+			}
+			items = append(items, val)
+		}
+		result = items
+		node.Details["items"] = items
+		logr.Debugf("LIST result: %v", result)
+
 	default:
 		result = nil
 		node.Details["error"] = "Invalid operation format"
