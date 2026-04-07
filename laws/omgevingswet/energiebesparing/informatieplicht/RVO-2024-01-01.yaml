@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: omgevingswet/energiebesparing/informatieplicht
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,11 @@ uuid: d4ecfc05-c1a3-48f4-bd1c-184390cd0013
 discoverable: BUSINESS
 articles:
 - number: 5.15d
-  text: ''
+  text: Als voor de inwerkingtreding van dit besluit gegevens en bescheiden zijn verstrekt of hadden moeten worden verstrekt
+    als bedoeld in artikel 2.15, tweede, negende of tiende lid, van het Activiteitenbesluit milieubeheer, blijft artikel 2.15
+    van dat besluit, zoals dat luidde voor de inwerkingtreding van dit besluit voor zover gericht op de verplichtingen als
+    bedoeld in artikel 2.15, tweede, negende of tiende lid, en de regels die bij of krachtens dat artikel in samenhang met
+    artikel 1.7, eerste lid, van het Activiteitenbesluit milieubeheer, zijn gesteld, tot 1 december 2027 van toepassing.
   url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Artikel5.15d
   machine_readable:
     definitions:

@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: zvw
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,38 @@ uuid: 8f2a6d4c-1e3b-4f9a-b5c8-7d9e3a2f1b8c
 discoverable: BUSINESS
 articles:
 - number: '42'
-  text: ''
+  text: "1 De inhoudingsplichtige is een inkomensafhankelijke bijdrage verschuldigd over het door hem verstrekte loon overeenkomstig\
+    \ de Wet op de loonbelasting 1964 uit:\n  a. tegenwoordige dienstbetrekking als bedoeld in de Wet op de loonbelasting\
+    \ 1964 van de verzekeringsplichtige of van degene, bedoeld in artikel 2, tweede lid, onderdeel b, van deze wet, met uitzondering\
+    \ van:\n  1°. de eindheffingsbestanddelen, bedoeld in artikel 31, eerste lid, onderdelen b tot en met h, van de Wet op\
+    \ de loonbelasting 1964;\n  2°. het in artikel 13bis van de Wet op de loonbelasting 1964 bedoelde voordeel, voor zover\
+    \ dit voordeel door middel van een aan de werknemer opgelegde naheffingsaanslag in aanmerking is genomen;\n  3°. het loon\
+    \ van degene, bedoeld in artikel 4, onderdeel f, van de Wet op de loonbelasting 1964;\n  4°. het loon van de directeur-grootaandeelhouder,\
+    \ bedoeld in artikel 6, eerste lid, onderdeel d, van de Ziektewet;\n  b. vroegere arbeid als bedoeld in de Wet op de loonbelasting\
+    \ 1964 van de verzekeringsplichtige of van degene, bedoeld in artikel 2, tweede lid, onderdeel b, tot een bij ministeriële\
+    \ regeling te bepalen tijdstip, met uitzondering van bij ministeriële regeling aan te wijzen bestanddelen van het loon.\n\
+    2 Het loon waarover de inkomensafhankelijke bijdrage ingevolge het eerste lid wordt geheven, wordt ten minste gesteld\
+    \ op nihil en wordt bij dezelfde inhoudingsplichtige tot geen hoger bedrag in aanmerking genomen dan het door Onze Minister,\
+    \ in overeenstemming met Onze Ministers van Sociale Zaken en Werkgelegenheid en van Financiën, met betrekking tot een\
+    \ kalenderjaar vastgestelde bedrag.\n3 Het bedrag, bedoeld in het tweede lid, wordt herleid en vastgesteld voor andere\
+    \ loontijdvakken waarin loon als bedoeld in het eerste lid wordt genoten.\n4 Voor de herleiding naar een ander loontijdvak\
+    \ van het bedrag, bedoeld in het derde lid, is artikel 25, eerste en vierde lid, van de Wet op de loonbelasting 1964 van\
+    \ overeenkomstige toepassing.\n5 De inkomensafhankelijke bijdrage wordt per loontijdvak berekend over het verschil tussen\
+    \ het loon dat de werknemer in het kalenderjaar heeft genoten tot en met dat loontijdvak en het loon dat de werknemer\
+    \ in dat kalenderjaar heeft genoten tot en met het aan dat loontijdvak voorafgaande loontijdvak, met dien verstande dat\
+    \ van het bij eenzelfde inhoudingsplichtige genoten loon buiten aanmerking blijft het gedeelte dat meer bedraagt dan het\
+    \ met toepassing van het derde of vierde lid vastgestelde bedrag per loontijdvak, vermenigvuldigd met het aantal loontijdvakken\
+    \ van het kalenderjaar. Artikel 17, derde lid, tweede en derde zin, van de Wet financiering sociale verzekeringen is van\
+    \ overeenkomstige toepassing op de berekening van de inkomensafhankelijke bijdrage, met dien verstande dat wijze van berekenen\
+    \ van de in dat lid bedoelde premies over het deel van het bij een werkgever genoten loon, dat betrekking heeft op de\
+    \ betaling van uitkeringen als bedoeld in artikel 40, eerste lid, onderdeel a of b, van die wet door een eigenrisicodrager\
+    \ tevens bepalend is voor de wijze van berekenen van de inkomensafhankelijk bijdrage over die uitkeringen.\n6 Het tweede,\
+    \ derde en vierde lid zijn niet van toepassing in de gevallen, bedoeld in artikel 26b, eerste volzin, van de Wet op de\
+    \ loonbelasting 1964.\n7 De inhoudingsplichtige mag de door hem verschuldigde inkomensafhankelijke bijdrage niet verhalen\
+    \ op de verzekeringsplichtige of op degene, bedoeld in artikel 2, tweede lid, onderdeel b. Elk beding waarbij van de eerste\
+    \ volzin wordt afgeweken, is nietig.\n8 De rijksbelastingdienst stort de inkomensafhankelijke bijdrage die is geheven\
+    \ over het loon van degene, bedoeld in artikel 2, tweede lid, onderdeel b, van deze wet op de rekening, bedoeld in artikel\
+    \ 70, eerste dan wel tweede lid."
   url: https://wetten.overheid.nl/BWBR0018450/2024-01-01#Artikel42
   machine_readable:
     definitions:

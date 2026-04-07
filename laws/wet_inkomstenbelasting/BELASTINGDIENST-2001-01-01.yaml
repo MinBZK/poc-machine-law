@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: wet_inkomstenbelasting
 regulatory_layer: WET
 publication_date: '2001-01-01'
@@ -11,7 +11,9 @@ uuid: cdd0ec9f-4975-4969-9d8a-808f2d6abfc9
 discoverable: CITIZEN
 articles:
 - number: '2.1'
-  text: ''
+  text: "1 Belastingplichtigen voor de inkomstenbelasting zijn de natuurlijke personen die:\n  a. in Nederland wonen (binnenlandse\
+    \ belastingplichtigen) of\n  b. niet in Nederland wonen maar wel Nederlands inkomen genieten (buitenlandse belastingplichtigen).\n\
+    2 Nederlands inkomen is inkomen bedoeld in hoofdstuk 7."
   url: https://wetten.overheid.nl/BWBR0011353/2001-01-01#Artikel2.1
   machine_readable:
     definitions:

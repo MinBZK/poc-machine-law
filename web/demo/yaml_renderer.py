@@ -146,7 +146,7 @@ def _detect_cross_references(data: Any, path: str = "", all_laws: list[dict[str,
         new_data = {}
         for key, value in data.items():
             if key == "service_reference" and isinstance(value, dict):
-                # This is a cross-reference (v0.1.7 format) - add link metadata
+                # This is a cross-reference (legacy format) - add link metadata
                 service = value.get("service")
                 law = value.get("law")
                 if service and law:

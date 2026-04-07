@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: algemene_nabestaandenwet
 regulatory_layer: WET
 publication_date: '2026-01-01'
@@ -11,7 +11,20 @@ uuid: 3c5d7e9f-2b4a-4f6c-9d8e-0a1b2c3d4e5f
 discoverable: CITIZEN
 articles:
 - number: '14'
-  text: ''
+  text: "1 Recht op nabestaandenuitkering heeft de nabestaande die:\n  a. een ongehuwd kind heeft, dat jonger is dan 18 jaar\
+    \ en niet tot het huishouden van een ander behoort; of\n  b. arbeidsongeschikt is\n  1°. op en sedert de dag van overlijden\
+    \ van de verzekerde, of\n  2°. op en sedert de laatste dag van de maand waarin hij niet meer voldoet aan de voorwaarde\
+    \ bedoeld in onderdeel a, en wiens arbeidsongeschiktheid na de onderscheidenlijk onder 1° en 2° bedoelde dag ten minste\
+    \ drie maanden voortduurt, dan wel ten aanzien van wie aannemelijk is dat de arbeidsongeschiktheid ten minste drie maanden\
+    \ na de vorenbedoelde dag zal voortduren.\n2 Het recht op nabestaandenuitkering gaat in op de eerste dag van de maand\
+    \ van overlijden van de verzekerde.\n3 Voor de nabestaande die op de dag van overlijden van de verzekerde niet voldoet\
+    \ aan de voorwaarde, genoemd in het eerste lid, onderdeel a, omdat het kind op het moment van overlijden tot het huishouden\
+    \ van een ander behoort, gaat het recht op nabestaandenuitkering in op de eerste dag van de maand waarin hij als gevolg\
+    \ van het overlijden wel aan die voorwaarde voldoet.\n4 Voor de nabestaande die geen recht heeft op een nabestaandenuitkering\
+    \ op grond van artikel 15, eerste lid, onderdeel d, gaat het recht op een nabestaandenuitkering in op de eerste dag van\
+    \ de maand dat hij, uiterlijk binnen zes maanden na het overlijden van de verzekerde, deze gezamenlijke huishouding niet\
+    \ meer voert.\n5 De Sociale verzekeringsbank kan, in afwijking van het vierde lid, een langere termijn vaststellen indien\
+    \ de toepassing wat de termijn van zes maanden betreft, zal leiden tot een onbillijkheid van overwegende aard."
   url: https://wetten.overheid.nl/BWBR0007795/2026-01-01#Artikel14
   machine_readable:
     definitions:

@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: wet_op_het_centraal_bureau_voor_de_statistiek
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -10,7 +10,7 @@ service: CBS
 uuid: bfc4ce3d-1c52-4fb8-ad96-4f1b9d836c4a
 articles:
 - number: '3'
-  text: ''
+  text: '1. Het CBS heeft tot taak het van overheidswege verrichten van statistisch onderzoek ten behoeve van praktijk, beleid en wetenschap en het openbaar maken van de op grond van zodanig onderzoek samengestelde statistieken. 2. Het CBS bevordert: a. een statistische informatievoorziening van overheidswege die voorziet in de behoeften van praktijk, beleid en wetenschap; b. de nauwkeurigheid en volledigheid van de van overheidswege openbaar te maken statistieken. 3. Door Onze Minister of een van Onze andere Ministers wordt slechts een nieuw statistisch onderzoek ingesteld of in een onderzoek dat reeds plaatsvindt wijziging gebracht, nadat de directeur-generaal is gehoord.'
   url: https://wetten.overheid.nl/BWBR0015926/2024-01-01#Artikel3
   machine_readable:
     execution:

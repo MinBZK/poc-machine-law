@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: wet_kinderopvang
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,12 @@ uuid: f8e7d6c5-4321-4f0f-bbbb-123456789abc
 discoverable: CITIZEN
 articles:
 - number: '1.5'
-  text: ''
+  text: "1 Een ouder heeft aanspraak op een kinderopvangtoeslag in de door hem of zijn partner betaalde kosten, indien het\
+    \ betreft:\n  a. kinderopvang in een geregistreerd kindercentrum; of\n  b. gastouderopvang in een geregistreerde voorziening\
+    \ voor gastouderopvang.\n2 Indien het ouderparticipatieopvang in een ouderparticipatiecrèche betreft, heeft de ouder in\
+    \ de aanloopperiode, bedoeld in artikel 1.60b, in afwijking van het eerste lid, geen aanspraak op kinderopvangtoeslag.\n\
+    3 Een ouder en diens partner die tevens ouder is worden voor de toepassing van deze wet geacht gezamenlijk één aanspraak\
+    \ te hebben."
   url: https://wetten.overheid.nl/BWBR0017017/2024-01-01#Artikel1.5
   machine_readable:
     definitions:
@@ -98,14 +103,17 @@ articles:
             BSN: $PARTNER_BSN
       - name: KINDEROPVANG_KVK
         type: string
+        required: true
         source_reference:
           source_type: claim
       - name: AANGEGEVEN_UREN
         type: array
+        required: true
         source_reference:
           source_type: claim
       - name: VERWACHTE_PARTNER_UREN
         type: number
+        required: true
         source_reference:
           source_type: claim
       output:

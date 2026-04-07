@@ -1,0 +1,1543 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json",
+  "title": "Machine-Readable Dutch Law Schema v0.5.1",
+  "description": "Article-based schema for machine-readable representation of Dutch laws and regulations",
+  "type": "object",
+  "required": [
+    "regulatory_layer",
+    "publication_date",
+    "url",
+    "articles"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the law/regulation (can be plain text or internal reference like '#wet_naam')"
+    },
+    "publication_date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "Date when the law/regulation was officially published (publicatiedatum)"
+    },
+    "valid_from": {
+      "type": "string",
+      "pattern": "^([0-9]{4}-[0-9]{2}-[0-9]{2}|#.+)$",
+      "description": "Date when the law/regulation becomes effective (inwerkingtredingsdatum), or an internal reference starting with #"
+    },
+    "regulatory_layer": {
+      "type": "string",
+      "enum": [
+        "GRONDWET",
+        "WET",
+        "AMVB",
+        "KONINKLIJK_BESLUIT",
+        "MINISTERIELE_REGELING",
+        "BELEIDSREGEL",
+        "EU_VERORDENING",
+        "EU_RICHTLIJN",
+        "VERDRAG",
+        "UITVOERINGSBELEID",
+        "GEMEENTELIJKE_VERORDENING",
+        "PROVINCIALE_VERORDENING"
+      ],
+      "description": "Type of legal instrument (regelgevingslaag)"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Official URL to the law text"
+    },
+    "bwb_id": {
+      "type": "string",
+      "pattern": "^BWBR[0-9]{7}$",
+      "description": "BWB identification number (for Dutch national laws)"
+    },
+    "celex_nummer": {
+      "type": "string",
+      "description": "CELEX number (for EU regulations and directives)"
+    },
+    "eli": {
+      "type": "string",
+      "format": "uri",
+      "description": "European Legislation Identifier (for EU laws)"
+    },
+    "tractatenblad_id": {
+      "type": "string",
+      "description": "Tractatenblad identification (for international treaties)"
+    },
+    "unts_nummer": {
+      "type": "string",
+      "description": "UN Treaty Series number (for international treaties)"
+    },
+    "gemeente_code": {
+      "type": "string",
+      "pattern": "^GM[0-9]{4}$",
+      "description": "CBS municipality code (for municipal regulations)"
+    },
+    "provincie_code": {
+      "type": "string",
+      "pattern": "^PV[0-9]{2}$",
+      "description": "CBS province code (for provincial regulations)"
+    },
+    "officiele_titel": {
+      "type": "string",
+      "description": "Official full title (for decentralized regulations)"
+    },
+    "stcrt_id": {
+      "type": "string",
+      "description": "Staatscourant identification number"
+    },
+    "organisation": {
+      "type": "string",
+      "description": "Organization responsible (for implementation policies without official IDs)"
+    },
+    "legal_basis": {
+      "type": "array",
+      "description": "Legal basis - articles from higher-level laws that authorize this regulation",
+      "items": {
+        "type": "object",
+        "required": [
+          "law_id",
+          "article"
+        ],
+        "properties": {
+          "law_id": {
+            "type": "string",
+            "description": "Identifier of the law that provides authority"
+          },
+          "article": {
+            "type": "string",
+            "description": "Article number that authorizes this regulation"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional explanation of the legal relationship"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "preamble": {
+      "type": "object",
+      "description": "Preamble/Aanhef section that appears before Article 1",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Preamble text in markdown format, preserving original formatting from official publication"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the preamble in the official publication (if available)"
+        },
+        "machine_readable": {
+          "$ref": "#/definitions/machineReadableSection"
+        }
+      },
+      "additionalProperties": false
+    },
+    "articles": {
+      "type": "array",
+      "description": "Articles of this law/regulation",
+      "items": {
+        "type": "object",
+        "required": [
+          "number",
+          "text",
+          "url"
+        ],
+        "properties": {
+          "number": {
+            "type": "string",
+            "description": "Article number as it appears in the law"
+          },
+          "text": {
+            "type": "string",
+            "description": "Article text in markdown format, preserving original formatting from official publication (numbered lists, links, paragraph structure)"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to this specific article"
+          },
+          "machine_readable": {
+            "$ref": "#/definitions/machineReadableSection"
+          },
+          "references": {
+            "type": "array",
+            "description": "Structured references to other laws/articles for runtime resolution",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "bwb_id"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Reference ID used in markdown links (e.g., 'ref1')"
+                },
+                "bwb_id": {
+                  "type": "string",
+                  "pattern": "^BWBR[0-9]{7}$",
+                  "description": "BWB identifier of referenced law"
+                },
+                "artikel": {
+                  "type": "string",
+                  "description": "Article number in referenced law"
+                },
+                "lid": {
+                  "type": "string",
+                  "description": "Lid (paragraph) number"
+                },
+                "onderdeel": {
+                  "type": "string",
+                  "description": "Onderdeel (sub-item) letter/number"
+                },
+                "hoofdstuk": {
+                  "type": "string",
+                  "description": "Chapter number"
+                },
+                "paragraaf": {
+                  "type": "string",
+                  "description": "Paragraph number"
+                },
+                "afdeling": {
+                  "type": "string",
+                  "description": "Section number"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "procedure": {
+      "type": "array",
+      "description": "AWB-defined procedure lifecycles for administrative decisions (RFC-008)",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "applies_to",
+          "stages"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this procedure (e.g., 'beschikking', 'beschikking_uov')"
+          },
+          "default": {
+            "type": "boolean",
+            "description": "Whether this is the default procedure for its legal_character"
+          },
+          "applies_to": {
+            "type": "object",
+            "required": [
+              "legal_character"
+            ],
+            "properties": {
+              "legal_character": {
+                "type": "string",
+                "description": "Legal character this procedure governs"
+              }
+            }
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Stage name (e.g., AANVRAAG, BESLUIT, BEKENDMAKING)"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Human-readable description"
+                },
+                "requires": {
+                  "type": "array",
+                  "description": "External inputs required to enter this stage",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "type"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "date",
+                          "array",
+                          "object"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "regulatory_layer": {
+            "enum": [
+              "WET",
+              "AMVB",
+              "MINISTERIELE_REGELING",
+              "GRONDWET"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "bwb_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "regulatory_layer": {
+            "enum": [
+              "EU_VERORDENING",
+              "EU_RICHTLIJN"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "celex_nummer"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "regulatory_layer": {
+            "const": "VERDRAG"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "tractatenblad_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "regulatory_layer": {
+            "const": "GEMEENTELIJKE_VERORDENING"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "gemeente_code",
+          "officiele_titel"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "regulatory_layer": {
+            "const": "PROVINCIALE_VERORDENING"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "provincie_code",
+          "officiele_titel"
+        ]
+      }
+    }
+  ],
+  "definitions": {
+    "baseField": {
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Field name (uppercase with underscores for constants)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description"
+        },
+        "type": {
+          "type": "string",
+          "description": "Data type of the field value",
+          "enum": [
+            "string",
+            "number",
+            "boolean",
+            "amount",
+            "object",
+            "array",
+            "date"
+          ]
+        },
+        "type_spec": {
+          "type": "object",
+          "description": "Additional type specifications for numeric and temporal values",
+          "properties": {
+            "unit": {
+              "type": "string",
+              "description": "Unit of measurement for the value",
+              "enum": [
+                "eurocent",
+                "years",
+                "weeks",
+                "months",
+                "days"
+              ]
+            },
+            "precision": {
+              "type": "number",
+              "description": "Number of decimal places for numeric values",
+              "minimum": 0
+            },
+            "min": {
+              "type": "number",
+              "description": "Minimum allowed value"
+            },
+            "max": {
+              "type": "number",
+              "description": "Maximum allowed value"
+            }
+          }
+        },
+        "temporal": {
+          "type": "object",
+          "description": "Temporal metadata describing how values relate to time",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Whether the value represents a period or point in time",
+              "enum": [
+                "period",
+                "point_in_time"
+              ]
+            },
+            "period_type": {
+              "type": "string",
+              "description": "Granularity of the period (for period type)",
+              "enum": [
+                "year",
+                "month",
+                "continuous"
+              ]
+            },
+            "reference": {
+              "description": "Reference date for point-in-time values",
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "$calculation_date",
+                    "$prev_january_first",
+                    "$january_first"
+                  ]
+                },
+                {
+                  "$ref": "#/definitions/variableReference"
+                }
+              ]
+            }
+          }
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      }
+    },
+    "variableReference": {
+      "type": "string",
+      "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+      "description": "Variable reference starting with $ (e.g., $standaardpremie, $referencedate.year). Supports dot notation for property access."
+    },
+    "parameterField": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/baseField"
+        },
+        {
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "description": "Whether this parameter must be provided (defaults to false)"
+            }
+          }
+        }
+      ]
+    },
+    "inputField": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/baseField"
+        },
+        {
+          "properties": {
+            "source": {
+              "type": "object",
+              "description": "Reference to where this input comes from",
+              "properties": {
+                "regulation": {
+                  "type": "string",
+                  "description": "Name of external law/regulation. Omit for external data sources that must be resolved outside the YAML."
+                },
+                "output": {
+                  "type": "string",
+                  "description": "Output name to retrieve from the source"
+                },
+                "parameters": {
+                  "type": "object",
+                  "description": "Parameters to pass when calling the source regulation (e.g., bsn: $bsn)",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Human-readable description or legal reference for this data source"
+                },
+                "endpoint": {
+                  "type": "string",
+                  "description": "Endpoint to call on the delegated regulation"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "source"
+          ]
+        }
+      ]
+    },
+    "outputField": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/baseField"
+        }
+      ]
+    },
+    "arithmeticOperation": {
+      "type": "object",
+      "description": "Arithmetic operations that compute numeric values",
+      "required": [
+        "operation",
+        "values"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "enum": [
+            "ADD",
+            "SUBTRACT",
+            "MULTIPLY",
+            "DIVIDE",
+            "MIN",
+            "MAX"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "description": "Operands for the operation",
+          "items": {
+            "$ref": "#/definitions/operationValue"
+          }
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "logicalOperation": {
+      "type": "object",
+      "description": "Logical operations that combine boolean conditions",
+      "required": [
+        "operation",
+        "conditions"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "enum": [
+            "AND",
+            "OR"
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "description": "Conditions to combine - each item can be an operation, variable reference, or boolean literal",
+          "items": {
+            "$ref": "#/definitions/operationValue"
+          }
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "comparisonOperation": {
+      "type": "object",
+      "description": "Comparison operations that compare values",
+      "required": [
+        "operation",
+        "subject"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "enum": [
+            "EQUALS",
+            "GREATER_THAN",
+            "LESS_THAN",
+            "GREATER_THAN_OR_EQUAL",
+            "LESS_THAN_OR_EQUAL"
+          ]
+        },
+        "subject": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Value to compare"
+        },
+        "value": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Value to compare against"
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "notOperation": {
+      "type": "object",
+      "description": "Logical NOT - negates a boolean value",
+      "required": [
+        "operation",
+        "value"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "NOT"
+        },
+        "value": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Value to negate"
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ifOperation": {
+      "type": "object",
+      "description": "Conditional operation with multiple cases evaluated in order",
+      "required": [
+        "operation",
+        "cases"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "IF"
+        },
+        "cases": {
+          "type": "array",
+          "description": "List of when/then pairs evaluated in order",
+          "items": {
+            "type": "object",
+            "required": [
+              "when",
+              "then"
+            ],
+            "properties": {
+              "when": {
+                "$ref": "#/definitions/operationValue",
+                "description": "Condition to evaluate"
+              },
+              "then": {
+                "$ref": "#/definitions/operationValue",
+                "description": "Value if condition is true"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "default": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Value if no case matches"
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "inOperation": {
+      "type": "object",
+      "description": "Membership test - checks if subject is in a list",
+      "required": [
+        "operation",
+        "subject"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "IN"
+        },
+        "subject": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Value to check"
+        },
+        "value": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Single value or list reference to check against"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/operationValue"
+          },
+          "description": "Inline list to check against"
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "listOperation": {
+      "type": "object",
+      "description": "Construct an array from items",
+      "required": [
+        "operation",
+        "items"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "LIST"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/operationValue"
+          },
+          "description": "Items in the list"
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ageOperation": {
+      "type": "object",
+      "description": "Calculate age in complete years between two dates",
+      "required": [
+        "operation",
+        "date_of_birth",
+        "reference_date"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "AGE"
+        },
+        "date_of_birth": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Date of birth"
+        },
+        "reference_date": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Reference date to calculate age at"
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "dateAddOperation": {
+      "type": "object",
+      "description": "Add years, months, weeks, and/or days to a date. Applied coarsest-to-finest: years → months → weeks → days. Month/year additions use the Dutch legal 'corresponding numbered day' rule: the day is clamped to the last day of the target month (e.g., Jan 31 + 1 month = Feb 28).",
+      "required": [
+        "operation",
+        "date"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "DATE_ADD"
+        },
+        "date": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Base date"
+        },
+        "years": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Number of years to add (clamped to last day of target month)"
+        },
+        "months": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Number of months to add (clamped to last day of target month)"
+        },
+        "weeks": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Number of weeks to add"
+        },
+        "days": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Number of days to add"
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "dateConstructOperation": {
+      "type": "object",
+      "description": "Construct a date from year, month, day components",
+      "required": [
+        "operation",
+        "year",
+        "month",
+        "day"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "DATE"
+        },
+        "year": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Year"
+        },
+        "month": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Month (1-12)"
+        },
+        "day": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Day (1-31)"
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "dayOfWeekOperation": {
+      "type": "object",
+      "description": "Get the day of the week (0=Monday, 6=Sunday)",
+      "required": [
+        "operation",
+        "date"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "DAY_OF_WEEK"
+        },
+        "date": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Date to check"
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "operationType": {
+      "type": "string",
+      "description": "Operation type identifier used in action definitions",
+      "enum": [
+        "ADD",
+        "SUBTRACT",
+        "MULTIPLY",
+        "DIVIDE",
+        "MIN",
+        "MAX",
+        "AND",
+        "OR",
+        "NOT",
+        "EQUALS",
+        "GREATER_THAN",
+        "LESS_THAN",
+        "GREATER_THAN_OR_EQUAL",
+        "LESS_THAN_OR_EQUAL",
+        "IF",
+        "IN",
+        "LIST",
+        "AGE",
+        "DATE_ADD",
+        "DATE",
+        "DAY_OF_WEEK"
+      ]
+    },
+    "operation": {
+      "description": "Executable operation that computes a value",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/arithmeticOperation"
+        },
+        {
+          "$ref": "#/definitions/logicalOperation"
+        },
+        {
+          "$ref": "#/definitions/comparisonOperation"
+        },
+        {
+          "$ref": "#/definitions/notOperation"
+        },
+        {
+          "$ref": "#/definitions/ifOperation"
+        },
+        {
+          "$ref": "#/definitions/inOperation"
+        },
+        {
+          "$ref": "#/definitions/listOperation"
+        },
+        {
+          "$ref": "#/definitions/ageOperation"
+        },
+        {
+          "$ref": "#/definitions/dateAddOperation"
+        },
+        {
+          "$ref": "#/definitions/dateConstructOperation"
+        },
+        {
+          "$ref": "#/definitions/dayOfWeekOperation"
+        }
+      ]
+    },
+    "operationValue": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/variableReference"
+        },
+        {
+          "type": [
+            "number",
+            "boolean",
+            "null"
+          ]
+        },
+        {
+          "type": "string",
+          "not": {
+            "pattern": "^\\$"
+          }
+        },
+        {
+          "$ref": "#/definitions/operation"
+        }
+      ]
+    },
+    "action": {
+      "type": "object",
+      "required": [
+        "output"
+      ],
+      "properties": {
+        "output": {
+          "type": "string",
+          "description": "Name of the output field this action computes"
+        },
+        "value": {
+          "$ref": "#/definitions/operationValue",
+          "description": "Direct value assignment"
+        },
+        "operation": {
+          "$ref": "#/definitions/operationType"
+        },
+        "values": {
+          "type": "array",
+          "description": "Operands for the operation",
+          "items": {
+            "$ref": "#/definitions/operationValue"
+          }
+        },
+        "resolve": {
+          "type": "object",
+          "description": "Delegation resolution - resolve value from an implementing regulation",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Regulatory layer to search for implementation"
+            },
+            "output": {
+              "type": "string",
+              "description": "Output field to retrieve"
+            },
+            "match": {
+              "type": "object",
+              "description": "Matching criteria for selecting the right implementation",
+              "additionalProperties": true
+            }
+          }
+        },
+        "legal_basis": {
+          "$ref": "#/definitions/legalBasis"
+        }
+      },
+      "additionalProperties": false
+    },
+    "legalBasis": {
+      "type": "object",
+      "properties": {
+        "law": {
+          "type": "string",
+          "description": "Name of the law"
+        },
+        "bwb_id": {
+          "type": "string",
+          "pattern": "^BWBR[0-9]{7}$",
+          "description": "BWB identification number"
+        },
+        "article": {
+          "type": "string",
+          "description": "Article number"
+        },
+        "paragraph": {
+          "type": "string",
+          "description": "Paragraph/lid number"
+        },
+        "sentence": {
+          "type": "string",
+          "description": "Sentence number for fine-grained reference"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to wetten.overheid.nl"
+        },
+        "juriconnect": {
+          "type": "string",
+          "pattern": "^jci1\\.3:c:BWBR[0-9]{7}(&[a-zA-Z_]+=.+)*$",
+          "description": "Juriconnect BWB 1.3 reference"
+        },
+        "explanation": {
+          "type": "string",
+          "description": "Dutch explanation of how this element relates to the law text"
+        }
+      },
+      "additionalProperties": false
+    },
+    "machineReadableSection": {
+      "type": "object",
+      "description": "Machine-readable interpretation of legal text",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "Named endpoint for this article, making it callable from other regulations"
+        },
+        "competent_authority": {
+          "description": "Bevoegd gezag - authority whose execution produces binding decisions",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^#",
+              "description": "Internal reference to output (e.g., '#bevoegd_gezag')"
+            },
+            {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of the authority"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "INSTANCE",
+                    "CATEGORY"
+                  ],
+                  "default": "INSTANCE",
+                  "description": "INSTANCE = specific organization (default), CATEGORY = must be resolved per context"
+                }
+              }
+            }
+          ]
+        },
+        "enables": {
+          "type": "array",
+          "description": "What this article enables - e.g., authority to create lower-level regulations",
+          "items": {
+            "type": "object",
+            "required": [
+              "regulatory_layer",
+              "subject"
+            ],
+            "properties": {
+              "regulatory_layer": {
+                "type": "string",
+                "enum": [
+                  "GRONDWET",
+                  "WET",
+                  "AMVB",
+                  "KONINKLIJK_BESLUIT",
+                  "MINISTERIELE_REGELING",
+                  "BELEIDSREGEL",
+                  "EU_VERORDENING",
+                  "EU_RICHTLIJN",
+                  "VERDRAG",
+                  "UITVOERINGSBELEID",
+                  "GEMEENTELIJKE_VERORDENING",
+                  "PROVINCIALE_VERORDENING"
+                ],
+                "description": "Type of regulation this article enables"
+              },
+              "subject": {
+                "type": "string",
+                "description": "Subject matter of the enabled regulation (e.g., 'rioolheffing')"
+              },
+              "for": {
+                "type": "object",
+                "description": "Who is granted the authority (optional - often implied by regulatory_layer)",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "INSTANCE",
+                      "CATEGORY"
+                    ]
+                  }
+                }
+              },
+              "interface": {
+                "type": "object",
+                "description": "Interface contract that implementing regulations must follow",
+                "properties": {
+                  "endpoint": {
+                    "type": "string",
+                    "description": "Required endpoint name for implementations"
+                  },
+                  "parameters": {
+                    "type": "array",
+                    "description": "Required parameters for the interface",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "required": {
+                          "type": "boolean"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "output": {
+                    "type": "array",
+                    "description": "Required output fields for the interface",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "defaults": {
+                "type": "object",
+                "description": "Default execution logic if no implementing regulation is found",
+                "properties": {
+                  "actions": {
+                    "type": "array",
+                    "description": "Default actions to execute"
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "requires": {
+          "type": "array",
+          "description": "Dependencies on other articles, regelingen, or external sources",
+          "items": {
+            "type": "object",
+            "properties": {
+              "article": {
+                "type": "string",
+                "description": "Article number within this law"
+              },
+              "law": {
+                "type": "string",
+                "description": "Name of external law"
+              },
+              "regeling": {
+                "type": "string",
+                "description": "Name of ministerial regulation"
+              },
+              "koninklijk_besluit": {
+                "type": "string",
+                "description": "Name of royal decree"
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Values/outputs required from the dependency"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "open_terms": {
+          "type": "array",
+          "description": "Abstract values that must or may be filled by implementing regulations at a lower level. Any regulatory layer can declare open_terms; a law typically has required: true (no default), lower layers often provide defaults that can be refined further down.",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "type"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Identifier for this open term (e.g., 'standaardpremie')"
+              },
+              "description": {
+                "type": "string",
+                "description": "Human-readable description of what this term represents"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "amount",
+                  "date"
+                ],
+                "description": "Data type of the expected value"
+              },
+              "required": {
+                "type": "boolean",
+                "default": true,
+                "description": "Whether an implementation is mandatory (true) or optional with possible default (false)"
+              },
+              "delegated_to": {
+                "type": "string",
+                "description": "Who is authorized to fill this term (e.g., 'minister', 'gemeenteraad')"
+              },
+              "delegation_type": {
+                "type": "string",
+                "description": "Expected regulatory layer of the implementation (e.g., 'MINISTERIELE_REGELING')"
+              },
+              "legal_basis": {
+                "type": "string",
+                "description": "Legal basis text (e.g., 'artikel 4 Wet op de zorgtoeslag')"
+              },
+              "default": {
+                "type": "object",
+                "description": "Default execution logic when no implementing regulation is found. Makes the article executable standalone while still allowing refinement via implements.",
+                "properties": {
+                  "actions": {
+                    "type": "array",
+                    "description": "Default actions to execute",
+                    "items": {
+                      "$ref": "#/definitions/action"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "implements": {
+          "type": "array",
+          "description": "Declares that this article fills open terms from a higher-level law. Maps to the 'Gelet op' clause in Dutch legislation. One article can implement multiple open terms from different laws.",
+          "items": {
+            "type": "object",
+            "required": [
+              "law",
+              "article",
+              "open_term"
+            ],
+            "properties": {
+              "law": {
+                "type": "string",
+                "description": "The $id of the higher-level law being implemented (e.g., 'wet_op_de_zorgtoeslag')"
+              },
+              "article": {
+                "type": "string",
+                "description": "Article number in the higher law that declares the open_term (e.g., '4')"
+              },
+              "open_term": {
+                "type": "string",
+                "description": "The open_term id being filled (e.g., 'standaardpremie')"
+              },
+              "gelet_op": {
+                "type": "string",
+                "description": "Legal reference text (e.g., 'Gelet op artikel 4 van de Wet op de zorgtoeslag')"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "definitions": {
+          "type": "object",
+          "description": "Definitions and constants",
+          "additionalProperties": true
+        },
+        "execution": {
+          "type": "object",
+          "description": "Executable logic",
+          "properties": {
+            "produces": {
+              "type": "object",
+              "properties": {
+                "legal_character": {
+                  "type": "string",
+                  "enum": [
+                    "BESCHIKKING",
+                    "TOETS",
+                    "WAARDEBEPALING",
+                    "BESLUIT_VAN_ALGEMENE_STREKKING",
+                    "INFORMATIEF"
+                  ],
+                  "description": "Legal character of the output"
+                },
+                "decision_type": {
+                  "type": "string",
+                  "enum": [
+                    "TOEKENNING",
+                    "AFWIJZING",
+                    "GOEDKEURING",
+                    "GEEN_BESLUIT",
+                    "ALGEMEEN_VERBINDEND_VOORSCHRIFT",
+                    "BELEIDSREGEL",
+                    "VOORBEREIDINGSBESLUIT",
+                    "ANDERE_HANDELING",
+                    "AANSLAG"
+                  ],
+                  "description": "Type of decision produced"
+                },
+                "procedure_id": {
+                  "type": "string",
+                  "description": "Selects a specific AWB procedure variant. When absent, the default procedure for the legal_character is used."
+                }
+              }
+            },
+            "parameters": {
+              "type": "array",
+              "description": "Input parameters required to execute",
+              "items": {
+                "$ref": "#/definitions/parameterField"
+              }
+            },
+            "input": {
+              "type": "array",
+              "description": "Input values from other sources/articles",
+              "items": {
+                "$ref": "#/definitions/inputField"
+              }
+            },
+            "output": {
+              "type": "array",
+              "description": "Output values produced",
+              "items": {
+                "$ref": "#/definitions/outputField"
+              }
+            },
+            "actions": {
+              "type": "array",
+              "description": "Actions that compute outputs or make decisions",
+              "items": {
+                "$ref": "#/definitions/action"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "hooks": {
+          "type": "array",
+          "description": "Hook declarations: this article fires when matching lifecycle events occur (RFC-007)",
+          "items": {
+            "type": "object",
+            "required": [
+              "hook_point",
+              "applies_to"
+            ],
+            "properties": {
+              "hook_point": {
+                "type": "string",
+                "enum": [
+                  "pre_actions",
+                  "post_actions"
+                ],
+                "description": "When in the lifecycle this hook fires"
+              },
+              "applies_to": {
+                "type": "object",
+                "properties": {
+                  "legal_character": {
+                    "type": "string",
+                    "enum": [
+                      "BESCHIKKING",
+                      "TOETS",
+                      "WAARDEBEPALING",
+                      "BESLUIT_VAN_ALGEMENE_STREKKING",
+                      "INFORMATIEF"
+                    ],
+                    "description": "Match articles that produce this legal character"
+                  },
+                  "decision_type": {
+                    "type": "string",
+                    "description": "Optionally narrow to a specific decision type"
+                  },
+                  "stage": {
+                    "type": "string",
+                    "description": "Lifecycle stage at which this hook fires (e.g., BESLUIT, BEKENDMAKING). Defaults to BESLUIT."
+                  }
+                },
+                "required": [
+                  "legal_character"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "overrides": {
+          "type": "array",
+          "description": "Override declarations: this article replaces another article's output (RFC-007, lex specialis)",
+          "items": {
+            "type": "object",
+            "required": [
+              "law",
+              "article",
+              "output"
+            ],
+            "properties": {
+              "law": {
+                "type": "string",
+                "description": "The $id of the law being overridden"
+              },
+              "article": {
+                "type": "string",
+                "description": "The article number being overridden"
+              },
+              "output": {
+                "type": "string",
+                "description": "The specific output being replaced"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "untranslatables": {
+          "type": "array",
+          "description": "Legal constructs in this article that cannot be faithfully expressed with the engine's current operation set (RFC-012)",
+          "items": {
+            "type": "object",
+            "required": [
+              "construct",
+              "reason"
+            ],
+            "properties": {
+              "construct": {
+                "type": "string",
+                "description": "The legal construct that cannot be translated (e.g., 'afronden op hele euro's')"
+              },
+              "reason": {
+                "type": "string",
+                "description": "Why this construct is untranslatable with the current engine operations"
+              },
+              "suggestion": {
+                "type": "string",
+                "description": "Suggested engine operation or approach to resolve this"
+              },
+              "legal_text_excerpt": {
+                "type": "string",
+                "description": "The relevant excerpt from the article's legal text"
+              },
+              "accepted": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether a human has reviewed and acknowledged this gap. Accepted untranslatables are allowed in error mode."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

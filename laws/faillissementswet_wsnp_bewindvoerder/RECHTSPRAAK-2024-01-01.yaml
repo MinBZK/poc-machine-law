@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: faillissementswet_wsnp_bewindvoerder
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,11 @@ uuid: 1a8ce7cd-8c96-41ae-806c-d6387e43c0dd
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '316'
-  text: ''
+  text: "1 De bewindvoerder is belast met:\n  a. het toezicht op de naleving door de schuldenaar van diens verplichtingen\
+    \ die uit de schuldsaneringsregeling voortvloeien;\n  b. het beheer en de vereffening van de boedel.\n2 Alvorens in rechte\
+    \ op te treden, behalve waar het verificatiegeschillen betreft, alsmede in de gevallen van de artikelen 37, 40, 58, tweede\
+    \ lid, 59a, zesde lid, 305, 326, eerste lid, en 349, eerste lid, behoeft de bewindvoerder machtiging van de rechter-commissaris.\
+    \ Artikel 72 is van overeenkomstige toepassing."
   url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#Artikel316
   machine_readable:
     definitions:

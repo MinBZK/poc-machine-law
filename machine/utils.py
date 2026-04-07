@@ -36,8 +36,9 @@ _yaml_cache = {}
 
 
 def _is_v050_format(data: dict) -> bool:
-    """Detect if a YAML law file uses the v0.5.0 article-based schema."""
-    return "articles" in data or (isinstance(data.get("$schema"), str) and "v0.5.0" in data["$schema"])
+    """Detect if a YAML law file uses the v0.5.x article-based schema."""
+    schema = data.get("$schema", "")
+    return "articles" in data or (isinstance(schema, str) and ("v0.5.0" in schema or "v0.5.1" in schema))
 
 
 def _convert_source_to_reference(source: dict) -> tuple[str, dict]:

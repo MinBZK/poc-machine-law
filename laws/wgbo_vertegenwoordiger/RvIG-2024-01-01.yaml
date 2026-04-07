@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: wgbo_vertegenwoordiger
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,32 @@ uuid: 54ba9cdb-61ff-4735-a650-8ccee6ef0bb8
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '465'
-  text: ''
+  text: '1 De verplichtingen die voor de hulpverlener uit deze afdeling jegens de patiënt voortvloeien worden, indien de patiënt
+    de leeftijd van twaalf jaren nog niet heeft bereikt, door de hulpverlener nagekomen jegens de ouders die het gezag over
+    de patiënt uitoefenen dan wel jegens zijn voogd.
+
+    2 Hetzelfde geldt indien de patiënt de leeftijd van twaalf jaren heeft bereikt, maar niet in staat kan worden geacht tot
+    een redelijke waardering van zijn belangen ter zake, tenzij zodanige patiënt meerderjarig is en onder curatele staat of
+    ten behoeve van hem het mentorschap is ingesteld, in welke gevallen nakoming jegens de curator of de mentor geschiedt.
+
+    3 Indien een meerderjarige patiënt die niet in staat kan worden geacht tot een redelijke waardering van zijn belangen
+    ter zake, niet onder curatele staat of ten behoeve van hem niet het mentorschap is ingesteld, worden de verplichtingen
+    die voor de hulpverlener uit deze afdeling jegens de patiënt voortvloeien, door de hulpverlener nagekomen jegens de persoon
+    die daartoe door de patiënt schriftelijk is gemachtigd in zijn plaats op te treden. Ontbreekt zodanige persoon, of treedt
+    deze niet op, dan worden de verplichtingen nagekomen jegens de echtgenoot, de geregistreerde partner of andere levensgezel
+    van de patiënt, tenzij deze persoon dat niet wenst, dan wel, indien ook zodanige persoon ontbreekt, jegens een ouder,
+    kind, broer, zus, grootouder of kleinkind van de patiënt, tenzij deze persoon dat niet wenst.
+
+    4 De hulpverlener komt zijn verplichtingen na jegens de in de leden 1 en 2 bedoelde wettelijke vertegenwoordigers van
+    de patiënt en de in lid 3 bedoelde personen, tenzij die nakoming niet verenigbaar is met de zorg van een goed hulpverlener.
+
+    5 De persoon jegens wie de hulpverlener krachtens de leden 2 of 3 gehouden is de uit deze afdeling jegens de patiënt voortvloeiende
+    verplichtingen na te komen, betracht de zorg van een goed vertegenwoordiger. Deze persoon is gehouden de patiënt zoveel
+    mogelijk bij de vervulling van zijn taak te betrekken.
+
+    6 Verzet de patiënt zich tegen een verrichting van ingrijpende aard waarvoor een persoon als bedoeld in de leden 2 of
+    3 toestemming heeft gegeven, dan kan de verrichting slechts worden uitgevoerd indien zij kennelijk nodig is teneinde ernstig
+    nadeel voor de patiënt te voorkomen.'
   url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Artikel465
   machine_readable:
     definitions:

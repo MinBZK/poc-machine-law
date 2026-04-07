@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: archiefwet/vernietiging
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -10,7 +10,7 @@ service: NATIONAAL_ARCHIEF
 uuid: 81c1b431-545b-4a8a-b1e2-eacfc6c3915a
 articles:
 - number: '5'
-  text: ''
+  text: '1. De zorgdrager is verplicht tot het ontwerpen van selectielijsten waarin tenminste wordt aangegeven welke archiefbescheiden voor vernietiging in aanmerking komen. 2. De lijsten worden vastgesteld, voor zover het betreft: a. archiefbescheiden van de Eerste en de Tweede Kamer der Staten-Generaal, de andere Hoge Colleges van Staat en het Kabinet van de Koning: bij koninklijk besluit, op voordracht van Onze minister, in overeenstemming met het betrokken overheidsorgaan; b. archiefbescheiden van de ministeries: door Onze minister en Onze minister wie het mede aangaat; c. archiefbescheiden van andere overheidsorganen: door Onze minister. 3. Een besluit tot vaststelling van een selectielijst wordt bekendgemaakt in de Staatscourant.'
   url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Artikel5
   machine_readable:
     definitions:

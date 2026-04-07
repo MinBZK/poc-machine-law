@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: burgerlijk_wetboek_beschermingsbewind
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,21 @@ uuid: 970f63e4-eed1-4884-a1ee-9050733eb2e1
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '431'
-  text: ''
+  text: "1 De kantonrechter kan een bewind instellen over één of meer van de goederen die een meerderjarige als rechthebbende\
+    \ toebehoren of zullen toebehoren\n  a. voor een bepaalde of onbepaalde tijdsduur indien de meerderjarige tijdelijk of\
+    \ duurzaam niet in staat is ten volle zijn vermogensrechtelijke belangen behoorlijk waar te nemen als gevolg van zijn\
+    \ lichamelijke of geestelijke toestand, dan wel\n  b. voor een bepaalde tijdsduur indien de meerderjarige tijdelijk niet\
+    \ in staat is ten volle zijn vermogensrechtelijke belangen behoorlijk waar te nemen als gevolg van verkwisting of het\
+    \ hebben van problematische schulden.\n2 Indien te verwachten is dat een minderjarige op het tijdstip waarop hij meerderjarig\
+    \ zal worden, in de in het vorige lid bedoelde toestand zal verkeren, kan het bewind reeds voor de meerderjarigheid worden\
+    \ ingesteld.\n3 Het bewind kan eveneens worden ingesteld indien te verwachten is dat de rechthebbende binnen afzienbare\
+    \ tijd in de in het eerste lid bedoelde toestand zal verkeren.\n4 De rechter bij wie een verzoek tot het verlenen van\
+    \ een rechterlijke machtiging als bedoeld in de Wet zorg en dwang psychogeriatrische en verstandelijk gehandicapte cliënten\
+    \ dan wel een zorgmachtiging of een machtiging tot voorzetting van de crisismaatregel als bedoeld in de Wet verplichte\
+    \ geestelijke gezondheidszorg aanhangig is, is tevens bevoegd tot de kennisneming van een verzoek tot instelling van het\
+    \ bewind.\n5 Onder aan de meerderjarige toebehorende goederen zijn in deze titel begrepen goederen die behoren tot zijn\
+    \ huwelijksgemeenschap of gemeenschap van geregistreerd partnerschap en die niet uitsluitend onder het bestuur van zijn\
+    \ echtgenoot dan wel geregistreerd partner staan."
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel431
   machine_readable:
     definitions:

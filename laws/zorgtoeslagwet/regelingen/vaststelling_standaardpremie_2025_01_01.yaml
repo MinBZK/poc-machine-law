@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: zorgtoeslagwet/regelingen/regeling_vaststelling_standaardpremie_en_bestuursrechtelijke_premies
 regulatory_layer: WET
 publication_date: '2025-01-01'
@@ -10,7 +10,7 @@ service: VWS
 uuid: ac962262-6628-49bf-a465-5d831271936a
 articles:
 - number: '1'
-  text: ''
+  text: De standaardpremie, bedoeld in de Wet op de zorgtoeslag, bedraagt voor het berekeningsjaar 2025 € 2.112,–.
   url: https://wetten.overheid.nl/BWBR0050536/2025-01-01#Artikel1
   machine_readable:
     definitions:

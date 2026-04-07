@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: faillissementswet_curator
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,17 @@ uuid: e1199fc0-2fbc-4bc7-aab5-e4f3790a5cc7
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '68'
-  text: ''
+  text: "1 De curator is belast met het beheer en de vereffening van de failliete boedel.\n2 De curator:\n  a. beziet bij\
+    \ het beheer en de vereffening van de failliete boedel of er sprake is van onregelmatigheden die het faillissement, althans\
+    \ mede, hebben veroorzaakt, de vereffening van de failliete boedel bemoeilijken of het tekort in het faillissement hebben\
+    \ vergroot;\n  b. informeert hierover de rechter-commissaris vertrouwelijk; en\n  c. doet, zo hij of de rechter-commissaris\
+    \ dit nodig acht, melding of aangifte van onregelmatigheden bij de bevoegde instanties.\n3 Alvorens in rechte op te treden,\
+    \ behalve waar het verificatiegeschillen betreft, alsmede in de gevallen van de artikelen 37, 39, 40, 58, tweede lid,\
+    \ 60, tweede en derde lid, en 60a, eerste lid, behoeft de curator machtiging van de rechter-commissaris.\n4 Ingeval in\
+    \ Nederland geen secundaire insolventieprocedure is geopend, wordt de machtiging tot beëindiging van arbeidsovereenkomsten,\
+    \ bedoeld in artikel 13 van de in artikel 5, derde lid, genoemde verordening op verzoek van de insolventiefunctionaris\
+    \ in de hoofdinsolventieprocedure verleend door de rechter-commissaris van de rechtbank, aangewezen in artikel 2. De rechtbank\
+    \ benoemt de rechter-commissaris binnen vijf werkdagen na ontvangst van dit machtigingsverzoek."
   url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#Artikel68
   machine_readable:
     definitions:

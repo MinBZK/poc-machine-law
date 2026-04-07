@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: ziektewet
 regulatory_layer: WET
 publication_date: '2025-01-01'
@@ -10,7 +10,76 @@ service: UWV
 uuid: 9b5e2d7a-3c4f-4e1b-9a6d-2f9c1e7b4d3a
 articles:
 - number: '29'
-  text: ''
+  text: "1 Behoudens het tweede lid, onderdeel e, en de artikelen 29a, 29b en 29d wordt geen ziekengeld uitgekeerd, indien\
+    \ de verzekerde uit hoofde van de dienstbetrekking op grond waarvan hij de arbeid behoort te verrichten:\n  a. recht heeft\
+    \ op loon als bedoeld in artikel 629 van Boek 7 van het Burgerlijk Wetboek, dan wel indien het recht op loon door toepassing\
+    \ van het derde, vijfde, zesde of negende lid van dat artikel geheel of gedeeltelijk ontbreekt;\n  b. recht heeft op bezoldiging\
+    \ als bedoeld in artikel 76a, eerste lid, dan wel indien het recht op die bezoldiging op grond van artikel 76a, derde\
+    \ of zevende lid, of artikel 76b, eerste, tweede of derde lid, geheel of gedeeltelijk ontbreekt.\nDe eerste zin is niet\
+    \ van toepassing op de werknemer waarvan de werkgever het loon niet voldoet omdat hij verkeert in een toestand als bedoeld\
+    \ in artikel 61 van de Werkloosheidswet gedurende de periode dat de voor de werknemer rechtens geldende opzegtermijn langer\
+    \ duurt dan de opzegtermijn, bedoeld in artikel 64, eerste lid, onderdeel b, van de Werkloosheidswet.\n2 Het ziekengeld\
+    \ wordt uitgekeerd over iedere dag van ongeschiktheid tot werken, doch over maximaal vijf dagen per kalenderweek en niet\
+    \ over zaterdagen en zondagen. In de eerste kalenderweek wordt in afwijking van het bepaalde in de eerste zin het ziekengeld\
+    \ uitgekeerd over zaterdag en zondag, doch over maximaal vijf dagen per kalenderweek, indien de zaterdag of zondag aantoonbaar\
+    \ een werkdag zou zijn geweest, met dien verstande dat:\n  1°. als de zaterdag aantoonbaar een werkdag zou zijn geweest,\
+    \ uitkering van ziekengeld plaatsvindt over de zaterdag;\n  2°. als de zaterdag en zondag aantoonbaar werkdagen zouden\
+    \ zijn geweest, uitkering van ziekengeld plaatsvindt over de zaterdag en zondag;\n  3°. als de zondag aantoonbaar een\
+    \ werkdag zou zijn geweest, uitkering van ziekengeld plaatsvindt over de zondag.\nHet ziekengeld wordt uitgekeerd aan:\n\
+    \  a. de verzekerde van wie de arbeidsverhouding op grond van artikel 4 of 5 als dienstbetrekking wordt beschouwd, vanaf\
+    \ de derde dag van de ongeschiktheid tot werken;\n  b. degene wiens aanspraak berust op artikel 46, vanaf de derde dag\
+    \ van de ongeschiktheid tot werken;\n  c. de verzekerde van wie de dienstbetrekking, bedoeld in artikel 3, binnen het\
+    \ op grond van het vijfde lid van toepassing zijnde tijdvak eindigt, vanaf de eerste dag van ongeschiktheid tot werken\
+    \ nadat de dienstbetrekking is geëindigd, doch niet eerder dan vanaf de derde dag van de ongeschiktheid tot werken;\n\
+    \  d. de verzekerde die:\n  1°. op grond van artikel 7, onderdeel a, als werknemer wordt beschouwd, vanaf de eerste dag\
+    \ van de veertiende week van de ongeschiktheid tot werken of zo veel eerder als de uitkering, bedoeld in dat onderdeel,\
+    \ eindigt op grond van artikel 20, eerste lid, onderdeel a of b, van de Werkloosheidswet;\n  2°. op grond van artikel\
+    \ 7, onderdeel b, als werknemer wordt beschouwd, vanaf de eerste dag van de ongeschiktheid tot werken;\n  e. de verzekerde\
+    \ die wegens orgaandonatie ongeschikt is tot het verrichten van zijn arbeid, vanaf de eerste dag van de ongeschiktheid\
+    \ tot werken;\n  f. de vrouwelijke verzekerde, overeenkomstig artikel 29a;\n  g. de werknemer, bedoeld in de artikelen\
+    \ 29b en 29d.\n3 Als eerste dag van de ongeschiktheid tot werken geldt de eerste werkdag waarop wegens ziekte niet is\
+    \ gewerkt of het werken tijdens de werktijd is gestaakt. Bij ministeriële regeling kunnen nadere regels worden gesteld\
+    \ en kunnen dagen waarop niet zou worden gewerkt als werkdag worden aangemerkt.\n4 Geen ziekengeld wordt uitgekeerd op\
+    \ en na de dag waarop de verzekerde de pensioengerechtigde leeftijd, bedoeld in artikel 7a, eerste lid, van de Algemene\
+    \ Ouderdomswet, bereikt, indien de eerste dag van ongeschiktheid tot werken is gelegen voor die leeftijd alsmede over\
+    \ de periode waarover de verzekerde een uitkering op grond van artikel 3:7, tweede lid, 3:9 of 3:10, tweede en derde lid\
+    \ van de Wet arbeid en zorg ontvangt.\n5 Geen ziekengeld wordt uitgekeerd nadat een tijdvak van 104 weken van ongeschiktheid\
+    \ tot werken is verstreken, te rekenen vanaf de eerste dag van de ongeschiktheid tot werken met dien verstande dat het\
+    \ tijdvak zes weken bedraagt indien de eerste dag van de ongeschiktheid tot werken is gelegen op of na de dag dat de verzekerde\
+    \ de leeftijd, bedoeld in artikel 7, onderdeel a, van de Algemene Ouderdomswet heeft bereikt. Voor het bepalen van het\
+    \ in de eerste volzin bedoelde tijdvak worden tijdvakken van ongeschiktheid tot werken samengeteld, indien zij elkaar\
+    \ met een onderbreking van minder dan vier weken opvolgen of indien zij direct voorafgaan aan en aansluiten op een periode\
+    \ waarin uitkering in verband met zwangerschap of bevalling op grond van artikel 3:7, eerste lid, 3:8 of 3:10, eerste\
+    \ lid, van de Wet arbeid en zorg wordt genoten, tenzij de ongeschiktheid redelijkerwijs niet geacht kan worden voort te\
+    \ vloeien uit dezelfde oorzaak. In de gevallen waarin de tweede volzin toepassing vindt, worden gedurende de desbetreffende\
+    \ periode van 104 weken onderscheidenlijk zes weken de eerste twee dagen van de ongeschiktheid tot werken, waarover op\
+    \ grond van het tweede lid, onderdelen a, b en c, geen ziekengeld wordt uitgekeerd, slechts eenmaal in aanmerking genomen.\n\
+    6 Geen ziekengeld wordt uitgekeerd voor zover de verzekerde, bedoeld in het tweede lid, onderdeel e, artikel 29a, artikel\
+    \ 29b of artikel 29d, door toepassing van artikel 629, derde lid, van Boek 7 van het Burgerlijk Wetboek geen recht heeft\
+    \ op loon dan wel op grond van artikel 76b, tweede lid, geen recht heeft op bezoldiging.\n7 Het ziekengeld, bedoeld in\
+    \ het tweede lid, onderdelen a tot en met c, en onderdeel d, onder 2°, bedraagt 70% van het dagloon van verzekerde. Het\
+    \ ziekengeld, bedoeld in het tweede lid, onderdeel d, onder 1°, wordt vastgesteld overeenkomstig de artikelen 47, eerste\
+    \ lid, onderdeel b, en 47a van de Werkloosheidswet, hierbij zijn de bepalingen met betrekking tot dagloon, maandloon en\
+    \ inkomen van artikel 1b van de Werkloosheidswet en de daarop berustende bepalingen van overeenkomstige toepassing. Bij\
+    \ deze vaststelling blijft artikel 31, tweede lid, buiten toepassing met dien verstande dat het loon, bedoeld in artikel\
+    \ 30, tweede lid, aangemerkt wordt als inkomen als bedoeld in artikel 47 respectievelijk artikel 47a van de Werkloosheidswet.\n\
+    8 Het ziekengeld, bedoeld in het tweede lid, onderdeel e, wordt gesteld op het dagloon.\n9 Het Uitvoeringsinstituut werknemersverzekeringen\
+    \ kan nadere regels stellen met betrekking tot het tweede lid, onderdeel e.\n10 Het tijdvak van 104 weken, bedoeld in\
+    \ het vijfde lid, wordt ten aanzien van een verzekerde als bedoeld in artikel 29, tweede lid, onderdelen a, b of c, die\
+    \ laatstelijk in dienstbetrekking stond tot een eigenrisicodrager, verlengd:\n  a. met de duur van de vertraging indien\
+    \ de aanvraag, bedoeld in artikel 64, eerste lid, van de Wet werk en inkomen naar arbeidsvermogen later wordt gedaan dan\
+    \ in of op grond van dat artikel is voorgeschreven;\n  b. met de duur van het tijdvak dat het Uitvoeringsinstituut werknemersverzekeringen\
+    \ op grond van artikel 26, tweede lid, van de Wet werk en inkomen naar arbeidsvermogen of artikel 71b, derde lid, van\
+    \ de Wet op de arbeidsongeschiktheidsverzekering heeft vastgesteld.\n11 Geen ziekengeld wordt uitgekeerd over de periode,\
+    \ gedurende welke de verzekerde, bedoeld in het tiende lid, onderdeel a, zonder deugdelijke grond zijn aanvraag om een\
+    \ uitkering als bedoeld in artikel 64, eerste lid, van de Wet werk en inkomen naar arbeidsvermogen later indient dan in\
+    \ dat artikel is voorgeschreven.\n12 Het tweede lid, onderdeel a, b of c, is niet van toepassing indien onderdeel e of\
+    \ g van dat lid van toepassing is.\n13 Het tweede lid, onderdeel d, is niet van toepassing indien onderdeel e of f van\
+    \ dat lid van toepassing is.\n14 Voor de toepassing van het tweede lid, onderdeel d, onder 1°, worden perioden van ongeschiktheid\
+    \ samengeteld, indien zij elkaar met een onderbreking van minder dan vier weken opvolgen of indien zij direct voorafgaan\
+    \ aan en aansluiten op een periode waarin uitkering in verband met zwangerschap of bevalling op grond van artikel 3:7,\
+    \ eerste lid, 3:8 of 3:10, eerste lid, van de Wet arbeid en zorg wordt genoten, tenzij de ongeschiktheid redelijkerwijs\
+    \ niet geacht kan worden voort te vloeien uit dezelfde oorzaak."
   url: https://wetten.overheid.nl/BWBR0001888/2025-01-01#Artikel29
   machine_readable:
     execution:

@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: wet_op_de_huurtoeslag
 regulatory_layer: WET
 publication_date: '2025-01-01'
@@ -11,7 +11,24 @@ uuid: a611a7ea-98d5-42f5-a05c-475b1be4590e
 discoverable: CITIZEN
 articles:
 - number: '1'
-  text: ''
+  text: "In deze wet en de bepalingen die daarop berusten wordt verstaan onder:\n  a. burgemeester en wethouders: burgemeester\
+    \ en wethouders van de gemeente waar de woning is gelegen waarop de huurtoeslag betrekking heeft;\n  b. huurcommissie:\
+    \ de huurcommissie, bedoeld in artikel 3a, eerste lid, van de Uitvoeringswet huurprijzen woonruimte;\n  c. huurder: persoon\
+    \ die zijn hoofdverblijf heeft in een door hem gehuurde woning, daaronder begrepen een woonwagen, tenzij:\n  1°. de overeenkomst\
+    \ van huur en verhuur een gebruik van de woning betreft dat naar zijn aard slechts van korte duur is, of\n  2°. de woning\
+    \ onderdeel uitmaakt van een hotel-, pension-, kamp- of vakantiebestedingsbedrijf, ongeacht de duur van de huurovereenkomst;\n\
+    \  d. huurprijs: de prijs die bij huur en verhuur is verschuldigd voor het enkele gebruik van een woning;\n  e. huurtoeslag:\
+    \ een tegemoetkoming van het Rijk als bedoeld in artikel 2, eerste lid, onderdeel h, van de Algemene wet inkomensafhankelijke\
+    \ regelingen in de kosten van het huren van een woning;\n  f. onderhuurder: persoon als bedoeld in artikel 2, eerste lid,\
+    \ onderdeel e, onder 2°, van de Algemene wet inkomensafhankelijke regelingen;\n  g. Onze Minister: Onze Minister van Volkshuisvesting\
+    \ en Ruimtelijke Ordening;\n  h. rekenhuur: de rekenhuur, bedoeld in artikel 5;\n  i. rekeninkomen: de gezamenlijke toetsingsinkomens,\
+    \ bedoeld in artikel 8 van de Algemene wet inkomensafhankelijke regelingen, die in aanmerking worden genomen voor het\
+    \ bepalen van de draagkracht, bedoeld in artikel 7 van die wet;\n  j. standplaats: kavel, bestemd voor het plaatsen van\
+    \ een woonwagen, waarop voorzieningen aanwezig zijn die op het leidingnet van de openbare nutsbedrijven, andere instellingen\
+    \ of van gemeenten kunnen worden aangesloten;\n  k. woning: een gebouwde onroerende zaak voor zover deze als zelfstandige\
+    \ woonruimte, onvrije etage dan wel andere onzelfstandige woonruimte is verhuurd, alsmede de onroerende aanhorigheden;\n\
+    \  l. woonwagen: voor bewoning bestemd gebouw dat is geplaatst op een standplaats en dat in zijn geheel of in delen kan\
+    \ worden verplaatst."
   url: https://wetten.overheid.nl/BWBR0008659/2025-01-01#Artikel1
   machine_readable:
     definitions:
@@ -196,16 +213,19 @@ articles:
           reference: $prev_january_first
       - name: HUURPRIJS
         type: amount
+        required: true
         source_reference:
           source_type: claim
           wallet_attribute: rent
       - name: SERVICEKOSTEN
         type: amount
+        required: true
         source_reference:
           source_type: claim
           wallet_attribute: service_charges
       - name: SUBSIDIABELE_SERVICEKOSTEN
         type: amount
+        required: true
         source_reference:
           source_type: claim
           wallet_attribute: eligible_service_charges

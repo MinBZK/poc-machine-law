@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: kernenergiewet
 regulatory_layer: WET
 publication_date: '2024-07-01'
@@ -11,7 +11,14 @@ uuid: 3f8a5c2d-9e7b-4f1c-8d6a-1b9e4c7a2f5d
 discoverable: BUSINESS
 articles:
 - number: '15'
-  text: ''
+  text: "Het is verboden zonder vergunning van de Autoriteit:\n  a. splijtstoffen of ertsen te vervoeren, voorhanden te hebben,\
+    \ binnen of buiten Nederlands grondgebied te brengen of te doen brengen, dan wel zich daarvan te ontdoen;\n  b. een inrichting,\
+    \ waarin kernenergie kan worden vrijgemaakt, splijtstoffen kunnen worden vervaardigd, bewerkt of verwerkt, dan wel splijtstoffen\
+    \ worden opgeslagen, op te richten, inwerking te brengen, in werking te houden, buiten gebruik te stellen of te wijzigen\
+    \ of een inrichting, waarin kernenergie kon worden vrijgemaakt, splijtstoffen konden worden vervaardigd, bewerkt of verwerkt,\
+    \ dan wel splijtstoffen werden opgeslagen, te ontmantelen;\n  c. een uitrusting, geschikt om een vaartuig of ander vervoermiddel\
+    \ door middel van kernenergie voort te bewegen, daarin aan te brengen of aangebracht te houden, dan wel zodanige daarin\
+    \ aangebrachte uitrusting in werking te brengen, in werking te houden of te wijzigen."
   url: https://wetten.overheid.nl/BWBR0002402/2024-07-01#Artikel15
   machine_readable:
     definitions:

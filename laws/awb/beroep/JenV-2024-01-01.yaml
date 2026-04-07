@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: awb/beroep
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -10,7 +10,7 @@ service: JenV
 uuid: c4fda809-15f2-454a-9e9b-f645b905ca12
 articles:
 - number: '8:1'
-  text: ''
+  text: Een belanghebbende kan tegen een besluit beroep instellen bij de bestuursrechter.
   url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Artikel8:1
   machine_readable:
     definitions:

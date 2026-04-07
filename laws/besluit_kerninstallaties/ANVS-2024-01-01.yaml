@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: besluit_kerninstallaties
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,56 @@ uuid: 9c6e5a4f-3d8b-4c2a-9e7d-6b4f8c9a3e2d
 discoverable: BUSINESS
 articles:
 - number: '1'
-  text: ''
+  text: "1 In dit besluit en de daarop berustende bepalingen wordt verstaan onder:\n  - beheer van verbruikte splijtstoffen:\n\
+    alle activiteiten die te maken hebben met het hanteren, de voorbehandeling, de behandeling, het conditioneren, de opslag,\
+    \ de opwerking of de eindberging van verbruikte splijtstoffen, met uitzondering van het vervoer buiten het terrein van\
+    \ de faciliteit;\n  - bron:\nsplijtstof of erts;\n  - buiten-ontwerpongeval:\nongeval waarvan de kans dat het zich voordoet\
+    \ geringer is dan elk van de gepostuleerde begin-gebeurtenissen en waarbij niet is uit te sluiten dat door het vrijkomen\
+    \ van splijtstoffen of radioactieve stoffen de bij artikel 18 vastgestelde limietwaarden voor de gepostuleerde begin-gebeurtenissen\
+    \ worden overschreden;\n  - gehalte:\nmassagehalte van de elementen uranium, thorium en plutonium in splijtstoffen;\n\
+    \  - gepostuleerde begin-gebeurtenissen:\nredelijkerwijs mogelijk te achten voorvallen die bij juist functioneren van\
+    \ de daartoe speciaal ontworpen veiligheidssystemen tot voorzienbare bedrijfsgevolgen of ongevalsomstandigheden leiden\
+    \ die een besmetting of een blootstelling van de omgeving kunnen veroorzaken;\n  - gevaarlijke stof:\ngevaarlijke stof\
+    \ als bedoeld in artikel 3, tiende lid, van de Seveso-richtlijn;\n  - handeling:\nhandeling als genoemd in artikel 15\
+    \ van de wet, niet zijnde het vervoeren van, het voorhanden hebben bij opslag in verband met vervoer, of het binnen of\
+    \ buiten Nederlands grondgebied brengen of doen brengen van splijtstoffen of ertsen, uitgezonderd bij een interventie,\
+    \ een ongeval of een radiologische noodsituatie;\n  - hoogactieve bron:\nhoogactieve bron als bedoeld in artikel 1.2 in\
+    \ samenhang met bijlage 1 van het Besluit basisveiligheidsnormen stralingsbescherming;\n  - ingekapselde bron:\nsplijtstoffen\
+    \ of ertsen welke permanent in een omhulsel zijn ingekapseld, dan wel gebonden zijn in vaste vorm teneinde onder normale\
+    \ gebruiksomstandigheden iedere verspreiding van splijtstoffen of ertsen te voorkomen;\n  - lid van de bevolking:\neen\
+    \ persoon uit de bevolking binnen of buiten een locatie, niet zijnde een werknemer gedurende zijn werktijd of een persoon\
+    \ die een medische blootstelling ondergaat;\n  - locatie:\ninrichting of uitrusting als bedoeld in artikel 15, onder b\
+    \ of c, van de wet, locatie waarop een milieubelastende activiteit die is aangewezen in hoofdstuk 3 van het Besluit activiteiten\
+    \ leefomgeving wordt verricht of plaats waar een handeling wordt verricht;\n  - natuurlijk uranium:\ndoor een chemisch\
+    \ scheidingsproces verkregen uranium waarin de uraniumisotopen zich in de natuurlijke verhouding bevinden;\n  - nucleaire\
+    \ drukapparatuur:\nspeciaal voor nucleair gebruik in inrichtingen als bedoeld in artikel 15, onder b, van de wet ontworpen\
+    \ drukapparatuur die bij defecten de verspreiding van radioactiviteit kan veroorzaken, met uitzondering van splijtstofstaven\
+    \ en opslag- en transportverpakkingen;\n  - ondernemer:\nnatuurlijke persoon, rechtspersoon of bestuursorgaan onder wiens\
+    \ verantwoordelijkheid een handeling wordt verricht of maatregel wordt uitgevoerd;\n  - ontmantelingsplan:\nplan met een\
+    \ beschrijving van de wijze waarop een inrichting als bedoeld in artikel 15, onder b, van de wet buiten gebruik wordt\
+    \ gesteld en ontmanteld;\n  - Onze Minister:\nOnze Minister van Infrastructuur en Milieu;\n  - referentiedreiging:\nlange\
+    \ termijnanalyse van dreigingen van diefstal van de in de bijlage genoemde splijtstoffen en ertsen dan wel van sabotage\
+    \ van die splijtstoffen of ertsen, of van inrichtingen als bedoeld in artikel 15, onder b, van de wet;\n  - schade:\n\
+    nadelige gevolgen van ioniserende straling voor mensen, dieren, planten en goederen;\n  - Seveso-richtlijn:\nRichtlijn\
+    \ 2012/18/EU van het Europees Parlement en de Raad van 4 juli 2012 betreffende de beheersing van de gevaren van zware\
+    \ ongevallen waarbij gevaarlijke stoffen zijn betrokken, houdende wijziging en vervolgens intrekking van Richtlijn 96/82/EG\
+    \ van de Raad (PbEU 2012, L 197);\n  - splijtstof of erts bevattende afvalstof:\nsplijtstof die, of erts dat krachtens\
+    \ artikel 19 van dit besluit in samenhang met artikel 10.7, eerste en tweede lid, van het Besluit basisveiligheidsnormen\
+    \ stralingsbescherming als zodanig is aangemerkt en niet wordt geloosd;\n  - verbruikte splijtstof:\nkernsplijtstof die\
+    \ bestraald is en permanent uit een reactorkern is verwijderd;\n  - verrijkingsgraad:\nmassagehalte van uranium-235 en\
+    \ uranium-233 tezamen in verrijkt uranium;\n  - verrijkt uranium:\nuranium met een hoger massapercentage uranium-235 dan\
+    \ in natuurlijk uranium;\n  - wet:\nKernenergiewet.\n2 In dit besluit en de daarop berustende bepalingen wordt onder «activiteit»,\
+    \ «blootstelling», «deskundige», «effectieve dosis» «eindberging», «equivalente dosis», «gezondheidsschade», «omgevingsdosisequivalent»,\
+    \ «radiotoxiciteitsequivalent», »richtlijn 2011/77/Euratom» en «wet» verstaan hetgeen daaronder wordt verstaan in artikel\
+    \ 1.2 in samenhang met bijlage 1 van het Besluit basisveiligheidsnormen stralingsbescherming.\n3 In dit besluit en de\
+    \ daarop berustende bepalingen wordt onder «besmetting», «lozing in de lucht», «lozing in het openbare riool» en «lozing\
+    \ in het oppervlaktewater» verstaan hetgeen daaronder wordt verstaan in artikel 1.2 in samenhang met bijlage 1 van het\
+    \ Besluit basisveiligheidsnormen stralingsbescherming, met dien verstande dat in plaats van «radioactieve stoffen» telkens\
+    \ «splijtstoffen of ertsen» wordt gelezen.\n4 Vervallen.\n5 In dit besluit en de daarop berustende bepalingen wordt onder\
+    \ «voorhanden hebben» mede verstaan: in bezit hebben, beheren, bewaren of anderszins feitelijk onder zich hebben, of het\
+    \ vervaardigen, bewerken, hanteren en opslaan, met uitzondering van het voorhanden hebben bij de opslag in verband met\
+    \ vervoer.\n6 In dit besluit en de daarop berustende bepalingen wordt onder drukvaten, installatieleidingen, veiligheidsappendages\
+    \ en onder druk staande appendages verstaan hetgeen daaronder wordt verstaan in het Warenwetbesluit drukapparatuur."
   url: https://wetten.overheid.nl/BWBR0002667/2024-01-01#Artikel1
   machine_readable:
     definitions:

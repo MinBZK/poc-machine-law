@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: algemene_ouderdomswet
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,11 @@ uuid: 13dc8a31-91eb-4598-998c-012c9129b9ea
 discoverable: CITIZEN
 articles:
 - number: '7'
-  text: ''
+  text: "1 Recht op ouderdomspensioen overeenkomstig de bepalingen van deze wet heeft degene, die\n  a. de pensioengerechtigde\
+    \ leeftijd heeft bereikt, en\n  b. ingevolge deze wet minimaal één kalenderjaar verzekerd is geweest in het tijdvak, aanvangende\
+    \ met de dag waarop de aanvangsleeftijd is bereikt en eindigende met de dag voorafgaande aan de dag waarop de pensioengerechtigde\
+    \ leeftijd is bereikt.\n2 Bij ministeriële regeling worden regels gesteld omtrent de herleiding van gedeelten van kalenderjaren\
+    \ tot gehele kalenderjaren."
   url: https://wetten.overheid.nl/BWBR0002221/2024-01-01#Artikel7
   machine_readable:
     definitions:

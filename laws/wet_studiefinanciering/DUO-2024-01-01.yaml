@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: wet_studiefinanciering
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -10,7 +10,15 @@ service: DUO
 uuid: e3bb489c-b7d1-49dd-985c-a3cde1ab0ad3
 articles:
 - number: '3.1'
-  text: ''
+  text: "1 Studiefinanciering bestaat voor een opleiding in het beroepsonderwijs uit een basisbeurs, een basislening en een\
+    \ aanvullende beurs of aanvullende lening, en kan geheel of gedeeltelijk worden toegekend in de vorm van:\n  a. een gift;\n\
+    \  b. een prestatiebeurs; of\n  c. een lening.\n2 Studiefinanciering bestaat voor een opleiding in het hoger onderwijs\
+    \ uit een basisbeurs, een basislening, een aanvullende beurs of aanvullende lening en collegegeldkrediet, en kan geheel\
+    \ of gedeeltelijk worden toegekend in de vorm van:\n  a. een gift;\n  b. een prestatiebeurs; of\n  c. een lening.\n3 Indien\
+    \ een student geen aanspraak heeft op studiefinanciering als bedoeld in het eerste of tweede lid bestaat studiefinanciering\
+    \ uit levenlanglerenkrediet.\n4 De hoogte van de studiefinanciering wordt vastgesteld op basis van een budget voor een\
+    \ kalendermaand.\n5 In afwijking van het vierde lid kan de hoogte van de studiefinanciering ook worden vastgesteld op\
+    \ een tegemoetkoming in de kosten van de toegang tot het onderwijs."
   url: https://wetten.overheid.nl/BWBR0011453/2024-01-01#Artikel3.1
   machine_readable:
     definitions:

@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: wet_werk_en_inkomen_naar_arbeidsvermogen
 regulatory_layer: WET
 publication_date: '2025-01-01'
@@ -10,7 +10,14 @@ service: UWV
 uuid: 4c8e1f6a-9d2b-4e3a-8b5c-1d9f8e2a6c4b
 articles:
 - number: '54'
-  text: ''
+  text: "1 Recht op een WGA-uitkering ontstaat voor de verzekerde die ziek wordt indien:\n  a. hij de wachttijd heeft doorlopen;\n\
+    \  b. hij gedeeltelijk arbeidsgeschikt is; en\n  c. er op hem geen uitsluitingsgrond van toepassing is.\n2 Het recht op\
+    \ een WGA-uitkering ontstaat niet eerder dan op de eerste dag na afloop van de wachttijd of indien op die dag de uitsluitingsgrond,\
+    \ bedoeld in artikel 43, onderdeel b, van toepassing is, op de dag dat zich die uitsluitingsgrond niet meer voordoet.\n\
+    3 De WGA-uitkering bestaat voor de verzekerde die voldoet aan de referte-eis, bedoeld in artikel 58 uit een loongerelateerde\
+    \ uitkering en na afloop hiervan uit een loonaanvullingsuitkering of een vervolguitkering.\n4 De WGA-uitkering bestaat\
+    \ voor de verzekerde die niet voldoet aan de referte-eis, bedoeld in artikel 58 uit een loonaanvullingsuitkering of een\
+    \ vervolguitkering."
   url: https://wetten.overheid.nl/BWBR0019057/2025-01-01#Artikel54
   machine_readable:
     execution:

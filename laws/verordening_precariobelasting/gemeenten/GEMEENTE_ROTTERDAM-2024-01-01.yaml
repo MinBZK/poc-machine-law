@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: verordening_precariobelasting
 regulatory_layer: GEMEENTELIJKE_VERORDENING
 publication_date: '2024-01-01'
@@ -10,8 +10,8 @@ uuid: b5d8e2f4-3a6c-4b9e-a7d1-9c4f2e8b1a53
 discoverable: BUSINESS
 articles:
 - number: '2'
-  text: ''
-  url: https://wetten.overheid.nl/2024-01-01#Artikel2
+  text: '1. Onder de naam ''precariobelasting'' wordt een directe belasting geheven ter zake van het hebben van voorwerpen onder, op of boven voor de openbare dienst bestemde gemeentegrond, bedoeld of genoemd in deze verordening. 2. Onder de naam ''reclamebelasting'' wordt een directe belasting geheven voor een openbare aankondiging die zichtbaar is vanaf de openbare weg.'
+  url: https://lokaleregelgeving.overheid.nl/CVDR719500/1#artikel_2
   machine_readable:
     definitions:
       BELASTINGJAAR:

@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: burgerlijk_wetboek_executeur
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,7 @@ uuid: 9e69492c-c73d-44ea-9672-8a1d36f53ad5
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '144'
-  text: ''
+  text: '1. Onverminderd de testamentaire lasten die de erflater aan de executeur mocht hebben opgelegd, heeft deze, voor zover de erflater niet anders heeft beschikt, tot taak de goederen der nalatenschap te beheren en de schulden der nalatenschap te voldoen, die tijdens zijn beheer uit die goederen behoren te worden voldaan. 2. Tenzij bij uiterste wil anders is geregeld, komt de executeur, of als er meer dan een executeur is, hun tezamen, een ten honderd van de waarde van het vermogen van de erflater op diens sterfdag toe. 3. Artikel 159 leden 2 en 3 is van overeenkomstige toepassing.'
   url: https://wetten.overheid.nl/BWBR0002761/2024-01-01#Artikel144
   machine_readable:
     definitions:

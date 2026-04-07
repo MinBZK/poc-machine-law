@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: handelsregisterwet
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -10,7 +10,12 @@ service: KVK
 uuid: 8b59ef92-03f8-4294-bce9-4eaac01ba0ed
 articles:
 - number: '2'
-  text: ''
+  text: "Er is een handelsregister van ondernemingen en rechtspersonen:\n  a. ter bevordering van de rechtszekerheid in het\
+    \ economisch verkeer;\n  b. voor de verstrekking van gegevens van algemene, feitelijke aard omtrent de samenstelling van\
+    \ ondernemingen en rechtspersonen ter bevordering van de economische belangen van handel, industrie, ambacht en dienstverlening;\n\
+    \  c. voor het registreren van alle ondernemingen en rechtspersonen als onderdeel van de gegevenshuishouding die bijdraagt\
+    \ aan het efficiënt functioneren van en de rechtshandhaving door de overheid;\n  d. voor het registreren van uiteindelijk\
+    \ belanghebbenden ter voorkoming van het gebruik van het financiële stelsel voor het witwassen van geld en terrorismefinanciering."
   url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Artikel2
   machine_readable:
     definitions:

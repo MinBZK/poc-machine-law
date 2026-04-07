@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: algemene_plaatselijke_verordening/terrassen
 regulatory_layer: GEMEENTELIJKE_VERORDENING
 publication_date: '2024-01-01'
@@ -10,8 +10,23 @@ uuid: 3e7f9b2a-5d8c-4a1e-9f6b-8c2d4e7a3b1f
 discoverable: BUSINESS
 articles:
 - number: 2:30b
-  text: ''
-  url: https://wetten.overheid.nl/2024-01-01#Artikel2:30b
+  text: 'Artikel 2:30b Terrassen 1. Ingeval van een exploitatievergunningaanvraag die tevens van toepassing is voor een of
+    meer bij de openbare inrichting behorende terrassen, beslist de burgemeester – gelet op de openbare orde en veiligheid
+    ter plaatse hetgeen mede omvat de kwaliteit en het uiterlijk aanzien van de terrassen – tevens omtrent de ingebruikneming
+    van de openbare weg. 2. Onverminderd het bepaalde in de artikelen 1:6, 1:8 en 2:28, kan de burgemeester de in het eerste
+    lid bedoelde ingebruikneming van de openbare weg weigeren of verbieden indien het de verwachting is dat het gebruik: a.
+    schade toebrengt aan de weg dan wel gevaar kan veroorzaken voor de bruikbaarheid van de weg of voor het doelmatig en veilig
+    gebruik daarvan; b. een belemmering vormt voor het doelmatig beheer en onderhoud van de weg; c. afbreuk doet aan andere
+    publieke functies van de openbare ruimte, inclusief de bescherming van het uiterlijk aanzien daarvan. 3. Als voor het
+    uitvoeren van openbare werken of om enigerlei andere reden verwijdering van het terras noodzakelijk is, is de exploitant
+    van de openbare inrichting verplicht dit binnen de door het bevoegde bestuursorgaan gestelde termijn, te verwijderen.
+    4. Het is verboden dranken of eetwaren voor gebruik ter plaatse te verstrekken buiten dat deel van de weg waarvan het
+    gebruik ingevolge het eerste lid is toegestaan. 5. De exploitant of de beheerder is verplicht te zorgen dat dagelijks,
+    uiterlijk een uur na sluiting van de openbare inrichting, doch in ieder geval onverwijld op eerste aanzegging van een
+    ambtenaar, belast met het toezicht op de naleving van het bepaalde in dit artikel, in de nabijheid van het terras op de
+    weg achtergebleven stoffen of voorwerpen, voor zover kennelijk uit of van dat terras afkomstig, worden verwijderd. <section
+    class="section-chapter js-scrollSection"'
+  url: https://lokaleregelgeving.overheid.nl/CVDR373493/11#artikel_2:30b
   machine_readable:
     definitions:
       MINIMALE_OBSTAKELVRIJE_RUIMTE:

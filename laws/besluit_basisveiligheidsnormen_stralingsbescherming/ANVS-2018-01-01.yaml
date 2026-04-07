@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: besluit_basisveiligheidsnormen_stralingsbescherming
 regulatory_layer: WET
 publication_date: '2018-01-01'
@@ -11,7 +11,23 @@ uuid: 7b4d8f3e-2c9a-4e1d-9f7b-5a3e6c8d1f4a
 discoverable: BUSINESS
 articles:
 - number: '3.7'
-  text: ''
+  text: "Een vergunning wordt geweigerd indien:\n  a. ten aanzien van de handeling waarop de aanvraag betrekking heeft, niet\
+    \ wordt voldaan aan het bepaalde in:\n  1°. hoofdstuk 2, 7 of 8, met betrekking tot rechtvaardiging, optimalisatie en\
+    \ dosislimitering, of\n  2°. hoofdstuk 5, met betrekking tot deskundigheid;\n  b. voor een lid van de bevolking dat zich\
+    \ op enig punt buiten de locatie bevindt, als gevolg van de handeling waarop de aanvraag betrekking heeft en ten gevolge\
+    \ van alle toegestane handelingen die onder verantwoordelijkheid van de ondernemer worden verricht, een effectieve dosis\
+    \ van 0,1 millisievert in een kalenderjaar wordt overschreden of kan worden overschreden;\n  c. voor een lid van de bevolking\
+    \ dat zich buiten de locatie bevindt, ten gevolge van de handeling waarop de aanvraag betrekking heeft en ten gevolge\
+    \ van andere handelingen binnen en buiten deze locatie, een van de volgende doses wordt overschreden of kan worden overschreden:\n\
+    \  1°. een effectieve dosis van 1 millisievert in een kalenderjaar en, met inachtneming daarvan:\n  2°. een equivalente\
+    \ dosis van 50 millisievert in een kalenderjaar voor de huid, gemiddeld over enig huidoppervlak van 1 cm2;\n  d. de handeling\
+    \ waarop de aanvraag betrekking heeft behoort tot een soort of categorie die op grond van paragraaf 2.2 generiek is gerechtvaardigd,\
+    \ maar het specifieke karakter van die handeling op grond van het bepaalde in die paragraaf niet gerechtvaardigd is;\n\
+    \  e. niet is aangetoond dat een krachtens dit besluit vereiste financiële zekerheid is gesteld;\n  f. geen, of een ontoereikend,\
+    \ beveiligingsplan als bedoeld in artikel 4.7, bedrijfsnoodplan als bedoeld in artikel 6.7 of beëindigingsplan als bedoeld\
+    \ in artikel 10.8 bij de aanvraag is gevoegd, voor zover vereist krachtens artikel 3.6, derde lid, aanhef en onder e;\n\
+    \  g. niet wordt voldaan aan bij of krachtens de wet met het oog op stralingsbescherming gestelde regels of voorschriften;\
+    \ of\n  h. internationale verplichtingen tot het weigeren van de vergunning noodzaken."
   url: https://wetten.overheid.nl/BWBR0040179/2018-01-01#Artikel3.7
   machine_readable:
     definitions:

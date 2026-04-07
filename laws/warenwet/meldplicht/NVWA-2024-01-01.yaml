@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: warenwet/meldplicht
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,19 @@ uuid: a4c7e9f1-2b5d-4e8a-93f6-5a1c9b7e2d40
 discoverable: BUSINESS
 articles:
 - number: '21'
-  text: ''
+  text: '1 Indien waren naar het oordeel van Onze Minister gevaar opleveren voor de veiligheid of de gezondheid van de mens,
+    of indien het technische voortbrengselen betreft, tevens gevaar opleveren voor de veiligheid van zaken, kan hij met het
+    oog op de bescherming van die belangen degene die de waar of het voortbrengsel verhandelt of heeft verhandeld, gelasten
+    om de houders dan wel de vermoedelijke houders van die waar onverwijld en op doeltreffende wijze op de hoogte te stellen
+    van het gevaar. Degene tot wie de last is gericht, geeft daaraan onverwijld gevolg.
+
+    2 Indien waren, niet zijnde eet- of drinkwaren, naar het oordeel van Onze Minister gevaar opleveren voor de veiligheid
+    of de gezondheid van de mens, of gevaar opleveren voor de veiligheid van zaken, kan hij met het oog op de bescherming
+    van die belangen degene die de waar verhandelt of heeft verhandeld, gelasten de verhandeling daarvan te staken dan wel
+    al de noodzakelijke maatregelen te treffen om die waar terug te nemen. Degene tot wie de last is gericht, geeft daaraan
+    onverwijld gevolg.
+
+    3 Het niet uitvoeren van een door Onze Minister gegeven last als bedoeld in het tweede lid is een misdrijf.'
   url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#Artikel21
   machine_readable:
     definitions:

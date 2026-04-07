@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: handelsregisterwet/bedrijfsgegevens
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -10,7 +10,10 @@ service: KVK
 uuid: 1b3c8d9e-5f2a-4c7b-8e1d-9a2b3c4d5e6f
 articles:
 - number: '14'
-  text: ''
+  text: "1 In het handelsregister worden over een vestiging van een rechtspersoon waaraan geen onderneming toebehoort opgenomen:\n\
+    \  a. een door de Kamer toegekend uniek nummer;\n  b. de naam;\n  c. het post- en bezoekadres;\n  d. de datum van ingebruikname\
+    \ of beëindiging.\n2 Indien een rechtspersoon meerdere vestigingen heeft, wordt in het handelsregister opgenomen welke\
+    \ vestiging de hoofdvestiging of de hoofdnederzetting is."
   url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Artikel14
   machine_readable:
     execution:

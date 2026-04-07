@@ -1,17 +1,30 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: zorgtoeslagwet
 regulatory_layer: WET
 publication_date: '2024-01-01'
 valid_from: '2024-01-01'
 name: Zorgtoeslag
-url: https://wetten.overheid.nl/2024-01-01
+bwb_id: BWBR0018451
+url: https://wetten.overheid.nl/BWBR0018451/2024-01-01
 service: TOESLAGEN
 uuid: 5be9dbe7-f565-40e2-8931-da82825dcf21
 discoverable: CITIZEN
 articles:
 - number: '1'
-  text: ''
-  url: https://wetten.overheid.nl/2024-01-01#Artikel1
+  text: "1 In deze wet en de daarop berustende bepalingen wordt, tenzij anders is geregeld, verstaan onder:\n  a. Onze Minister:\
+    \ Onze Minister van Volksgezondheid, Welzijn en Sport;\n  b. zorgverzekering: de schadeverzekering, bedoeld in artikel\
+    \ 1, onder d, van de Zorgverzekeringswet;\n  c. verzekerde: de persoon, bedoeld in artikel 1, onder f, of in artikel 69\
+    \ van de Zorgverzekeringswet, vanaf de eerste dag van de kalendermaand volgende op de maand waarin hij achttien jaar wordt,\
+    \ met uitzondering van de verzekerde, bedoeld in artikel 24, eerste of tweede lid, van die wet;\n  d. premie: een premie\
+    \ als bedoeld in afdeling 3.3.1 van de Zorgverzekeringswet;\n  e. zorgtoeslag: een tegemoetkoming in een premie dan wel\
+    \ in een bestuursrechtelijke premie als bedoeld in artikel 18d of 18e van de Zorgverzekeringswet en in het verplicht eigen\
+    \ risico, bedoeld in artikel 19 van de Zorgverzekeringswet;\n  f. drempelinkomen: 108% van het twaalfvoud van het voor\
+    \ de maand januari van het berekeningsjaar geldende in artikel 8, eerste lid, onderdeel b, van de Wet minimumloon en minimumvakantiebijslag\
+    \ bedoelde bedrag per maand;\n  g. de standaardpremie: het op grond van artikel 4 vastgestelde bedrag;\n  h. de normpremie:\
+    \ de aan de hand van het drempelinkomen en het toetsingsinkomen van de verzekerde berekende premie voor een zorgverzekering\
+    \ in het berekeningsjaar.\n2 De hoogte van de zorgtoeslag is afhankelijk van de draagkracht op basis van het inkomen en\
+    \ het vermogen."
+  url: https://wetten.overheid.nl/BWBR0018451/2024-01-01#Artikel1
   machine_readable:
     definitions:
       MINIMUM_LEEFTIJD:

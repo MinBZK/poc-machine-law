@@ -1,17 +1,18 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: algemene_wet_bestuursrecht
 regulatory_layer: WET
 publication_date: '1994-01-01'
 valid_from: '1994-01-01'
 name: Bestuursorgaan Definitie
-url: https://wetten.overheid.nl/1994-01-01
+bwb_id: BWBR0005537
+url: https://wetten.overheid.nl/BWBR0005537/1994-01-01
 service: AWB
 uuid: 7b2c4d8e-3f91-4a6b-9c5e-8d7f6a5b4c3d
 discoverable: BUSINESS
 articles:
 - number: '1'
-  text: ''
-  url: https://wetten.overheid.nl/1994-01-01#Artikel1
+  text: '1. Onder bestuursorgaan wordt verstaan: a. een orgaan van een rechtspersoon die krachtens publiekrecht is ingesteld, of b. een ander persoon of college, met enig openbaar gezag bekleed. 2. De volgende organen, personen en colleges worden niet als bestuursorgaan aangemerkt: a. de wetgevende macht; b. de kamers en de verenigde vergadering der Staten-Generaal; c. onafhankelijke, bij de wet ingestelde organen die met rechtspraak zijn belast, alsmede de Raad voor de rechtspraak en het College van afgevaardigden; d. de Raad van State en zijn afdelingen; e. de Algemene Rekenkamer; f. de Nationale ombudsman en de substituut-ombudsmannen als bedoeld in artikel 9, eerste lid, van de Wet Nationale ombudsman, en ombudsmannen en ombudscommissies als bedoeld in artikel 9:17, onderdeel b; g. de voorzitters, leden, griffiers en secretarissen van de in de onderdelen b tot en met f bedoelde organen, de procureur-generaal, de plaatsvervangend procureur-generaal en de advocaten-generaal bij de Hoge Raad, de besturen van de in onderdeel c bedoelde organen alsmede de voorzitters van die besturen, alsmede de commissies uit het midden van de in de onderdelen b tot en met f bedoelde organen; h. de commissie van toezicht op de inlichtingen- en veiligheidsdiensten en haar afdelingen, bedoeld in artikel 97 van de Wet op de inlichtingen- en veiligheidsdiensten 2017; i. de toetsingscommissie inzet bevoegdheden, bedoeld in artikel 32 van de Wet op de inlichtingen- en veiligheidsdiensten 2017. 3. Een ingevolge het tweede lid uitgezonderd orgaan, persoon of college wordt wel als bestuursorgaan aangemerkt voor zover het orgaan, de persoon of het college besluiten neemt of handelingen verricht ten aanzien van een persoon met betrekking tot diens in artikel 3 van de Ambtenarenwet 2017 bedoelde hoedanigheid, zijn nagelaten betrekkingen of zijn rechtverkrijgenden, met uitzondering van een voor het leven benoemde ambtenaar werkzaam bij de Raad van State en zijn afdelingen en de Algemene Rekenkamer. 4. De vermogensrechtelijke gevolgen van een handeling van een bestuursorgaan treffen de rechtspersoon waartoe het bestuursorgaan behoort.'
+  url: https://wetten.overheid.nl/BWBR0005537/1994-01-01#Artikel1
   machine_readable:
     definitions:
       TWEE_DERDE_DREMPEL:

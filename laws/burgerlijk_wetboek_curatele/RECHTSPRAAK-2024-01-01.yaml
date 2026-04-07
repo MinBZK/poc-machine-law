@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: burgerlijk_wetboek_curatele
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,16 @@ uuid: b270d49d-f98d-4f3a-bff7-1043dbd5dacb
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '378'
-  text: ''
+  text: "1 Een meerderjarige kan door de kantonrechter onder curatele worden gesteld, wanneer hij tijdelijk of duurzaam zijn\
+    \ belangen niet behoorlijk waarneemt of zijn veiligheid of die van anderen in gevaar brengt, als gevolg van\n  a. zijn\
+    \ lichamelijke of geestelijke toestand, dan wel\n  b. gewoonte van drank- of drugsmisbruik,\nen een voldoende behartiging\
+    \ van die belangen niet met een meer passende en minder verstrekkende voorziening kan worden bewerkstelligd.\n2 Indien\
+    \ te verwachten is dat ten aanzien van een minderjarige op het tijdstip waarop hij meerderjarig zal worden, van een der\
+    \ in het vorige lid genoemde gronden voor curatele sprake zal zijn, kan de curatele reeds voor de meerderjarigheid worden\
+    \ uitgesproken.\n3 De rechter bij wie een verzoek tot het verlenen van een rechterlijke machtiging als bedoeld in de Wet\
+    \ zorg en dwang psychogeriatrische en verstandelijk gehandicapte cliënten dan wel een zorgmachtiging of een machtiging\
+    \ tot voorzetting van de crisismaatregel als bedoeld in de Wet verplichte geestelijke gezondheidszorg aanhangig is, is\
+    \ tevens bevoegd tot de kennisneming van een verzoek tot ondercuratelestelling."
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel378
   machine_readable:
     definitions:

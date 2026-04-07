@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: zorgverzekeringswet/bijdrage
 regulatory_layer: WET
 publication_date: '2026-01-01'
@@ -11,7 +11,7 @@ uuid: 2b4c6d8e-1a3f-4e5b-8c7d-9f0e1a2b3c4d
 discoverable: CITIZEN
 articles:
 - number: '41'
-  text: ''
+  text: De inhoudingsplichtige en de verzekeringsplichtige zijn een inkomensafhankelijke bijdrage verschuldigd.
   url: https://wetten.overheid.nl/BWBR0018450/2026-01-01#Artikel41
   machine_readable:
     definitions:

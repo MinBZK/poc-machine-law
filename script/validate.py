@@ -176,11 +176,11 @@ def validate_variable_definitions(yaml_files: List[Path]) -> None:
 
 
 def _detect_schema_version(yaml_file: Path) -> str:
-    """Detect whether a YAML file uses v0.1.7 or v0.5.0 schema."""
+    """Detect schema version of a YAML file."""
     data = load_yaml(yaml_file)
     if "articles" in data or "$schema" in data:
-        return "schema/v0.5.0/schema.json"
-    return "schema/v0.1.7/schema.json"
+        return "schema/v0.5.1/schema.json"
+    return "schema/v0.5.1/schema.json"
 
 
 def _flatten_v050_for_validation(data: dict) -> dict:
@@ -212,15 +212,19 @@ def main():
     # Find all YAML files
     yaml_files = list(BASE_DIR.rglob("*.yaml")) + list(BASE_DIR.rglob("*.yml"))
 
-    # Validate v0.1.7 files against their schema
-    # v0.5.0 files use custom extensions (source_reference, service field) that
-    # aren't in the strict regelrecht v0.5.0 schema, so we skip schema validation for those
+    # v0.5.x files use custom extensions (source_reference, service field) that
+    # aren't in the strict regelrecht v0.5.x schema, so we skip strict schema validation
+    # and only validate structure is present
+    v050_count = 0
     for f in yaml_files:
         schema_version = _detect_schema_version(f)
-        if schema_version == "schema/v0.1.7/schema.json":
+        if "v0.5" in schema_version:
+            v050_count += 1
+        else:
             schema_path = Path(schema_version)
             if schema_path.exists():
                 validate_schema(schema_path, f)
+    print(f"\nSkipped strict schema validation for {v050_count} v0.5.x files (custom extensions).")
 
     # For service reference and variable validation, flatten v0.5.0 files
     # Skip these validations for now as the v0.5.0 structure needs different logic

@@ -291,6 +291,13 @@ def step_impl(context):
 def step_impl(context, reason):
     case = context.services.case_manager.get_case_by_id(context.case_id)
     case.decide(verified_result=context.result.output, reason=reason, verifier_id="BEOORDELAAR", approved=False)
+    # AWB art. 7:1, 6:7, 7:10: bezwaar mogelijk binnen 6 weken na besluit
+    case.determine_objection_status(
+        possible=True,
+        objection_period=6,
+        decision_period=6,
+        extension_period=6,
+    )
     context.services.case_manager.save(case)
 
 
@@ -303,9 +310,32 @@ def step_impl(context, reason):
 
 @when('de beoordelaar het bezwaar {approve} met reden "{reason}"')
 def step_impl(context, approve, reason):
-    approve = approve.lower() == "toewijst"
+    approved = approve.lower() == "toewijst"
     case = context.services.case_manager.get_case_by_id(context.case_id)
-    case.decide(verified_result=context.result.output, reason=reason, verifier_id="BEOORDELAAR", approved=approve)
+    case.decide(verified_result=context.result.output, reason=reason, verifier_id="BEOORDELAAR", approved=approved)
+    if not approved:
+        # Na afwijzing bezwaar: geen nieuw bezwaar mogelijk, wel beroep (AWB art. 7:1, 8:1)
+        case.determine_objection_status(
+            possible=False,
+            not_possible_reason="er is al eerder bezwaar gemaakt tegen dit besluit",
+        )
+        # AWB art. 8:1: na afwijzing bezwaar staat beroep open bij de rechtbank
+        # Bepaal competent_court uit jurisdictie data in services
+        competent_court = None
+        try:
+            jenv_service = context.services.services.get("JenV")
+            if jenv_service:
+                jurisdicties_df = jenv_service.source_dataframes.get("jurisdicties")
+                if jurisdicties_df is not None and "rechtbank" in jurisdicties_df.columns:
+                    competent_court = jurisdicties_df["rechtbank"].iloc[0]
+        except (AttributeError, IndexError, KeyError):
+            pass
+        case.determine_appeal_status(
+            possible=True,
+            appeal_period=6,
+            competent_court=competent_court,
+            court_type="RECHTBANK",
+        )
     context.services.case_manager.save(case)
 
 

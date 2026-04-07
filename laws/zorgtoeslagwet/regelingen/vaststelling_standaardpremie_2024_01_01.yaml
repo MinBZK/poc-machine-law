@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: zorgtoeslagwet/regelingen/regeling_vaststelling_standaardpremie_en_bestuursrechtelijke_premies
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -10,7 +10,8 @@ service: VWS
 uuid: ce827aca-e943-4588-bc49-457650f68b04
 articles:
 - number: '1'
-  text: ''
+  text: De standaardpremie, bedoeld in artikel 1, onderdeel g, van de Wet op de zorgtoeslag, bedraagt voor het berekeningsjaar
+    2024 € 1.987.
   url: https://wetten.overheid.nl/BWBR0049005/2024-01-01#Artikel1
   machine_readable:
     definitions:

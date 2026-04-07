@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: machtigingenwet
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,17 @@ uuid: 3f8a2b1c-9d4e-4f5a-b8c7-6e1d2f3a4b5c
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '240'
-  text: ''
+  text: '1 Het bestuur vertegenwoordigt de vennootschap, voor zover uit de wet niet anders voortvloeit.
+
+    2 De bevoegdheid tot vertegenwoordiging komt mede aan iedere bestuurder toe. De statuten kunnen echter bepalen dat zij
+    behalve aan het bestuur slechts toekomt aan een of meer bestuurders. Zij kunnen voorts bepalen dat een bestuurder de vennootschap
+    slechts met medewerking van een of meer anderen mag vertegenwoordigen.
+
+    3 Bevoegdheid tot vertegenwoordiging die aan het bestuur of aan een bestuurder toekomt, is onbeperkt en onvoorwaardelijk,
+    voor zover uit de wet niet anders voortvloeit. Een wettelijk toegelaten of voorgeschreven beperking van of voorwaarde
+    voor de bevoegdheid tot vertegenwoordiging kan slechts door de vennootschap worden ingeroepen.
+
+    4 De statuten kunnen ook aan andere personen dan bestuurders bevoegdheid tot vertegenwoordiging toekennen.'
   url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Artikel240
   machine_readable:
     definitions:

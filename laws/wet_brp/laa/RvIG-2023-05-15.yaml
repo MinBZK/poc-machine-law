@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: wet_brp/laa
 regulatory_layer: WET
 publication_date: '2023-05-15'
@@ -10,7 +10,9 @@ service: RvIG
 uuid: 7f3e9a2b-5c4d-4e8f-9b1a-3d6c8f2e4a5b
 articles:
 - number: 28a
-  text: ''
+  text: "De analysemethoden, bedoeld in artikel 2.37c, vierde lid, van de wet zien op:\n  a. de analyse van mededelingen als\
+    \ bedoeld in artikel 2.37b, eerste lid, van de wet;\n  b. de analyse aan de hand van profielen;\n  c. een onderzoek naar\
+    \ patronen."
   url: https://wetten.overheid.nl/BWBR0034306/2023-05-15#Artikel28a
   machine_readable:
     definitions:

@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: wet_inkomstenbelasting
 regulatory_layer: WET
 publication_date: '2020-01-01'
@@ -10,7 +10,7 @@ service: UWV
 uuid: 06c43099-444f-415d-a98a-cb686954ed24
 articles:
 - number: '2.11'
-  text: ''
+  text: Vervallen
   url: https://wetten.overheid.nl/BWBR0011353/2020-01-01#Artikel2.11
   machine_readable:
     execution:

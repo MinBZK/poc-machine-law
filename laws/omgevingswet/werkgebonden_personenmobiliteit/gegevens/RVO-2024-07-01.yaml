@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: omgevingswet/werkgebonden_personenmobiliteit/gegevens
 regulatory_layer: WET
 publication_date: '2024-07-01'
@@ -11,7 +11,15 @@ uuid: 9c5d8e7a-4b2f-4d6e-8a1c-3e5b7d9a2f4c
 discoverable: BUSINESS
 articles:
 - number: '18.14'
-  text: ''
+  text: '1 De emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit in kalenderjaargemiddelde
+    per reizigerskilometer wordt berekend door de emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke
+    mobiliteit in het kalenderjaar te delen door het aantal reizigerskilometers voor woon-werkmobiliteit respectievelijk zakelijke
+    mobiliteit in het kalenderjaar.
+
+    2 De emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit, bedoeld in het eerste lid,
+    wordt berekend door voor elke reismodaliteit het aantal in het kalenderjaar gereisde kilometers voor woon-werkmobiliteit
+    respectievelijk zakelijke mobiliteit te vermenigvuldigen met de bij ministeriële regeling vastgestelde emissiefactor voor
+    die reismodaliteit en de uitkomsten bij elkaar op te tellen.'
   url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Artikel18.14
   machine_readable:
     definitions:

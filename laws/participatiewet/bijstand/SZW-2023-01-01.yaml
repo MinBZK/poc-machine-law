@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: participatiewet/bijstand
 regulatory_layer: WET
 publication_date: '2025-01-01'
@@ -10,7 +10,18 @@ service: SZW
 uuid: c00f6a8b-b387-45d0-ab15-6f5aa34b7287
 articles:
 - number: '11'
-  text: ''
+  text: "1 Iedere in Nederland woonachtige Nederlander die hier te lande in zodanige omstandigheden verkeert of dreigt te\
+    \ geraken dat hij niet over de middelen beschikt om in de noodzakelijke kosten van bestaan te voorzien, heeft recht op\
+    \ bijstand van overheidswege.\n2 Met de Nederlander, bedoeld in het eerste lid, wordt gelijkgesteld de hier te lande woonachtige\
+    \ vreemdeling die rechtmatig in Nederland verblijf houdt in de zin van artikel 8, onderdelen a tot en met e en l, van\
+    \ de Vreemdelingenwet 2000, met uitzondering van de gevallen, bedoeld in artikel 24, tweede lid, van Richtlijn 2004/38/EG.\n\
+    3 Bij algemene maatregel van bestuur kunnen andere hier te lande woonachtige vreemdelingen dan de in het tweede lid bedoelde\
+    \ voor de toepassing van deze wet met een Nederlander gelijk worden gesteld:\n  a. ter uitvoering van een verdrag dan\
+    \ wel van een besluit van een volkenrechtelijke organisatie, of\n  b. indien zij, na rechtmatig verblijf te hebben gehouden\
+    \ in de zin van artikel 8, onderdelen a tot en met e en l, van de Vreemdelingenwet 2000, rechtmatig in Nederland verblijf\
+    \ hebben als bedoeld in artikel 8, onderdeel g of h, van die wet en zij aan de in die algemene maatregel van bestuur gestelde\
+    \ voorwaarden voldoen.\n4 Het recht op bijstand komt de echtgenoten gezamenlijk toe, tenzij een van de echtgenoten geen\
+    \ recht op bijstand heeft."
   url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Artikel11
   machine_readable:
     definitions:

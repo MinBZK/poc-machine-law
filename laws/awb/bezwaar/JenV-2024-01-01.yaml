@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: awb/bezwaar
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -10,7 +10,15 @@ service: JenV
 uuid: b6679cca-4555-44b4-9b8f-caa6886b74a0
 articles:
 - number: '7:1'
-  text: ''
+  text: "1 Degene aan wie het recht is toegekend beroep bij een bestuursrechter in te stellen, dient alvorens beroep in te\
+    \ stellen bezwaar te maken, tenzij:\n  a. het besluit in bezwaar of in administratief beroep is genomen,\n  b. het besluit\
+    \ aan goedkeuring is onderworpen,\n  c. het besluit een goedkeuring of een weigering daarvan inhoudt,\n  d. het besluit\
+    \ is voorbereid met toepassing van afdeling 3.4,\n  e. het besluit is genomen op basis van een uitspraak waarin de bestuursrechter\
+    \ met toepassing van artikel 8:72, vierde lid, onderdeel a, heeft bepaald dat afdeling 3.4 geheel of gedeeltelijk buiten\
+    \ toepassing blijft,\n  f. het beroep zich richt tegen het niet tijdig nemen van een besluit,\n  g. het besluit is genomen\
+    \ op grond van een voorschrift als genoemd in de bij deze wet behorende Regeling rechtstreeks beroep dan wel het besluit\
+    \ anderszins in die regeling is omschreven.\n2 Tegen de beslissing op het bezwaar kan beroep worden ingesteld met toepassing\
+    \ van de voorschriften die gelden voor het instellen van beroep tegen het besluit waartegen bezwaar is gemaakt."
   url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Artikel7:1
   machine_readable:
     definitions:

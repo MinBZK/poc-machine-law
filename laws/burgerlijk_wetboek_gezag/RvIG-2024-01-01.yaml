@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: burgerlijk_wetboek_gezag
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,19 @@ uuid: a87bbb48-0bde-487a-af4d-3dc7f4a7c220
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '245'
-  text: ''
+  text: '1 Minderjarigen staan onder gezag.
+
+    2 Onder gezag wordt verstaan ouderlijk gezag dan wel voogdij.
+
+    3 Ouderlijk gezag wordt door de ouders gezamenlijk of door één ouder uitgeoefend. Voogdij wordt door een ander dan een
+    ouder uitgeoefend.
+
+    4 Het gezag heeft betrekking op de persoon van de minderjarige, het bewind over zijn vermogen en zijn vertegenwoordiging
+    in burgerlijke handelingen, zowel in als buiten rechte.
+
+    5 Het gezag van de ouder die dit krachtens artikel 253sa of krachtens een rechterlijke beslissing overeenkomstig artikel
+    253t samen met een ander dan een ouder uitoefent, wordt aangemerkt als ouderlijk gezag dat door ouders gezamenlijk wordt
+    uitgeoefend, tenzij uit een wettelijke bepaling het tegendeel voortvloeit.'
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel245
   machine_readable:
     definitions:

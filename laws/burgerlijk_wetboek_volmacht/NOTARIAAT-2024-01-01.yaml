@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: burgerlijk_wetboek_volmacht
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,7 @@ uuid: 5a437c98-30bb-4044-af1a-11701a9bf7ea
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '60'
-  text: ''
+  text: '1. Volmacht is de bevoegdheid die een volmachtgever verleent aan een ander, de gevolmachtigde, om in zijn naam rechtshandelingen te verrichten. 2. Waar in deze titel van rechtshandeling wordt gesproken, is daaronder het in ontvangst nemen van een verklaring begrepen.'
   url: https://wetten.overheid.nl/BWBR0005291/2024-01-01#Artikel60
   machine_readable:
     definitions:

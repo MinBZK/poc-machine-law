@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: belastingdienst_vermogen
 regulatory_layer: WET
 publication_date: '2020-01-01'
@@ -10,7 +10,15 @@ service: BELASTINGDIENST
 uuid: 3f8c2a7d-5e9b-4c1a-8d6f-9b2e5c4a7f3d
 articles:
 - number: '47'
-  text: ''
+  text: "1 Ieder is gehouden desgevraagd aan de inspecteur:\n  a. de gegevens en inlichtingen te verstrekken welke voor de\
+    \ belastingheffing te zijnen aanzien van belang kunnen zijn;\n  b. de boeken, bescheiden en andere gegevensdragers of\
+    \ de inhoud daarvan - zulks ter keuze van de inspecteur - waarvan de raadpleging van belang kan zijn voor de vaststelling\
+    \ van de feiten welke invloed kunnen uitoefenen op de belastingheffing te zijnen aanzien, voor dit doel beschikbaar te\
+    \ stellen.\n2 Ingeval de belastingwet aangelegenheden van een derde aanmerkt als aangelegenheden van degene die vermoedelijk\
+    \ belastingplichtig is, gelden, voor zover het deze aangelegenheden betreft, gelijke verplichtingen voor de derde.\n3\
+    \ Een ieder die de leeftijd van veertien jaar heeft bereikt, is verplicht op vordering van de inspecteur terstond een\
+    \ identiteitsbewijs als bedoeld in artikel 1 van de Wet op de identificatieplicht ter inzage aan te bieden, indien dit\
+    \ van belang kan zijn voor de belastingheffing te zijnen aanzien."
   url: https://wetten.overheid.nl/BWBR0002320/2020-01-01#Artikel47
   machine_readable:
     execution:

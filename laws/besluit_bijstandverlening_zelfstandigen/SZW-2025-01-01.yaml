@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: besluit_bijstandverlening_zelfstandigen
 regulatory_layer: WET
 publication_date: '2025-01-01'
@@ -11,7 +11,20 @@ uuid: 7d4e8f2a-3b6c-4a9d-8e1f-5c2d7a9b4e3f
 discoverable: CITIZEN
 articles:
 - number: '2'
-  text: ''
+  text: "1 Algemene bijstand kan worden verleend aan:\n  a. de zelfstandige die gedurende een redelijke termijn als zodanig\
+    \ werkzaam is geweest en wiens bedrijf of zelfstandig beroep levensvatbaar is;\n  b. de persoon of de echtgenoot van de\
+    \ persoon die uit hoofde van werkloosheid een uitkering ontvangt en die een bedrijf of zelfstandig beroep begint dat levensvatbaar\
+    \ is;\n  c. de zelfstandige geboren voor 1 januari 1960, wiens bedrijf of zelfstandig beroep niet levensvatbaar is en\
+    \ die het bedrijf of zelfstandig beroep gedurende een aaneengesloten periode van 10 jaar onmiddellijk voorafgaand aan\
+    \ de aanvraag heeft uitgeoefend en hieruit een inkomen geniet dat duurzaam ontoereikend is om in de noodzakelijke kosten\
+    \ van het bestaan te voorzien;\n  d. de zelfstandige wiens bedrijf of zelfstandig beroep niet levensvatbaar is en die\
+    \ zich verplicht de activiteiten in het bedrijf of zelfstandig beroep zo spoedig mogelijk, doch uiterlijk binnen 12 maanden,\
+    \ te beëindigen.\n2 Bijstand ter voorziening in de behoefte aan bedrijfskapitaal kan slechts worden verleend aan de zelfstandige,\
+    \ bedoeld in de onderdelen a, b en c van het eerste lid.\n3 Bijstandsverlening aan een persoon die algemene bijstand ontvangt,\
+    \ die voornemens is een bedrijf of zelfstandig beroep te beginnen en zich in verband hiermee niet beschikbaar stelt voor\
+    \ arbeid in dienstbetrekking kan gedurende een voorbereidingsperiode van ten hoogste 12 maanden worden voortgezet. In\
+    \ een zodanig geval:\n  a. zijn de artikelen 9, met uitzondering van het eerste lid, onderdeel c, en 10 van de wet niet\
+    \ van toepassing;\n  b. is de belanghebbende verplicht mee te werken aan door het college aangewezen begeleiding."
   url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Artikel2
   machine_readable:
     definitions:

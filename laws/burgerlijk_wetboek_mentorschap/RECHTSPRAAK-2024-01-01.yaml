@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: burgerlijk_wetboek_mentorschap
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,20 @@ uuid: 0c6a4f3c-8a49-4f76-a109-265c0b7a05dc
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '450'
-  text: ''
+  text: '1 Indien een meerderjarige als gevolg van zijn geestelijke of lichamelijke toestand tijdelijk of duurzaam niet in
+    staat is of bemoeilijkt wordt zijn belangen van niet-vermogensrechtelijke aard zelf behoorlijk waar te nemen, kan de kantonrechter
+    te zijnen behoeve een mentorschap instellen.
+
+    2 Indien te verwachten is dat een minderjarige op het tijdstip waarop hij meerderjarig zal worden, in de in het eerste
+    lid bedoelde toestand zal verkeren, kan het mentorschap reeds voor de meerderjarigheid worden ingesteld.
+
+    3 Het mentorschap kan eveneens worden ingesteld, indien te verwachten is dat een meerderjarige binnen afzienbare tijd
+    in de in het eerste lid bedoelde toestand zal verkeren.
+
+    4 De rechter bij wie een verzoek tot het verlenen van een rechterlijke machtiging als bedoeld in de Wet zorg en dwang
+    psychogeriatrische en verstandelijk gehandicapte cliënten dan wel een zorgmachtiging of een machtiging tot voorzetting
+    van de crisismaatregel als bedoeld in de Wet verplichte geestelijke gezondheidszorg aanhangig is, is tevens bevoegd tot
+    kennisneming van een verzoek tot instelling van een mentorschap.'
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel450
   machine_readable:
     definitions:

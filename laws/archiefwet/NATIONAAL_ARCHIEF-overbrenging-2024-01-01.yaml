@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: archiefwet/overbrenging
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -10,7 +10,7 @@ service: NATIONAAL_ARCHIEF
 uuid: 5cebc6f0-caa4-4f2f-908e-37c0fcb7337a
 articles:
 - number: '12'
-  text: ''
+  text: '1. De zorgdrager brengt de archiefbescheiden die niet voor vernietiging in aanmerking komen en ouder zijn dan twintig jaar over naar een archiefbewaarplaats. 2. Bij of krachtens algemene maatregel van bestuur worden regels gesteld, die bij de overbrenging van archiefbescheiden in acht dienen te worden genomen.'
   url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Artikel12
   machine_readable:
     definitions:

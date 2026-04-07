@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
 $id: wet_bibob
 regulatory_layer: WET
 publication_date: '2024-01-01'
@@ -11,7 +11,27 @@ uuid: 2d6430cb-dd3c-47fa-9741-2202386619a8
 discoverable: HIDDEN
 articles:
 - number: '9'
-  text: ''
+  text: "1 Het Bureau heeft tot taak aan bestuursorganen, voorzover deze bij of krachtens de wet de bevoegdheid hebben gekregen\
+    \ het Bureau daartoe te verzoeken, op verzoek advies uit te brengen over de mate van gevaar, bedoeld in artikel 3, eerste\
+    \ lid, of over de feiten en omstandigheden, bedoeld in artikel 3, zesde lid.\n2 Voor zover het gaat om een overheidsopdracht,\
+    \ heeft het Bureau voorts tot taak rechtspersonen met een overheidstaak desgevraagd advies uit te brengen over:\n  a.\
+    \ feiten en omstandigheden die grond kunnen opleveren voor de toepassing ten aanzien van een betrokkene van artikelen\
+    \ 2.86 tot en met 2.89 van de Aanbestedingswet 2012;\n  b. feiten en omstandigheden die grond kunnen opleveren voor de\
+    \ toepassing ten aanzien van een betrokkene van artikel 3.65 van de Aanbestedingswet 2012 in samenhang gelezen met de\
+    \ in onderdeel a genoemde bepalingen, indien het gaat om een speciale-sectoropdracht als bedoeld in artikel 1.1 van de\
+    \ Aanbestedingswet 2012;\n  c. de mogelijkheid dat een betrokkene wordt gefinancierd met uit gepleegde strafbare feiten\
+    \ verkregen of te verkrijgen, op geld waardeerbare voordelen;\n  d. de mate van gevaar dat een betrokkene, indien de overheidsopdracht\
+    \ aan hem zou worden gegund, bij de uitvoering van die opdracht strafbare feiten zal plegen.\n3 Voor zover het gaat om\
+    \ een vastgoedtransactie, heeft het Bureau tot taak rechtspersonen met een overheidstaak op verzoek advies uit te brengen\
+    \ over:\n  a. de mate van gevaar dat de vastgoedtransactie mede zal worden gebruikt om uit gepleegde strafbare feiten\
+    \ verkregen of te verkrijgen, op geld waardeerbare voordelen te benutten,\n  b. de mate van gevaar dat in of met de onroerende\
+    \ zaak waar de vastgoedtransactie betrekking op heeft, mede strafbare feiten zullen worden gepleegd, of\n  c. de feiten\
+    \ en omstandigheden die er op wijzen of redelijkerwijs doen vermoeden dat ter verkrijging of behoud van een vastgoedtransactie\
+    \ een strafbaar feit is gepleegd.\n4 Artikel 3, tweede tot en met vijfde lid, is van overeenkomstige toepassing.\n5 Het\
+    \ Bureau kan afzien van het uitbrengen van een advies indien:\n  a. het bestuursorgaan of de rechtspersoon met een overheidstaak\
+    \ niet de in artikel 7a, vierde lid, bedoelde informatie heeft toegezonden aan het Bureau; of\n  b. uit de in artikel\
+    \ 7a, vierde lid, bedoelde informatie naar het oordeel van het Bureau blijkt dat het bestuursorgaan of de rechtspersoon\
+    \ met een overheidstaak onvoldoende gebruik heeft gemaakt van de mogelijkheden tot het verrichten van eigen onderzoek."
   url: https://wetten.overheid.nl/BWBR0013798/2024-01-01#Artikel9
   machine_readable:
     definitions:
