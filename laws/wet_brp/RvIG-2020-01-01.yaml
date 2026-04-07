@@ -244,8 +244,8 @@ articles:
       - output: kinderen_bsns
         value:
           operation: FOREACH
-          subject: $kinderen_gegevens
-          value: $bsn
+          collection: $kinderen_gegevens
+          body: $bsn
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -361,8 +361,8 @@ articles:
               values:
               - 1
               - operation: FOREACH
-                subject: $huishouden
-                value: 1
+                collection: $huishouden
+                body: 1
                 combine: ADD
           default: 1
       - output: postadres
@@ -454,6 +454,7 @@ articles:
           explanation: Artikel 1.6 Wet BRP bepaalt verplicht gebruik van basisregistratie voor persoonsgegevens
     untranslatables:
     - construct: iteratie over variabel aantal kinderen en huishoudleden
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal kinderen en huishoudleden is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal kinderen en huishoudleden is dynamisch en kan niet
+        vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal personen tot een vast maximum
       accepted: true

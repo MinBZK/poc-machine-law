@@ -114,12 +114,12 @@ articles:
       - output: bevoegde_functionarissen
         value:
           operation: FOREACH
-          subject: $functionarissen
-          where:
+          collection: $functionarissen
+          filter:
             operation: IN
             subject: $current.functie
             values: $bevoegde_functies
-          value: $current
+          body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 2
           bwb_id: BWBR0003045
@@ -165,8 +165,8 @@ articles:
       - output: subject_types
         value:
           operation: FOREACH
-          subject: $bevoegde_functionarissen
-          value: BUSINESS
+          collection: $bevoegde_functionarissen
+          body: BUSINESS
         legal_basis:
           law: Handelsregisterwet 2007
           bwb_id: BWBR0021777
@@ -197,8 +197,8 @@ articles:
       - output: permissions
         value:
           operation: FOREACH
-          subject: $bevoegdheden
-          value:
+          collection: $bevoegdheden
+          body:
             operation: IF
             cases:
             - when:
@@ -236,6 +236,7 @@ articles:
           explanation: Uitschrijvingsdatum uit Handelsregister, null indien nog actief
     untranslatables:
     - construct: iteratie over variabel aantal functionarissen en bevoegdheden
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal functionarissen en bevoegdheden per rechtspersoon is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal functionarissen en bevoegdheden per rechtspersoon is
+        dynamisch en kan niet vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal functionarissen tot een vast maximum
       accepted: true

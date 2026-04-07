@@ -82,8 +82,8 @@ articles:
       - output: actieve_faillissementen
         value:
           operation: FOREACH
-          subject: $faillissement_registraties
-          where:
+          collection: $faillissement_registraties
+          filter:
             operation: AND
             conditions:
             - operation: EQUALS
@@ -99,7 +99,7 @@ articles:
               - operation: GREATER_THAN
                 subject: $current.datum_einde
                 value: $calculation_date
-          value: $current
+          body: $current
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -134,8 +134,8 @@ articles:
       - output: subject_names
         value:
           operation: FOREACH
-          subject: $actieve_faillissementen
-          value:
+          collection: $actieve_faillissementen
+          body:
             operation: CONCAT
             values:
             - 'Boedel '
@@ -150,8 +150,8 @@ articles:
       - output: subject_types
         value:
           operation: FOREACH
-          subject: $actieve_faillissementen
-          value:
+          collection: $actieve_faillissementen
+          body:
             operation: IF
             cases:
             - when:
@@ -170,8 +170,8 @@ articles:
       - output: delegation_types
         value:
           operation: FOREACH
-          subject: $actieve_faillissementen
-          value: CURATOR_BOEDEL
+          collection: $actieve_faillissementen
+          body: CURATOR_BOEDEL
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -182,8 +182,8 @@ articles:
       - output: permissions
         value:
           operation: FOREACH
-          subject: $actieve_faillissementen
-          value: $curator_boedel_rechten
+          collection: $actieve_faillissementen
+          body: $curator_boedel_rechten
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -213,6 +213,7 @@ articles:
           explanation: Einddatum faillissement, null indien nog actief
     untranslatables:
     - construct: iteratie over variabel aantal faillissement-registraties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve faillissementen is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve faillissementen is dynamisch en kan niet
+        vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
       accepted: true

@@ -45,6 +45,7 @@ dev = [
     "playwright>=1.40.0",
     "ruff>=0.11.0",
     "openapi-python-client>=0.24.3",
+    "ruamel-yaml>=0.19.1",
 ]
 
 [tool.ruff]

@@ -88,8 +88,8 @@ articles:
       - output: wgbo_vertegenwoordigingen
         value:
           operation: FOREACH
-          subject: $familie_relaties
-          where:
+          collection: $familie_relaties
+          filter:
             operation: AND
             conditions:
             - operation: EQUALS
@@ -98,7 +98,7 @@ articles:
             - operation: IN
               subject: $current.relatie_type
               values: $wgbo_relatie_hierarchie
-          value: $current
+          body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 7
           bwb_id: BWBR0005290
@@ -143,8 +143,8 @@ articles:
       - output: subject_types
         value:
           operation: FOREACH
-          subject: $wgbo_vertegenwoordigingen
-          value: CITIZEN
+          collection: $wgbo_vertegenwoordigingen
+          body: CITIZEN
         legal_basis:
           law: Burgerlijk Wetboek Boek 7
           bwb_id: BWBR0005290
@@ -155,8 +155,8 @@ articles:
       - output: delegation_types
         value:
           operation: FOREACH
-          subject: $wgbo_vertegenwoordigingen
-          value:
+          collection: $wgbo_vertegenwoordigingen
+          body:
             operation: IF
             cases:
             - when:
@@ -189,8 +189,8 @@ articles:
       - output: permissions
         value:
           operation: FOREACH
-          subject: $wgbo_vertegenwoordigingen
-          value: $wgbo_vertegenwoordiger_rechten
+          collection: $wgbo_vertegenwoordigingen
+          body: $wgbo_vertegenwoordiger_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 7
           bwb_id: BWBR0005290
@@ -212,8 +212,8 @@ articles:
       - output: valid_until_dates
         value:
           operation: FOREACH
-          subject: $wgbo_vertegenwoordigingen
-          value:
+          collection: $wgbo_vertegenwoordigingen
+          body:
         legal_basis:
           law: Burgerlijk Wetboek Boek 7
           bwb_id: BWBR0005290
@@ -223,6 +223,7 @@ articles:
           explanation: Vertegenwoordiging eindigt bij herstel wilsbekwaamheid of overlijden
     untranslatables:
     - construct: iteratie over variabel aantal WGBO-vertegenwoordigingen
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal vertegenwoordigingsrelaties is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal vertegenwoordigingsrelaties is dynamisch en kan niet
+        vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
       accepted: true

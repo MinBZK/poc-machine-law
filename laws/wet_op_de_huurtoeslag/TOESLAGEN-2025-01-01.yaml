@@ -253,22 +253,21 @@ articles:
             operation: GREATER_THAN_OR_EQUAL
             value: $minimum_leeftijd
           - operation: LESS_THAN
-            values:
-            - operation: ADD
+            subject:
+              operation: ADD
               values:
               - $inkomen
               - $partner_inkomen
               - operation: FOREACH
-                subject: $huishoudleden
+                collection: $huishoudleden
                 combine: ADD
-                value:
+                body:
                   operation: IF
                   cases:
                   - when:
                       operation: GREATER_THAN_OR_EQUAL
-                      values:
-                      - $leeftijd
-                      - 21
+                      subject: $leeftijd
+                      value: 21
                     then: $inkomen
                   default:
                     operation: SUBTRACT
@@ -276,23 +275,23 @@ articles:
                     - $inkomen
                     - $kind_vrijstelling
               - operation: FOREACH
-                subject: $kinderen
+                collection: $kinderen
                 combine: ADD
-                value:
+                body:
                   operation: IF
                   cases:
                   - when:
                       operation: LESS_THAN
-                      values:
-                      - $leeftijd
-                      - $leeftijdsgrens_kind_inkomen
+                      subject: $leeftijd
+                      value: $leeftijdsgrens_kind_inkomen
                     then:
                       operation: SUBTRACT
                       values:
                       - $inkomen
                       - $kind_vrijstelling
                   default: $inkomen
-            - operation: IF
+            value:
+              operation: IF
               cases:
               - when:
                   subject: $heeft_partner
@@ -308,9 +307,8 @@ articles:
                 value: true
               then:
                 operation: EQUALS
-                values:
-                - $verblijfsadres
-                - $partner_adres
+                subject: $verblijfsadres
+                value: $partner_adres
             default: true
           - operation: IF
             cases:
@@ -320,14 +318,12 @@ articles:
                 value: true
               then:
                 operation: LESS_THAN
-                values:
-                - $gezamenlijk_vermogen
-                - $vermogensgrens_partners
+                subject: $gezamenlijk_vermogen
+                value: $vermogensgrens_partners
             default:
               operation: LESS_THAN
-              values:
-              - $vermogen
-              - $vermogensgrens_alleenstaande
+              subject: $vermogen
+              value: $vermogensgrens_alleenstaande
           - operation: IF
             cases:
             - when:
@@ -336,27 +332,26 @@ articles:
                 value: true
               then:
                 operation: LESS_THAN
-                values:
-                - operation: ADD
+                subject:
+                  operation: ADD
                   values:
                   - $inkomen
                   - $partner_inkomen
-                - $inkomensgrens_partners
+                value: $inkomensgrens_partners
             default:
               operation: LESS_THAN
-              values:
-              - $inkomen
-              - $inkomensgrens_alleenstaande
+              subject: $inkomen
+              value: $inkomensgrens_alleenstaande
           - operation: LESS_THAN
-            values:
-            - operation: ADD
+            subject:
+              operation: ADD
               values:
               - $huurprijs
               - operation: MIN
                 values:
                 - $subsidiabele_servicekosten
                 - $maximale_servicekosten
-            - $maximale_huurgrens
+            value: $maximale_huurgrens
       - output: is_gerechtigd
         value: true
         legal_basis:
@@ -532,6 +527,7 @@ articles:
           explanation: De hoogte van de huurtoeslag wordt berekend volgens de formule in artikel 21
     untranslatables:
     - construct: iteratie over variabel aantal huishoudleden en kinderen voor inkomenstoets
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal huishoudleden en kinderen is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal huishoudleden en kinderen is dynamisch en kan niet
+        vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal huishoudleden tot een vast maximum
       accepted: true

@@ -92,8 +92,8 @@ articles:
       - output: bevoegde_gezag_relaties
         value:
           operation: FOREACH
-          subject: $gezag_relaties
-          where:
+          collection: $gezag_relaties
+          filter:
             operation: AND
             conditions:
             - operation: IN
@@ -118,7 +118,7 @@ articles:
               - operation: GREATER_THAN
                 subject: $current.datum_einde
                 value: $calculation_date
-          value: $current
+          body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -163,8 +163,8 @@ articles:
       - output: subject_types
         value:
           operation: FOREACH
-          subject: $bevoegde_gezag_relaties
-          value: CITIZEN
+          collection: $bevoegde_gezag_relaties
+          body: CITIZEN
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -184,8 +184,8 @@ articles:
       - output: permissions
         value:
           operation: FOREACH
-          subject: $bevoegde_gezag_relaties
-          value:
+          collection: $bevoegde_gezag_relaties
+          body:
             operation: IF
             cases:
             - when:
@@ -222,6 +222,7 @@ articles:
           explanation: Einddatum gezag, of null als nog actief (leeftijdscheck al in filter)
     untranslatables:
     - construct: iteratie over variabel aantal gezagsrelaties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal gezagsrelaties per persoon is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal gezagsrelaties per persoon is dynamisch en kan niet
+        vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal gezagsrelaties tot een vast maximum
       accepted: true

@@ -134,7 +134,8 @@ articles:
           article: '8:6'
           url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Afdeling8.1.2_Artikel8:6
           juriconnect: jci1.3:c:BWBR0005537&artikel=8:6&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 8:6 Awb bepaalt de absolute bevoegdheid van rechters voor verschillende wetten
+          explanation: Artikel 8:6 Awb bepaalt de absolute bevoegdheid van rechters
+            voor verschillende wetten
       - output: bevoegde_rechtbank
         value:
           operation: IF
@@ -171,7 +172,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Afdeling8.1.2_Artikel8:7
           juriconnect: jci1.3:c:BWBR0005537&artikel=8:7&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 8:7 lid 1 Awb bepaalt de relatieve bevoegdheid van rechtbanken
+          explanation: Artikel 8:7 lid 1 Awb bepaalt de relatieve bevoegdheid van
+            rechtbanken
       - output: beroep_mogelijk
         value:
           operation: AND
@@ -192,9 +194,9 @@ articles:
               - operation: GREATER_THAN
                 subject:
                   operation: FOREACH
-                  subject: $gebeurtenissen
-                  value:
-                  - operation: EQUALS
+                  collection: $gebeurtenissen
+                  body:
+                    operation: EQUALS
                     subject: $event_type
                     value: Objected
                   combine: ADD
@@ -239,9 +241,9 @@ articles:
               - operation: EQUALS
                 subject:
                   operation: FOREACH
-                  subject: $gebeurtenissen
-                  value:
-                  - operation: EQUALS
+                  collection: $gebeurtenissen
+                  body:
+                    operation: EQUALS
                     subject: $event_type
                     value: Objected
                   combine: ADD
@@ -253,9 +255,9 @@ articles:
               - operation: GREATER_THAN
                 subject:
                   operation: FOREACH
-                  subject: $gebeurtenissen
-                  value:
-                  - operation: EQUALS
+                  collection: $gebeurtenissen
+                  body:
+                    operation: EQUALS
                     subject: $event_type
                     value: Objected
                   combine: ADD
@@ -279,7 +281,8 @@ articles:
           article: '8:3'
           url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:3
           juriconnect: jci1.3:c:BWBR0005537&artikel=8:3&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 8:3 Awb bepaalt redenen waarom beroep niet mogelijk is
+          explanation: Artikel 8:3 Awb bepaalt redenen waarom beroep niet mogelijk
+            is
       - output: beroepstermijn
         value:
           operation: IF
@@ -310,7 +313,8 @@ articles:
           paragraph: '2'
           url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk3_Afdeling3.3_Artikel3:11
           juriconnect: jci1.3:c:BWBR0005537&artikel=3:11&lid=2&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 3:11 lid 2 Awb bepaalt dat bij uitgebreide voorbereidingsprocedure direct beroep mogelijk is
+          explanation: Artikel 3:11 lid 2 Awb bepaalt dat bij uitgebreide voorbereidingsprocedure
+            direct beroep mogelijk is
       - output: reden_direct_beroep
         value:
           operation: IF
@@ -330,6 +334,8 @@ articles:
           explanation: Artikel 3:11 lid 2 Awb bepaalt de reden voor direct beroep
     untranslatables:
     - construct: iteratie over variabel aantal gebeurtenissen voor beroepscheck
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal zaakgebeurtenissen is dynamisch en kan niet vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal gebeurtenissen tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal zaakgebeurtenissen
+        is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal gebeurtenissen
+        tot een vast maximum
       accepted: true

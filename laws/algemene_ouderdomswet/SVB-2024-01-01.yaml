@@ -230,12 +230,12 @@ articles:
             operation: GREATER_THAN_OR_EQUAL
             value: $pensioenleeftijd
           - operation: GREATER_THAN
-            values:
-            - operation: ADD
+            subject:
+              operation: ADD
               values:
               - $woonachtige_verzekerde_jaren
               - $werkzame_verzekerde_jaren
-            - 0
+            value: 0
       - output: is_gerechtigd
         value: true
         legal_basis:

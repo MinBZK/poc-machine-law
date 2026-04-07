@@ -84,9 +84,8 @@ articles:
           - operation: NOT
             value:
               operation: EQUALS
-              values:
-              - $adres
-              - $toeslag_adres
+              subject: $adres
+              value: $toeslag_adres
           - operation: EQUALS
             subject: $toeslagen_onderzoek.adres_geverifieerd
             value: false
@@ -105,9 +104,8 @@ articles:
               operation: NOT
               value:
                 operation: EQUALS
-                values:
-                - $adres
-                - $toeslag_adres
+                subject: $adres
+                value: $toeslag_adres
             then: $twijfel_adres_afwijking
           - when:
               operation: EQUALS

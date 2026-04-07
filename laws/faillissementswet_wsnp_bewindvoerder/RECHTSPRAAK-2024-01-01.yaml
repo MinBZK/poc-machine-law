@@ -78,8 +78,8 @@ articles:
       - output: actieve_wsnp
         value:
           operation: FOREACH
-          subject: $wsnp_registraties
-          where:
+          collection: $wsnp_registraties
+          filter:
             operation: AND
             conditions:
             - operation: EQUALS
@@ -95,7 +95,7 @@ articles:
               - operation: GREATER_THAN
                 subject: $current.datum_einde
                 value: $calculation_date
-          value: $current
+          body: $current
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -130,8 +130,8 @@ articles:
       - output: subject_names
         value:
           operation: FOREACH
-          subject: $actieve_wsnp
-          value:
+          collection: $actieve_wsnp
+          body:
             operation: CONCAT
             values:
             - 'WSNP Boedel '
@@ -146,8 +146,8 @@ articles:
       - output: subject_types
         value:
           operation: FOREACH
-          subject: $actieve_wsnp
-          value: CITIZEN
+          collection: $actieve_wsnp
+          body: CITIZEN
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -158,8 +158,8 @@ articles:
       - output: delegation_types
         value:
           operation: FOREACH
-          subject: $actieve_wsnp
-          value: WSNP_BEWINDVOERDER_BOEDEL
+          collection: $actieve_wsnp
+          body: WSNP_BEWINDVOERDER_BOEDEL
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -170,8 +170,8 @@ articles:
       - output: permissions
         value:
           operation: FOREACH
-          subject: $actieve_wsnp
-          value: $wsnp_bewindvoerder_rechten
+          collection: $actieve_wsnp
+          body: $wsnp_bewindvoerder_rechten
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -201,6 +201,7 @@ articles:
           explanation: Einddatum WSNP, null indien nog actief
     untranslatables:
     - construct: iteratie over variabel aantal WSNP-registraties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve schuldsaneringen is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve schuldsaneringen is dynamisch en kan niet
+        vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
       accepted: true

@@ -265,17 +265,16 @@ articles:
                 value: true
               then:
                 operation: LESS_THAN
-                values:
-                - operation: ADD
+                subject:
+                  operation: ADD
                   values:
                   - $bezittingen
                   - $partner_bezittingen
-                - $vermogensgrens_partner
+                value: $vermogensgrens_partner
             default:
               operation: LESS_THAN
-              values:
-              - $bezittingen
-              - $vermogensgrens_alleenstaand
+              subject: $bezittingen
+              value: $vermogensgrens_alleenstaand
           - operation: IF
             cases:
             - when:
@@ -284,21 +283,21 @@ articles:
                 value: true
               then:
                 operation: LESS_THAN
-                values:
-                - operation: ADD
+                subject:
+                  operation: ADD
                   values:
                   - $inkomen
                   - $bedrijfsinkomen
                   - $partner_inkomen
-                - $basisbedrag_partners_21_plus
+                value: $basisbedrag_partners_21_plus
             default:
               operation: LESS_THAN
-              values:
-              - operation: ADD
+              subject:
+                operation: ADD
                 values:
                 - $inkomen
                 - $bedrijfsinkomen
-              - $basisbedrag_alleenstaand_21_plus
+              value: $basisbedrag_alleenstaand_21_plus
       - output: is_gerechtigd
         value: true
         legal_basis:

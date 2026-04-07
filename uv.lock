@@ -1654,6 +1654,7 @@ dev = [
     { name = "playwright" },
     { name = "pytest" },
     { name = "pytest-playwright" },
+    { name = "ruamel-yaml" },
     { name = "ruff" },
 ]
 
@@ -1698,6 +1699,7 @@ dev = [
     { name = "playwright", specifier = ">=1.40.0" },
     { name = "pytest", specifier = ">=8.0.0" },
     { name = "pytest-playwright", specifier = ">=0.4.0" },
+    { name = "ruamel-yaml", specifier = ">=0.19.1" },
     { name = "ruff", specifier = ">=0.11.0" },
 ]
 

@@ -443,13 +443,24 @@ class RulesEngine:
             context.pop_path()
             return result
 
+    @staticmethod
+    def _foreach_key(operation, new_key, old_key):
+        """Get a FOREACH field, accepting both new and old key names."""
+        if new_key in operation:
+            return operation[new_key]
+        return operation.get(old_key)
+
     def _evaluate_foreach(self, operation, context):
         """Handle FOREACH operation"""
         logger.debug("For each condition")
 
         combine = operation.get("combine")
 
-        array_data = self._evaluate_value(operation["subject"], context)
+        collection = self._foreach_key(operation, "collection", "subject")
+        body = self._foreach_key(operation, "body", "value")
+        filter_clause = self._foreach_key(operation, "filter", "where")
+
+        array_data = self._evaluate_value(collection, context)
         if not array_data:
             logger.warning("No data found to run FOREACH on")
             if combine:
@@ -476,16 +487,14 @@ class RulesEngine:
                             item_context.local[f"current_{i}"] = item
                             break
 
-                    # Check where clause if present - skip item if condition is not met
-                    if "where" in operation:
-                        where_result = self._evaluate_value(operation["where"], item_context)
-                        if not where_result:
-                            logger.debug(f"Skipping item due to where clause: {item}")
+                    # Check filter clause if present - skip item if condition is not met
+                    if filter_clause is not None:
+                        filter_result = self._evaluate_value(filter_clause, item_context)
+                        if not filter_result:
+                            logger.debug(f"Skipping item due to filter clause: {item}")
                             continue
 
-                    value_to_evaluate = (
-                        operation["value"][0] if isinstance(operation["value"], list) else operation["value"]
-                    )
+                    value_to_evaluate = body[0] if isinstance(body, list) else body
                     result = self._evaluate_value(value_to_evaluate, item_context)
                     context.missing_required = context.missing_required or item_context.missing_required
                     context.path = item_context.path
@@ -758,7 +767,8 @@ class RulesEngine:
 
         elif op_type == "FOREACH":
             result = self._evaluate_foreach(operation, context)
-            node.details.update({"raw_values": operation["value"], "arithmetic_type": op_type})
+            body = self._foreach_key(operation, "body", "value")
+            node.details.update({"raw_values": body, "arithmetic_type": op_type})
 
         elif op_type in ["IN", "NOT_IN"]:
             with logger.indent_block(op_type):

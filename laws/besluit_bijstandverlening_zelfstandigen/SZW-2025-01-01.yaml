@@ -213,12 +213,12 @@ articles:
             operation: LESS_THAN
             value: $pensioenleeftijd
           - operation: GREATER_THAN_OR_EQUAL
-            values:
-            - operation: MULTIPLY
+            subject:
+              operation: MULTIPLY
               values:
               - $bbz_aanvraag.uren_per_week
               - 52
-            - $urencriterium_per_jaar
+            value: $urencriterium_per_jaar
           - operation: OR
             conditions:
             - operation: AND
@@ -227,13 +227,11 @@ articles:
                 operation: EQUALS
                 value: OUDER
               - operation: LESS_THAN_OR_EQUAL
-                values:
-                - $vermogen
-                - $vermogensgrens_ouder
+                subject: $vermogen
+                value: $vermogensgrens_ouder
             - operation: LESS_THAN_OR_EQUAL
-              values:
-              - $vermogen
-              - $vermogensgrens_algemeen
+              subject: $vermogen
+              value: $vermogensgrens_algemeen
           - operation: OR
             conditions:
             - operation: AND
@@ -267,9 +265,8 @@ articles:
                 operation: EQUALS
                 value: false
               - operation: GREATER_THAN_OR_EQUAL
-                values:
-                - $bbz_aanvraag.jaren_ondernemerschap
-                - 10
+                subject: $bbz_aanvraag.jaren_ondernemerschap
+                value: 10
             - operation: AND
               conditions:
               - subject: $bbz_aanvraag.type_zelfstandige

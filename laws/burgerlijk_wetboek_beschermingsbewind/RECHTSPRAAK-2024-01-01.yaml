@@ -81,8 +81,8 @@ articles:
       - output: actief_bewind
         value:
           operation: FOREACH
-          subject: $bewind_registraties
-          where:
+          collection: $bewind_registraties
+          filter:
             operation: AND
             conditions:
             - operation: EQUALS
@@ -98,7 +98,7 @@ articles:
               - operation: GREATER_THAN
                 subject: $current.datum_einde
                 value: $calculation_date
-          value: $current
+          body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -142,8 +142,8 @@ articles:
       - output: subject_types
         value:
           operation: FOREACH
-          subject: $actief_bewind
-          value: CITIZEN
+          collection: $actief_bewind
+          body: CITIZEN
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -154,8 +154,8 @@ articles:
       - output: delegation_types
         value:
           operation: FOREACH
-          subject: $actief_bewind
-          value: BEWINDVOERDER
+          collection: $actief_bewind
+          body: BEWINDVOERDER
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -166,8 +166,8 @@ articles:
       - output: permissions
         value:
           operation: FOREACH
-          subject: $actief_bewind
-          value: $bewindvoerder_rechten
+          collection: $actief_bewind
+          body: $bewindvoerder_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -197,6 +197,7 @@ articles:
           explanation: Einddatum bewind, null indien nog actief
     untranslatables:
     - construct: iteratie over variabel aantal bewind-registraties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve beschermingsbewind-registraties is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve beschermingsbewind-registraties is dynamisch
+        en kan niet vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
       accepted: true

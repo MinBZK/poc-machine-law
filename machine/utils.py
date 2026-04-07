@@ -90,12 +90,18 @@ def _convert_source_to_reference(source: dict) -> tuple[str, dict]:
 
 
 def _unwrap_definitions(definitions: dict) -> dict:
-    """Unwrap v0.5.0 definitions that are wrapped in {value: ...}."""
+    """Unwrap definitions that may be wrapped in {value: ...} or already plain scalars.
+
+    Handles three formats:
+    - {value: X} → X  (v0.5.0 wrapped format)
+    - {value: X, legal_basis: {...}} → X  (wrapped with metadata, drop legal_basis)
+    - plain scalar → pass through  (v0.5.1+ unwrapped format)
+    """
     if not definitions:
         return {}
     unwrapped = {}
     for key, val in definitions.items():
-        if isinstance(val, dict) and "value" in val and len(val) == 1:
+        if isinstance(val, dict) and "value" in val:
             unwrapped[key] = val["value"]
         else:
             unwrapped[key] = val

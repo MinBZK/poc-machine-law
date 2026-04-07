@@ -11,12 +11,14 @@ uuid: f8e7d6c5-4321-4f0f-bbbb-123456789abc
 discoverable: CITIZEN
 articles:
 - number: '1.5'
-  text: |-
-    1 Een ouder heeft aanspraak op een kinderopvangtoeslag in de door hem of zijn partner betaalde kosten, indien het betreft:
-      a. kinderopvang in een geregistreerd kindercentrum; of
-      b. gastouderopvang in een geregistreerde voorziening voor gastouderopvang.
-    2 Indien het ouderparticipatieopvang in een ouderparticipatiecrèche betreft, heeft de ouder in de aanloopperiode, bedoeld in artikel 1.60b, in afwijking van het eerste lid, geen aanspraak op kinderopvangtoeslag.
-    3 Een ouder en diens partner die tevens ouder is worden voor de toepassing van deze wet geacht gezamenlijk één aanspraak te hebben.
+  text: "1 Een ouder heeft aanspraak op een kinderopvangtoeslag in de door hem of\
+    \ zijn partner betaalde kosten, indien het betreft:\n  a. kinderopvang in een\
+    \ geregistreerd kindercentrum; of\n  b. gastouderopvang in een geregistreerde\
+    \ voorziening voor gastouderopvang.\n2 Indien het ouderparticipatieopvang in een\
+    \ ouderparticipatiecrèche betreft, heeft de ouder in de aanloopperiode, bedoeld\
+    \ in artikel 1.60b, in afwijking van het eerste lid, geen aanspraak op kinderopvangtoeslag.\n\
+    3 Een ouder en diens partner die tevens ouder is worden voor de toepassing van\
+    \ deze wet geacht gezamenlijk één aanspraak te hebben."
   url: https://wetten.overheid.nl/BWBR0017017/2024-01-01#Artikel1.5
   machine_readable:
     definitions:
@@ -152,9 +154,9 @@ articles:
       - output: jaarbedrag
         value:
           operation: FOREACH
-          subject: $aangegeven_uren
-          value:
-          - operation: MULTIPLY
+          collection: $aangegeven_uren
+          body:
+            operation: MULTIPLY
             values:
             - operation: MIN
               values:
@@ -215,9 +217,12 @@ articles:
           article: '1.6'
           url: https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6
           juriconnect: jci1.3:c:BWBR0017017&artikel=1.6&z=2024-12-11&g=2024-12-11
-          explanation: Artikel 1.6 Wet kinderopvang bepaalt optelling toeslag voor alle kinderen
+          explanation: Artikel 1.6 Wet kinderopvang bepaalt optelling toeslag voor
+            alle kinderen
     untranslatables:
     - construct: iteratie over variabel aantal kinderen voor toeslagberekening
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal aangegeven kinderopvanguren per kind is dynamisch en kan niet vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal kinderen tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal aangegeven kinderopvanguren
+        per kind is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal kinderen tot
+        een vast maximum
       accepted: true

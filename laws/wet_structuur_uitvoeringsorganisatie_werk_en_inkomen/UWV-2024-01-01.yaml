@@ -10,44 +10,64 @@ service: UWV
 uuid: c19a458e-3f5e-4d99-a7c3-67a4288aaa07
 articles:
 - number: '33'
-  text: "1 Het Uitvoeringsinstituut werknemersverzekeringen draagt zorg voor de inrichting en adequate werking van de polisadministratie.\n\
-    2 De polisadministratie heeft tot doel:\n  a. van de werknemer gegevens over zijn arbeidsverhouding en uitkeringsverhouding\
-    \ – daaronder begrepen duur, loon en premies werknemersverzekeringen – vast te leggen ten behoeve van de werknemersverzekeringen\
-    \ en de uitvoering van taken die bij of krachtens enige andere wet dan bedoeld in artikel 30, eerste lid, aan het Uitvoeringsinstituut\
-    \ werknemersverzekeringen zijn opgedragen;\n  b. besluiten over recht op uitkering of verstrekking te baseren op gegevens\
-    \ als bedoeld in onderdeel a met het oog waarop de werknemer wordt geïnformeerd over die gegevens en het al dan niet verzekerd\
-    \ zijn voor de werknemersverzekeringen;\n  c. de verwerking van gegevens van de persoon die vrijwillig verzekerd is voor\
-    \ de Ziektewet, de Wet werk en inkomen naar arbeidsvermogen, Werkloosheidswet en Wet op de arbeidsongeschiktheidsverzekering\
-    \ waarbij de onderdelen a en b van overeenkomstige toepassing zijn;\n  d. de verwerking van gegevens van de werknemer\
-    \ over genoten loon in de zin van de Wet op de loonbelasting 1964, ingehouden loonbelasting, premie volksverzekeringen\
-    \ in de zin van de Wet financiering sociale verzekeringen, inkomensafhankelijke bijdrage als bedoeld in de Zorgverzekeringswet,\
-    \ alsmede andere gegevens van belang voor de heffing van de inkomstenbelasting ten behoeve van de uitvoering van de taken\
-    \ van de Belastingdienst;\n  e. de verwerking van overige gegevens van de werknemers van belang voor statistische doeleinden\
-    \ op het gebied van arbeid en lonen ten behoeve van het Centraal bureau voor de statistiek.\n3 Het Uitvoeringsinstituut\
-    \ werknemersverzekeringen is de verwerkingsverantwoordelijke voorzover het betreft de verwerking van de gegevens, bedoeld\
-    \ in het tweede lid, onderdelen a, b en c, en de verwerker voorzover het betreft de verwerking van de gegevens, bedoeld\
-    \ in het tweede lid, onderdelen d en e.\n4 De verwerkingsverantwoordelijke voor de verwerking van de gegevens, bedoeld\
-    \ in het tweede lid, d en e, zijn respectievelijk Onze Minister van Financiën en het Centraal bureau voor de statistiek.\n\
-    5 De Belastingdienst verstrekt aan het Uitvoeringsinstituut werknemersverzekeringen, in het kader van zijn taak bedoeld\
-    \ in het eerste lid, alle gegevens en inlichtingen, die verkregen zijn bij de uitvoering van de heffing van loonbelasting\
-    \ en van de artikelen 58, tweede lid, en 59 van de Wet financiering sociale verzekeringen, voorzover die gegevens en inlichtingen\
-    \ noodzakelijk zijn voor de verwerking van gegevens in de polisadministratie.\n6 De basisregistratie personen wordt ter\
-    \ verificatie geraadpleegd voor de verwerking van gegevens door het Uitvoeringsinstituut werknemersverzekeringen op grond\
-    \ van dit artikel.\n7 Het Uitvoeringsinstituut werknemersverzekeringen verstrekt aan de Belastingdienst alle gegevens\
-    \ en inlichtingen, die noodzakelijk zijn ten behoeve van de uitvoering van de taken van de Belastingdienst.\n8 De gegevens,\
-    \ bedoeld in het tweede lid, onderdeel e, kunnen door het Uitvoeringsinstituut werknemersverzekeringen, de Sociale verzekeringsbank\
-    \ en de colleges van burgemeester en wethouders tevens verwerkt worden voor de uitvoering van de taken, bedoeld in artikel 62.\n\
-    9 Het Uitvoeringsinstituut werknemersverzekeringen verstrekt Onze Minister en bestuursorganen als bedoeld in de artikelen,\
-    \ 62, 72 en 73, zevende lid, gegevens die op grond van het tweede lid, onderdelen a tot en met c, verwerkt worden in de\
-    \ polisadministratie, tenzij de gegevens, bedoeld in het tweede lid, onderdeel e, tevens verwerkt kunnen worden op grond\
-    \ van het achtste lid.\n10 Gegevens als bedoeld in het tweede lid, onderdeel e, over lonen kunnen voor de uitvoering van\
-    \ de pensioenregelingen of beroepspensioenregelingen tevens verwerkt worden door de pensioenuitvoerders en beroepspensioenfondsen,\
-    \ genoemd in artikel 73, eerste lid, onderdeel a, en voor regelingen inzake vervroegd uittreden op grond van een algemeen\
-    \ verbindend voorschrift door de stichtingen, genoemd in artikel 73, eerste lid, onderdeel b. Artikel 73, eerste en vijfde\
-    \ lid, is van overeenkomstige toepassing.\n11 Bij of krachtens algemene maatregel van bestuur worden nadere regels gesteld,\
-    \ in ieder geval over de inrichting, de gegevensset en de wijze van verkrijging van de gegevens van de polisadministratie.\
-    \ Tevens worden regels gesteld over het elektronische gegevensverkeer, de daarbij te gebruiken elektronische infrastructuur\
-    \ en de eisen die aan de gegevensverstrekking uit de polisadministratie worden gesteld."
+  text: "1 Het Uitvoeringsinstituut werknemersverzekeringen draagt zorg voor de inrichting\
+    \ en adequate werking van de polisadministratie.\n2 De polisadministratie heeft\
+    \ tot doel:\n  a. van de werknemer gegevens over zijn arbeidsverhouding en uitkeringsverhouding\
+    \ – daaronder begrepen duur, loon en premies werknemersverzekeringen – vast te\
+    \ leggen ten behoeve van de werknemersverzekeringen en de uitvoering van taken\
+    \ die bij of krachtens enige andere wet dan bedoeld in artikel 30, eerste lid,\
+    \ aan het Uitvoeringsinstituut werknemersverzekeringen zijn opgedragen;\n  b.\
+    \ besluiten over recht op uitkering of verstrekking te baseren op gegevens als\
+    \ bedoeld in onderdeel a met het oog waarop de werknemer wordt geïnformeerd over\
+    \ die gegevens en het al dan niet verzekerd zijn voor de werknemersverzekeringen;\n\
+    \  c. de verwerking van gegevens van de persoon die vrijwillig verzekerd is voor\
+    \ de Ziektewet, de Wet werk en inkomen naar arbeidsvermogen, Werkloosheidswet\
+    \ en Wet op de arbeidsongeschiktheidsverzekering waarbij de onderdelen a en b\
+    \ van overeenkomstige toepassing zijn;\n  d. de verwerking van gegevens van de\
+    \ werknemer over genoten loon in de zin van de Wet op de loonbelasting 1964, ingehouden\
+    \ loonbelasting, premie volksverzekeringen in de zin van de Wet financiering sociale\
+    \ verzekeringen, inkomensafhankelijke bijdrage als bedoeld in de Zorgverzekeringswet,\
+    \ alsmede andere gegevens van belang voor de heffing van de inkomstenbelasting\
+    \ ten behoeve van de uitvoering van de taken van de Belastingdienst;\n  e. de\
+    \ verwerking van overige gegevens van de werknemers van belang voor statistische\
+    \ doeleinden op het gebied van arbeid en lonen ten behoeve van het Centraal bureau\
+    \ voor de statistiek.\n3 Het Uitvoeringsinstituut werknemersverzekeringen is de\
+    \ verwerkingsverantwoordelijke voorzover het betreft de verwerking van de gegevens,\
+    \ bedoeld in het tweede lid, onderdelen a, b en c, en de verwerker voorzover het\
+    \ betreft de verwerking van de gegevens, bedoeld in het tweede lid, onderdelen\
+    \ d en e.\n4 De verwerkingsverantwoordelijke voor de verwerking van de gegevens,\
+    \ bedoeld in het tweede lid, d en e, zijn respectievelijk Onze Minister van Financiën\
+    \ en het Centraal bureau voor de statistiek.\n5 De Belastingdienst verstrekt aan\
+    \ het Uitvoeringsinstituut werknemersverzekeringen, in het kader van zijn taak\
+    \ bedoeld in het eerste lid, alle gegevens en inlichtingen, die verkregen zijn\
+    \ bij de uitvoering van de heffing van loonbelasting en van de artikelen 58, tweede\
+    \ lid, en 59 van de Wet financiering sociale verzekeringen, voorzover die gegevens\
+    \ en inlichtingen noodzakelijk zijn voor de verwerking van gegevens in de polisadministratie.\n\
+    6 De basisregistratie personen wordt ter verificatie geraadpleegd voor de verwerking\
+    \ van gegevens door het Uitvoeringsinstituut werknemersverzekeringen op grond\
+    \ van dit artikel.\n7 Het Uitvoeringsinstituut werknemersverzekeringen verstrekt\
+    \ aan de Belastingdienst alle gegevens en inlichtingen, die noodzakelijk zijn\
+    \ ten behoeve van de uitvoering van de taken van de Belastingdienst.\n8 De gegevens,\
+    \ bedoeld in het tweede lid, onderdeel e, kunnen door het Uitvoeringsinstituut\
+    \ werknemersverzekeringen, de Sociale verzekeringsbank en de colleges van burgemeester\
+    \ en wethouders tevens verwerkt worden voor de uitvoering van de taken, bedoeld\
+    \ in artikel 62.\n9 Het Uitvoeringsinstituut werknemersverzekeringen verstrekt\
+    \ Onze Minister en bestuursorganen als bedoeld in de artikelen, 62, 72 en 73,\
+    \ zevende lid, gegevens die op grond van het tweede lid, onderdelen a tot en met\
+    \ c, verwerkt worden in de polisadministratie, tenzij de gegevens, bedoeld in\
+    \ het tweede lid, onderdeel e, tevens verwerkt kunnen worden op grond van het\
+    \ achtste lid.\n10 Gegevens als bedoeld in het tweede lid, onderdeel e, over lonen\
+    \ kunnen voor de uitvoering van de pensioenregelingen of beroepspensioenregelingen\
+    \ tevens verwerkt worden door de pensioenuitvoerders en beroepspensioenfondsen,\
+    \ genoemd in artikel 73, eerste lid, onderdeel a, en voor regelingen inzake vervroegd\
+    \ uittreden op grond van een algemeen verbindend voorschrift door de stichtingen,\
+    \ genoemd in artikel 73, eerste lid, onderdeel b. Artikel 73, eerste en vijfde\
+    \ lid, is van overeenkomstige toepassing.\n11 Bij of krachtens algemene maatregel\
+    \ van bestuur worden nadere regels gesteld, in ieder geval over de inrichting,\
+    \ de gegevensset en de wijze van verkrijging van de gegevens van de polisadministratie.\
+    \ Tevens worden regels gesteld over het elektronische gegevensverkeer, de daarbij\
+    \ te gebruiken elektronische infrastructuur en de eisen die aan de gegevensverstrekking\
+    \ uit de polisadministratie worden gesteld."
   url: https://wetten.overheid.nl/BWBR0013060/2024-01-01#Artikel33
   machine_readable:
     definitions:
@@ -120,18 +140,18 @@ articles:
           - operation: ADD
             values:
             - operation: FOREACH
-              subject: $dienstverbandperiodes
-              value:
-              - operation: SUBTRACT_DATE
+              collection: $dienstverbandperiodes
+              body:
+                operation: SUBTRACT_DATE
                 unit: days
                 values:
                 - $end_date
                 - $start_date
               combine: ADD
             - operation: FOREACH
-              subject: $uitkeringsperiodes
-              value:
-              - operation: SUBTRACT_DATE
+              collection: $uitkeringsperiodes
+              body:
+                operation: SUBTRACT_DATE
                 unit: days
                 values:
                 - $end_date
@@ -143,9 +163,9 @@ articles:
           operation: MULTIPLY
           values:
           - operation: FOREACH
-            subject: $dienstverbandperiodes
-            value:
-            - operation: SUBTRACT_DATE
+            collection: $dienstverbandperiodes
+            body:
+              operation: SUBTRACT_DATE
               unit: days
               values:
               - $end_date
@@ -154,6 +174,8 @@ articles:
           - $uren_per_dag
     untranslatables:
     - construct: iteratie over variabel aantal dienstverband- en uitkeringsperiodes
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal periodes is dynamisch en kan niet vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal periodes tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal periodes is dynamisch
+        en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal periodes tot
+        een vast maximum
       accepted: true

@@ -76,8 +76,8 @@ articles:
       - output: actief_executeurschap
         value:
           operation: FOREACH
-          subject: $executeur_registraties
-          where:
+          collection: $executeur_registraties
+          filter:
             operation: AND
             conditions:
             - operation: EQUALS
@@ -93,7 +93,7 @@ articles:
               - operation: GREATER_THAN
                 subject: $current.datum_einde
                 value: $calculation_date
-          value: $current
+          body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 4
           bwb_id: BWBR0002761
@@ -128,8 +128,8 @@ articles:
       - output: subject_names
         value:
           operation: FOREACH
-          subject: $actief_executeurschap
-          value:
+          collection: $actief_executeurschap
+          body:
             operation: CONCAT
             values:
             - 'Nalatenschap '
@@ -144,8 +144,8 @@ articles:
       - output: subject_types
         value:
           operation: FOREACH
-          subject: $actief_executeurschap
-          value: CITIZEN
+          collection: $actief_executeurschap
+          body: CITIZEN
         legal_basis:
           law: Burgerlijk Wetboek Boek 4
           bwb_id: BWBR0002761
@@ -156,8 +156,8 @@ articles:
       - output: delegation_types
         value:
           operation: FOREACH
-          subject: $actief_executeurschap
-          value: EXECUTEUR_NALATENSCHAP
+          collection: $actief_executeurschap
+          body: EXECUTEUR_NALATENSCHAP
         legal_basis:
           law: Burgerlijk Wetboek Boek 4
           bwb_id: BWBR0002761
@@ -168,8 +168,8 @@ articles:
       - output: permissions
         value:
           operation: FOREACH
-          subject: $actief_executeurschap
-          value: $executeur_rechten
+          collection: $actief_executeurschap
+          body: $executeur_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 4
           bwb_id: BWBR0002761
@@ -199,6 +199,7 @@ articles:
           explanation: Einddatum executeurschap, null indien nog actief
     untranslatables:
     - construct: iteratie over variabel aantal executeurschap-registraties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve executeurschappen is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve executeurschappen is dynamisch en kan niet
+        vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
       accepted: true

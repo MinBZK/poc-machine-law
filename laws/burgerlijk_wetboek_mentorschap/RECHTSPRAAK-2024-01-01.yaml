@@ -77,8 +77,8 @@ articles:
       - output: actief_mentorschap
         value:
           operation: FOREACH
-          subject: $mentorschap_registraties
-          where:
+          collection: $mentorschap_registraties
+          filter:
             operation: AND
             conditions:
             - operation: EQUALS
@@ -94,7 +94,7 @@ articles:
               - operation: GREATER_THAN
                 subject: $current.datum_einde
                 value: $calculation_date
-          value: $current
+          body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -138,8 +138,8 @@ articles:
       - output: subject_types
         value:
           operation: FOREACH
-          subject: $actief_mentorschap
-          value: CITIZEN
+          collection: $actief_mentorschap
+          body: CITIZEN
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -150,8 +150,8 @@ articles:
       - output: delegation_types
         value:
           operation: FOREACH
-          subject: $actief_mentorschap
-          value: MENTOR
+          collection: $actief_mentorschap
+          body: MENTOR
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -162,8 +162,8 @@ articles:
       - output: permissions
         value:
           operation: FOREACH
-          subject: $actief_mentorschap
-          value: $mentor_rechten
+          collection: $actief_mentorschap
+          body: $mentor_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -193,6 +193,7 @@ articles:
           explanation: Einddatum mentorschap, null indien nog actief
     untranslatables:
     - construct: iteratie over variabel aantal mentorschap-registraties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve mentorschap-registraties is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve mentorschap-registraties is dynamisch en kan
+        niet vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
       accepted: true

@@ -203,12 +203,12 @@ articles:
             operation: LESS_THAN
             value: $pensioenleeftijd
           - operation: GREATER_THAN_OR_EQUAL
-            values:
-            - operation: SUBTRACT
+            subject:
+              operation: SUBTRACT
               values:
               - $gemiddeld_arbeidsuren_per_week
               - $huidige_arbeidsuren_per_week
-            - $minimum_urenvermindering
+            value: $minimum_urenvermindering
           - subject: $gewerkte_weken_in_refperiode
             operation: GREATER_THAN_OR_EQUAL
             value: $minimum_gewerkte_weken

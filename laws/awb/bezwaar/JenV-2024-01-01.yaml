@@ -10,16 +10,20 @@ service: JenV
 uuid: b6679cca-4555-44b4-9b8f-caa6886b74a0
 articles:
 - number: '7:1'
-  text: |-
-    1 Degene aan wie het recht is toegekend beroep bij een bestuursrechter in te stellen, dient alvorens beroep in te stellen bezwaar te maken, tenzij:
-      a. het besluit in bezwaar of in administratief beroep is genomen,
-      b. het besluit aan goedkeuring is onderworpen,
-      c. het besluit een goedkeuring of een weigering daarvan inhoudt,
-      d. het besluit is voorbereid met toepassing van afdeling 3.4,
-      e. het besluit is genomen op basis van een uitspraak waarin de bestuursrechter met toepassing van artikel 8:72, vierde lid, onderdeel a, heeft bepaald dat afdeling 3.4 geheel of gedeeltelijk buiten toepassing blijft,
-      f. het beroep zich richt tegen het niet tijdig nemen van een besluit,
-      g. het besluit is genomen op grond van een voorschrift als genoemd in de bij deze wet behorende Regeling rechtstreeks beroep dan wel het besluit anderszins in die regeling is omschreven.
-    2 Tegen de beslissing op het bezwaar kan beroep worden ingesteld met toepassing van de voorschriften die gelden voor het instellen van beroep tegen het besluit waartegen bezwaar is gemaakt.
+  text: "1 Degene aan wie het recht is toegekend beroep bij een bestuursrechter in\
+    \ te stellen, dient alvorens beroep in te stellen bezwaar te maken, tenzij:\n\
+    \  a. het besluit in bezwaar of in administratief beroep is genomen,\n  b. het\
+    \ besluit aan goedkeuring is onderworpen,\n  c. het besluit een goedkeuring of\
+    \ een weigering daarvan inhoudt,\n  d. het besluit is voorbereid met toepassing\
+    \ van afdeling 3.4,\n  e. het besluit is genomen op basis van een uitspraak waarin\
+    \ de bestuursrechter met toepassing van artikel 8:72, vierde lid, onderdeel a,\
+    \ heeft bepaald dat afdeling 3.4 geheel of gedeeltelijk buiten toepassing blijft,\n\
+    \  f. het beroep zich richt tegen het niet tijdig nemen van een besluit,\n  g.\
+    \ het besluit is genomen op grond van een voorschrift als genoemd in de bij deze\
+    \ wet behorende Regeling rechtstreeks beroep dan wel het besluit anderszins in\
+    \ die regeling is omschreven.\n2 Tegen de beslissing op het bezwaar kan beroep\
+    \ worden ingesteld met toepassing van de voorschriften die gelden voor het instellen\
+    \ van beroep tegen het besluit waartegen bezwaar is gemaakt."
   url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Artikel7:1
   machine_readable:
     definitions:
@@ -112,9 +116,9 @@ articles:
           - operation: EQUALS
             subject:
               operation: FOREACH
-              subject: $gebeurtenissen
-              value:
-              - operation: EQUALS
+              collection: $gebeurtenissen
+              body:
+                operation: EQUALS
                 subject: $event_type
                 value: Objected
               combine: ADD
@@ -126,7 +130,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1
           juriconnect: jci1.3:c:BWBR0005537&artikel=7:1&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 7:1 lid 1 Awb bepaalt de voorwaarden waaronder bezwaar mogelijk is
+          explanation: Artikel 7:1 lid 1 Awb bepaalt de voorwaarden waaronder bezwaar
+            mogelijk is
       - output: reden_niet_mogelijk
         value:
           operation: IF
@@ -145,15 +150,15 @@ articles:
               operation: NOT
               value:
                 operation: EQUALS
-                values:
-                - operation: FOREACH
-                  subject: $gebeurtenissen
-                  value:
-                  - operation: EQUALS
+                subject:
+                  operation: FOREACH
+                  collection: $gebeurtenissen
+                  body:
+                    operation: EQUALS
                     subject: $event_type
                     value: Objected
                   combine: ADD
-                - 0
+                value: 0
             then: er is al eerder bezwaar gemaakt tegen dit besluit
         legal_basis:
           law: Algemene wet bestuursrecht
@@ -198,7 +203,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.2_Artikel7:10
           juriconnect: jci1.3:c:BWBR0005537&artikel=7:10&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 7:10 lid 1 Awb bepaalt de termijn voor beslissing op bezwaar
+          explanation: Artikel 7:10 lid 1 Awb bepaalt de termijn voor beslissing op
+            bezwaar
       - output: verdagingstermijn
         value:
           operation: IF
@@ -220,6 +226,8 @@ articles:
           explanation: Artikel 7:10 lid 3 Awb bepaalt de verdagingstermijn
     untranslatables:
     - construct: iteratie over variabel aantal gebeurtenissen voor bezwaarcheck
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal zaakgebeurtenissen is dynamisch en kan niet vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal gebeurtenissen tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal zaakgebeurtenissen
+        is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal gebeurtenissen
+        tot een vast maximum
       accepted: true

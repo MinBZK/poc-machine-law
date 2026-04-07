@@ -79,8 +79,8 @@ articles:
       - output: actieve_curatele
         value:
           operation: FOREACH
-          subject: $curatele_registraties
-          where:
+          collection: $curatele_registraties
+          filter:
             operation: AND
             conditions:
             - operation: EQUALS
@@ -96,7 +96,7 @@ articles:
               - operation: GREATER_THAN
                 subject: $current.datum_einde
                 value: $calculation_date
-          value: $current
+          body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -140,8 +140,8 @@ articles:
       - output: subject_types
         value:
           operation: FOREACH
-          subject: $actieve_curatele
-          value: CITIZEN
+          collection: $actieve_curatele
+          body: CITIZEN
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -152,8 +152,8 @@ articles:
       - output: delegation_types
         value:
           operation: FOREACH
-          subject: $actieve_curatele
-          value: CURATOR
+          collection: $actieve_curatele
+          body: CURATOR
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -164,8 +164,8 @@ articles:
       - output: permissions
         value:
           operation: FOREACH
-          subject: $actieve_curatele
-          value: $curator_rechten
+          collection: $actieve_curatele
+          body: $curator_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -195,6 +195,7 @@ articles:
           explanation: Einddatum curatele, null indien nog actief
     untranslatables:
     - construct: iteratie over variabel aantal curatele-registraties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve curatele-registraties is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve curatele-registraties is dynamisch en kan
+        niet vooraf worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
       accepted: true

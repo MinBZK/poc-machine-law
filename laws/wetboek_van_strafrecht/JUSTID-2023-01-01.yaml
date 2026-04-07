@@ -10,16 +10,22 @@ service: JUSTID
 uuid: 41ffa9a4-89a6-4fed-acc7-6b4fdb2e56ce
 articles:
 - number: '28'
-  text: |-
-    1 De rechten waarvan de schuldige, in de bij de wet bepaalde gevallen, bij rechterlijke uitspraak kan worden ontzet, zijn:
-      1°. het bekleden van ambten of van bepaalde ambten;
-      2°. het dienen bij de gewapende macht;
-      3°. het recht de leden van algemeen vertegenwoordigende organen te verkiezen en tot lid van deze organen te worden verkozen;
-      4°. het zijn van raadsman of gerechtelijk bewindvoerder;
-      5°. de uitoefening van bepaalde beroepen.
-    2 Ontzetting van leden van de rechterlijke macht die, hetzij voor hun leven, hetzij voor een bepaalde tijd, zijn aangesteld, of van andere voor hun leven aangestelde ambtenaren, geschiedt, ten opzichte van het ambt waartoe zij aldus zijn aangesteld, alleen in de gevallen en op de wijze bij de wet bepaald.
-    3 Ontzetting van het recht bedoeld in het eerste lid, onder 3°, kan alleen worden uitgesproken bij veroordeling tot gevangenisstraf van ten minste een jaar.
-    4 De rechter kan aan een krachtens algemene maatregel van bestuur aangewezen reclasseringsinstelling opdracht geven toezicht te houden op de naleving door de veroordeelde van de ontzetting van het recht om ambten of bepaalde ambten te bekleden en het recht om bepaalde beroepen uit te oefenen.
+  text: "1 De rechten waarvan de schuldige, in de bij de wet bepaalde gevallen, bij\
+    \ rechterlijke uitspraak kan worden ontzet, zijn:\n  1°. het bekleden van ambten\
+    \ of van bepaalde ambten;\n  2°. het dienen bij de gewapende macht;\n  3°. het\
+    \ recht de leden van algemeen vertegenwoordigende organen te verkiezen en tot\
+    \ lid van deze organen te worden verkozen;\n  4°. het zijn van raadsman of gerechtelijk\
+    \ bewindvoerder;\n  5°. de uitoefening van bepaalde beroepen.\n2 Ontzetting van\
+    \ leden van de rechterlijke macht die, hetzij voor hun leven, hetzij voor een\
+    \ bepaalde tijd, zijn aangesteld, of van andere voor hun leven aangestelde ambtenaren,\
+    \ geschiedt, ten opzichte van het ambt waartoe zij aldus zijn aangesteld, alleen\
+    \ in de gevallen en op de wijze bij de wet bepaald.\n3 Ontzetting van het recht\
+    \ bedoeld in het eerste lid, onder 3°, kan alleen worden uitgesproken bij veroordeling\
+    \ tot gevangenisstraf van ten minste een jaar.\n4 De rechter kan aan een krachtens\
+    \ algemene maatregel van bestuur aangewezen reclasseringsinstelling opdracht geven\
+    \ toezicht te houden op de naleving door de veroordeelde van de ontzetting van\
+    \ het recht om ambten of bepaalde ambten te bekleden en het recht om bepaalde\
+    \ beroepen uit te oefenen."
   url: https://wetten.overheid.nl/BWBR0001854/2023-01-01#Artikel28
   machine_readable:
     execution:
@@ -62,9 +68,9 @@ articles:
                 subject: $stemrecht_uitsluitingen
             then:
               operation: FOREACH
-              subject: $stemrecht_uitsluitingen
-              value:
-              - operation: AND
+              collection: $stemrecht_uitsluitingen
+              body:
+                operation: AND
                 conditions:
                 - operation: LESS_THAN_OR_EQUAL
                   subject: $startdatum
@@ -85,9 +91,12 @@ articles:
           article: '28'
           url: https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28
           juriconnect: jci1.3:c:BWBR0001854&artikel=28&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 28 Sr bepaalt de vaststelling van uitsluiting van het kiesrecht
+          explanation: Artikel 28 Sr bepaalt de vaststelling van uitsluiting van het
+            kiesrecht
     untranslatables:
     - construct: iteratie over variabel aantal stemrecht-uitsluitingen
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal uitsluitingen is dynamisch en kan niet vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal uitsluitingen tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal uitsluitingen
+        is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal uitsluitingen
+        tot een vast maximum
       accepted: true

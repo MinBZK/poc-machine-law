@@ -81,9 +81,8 @@ articles:
           - operation: NOT
             value:
               operation: EQUALS
-              values:
-              - $adres
-              - $belasting_adres
+              subject: $adres
+              value: $belasting_adres
           - operation: EQUALS
             subject: $langdurig_buitenland
             value: true
@@ -102,9 +101,8 @@ articles:
               operation: NOT
               value:
                 operation: EQUALS
-                values:
-                - $adres
-                - $belasting_adres
+                subject: $adres
+                value: $belasting_adres
             then: $twijfel_adres_afwijking
           - when:
               operation: EQUALS

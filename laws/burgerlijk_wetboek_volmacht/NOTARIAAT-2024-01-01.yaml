@@ -83,8 +83,8 @@ articles:
       - output: actieve_volmachten
         value:
           operation: FOREACH
-          subject: $volmacht_registraties
-          where:
+          collection: $volmacht_registraties
+          filter:
             operation: AND
             conditions:
             - operation: EQUALS
@@ -105,7 +105,7 @@ articles:
               - operation: GREATER_THAN
                 subject: $current.datum_einde
                 value: $calculation_date
-          value: $current
+          body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 3
           bwb_id: BWBR0005291
@@ -149,8 +149,8 @@ articles:
       - output: subject_types
         value:
           operation: FOREACH
-          subject: $actieve_volmachten
-          value: CITIZEN
+          collection: $actieve_volmachten
+          body: CITIZEN
         legal_basis:
           law: Burgerlijk Wetboek Boek 3
           bwb_id: BWBR0005291
@@ -161,8 +161,8 @@ articles:
       - output: delegation_types
         value:
           operation: FOREACH
-          subject: $actieve_volmachten
-          value:
+          collection: $actieve_volmachten
+          body:
             operation: IF
             cases:
             - when:
@@ -181,8 +181,8 @@ articles:
       - output: permissions
         value:
           operation: FOREACH
-          subject: $actieve_volmachten
-          value:
+          collection: $actieve_volmachten
+          body:
             operation: IF
             cases:
             - when:
@@ -219,6 +219,7 @@ articles:
           explanation: Einddatum volmacht, null indien onbepaalde tijd
     untranslatables:
     - construct: iteratie over variabel aantal volmacht-registraties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve volmachten is dynamisch en kan niet vooraf worden uitgerold
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve volmachten is dynamisch en kan niet vooraf
+        worden uitgerold
       suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
       accepted: true

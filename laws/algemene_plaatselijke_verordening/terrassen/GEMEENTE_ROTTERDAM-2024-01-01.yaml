@@ -364,24 +364,20 @@ articles:
             operation: IN
             values: $toegestane_gebruiksdoelen
           - operation: GREATER_THAN_OR_EQUAL
-            values:
-            - $obstakelvrije_ruimte
-            - $minimale_obstakelvrije_ruimte
+            subject: $obstakelvrije_ruimte
+            value: $minimale_obstakelvrije_ruimte
           - operation: LESS_THAN_OR_EQUAL
-            values:
-            - $terras_oppervlakte
-            - $bgt_oppervlakte_beschikbaar
+            subject: $terras_oppervlakte
+            value: $bgt_oppervlakte_beschikbaar
           - subject: $bgt_functie_oppervlak
             operation: IN
             values: $toegestane_bgt_functies
           - operation: LESS_THAN_OR_EQUAL
-            values:
-            - $gewenste_sluitingstijd_doordeweeks
-            - $maximale_sluitingstijd_doordeweeks
+            subject: $gewenste_sluitingstijd_doordeweeks
+            value: $maximale_sluitingstijd_doordeweeks
           - operation: LESS_THAN_OR_EQUAL
-            values:
-            - $gewenste_sluitingstijd_weekend
-            - $maximale_sluitingstijd_weekend
+            subject: $gewenste_sluitingstijd_weekend
+            value: $maximale_sluitingstijd_weekend
           - operation: OR
             conditions:
             - subject: $schenkt_alcohol
