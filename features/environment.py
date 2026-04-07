@@ -10,6 +10,7 @@ from machine.logging_config import configure_logging
 def before_all(context) -> None:
     log_level = context.config.userdata.get("log_level", "DEBUG")
     context.loggers = configure_logging(log_level)
+    context.engine_type = context.config.userdata.get("engine", "python")
 
     # Start the web server once for all tests that need it
     # Check if server is already running

@@ -60,7 +60,9 @@ def _check_output_contains(context, field: str, value: str) -> None:
     expected = parse_value(value)
     actual_str = [str(x) for x in actual]
     expected_str = str(expected)
-    assertions.assertIn(expected_str, actual_str, f"Expected {field} to contain {expected_str}, but it was {actual_str}")
+    assertions.assertIn(
+        expected_str, actual_str, f"Expected {field} to contain {expected_str}, but it was {actual_str}"
+    )
 
 
 def _check_output_empty(context, field: str) -> None:
@@ -171,7 +173,12 @@ def step_impl(context, date):
             del context.services
     except Exception:
         pass
-    context.services = Services(date)
+    if getattr(context, "engine_type", "python") == "regelrecht":
+        from machine.regelrecht_services import RegelrechtServices
+
+        context.services = RegelrechtServices(date)
+    else:
+        context.services = Services(date)
 
 
 @given('een persoon met BSN "{bsn}"')
@@ -610,7 +617,9 @@ def step_impl(context, amount):
 def step_impl(context):
     max_dagloon = 29067
     actual = context.result.output.get("ww_dagloon")
-    assertions.assertEqual(actual, max_dagloon, f"Expected dagloon to be maximized at €290.67, but was €{actual / 100:.2f}")
+    assertions.assertEqual(
+        actual, max_dagloon, f"Expected dagloon to be maximized at €290.67, but was €{actual / 100:.2f}"
+    )
 
 
 # =============================================================================
@@ -660,7 +669,9 @@ def step_impl(context):
     max_budget_2_kinderen_alo = 850200
     totaal = context.result.output.get("kindgebonden_budget_jaar", 0)
     assertions.assertLess(
-        totaal, max_budget_2_kinderen_alo, f"Expected budget to be reduced from maximum €8,502, but was €{totaal / 100:.2f}"
+        totaal,
+        max_budget_2_kinderen_alo,
+        f"Expected budget to be reduced from maximum €8,502, but was €{totaal / 100:.2f}",
     )
 
 
@@ -680,23 +691,25 @@ def step_impl(context):
         totaal, 800000, f"Expected high budget for 3 children with low income, but was €{totaal / 100:.2f}"
     )
     assertions.assertLess(
-        inkomen_afbouw, 100000, f"Expected minimal income reduction for low income, but afbouw was €{inkomen_afbouw / 100:.2f}"
+        inkomen_afbouw,
+        100000,
+        f"Expected minimal income reduction for low income, but afbouw was €{inkomen_afbouw / 100:.2f}",
     )
 
 
 @then("ontvangt de persoon extra bedragen voor kinderen 12+ en 16+")
 def step_impl(context):
     totaal = context.result.output.get("kindgebonden_budget_jaar", 0)
-    assertions.assertGreater(
-        totaal, 251100, f"Expected budget with age supplements, but was only €{totaal / 100:.2f}"
-    )
+    assertions.assertGreater(totaal, 251100, f"Expected budget with age supplements, but was only €{totaal / 100:.2f}")
 
 
 @then("is het kindgebonden budget maximaal door laag inkomen")
 def step_impl(context):
     inkomen_afbouw = context.result.output.get("inkomen_afbouw", 0)
     assertions.assertLess(
-        inkomen_afbouw, 50000, f"Expected minimal/no income reduction for low income, but afbouw was €{inkomen_afbouw / 100:.2f}"
+        inkomen_afbouw,
+        50000,
+        f"Expected minimal/no income reduction for low income, but afbouw was €{inkomen_afbouw / 100:.2f}",
     )
 
 
