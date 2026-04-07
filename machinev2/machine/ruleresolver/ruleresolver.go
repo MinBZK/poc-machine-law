@@ -17,6 +17,22 @@ const (
 	LawBaseDir = "laws"
 )
 
+// regulatoryLayerToLawType maps v0.5.0 regulatory_layer values to v0.1.x law_type values
+var regulatoryLayerToLawType = map[string]string{
+	"GRONDWET":                  "GRONDWET",
+	"WET":                       "FORMELE_WET",
+	"AMVB":                      "AMVB",
+	"KONINKLIJK_BESLUIT":        "KONINKLIJK_BESLUIT",
+	"MINISTERIELE_REGELING":     "MINISTERIELE_REGELING",
+	"BELEIDSREGEL":              "BELEIDSREGEL",
+	"EU_VERORDENING":            "EU_VERORDENING",
+	"EU_RICHTLIJN":              "EU_RICHTLIJN",
+	"VERDRAG":                   "VERDRAG",
+	"UITVOERINGSBELEID":         "UITVOERINGSBELEID",
+	"GEMEENTELIJKE_VERORDENING": "GEMEENTELIJKE_VERORDENING",
+	"PROVINCIALE_VERORDENING":   "PROVINCIALE_VERORDENING",
+}
+
 var (
 	loaded                    bool = false
 	ruleSpec                  []RuleSpec
@@ -96,15 +112,20 @@ func New() (resolver *RuleResolve, err error) {
 // isV050Format detects whether raw YAML data is in v0.5.0 article-based format
 func isV050Format(data map[string]interface{}) bool {
 	_, hasArticles := data["articles"]
-	_, hasSchema := data["$schema"]
-	return hasArticles || hasSchema
+	if hasArticles {
+		return true
+	}
+	if schema, ok := data["$schema"].(string); ok {
+		return strings.Contains(schema, "v0.5.")
+	}
+	return false
 }
 
 // unwrapDefinitionValue extracts the raw value from a v0.5.0 definition.
 // Definitions in v0.5.0 can be wrapped as {value: X}; this unwraps them.
 func unwrapDefinitionValue(v interface{}) interface{} {
 	if m, ok := v.(map[string]interface{}); ok {
-		if val, hasValue := m["value"]; hasValue {
+		if val, hasValue := m["value"]; hasValue && len(m) == 1 {
 			return val
 		}
 	}
@@ -184,13 +205,16 @@ func flattenV050(spec ArticleBasedSpec) (RuleSpec, error) {
 		UUID:      uuidVal,
 		Name:      spec.Name,
 		Law:       spec.ID,
-		LawType:   strPtr(spec.RegulatoryLayer),
+		LawType:   strPtr(mapRegulatoryLayer(spec.RegulatoryLayer)),
 		ValidFrom: validFrom,
 		Service:   spec.Service,
 	}
 
 	if spec.Discoverable != "" {
 		rule.Discoverable = &spec.Discoverable
+	} else {
+		citizen := "CITIZEN"
+		rule.Discoverable = &citizen
 	}
 
 	// Merge definitions, parameters, inputs, outputs, actions, requirements from all articles
@@ -312,6 +336,14 @@ func strPtr(s string) *string {
 		return nil
 	}
 	return &s
+}
+
+// mapRegulatoryLayer maps a v0.5.0 regulatory_layer to the corresponding v0.1.x law_type
+func mapRegulatoryLayer(layer string) string {
+	if mapped, ok := regulatoryLayerToLawType[layer]; ok {
+		return mapped
+	}
+	return layer
 }
 
 // parseRuleFromData parses raw YAML data into a RuleSpec, detecting v0.5.0 format automatically

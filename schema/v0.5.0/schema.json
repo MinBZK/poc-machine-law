@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json",
+  "$id": "https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.0/schema.json",
   "title": "Machine-Readable Dutch Law Schema v0.5.0",
   "description": "Article-based schema for machine-readable representation of Dutch laws and regulations",
   "type": "object",

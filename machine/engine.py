@@ -262,8 +262,6 @@ class RulesEngine:
 
     def _evaluate_action(self, action, context):
         with logger.indent_block(f"Computing {action.get('output', '')}"):
-            if action["output"] == "partner_bsn":
-                pass
             action_node = PathNode(
                 type="action",
                 name=f"Evaluate action for {action.get('output', '')}",
@@ -408,8 +406,6 @@ class RulesEngine:
         combine = operation.get("combine")
 
         array_data = self._evaluate_value(operation["subject"], context)
-        if "DECLARED_HOURS" in operation["subject"]:
-            pass
         if not array_data:
             logger.warning("No data found to run FOREACH on")
             return self._evaluate_aggregate_ops(combine, [])

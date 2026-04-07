@@ -165,7 +165,7 @@ DEMO_COLLAPSE_CONFIG = {
         "collapse_all_except_expanded": True,
     },
     # CBS Statistiekverplichting - Show articles
-    "wet_op_het_centraal_bureau_voor_de_statistiek/enquete/CBS-2024-01-01": {
+    "wet_op_het_centraal_bureau_voor_de_statistiek/CBS-2024-01-01": {
         "expand_paths": [
             "articles",
         ],

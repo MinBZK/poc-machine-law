@@ -55,7 +55,6 @@ class BracketYAMLGenerator:
         """Generate YAML spec from bracket model."""
         is_business = model.primary_feature != "income"
         yaml_spec = {
-            "$id": "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.5.0/schema.json",
             "uuid": str(uuid.uuid4()),
             "name": self.config.law_display_name,
             "law": self.config.law_name,

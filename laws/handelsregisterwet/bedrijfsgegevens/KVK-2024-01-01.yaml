@@ -1,4 +1,4 @@
-$schema: https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.1/schema.json
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
 $id: handelsregisterwet/bedrijfsgegevens
 regulatory_layer: WET
 publication_date: '2024-01-01'

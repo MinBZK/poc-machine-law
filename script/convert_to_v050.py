@@ -20,7 +20,7 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-V050_SCHEMA_URL = "https://raw.githubusercontent.com/MinBZK/regelrecht-mvp/refs/heads/main/schema/v0.5.0/schema.json"
+V050_SCHEMA_URL = "https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.0/schema.json"
 
 LAW_TYPE_TO_REGULATORY_LAYER = {
     "FORMELE_WET": "WET",

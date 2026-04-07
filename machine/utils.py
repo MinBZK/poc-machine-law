@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
@@ -35,10 +36,12 @@ REGULATORY_LAYER_TO_LAW_TYPE = {
 _yaml_cache = {}
 
 
-def _is_v050_format(data: dict) -> bool:
+def _is_v050_format(data) -> bool:
     """Detect if a YAML law file uses the v0.5.x article-based schema."""
+    if not isinstance(data, dict):
+        return False
     schema = data.get("$schema", "")
-    return "articles" in data or (isinstance(schema, str) and ("v0.5.0" in schema or "v0.5.1" in schema))
+    return "articles" in data or (isinstance(schema, str) and bool(re.search(r"v0\.5\.\d+", schema)))
 
 
 def _convert_source_to_reference(source: dict) -> tuple[str, dict]:
@@ -101,7 +104,7 @@ def _flatten_v050(data: dict) -> dict:
     Merges all articles' machine_readable sections into a single flat spec
     that the engine can process identically to v0.1.x files.
     """
-    articles = data.get("articles", [])
+    articles = data.get("articles") or []
 
     merged_parameters = []
     merged_input = []
@@ -240,6 +243,10 @@ def load_yaml_cached(file_path: str) -> dict:
     with open(file_path) as f:
         data = yaml.load(f, Loader=Loader)
 
+    if not isinstance(data, dict):
+        _yaml_cache[file_path] = data or {}
+        return _yaml_cache[file_path]
+
     # Flatten v0.5.0 format to internal representation
     if _is_v050_format(data):
         data = _flatten_v050(data)
@@ -269,7 +276,9 @@ class RuleSpec:
 
         # Parse valid_from: handle datetime, date, and string formats
         valid_from_raw = data.get("valid_from")
-        if isinstance(valid_from_raw, datetime):
+        if valid_from_raw is None:
+            raise ValueError(f"Missing valid_from in {path}")
+        elif isinstance(valid_from_raw, datetime):
             valid_from = valid_from_raw
         elif isinstance(valid_from_raw, str):
             valid_from = datetime.strptime(valid_from_raw, "%Y-%m-%d")
