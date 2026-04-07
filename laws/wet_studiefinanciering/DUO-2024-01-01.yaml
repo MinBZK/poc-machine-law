@@ -25,48 +25,48 @@ articles:
   url: https://wetten.overheid.nl/BWBR0011453/2024-01-01#Artikel3.1
   machine_readable:
     definitions:
-      BASISBEURS_WO_UIT:
+      basisbeurs_wo_uit:
         value: 28800
-      BASISBEURS_WO_THUIS:
+      basisbeurs_wo_thuis:
         value: 10300
-      BASISBEURS_HBO_UIT:
+      basisbeurs_hbo_uit:
         value: 28800
-      BASISBEURS_HBO_THUIS:
+      basisbeurs_hbo_thuis:
         value: 10300
-      BASISBEURS_MBO_UIT:
+      basisbeurs_mbo_uit:
         value: 28800
-      BASISBEURS_MBO_THUIS:
+      basisbeurs_mbo_thuis:
         value: 10300
-      MAX_AANVULLENDE_BEURS_WO:
+      max_aanvullende_beurs_wo:
         value: 41900
-      MAX_AANVULLENDE_BEURS_HBO:
+      max_aanvullende_beurs_hbo:
         value: 41900
-      MAX_AANVULLENDE_BEURS_MBO:
+      max_aanvullende_beurs_mbo:
         value: 41900
-      INKOMEN_GRENS_GEEN_BEURS:
+      inkomen_grens_geen_beurs:
         value: 7000000
-      INKOMENSDREMPEL_BASIS:
+      inkomensdrempel_basis:
         value: 3400000
-      VERHOGING_DREMPEL_PER_KIND:
+      verhoging_drempel_per_kind:
         value: 350000
     execution:
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: WOONSITUATIE
+      - name: woonsituatie
         type: string
         source:
           regulation: wet_brp
           output: woonsituatie
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: period
           period_type: month
-      - name: OUDER1_INKOMEN
+      - name: ouder1_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -77,11 +77,11 @@ articles:
           output: inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
-      - name: OUDER2_INKOMEN
+      - name: ouder2_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -92,11 +92,11 @@ articles:
           output: inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
-      - name: PARTNER_BSN
+      - name: partner_bsn
         type: string
         source:
           regulation: wet_brp
@@ -105,18 +105,18 @@ articles:
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PARTNER_WOONSITUATIE
+      - name: partner_woonsituatie
         type: string
         source:
           regulation: wet_brp
           output: woonsituatie
           service: RvIG
           parameters:
-            BSN: $PARTNER_BSN
+            bsn: $partner_bsn
         temporal:
           type: period
           period_type: month
-      - name: PARTNER_OUDER1_INKOMEN
+      - name: partner_ouder1_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -127,11 +127,11 @@ articles:
           output: inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $PARTNER_BSN
+            bsn: $partner_bsn
         temporal:
           type: period
           period_type: year
-      - name: PARTNER_OUDER2_INKOMEN
+      - name: partner_ouder2_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -142,11 +142,11 @@ articles:
           output: inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $PARTNER_BSN
+            bsn: $partner_bsn
         temporal:
           type: period
           period_type: year
-      - name: OPLEIDING_TYPE
+      - name: opleiding_type
         type: string
         source_reference:
           table: inschrijvingen
@@ -155,8 +155,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: STUDEREND_GEZIN
+            value: $bsn
+      - name: studerend_gezin
         type: number
         source_reference:
           table: studiefinanciering
@@ -165,8 +165,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: PARTNER_OPLEIDING_TYPE
+            value: $bsn
+      - name: partner_opleiding_type
         type: string
         source_reference:
           table: inschrijvingen
@@ -175,8 +175,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_STUDEREND_GEZIN
+            value: $partner_bsn
+      - name: partner_studerend_gezin
         type: number
         source_reference:
           table: studiefinanciering
@@ -185,7 +185,7 @@ articles:
           - name: bsn
             description: Burgerservicenummer van partner
             type: string
-            value: $PARTNER_BSN
+            value: $partner_bsn
       output:
       - name: studiefinanciering
         type: amount
@@ -212,43 +212,43 @@ articles:
             cases:
             - when:
                 operation: EQUALS
-                subject: $OPLEIDING_TYPE
+                subject: $opleiding_type
                 value: WO
               then:
                 operation: IF
                 cases:
                 - when:
                     operation: EQUALS
-                    subject: $WOONSITUATIE
+                    subject: $woonsituatie
                     value: UIT
-                  then: $BASISBEURS_WO_UIT
-                default: $BASISBEURS_WO_THUIS
+                  then: $basisbeurs_wo_uit
+                default: $basisbeurs_wo_thuis
             - when:
                 operation: EQUALS
-                subject: $OPLEIDING_TYPE
+                subject: $opleiding_type
                 value: HBO
               then:
                 operation: IF
                 cases:
                 - when:
                     operation: EQUALS
-                    subject: $WOONSITUATIE
+                    subject: $woonsituatie
                     value: UIT
-                  then: $BASISBEURS_HBO_UIT
-                default: $BASISBEURS_HBO_THUIS
+                  then: $basisbeurs_hbo_uit
+                default: $basisbeurs_hbo_thuis
             - when:
                 operation: EQUALS
-                subject: $OPLEIDING_TYPE
+                subject: $opleiding_type
                 value: MBO
               then:
                 operation: IF
                 cases:
                 - when:
                     operation: EQUALS
-                    subject: $WOONSITUATIE
+                    subject: $woonsituatie
                     value: UIT
-                  then: $BASISBEURS_MBO_UIT
-                default: $BASISBEURS_MBO_THUIS
+                  then: $basisbeurs_mbo_uit
+                default: $basisbeurs_mbo_thuis
           - operation: IF
             cases:
             - when:
@@ -256,9 +256,9 @@ articles:
                 subject:
                   operation: ADD
                   values:
-                  - $OUDER1_INKOMEN
-                  - $OUDER2_INKOMEN
-                value: $INKOMEN_GRENS_GEEN_BEURS
+                  - $ouder1_inkomen
+                  - $ouder2_inkomen
+                value: $inkomen_grens_geen_beurs
               then:
                 operation: MULTIPLY
                 values:
@@ -266,19 +266,19 @@ articles:
                   cases:
                   - when:
                       operation: EQUALS
-                      subject: $OPLEIDING_TYPE
+                      subject: $opleiding_type
                       value: WO
-                    then: $MAX_AANVULLENDE_BEURS_WO
+                    then: $max_aanvullende_beurs_wo
                   - when:
                       operation: EQUALS
-                      subject: $OPLEIDING_TYPE
+                      subject: $opleiding_type
                       value: HBO
-                    then: $MAX_AANVULLENDE_BEURS_HBO
+                    then: $max_aanvullende_beurs_hbo
                   - when:
                       operation: EQUALS
-                      subject: $OPLEIDING_TYPE
+                      subject: $opleiding_type
                       value: MBO
-                    then: $MAX_AANVULLENDE_BEURS_MBO
+                    then: $max_aanvullende_beurs_mbo
                 - operation: SUBTRACT
                   values:
                   - 1
@@ -288,17 +288,17 @@ articles:
                       values:
                       - operation: ADD
                         values:
-                        - $OUDER1_INKOMEN
-                        - $OUDER2_INKOMEN
-                      - $INKOMENSDREMPEL_BASIS
+                        - $ouder1_inkomen
+                        - $ouder2_inkomen
+                      - $inkomensdrempel_basis
                       - operation: MULTIPLY
                         values:
-                        - $STUDEREND_GEZIN
-                        - $VERHOGING_DREMPEL_PER_KIND
+                        - $studerend_gezin
+                        - $verhoging_drempel_per_kind
                     - operation: SUBTRACT
                       values:
-                      - $INKOMEN_GRENS_GEEN_BEURS
-                      - $INKOMENSDREMPEL_BASIS
+                      - $inkomen_grens_geen_beurs
+                      - $inkomensdrempel_basis
         legal_basis:
           law: Wet studiefinanciering 2000
           bwb_id: BWBR0011453
@@ -314,43 +314,43 @@ articles:
             cases:
             - when:
                 operation: EQUALS
-                subject: $PARTNER_OPLEIDING_TYPE
+                subject: $partner_opleiding_type
                 value: WO
               then:
                 operation: IF
                 cases:
                 - when:
                     operation: EQUALS
-                    subject: $PARTNER_WOONSITUATIE
+                    subject: $partner_woonsituatie
                     value: UIT
-                  then: $BASISBEURS_WO_UIT
-                default: $BASISBEURS_WO_THUIS
+                  then: $basisbeurs_wo_uit
+                default: $basisbeurs_wo_thuis
             - when:
                 operation: EQUALS
-                subject: $PARTNER_OPLEIDING_TYPE
+                subject: $partner_opleiding_type
                 value: HBO
               then:
                 operation: IF
                 cases:
                 - when:
                     operation: EQUALS
-                    subject: $PARTNER_WOONSITUATIE
+                    subject: $partner_woonsituatie
                     value: UIT
-                  then: $BASISBEURS_HBO_UIT
-                default: $BASISBEURS_HBO_THUIS
+                  then: $basisbeurs_hbo_uit
+                default: $basisbeurs_hbo_thuis
             - when:
                 operation: EQUALS
-                subject: $PARTNER_OPLEIDING_TYPE
+                subject: $partner_opleiding_type
                 value: MBO
               then:
                 operation: IF
                 cases:
                 - when:
                     operation: EQUALS
-                    subject: $PARTNER_WOONSITUATIE
+                    subject: $partner_woonsituatie
                     value: UIT
-                  then: $BASISBEURS_MBO_UIT
-                default: $BASISBEURS_MBO_THUIS
+                  then: $basisbeurs_mbo_uit
+                default: $basisbeurs_mbo_thuis
           - operation: IF
             cases:
             - when:
@@ -358,9 +358,9 @@ articles:
                 subject:
                   operation: ADD
                   values:
-                  - $PARTNER_OUDER1_INKOMEN
-                  - $PARTNER_OUDER2_INKOMEN
-                value: $INKOMEN_GRENS_GEEN_BEURS
+                  - $partner_ouder1_inkomen
+                  - $partner_ouder2_inkomen
+                value: $inkomen_grens_geen_beurs
               then:
                 operation: MULTIPLY
                 values:
@@ -368,19 +368,19 @@ articles:
                   cases:
                   - when:
                       operation: EQUALS
-                      subject: $PARTNER_OPLEIDING_TYPE
+                      subject: $partner_opleiding_type
                       value: WO
-                    then: $MAX_AANVULLENDE_BEURS_WO
+                    then: $max_aanvullende_beurs_wo
                   - when:
                       operation: EQUALS
-                      subject: $PARTNER_OPLEIDING_TYPE
+                      subject: $partner_opleiding_type
                       value: HBO
-                    then: $MAX_AANVULLENDE_BEURS_HBO
+                    then: $max_aanvullende_beurs_hbo
                   - when:
                       operation: EQUALS
-                      subject: $PARTNER_OPLEIDING_TYPE
+                      subject: $partner_opleiding_type
                       value: MBO
-                    then: $MAX_AANVULLENDE_BEURS_MBO
+                    then: $max_aanvullende_beurs_mbo
                 - operation: SUBTRACT
                   values:
                   - 1
@@ -390,17 +390,17 @@ articles:
                       values:
                       - operation: ADD
                         values:
-                        - $PARTNER_OUDER1_INKOMEN
-                        - $PARTNER_OUDER2_INKOMEN
-                      - $INKOMENSDREMPEL_BASIS
+                        - $partner_ouder1_inkomen
+                        - $partner_ouder2_inkomen
+                      - $inkomensdrempel_basis
                       - operation: MULTIPLY
                         values:
-                        - $PARTNER_STUDEREND_GEZIN
-                        - $VERHOGING_DREMPEL_PER_KIND
+                        - $partner_studerend_gezin
+                        - $verhoging_drempel_per_kind
                     - operation: SUBTRACT
                       values:
-                      - $INKOMEN_GRENS_GEEN_BEURS
-                      - $INKOMENSDREMPEL_BASIS
+                      - $inkomen_grens_geen_beurs
+                      - $inkomensdrempel_basis
         legal_basis:
           law: Wet studiefinanciering 2000
           bwb_id: BWBR0011453
@@ -414,7 +414,7 @@ articles:
           operation: NOT
           value:
             operation: IS_NULL
-            subject: $OPLEIDING_TYPE
+            subject: $opleiding_type
         legal_basis:
           law: Wet studiefinanciering 2000
           bwb_id: BWBR0011453

@@ -300,7 +300,7 @@ class Services:
                 rule_spec = self.resolver.get_rule_spec(law, current_date, service=service)
 
                 # Run the law for this person and get results
-                result = self.evaluate(service=service, law=law, parameters={"BSN": bsn}, reference_date=current_date)
+                result = self.evaluate(service=service, law=law, parameters={"bsn": bsn}, reference_date=current_date)
 
                 # Extract financial impact from result based on citizen_relevance
                 impact_value = 0

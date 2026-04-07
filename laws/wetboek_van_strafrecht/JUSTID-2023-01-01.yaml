@@ -27,11 +27,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: STEMRECHT_UITSLUITINGEN
+      - name: stemrecht_uitsluitingen
         type: array
         source_reference:
           table: ontzettingen
@@ -42,7 +42,7 @@ articles:
           - name: bsn
             description: BSN van de persoon
             type: string
-            value: $BSN
+            value: $bsn
           - name: type
             description: Type ontzetting
             type: string
@@ -59,10 +59,10 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $STEMRECHT_UITSLUITINGEN
+                subject: $stemrecht_uitsluitingen
             then:
               operation: FOREACH
-              subject: $STEMRECHT_UITSLUITINGEN
+              subject: $stemrecht_uitsluitingen
               value:
               - operation: AND
                 conditions:

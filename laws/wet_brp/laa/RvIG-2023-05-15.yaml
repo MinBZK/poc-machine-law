@@ -18,67 +18,67 @@ articles:
   url: https://wetten.overheid.nl/BWBR0034306/2023-05-15#Artikel28a
   machine_readable:
     definitions:
-      HOOG_BEWONERS_DREMPEL:
+      hoog_bewoners_drempel:
         value: 5
-      REACTIETERMIJN_WEKEN:
+      reactietermijn_weken:
         value: 4
-      ONDERZOEKSTERMIJN_MAANDEN:
+      onderzoekstermijn_maanden:
         value: 6
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
-      - name: ADRES
+      - name: adres
         type: object
         required: true
       input:
-      - name: BELASTINGDIENST_TWIJFEL
+      - name: belastingdienst_twijfel
         type: boolean
         source:
           regulation: wet_brp/terugmelding
           output: heeft_gerede_twijfel_adres
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
-            ADRES: $ADRES
-      - name: TOESLAGEN_TWIJFEL
+            bsn: $bsn
+            adres: $adres
+      - name: toeslagen_twijfel
         type: boolean
         source:
           regulation: wet_brp/terugmelding
           output: heeft_gerede_twijfel_adres
           service: TOESLAGEN
           parameters:
-            BSN: $BSN
-            ADRES: $ADRES
-      - name: CJIB_TWIJFEL
+            bsn: $bsn
+            adres: $adres
+      - name: cjib_twijfel
         type: boolean
         source:
           regulation: wet_brp/terugmelding
           output: heeft_gerede_twijfel_adres
           service: CJIB
           parameters:
-            BSN: $BSN
-            ADRES: $ADRES
-      - name: BAG_GEBRUIKSDOEL
+            bsn: $bsn
+            adres: $adres
+      - name: bag_gebruiksdoel
         type: string
         source:
           regulation: wet_bag
           output: gebruiksdoel
           service: KADASTER
           parameters:
-            ADRES: $ADRES
-      - name: BAG_IS_WOONFUNCTIE
+            adres: $adres
+      - name: bag_is_woonfunctie
         type: boolean
         source:
           regulation: wet_bag
           output: is_woonfunctie
           service: KADASTER
           parameters:
-            ADRES: $ADRES
-      - name: AANTAL_BEWONERS
+            adres: $adres
+      - name: aantal_bewoners
         type: number
         source_reference:
           table: brp_adressen
@@ -87,11 +87,11 @@ articles:
           - name: postcode
             description: Postcode van het adres
             type: string
-            value: $ADRES.postcode
+            value: $adres.postcode
           - name: huisnummer
             description: Huisnummer van het adres
             type: string
-            value: $ADRES.huisnummer
+            value: $adres.huisnummer
       output:
       - name: genereer_signaal
         type: boolean
@@ -112,7 +112,7 @@ articles:
         - operation: NOT
           value:
             operation: IS_NULL
-            subject: $ADRES
+            subject: $adres
           legal_basis:
             law: Besluit basisregistratie personen
             bwb_id: BWBR0034306
@@ -126,21 +126,21 @@ articles:
           operation: OR
           conditions:
           - operation: EQUALS
-            subject: $BELASTINGDIENST_TWIJFEL
+            subject: $belastingdienst_twijfel
             value: true
           - operation: EQUALS
-            subject: $TOESLAGEN_TWIJFEL
+            subject: $toeslagen_twijfel
             value: true
           - operation: EQUALS
-            subject: $CJIB_TWIJFEL
+            subject: $cjib_twijfel
             value: true
           - operation: AND
             conditions:
             - operation: GREATER_THAN
-              subject: $AANTAL_BEWONERS
-              value: $HOOG_BEWONERS_DREMPEL
+              subject: $aantal_bewoners
+              value: $hoog_bewoners_drempel
             - operation: EQUALS
-              subject: $BAG_IS_WOONFUNCTIE
+              subject: $bag_is_woonfunctie
               value: false
         legal_basis:
           law: Besluit basisregistratie personen
@@ -157,13 +157,13 @@ articles:
               operation: OR
               conditions:
               - operation: EQUALS
-                subject: $BELASTINGDIENST_TWIJFEL
+                subject: $belastingdienst_twijfel
                 value: true
               - operation: EQUALS
-                subject: $TOESLAGEN_TWIJFEL
+                subject: $toeslagen_twijfel
                 value: true
               - operation: EQUALS
-                subject: $CJIB_TWIJFEL
+                subject: $cjib_twijfel
                 value: true
             then: MELDING
           default: PROFIEL
@@ -175,7 +175,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0034306&artikel=28a&z=2024-04-01&g=2024-04-01
           explanation: Artikel 28a onderscheidt meldingen en profielen (patroononderzoek leidt niet tot signaal)
       - output: reactietermijn_weken
-        value: $REACTIETERMIJN_WEKEN
+        value: $reactietermijn_weken
         legal_basis:
           law: Besluit basisregistratie personen
           bwb_id: BWBR0034306
@@ -185,7 +185,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0034306&artikel=28g&lid=1&z=2024-04-01&g=2024-04-01
           explanation: Artikel 28g lid 1 bepaalt vier weken reactietermijn
       - output: onderzoekstermijn_maanden
-        value: $ONDERZOEKSTERMIJN_MAANDEN
+        value: $onderzoekstermijn_maanden
         legal_basis:
           law: Besluit basisregistratie personen
           bwb_id: BWBR0034306

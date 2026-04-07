@@ -39,7 +39,7 @@ Feature: Bepalen precariobelasting voor terras op openbare grond Rotterdam
     # Tarief: EUR 36,10/m²/jaar → 30 × 3610 = 108.300 eurocent
     # Verwachting: Belastingplichtig, belasting berekend over 30 m²
     When de verordening_precariobelasting wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | HEEFT_ACTIEVE_VERGUNNING | VERGUNDE_OPPERVLAKTE |
+      | heeft_actieve_vergunning | vergunde_oppervlakte |
       | true                     | 80                   |
     Then is voldaan aan de voorwaarden
     And is de output "is_belastingplichtig" waar
@@ -52,7 +52,7 @@ Feature: Bepalen precariobelasting voor terras op openbare grond Rotterdam
     # Heffingsmaatstaf = MAX(50 - 50, 0) = 0 → belasting = 0
     # Verwachting: Wel belastingplichtig, maar belasting is 0
     When de verordening_precariobelasting wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | HEEFT_ACTIEVE_VERGUNNING | VERGUNDE_OPPERVLAKTE |
+      | heeft_actieve_vergunning | vergunde_oppervlakte |
       | true                     | 50                   |
     Then is voldaan aan de voorwaarden
     And is de output "is_belastingplichtig" waar
@@ -64,7 +64,7 @@ Feature: Bepalen precariobelasting voor terras op openbare grond Rotterdam
     # Heffingsmaatstaf = MAX(20 - 50, 0) = 0 → belasting = 0
     # Verwachting: Wel belastingplichtig, maar belasting is 0
     When de verordening_precariobelasting wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | HEEFT_ACTIEVE_VERGUNNING | VERGUNDE_OPPERVLAKTE |
+      | heeft_actieve_vergunning | vergunde_oppervlakte |
       | true                     | 20                   |
     Then is voldaan aan de voorwaarden
     And is de output "is_belastingplichtig" waar
@@ -82,7 +82,7 @@ Feature: Bepalen precariobelasting voor terras op openbare grond Rotterdam
       | kvk_nummer | heeft_terras |
       | 85234567   | false        |
     When de verordening_precariobelasting wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | HEEFT_ACTIEVE_VERGUNNING | VERGUNDE_OPPERVLAKTE |
+      | heeft_actieve_vergunning | vergunde_oppervlakte |
       | true                     | 10                   |
     Then is niet voldaan aan de voorwaarden
 
@@ -90,7 +90,7 @@ Feature: Bepalen precariobelasting voor terras op openbare grond Rotterdam
     # Casus: Het bedrijf heeft een terras maar geen actieve terrasvergunning.
     # Verwachting: Niet belastingplichtig
     When de verordening_precariobelasting wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | HEEFT_ACTIEVE_VERGUNNING | VERGUNDE_OPPERVLAKTE |
+      | heeft_actieve_vergunning | vergunde_oppervlakte |
       | false                    | 10                   |
     Then is niet voldaan aan de voorwaarden
 
@@ -101,6 +101,6 @@ Feature: Bepalen precariobelasting voor terras op openbare grond Rotterdam
       | adres                 | is_openbare_weg |
       | Witte de Withstraat 1 | false           |
     When de verordening_precariobelasting wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | HEEFT_ACTIEVE_VERGUNNING | VERGUNDE_OPPERVLAKTE |
+      | heeft_actieve_vergunning | vergunde_oppervlakte |
       | true                     | 10                   |
     Then is niet voldaan aan de voorwaarden

@@ -87,11 +87,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: ZW_UITKERING
+      - name: zw_uitkering
         type: object
         source_reference:
           table: ziektewet
@@ -101,10 +101,10 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_ziektewet_uitkering
         type: boolean
       actions:
       - output: heeft_ziektewet_uitkering
-        value: $ZW_UITKERING.heeft_ziektewet_uitkering
+        value: $zw_uitkering.heeft_ziektewet_uitkering

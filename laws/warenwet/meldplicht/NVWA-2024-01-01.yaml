@@ -27,22 +27,22 @@ articles:
   url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#Artikel21
   machine_readable:
     definitions:
-      MELDING_DEADLINE_UREN:
+      melding_deadline_uren:
         value: 4
-      RAPPORTAGE_METHODE:
+      rapportage_methode:
         value: NVWA meldformulier (nvwa.nl/melden)
-      TOEZICHTHOUDER:
+      toezichthouder:
         value: NVWA
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: KVK_NUMMER
+      - name: kvk_nummer
         type: string
         required: true
       input:
-      - name: IS_LEVENSMIDDELENBEDRIJF
+      - name: is_levensmiddelenbedrijf
         type: boolean
         source_reference:
           source_type: NVWA
@@ -52,8 +52,8 @@ articles:
           - name: kvk_nummer
             description: KvK-nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
-      - name: HEEFT_ACTIEF_INCIDENT
+            value: $kvk_nummer
+      - name: heeft_actief_incident
         type: boolean
         source_reference:
           source_type: NVWA
@@ -63,7 +63,7 @@ articles:
           - name: kvk_nummer
             description: KvK-nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
+            value: $kvk_nummer
       output:
       - name: heeft_meldplicht
         type: boolean
@@ -79,7 +79,7 @@ articles:
         type: string
       requirements:
       - all:
-        - subject: $IS_LEVENSMIDDELENBEDRIJF
+        - subject: $is_levensmiddelenbedrijf
           operation: EQUALS
           value: true
           legal_basis:
@@ -100,7 +100,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
           explanation: Het bedrijf is een levensmiddelenbedrijf; de meldplicht is van toepassing
       - output: heeft_actief_incident
-        value: $HEEFT_ACTIEF_INCIDENT
+        value: $heeft_actief_incident
         legal_basis:
           law: Warenwet
           bwb_id: BWBR0001969
@@ -109,7 +109,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
           explanation: Incidentstatus wordt overgenomen uit het NVWA-systeem
       - output: melding_deadline_uren
-        value: $MELDING_DEADLINE_UREN
+        value: $melding_deadline_uren
         legal_basis:
           law: Warenwet
           bwb_id: BWBR0001969
@@ -118,7 +118,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
           explanation: Incidenten moeten binnen 4 uur worden gemeld bij de NVWA
       - output: rapportage_methode
-        value: $RAPPORTAGE_METHODE
+        value: $rapportage_methode
         legal_basis:
           law: Warenwet
           bwb_id: BWBR0001969
@@ -136,7 +136,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
           explanation: De meldplicht is event-driven en treedt alleen in werking bij een daadwerkelijk incident
       - output: toezichthouder
-        value: $TOEZICHTHOUDER
+        value: $toezichthouder
         legal_basis:
           law: Warenwet
           bwb_id: BWBR0001969

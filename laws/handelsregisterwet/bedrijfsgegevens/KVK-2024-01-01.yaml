@@ -21,11 +21,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: KVK_NUMMER
+      - name: kvk_nummer
         type: string
         required: true
       input:
-      - name: ORGANISATIE_GEGEVENS
+      - name: organisatie_gegevens
         type: object
         source_reference:
           table: organisaties
@@ -41,7 +41,7 @@ articles:
           - name: kvk_nummer
             description: KvK nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
+            value: $kvk_nummer
       output:
       - name: aantal_werknemers
         type: number
@@ -55,12 +55,12 @@ articles:
         type: string
       actions:
       - output: aantal_werknemers
-        value: $ORGANISATIE_GEGEVENS.aantal_werknemers
+        value: $organisatie_gegevens.aantal_werknemers
       - output: status
-        value: $ORGANISATIE_GEGEVENS.status
+        value: $organisatie_gegevens.status
       - output: rechtsvorm
-        value: $ORGANISATIE_GEGEVENS.rechtsvorm
+        value: $organisatie_gegevens.rechtsvorm
       - output: datum_aanvang
-        value: $ORGANISATIE_GEGEVENS.datum_aanvang
+        value: $organisatie_gegevens.datum_aanvang
       - output: vestigingsadres
-        value: $ORGANISATIE_GEGEVENS.vestigingsadres
+        value: $organisatie_gegevens.vestigingsadres

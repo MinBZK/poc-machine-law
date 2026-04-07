@@ -19,22 +19,22 @@ articles:
   url: https://wetten.overheid.nl/BWBR0033715/2023-05-15#Artikel2.34
   machine_readable:
     definitions:
-      TWIJFEL_ADRES_AFWIJKING:
+      twijfel_adres_afwijking:
         value: Adres bij Belastingdienst wijkt af van BRP
-      TWIJFEL_LANGDURIG_AFWEZIG:
+      twijfel_langdurig_afwezig:
         value: Persoon langdurig in buitenland, mogelijk geen ingezetene
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
-      - name: ADRES
+      - name: adres
         type: object
         required: true
       input:
-      - name: BELASTING_ADRES
+      - name: belasting_adres
         type: object
         source_reference:
           table: belasting_adressen
@@ -47,8 +47,8 @@ articles:
           - name: bsn
             description: BSN van de belastingplichtige
             type: string
-            value: $BSN
-      - name: LANGDURIG_BUITENLAND
+            value: $bsn
+      - name: langdurig_buitenland
         type: boolean
         source_reference:
           table: belasting_verblijf
@@ -57,7 +57,7 @@ articles:
           - name: bsn
             description: BSN van de belastingplichtige
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_gerede_twijfel_adres
         type: boolean
@@ -68,7 +68,7 @@ articles:
         - operation: NOT
           value:
             operation: IS_NULL
-            subject: $ADRES
+            subject: $adres
       actions:
       - output: heeft_gerede_twijfel_adres
         value:
@@ -78,10 +78,10 @@ articles:
             value:
               operation: EQUALS
               values:
-              - $ADRES
-              - $BELASTING_ADRES
+              - $adres
+              - $belasting_adres
           - operation: EQUALS
-            subject: $LANGDURIG_BUITENLAND
+            subject: $langdurig_buitenland
             value: true
         legal_basis:
           law: Wet basisregistratie personen
@@ -99,14 +99,14 @@ articles:
               value:
                 operation: EQUALS
                 values:
-                - $ADRES
-                - $BELASTING_ADRES
-            then: $TWIJFEL_ADRES_AFWIJKING
+                - $adres
+                - $belasting_adres
+            then: $twijfel_adres_afwijking
           - when:
               operation: EQUALS
-              subject: $LANGDURIG_BUITENLAND
+              subject: $langdurig_buitenland
               value: true
-            then: $TWIJFEL_LANGDURIG_AFWEZIG
+            then: $twijfel_langdurig_afwezig
         legal_basis:
           law: Besluit basisregistratie personen
           bwb_id: BWBR0034306

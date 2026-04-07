@@ -14,28 +14,28 @@ articles:
   url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Artikel8:1
   machine_readable:
     definitions:
-      EXCLUDED_DECISION_TYPES:
+      excluded_decision_types:
         value:
         - ALGEMEEN_VERBINDEND_VOORSCHRIFT
         - BELEIDSREGEL
         - VOORBEREIDINGSBESLUIT
         - ANDERE_HANDELING
-      REQUIRED_LEGAL_CHARACTER:
+      required_legal_character:
         value:
         - BESCHIKKING
         - BESLUIT_VAN_ALGEMENE_STREKKING
-      DEFAULT_TERMIJN_BEROEP_WEKEN:
+      default_termijn_beroep_weken:
         value: 6
-      DEFAULT_COURT_TYPE:
+      default_court_type:
         value: RECHTBANK
-      DEFAULT_COURT:
+      default_court:
         value: RECHTBANK_DEN_HAAG
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       input:
-      - name: WET
+      - name: wet
         type: object
         source_reference:
           source_type: laws
@@ -52,10 +52,10 @@ articles:
           - name: uuid
             description: UUID van de wet
             type: string
-            value: $ZAAK.rulespec_uuid
-      - name: ADRES
+            value: $zaak.rulespec_uuid
+      - name: adres
         type: object
-      - name: JURISDICTIE
+      - name: jurisdictie
         type: object
         source_reference:
           source_type: reference_data
@@ -68,8 +68,8 @@ articles:
           - name: gemeente
             description: Gemeente waar persoon woont
             type: string
-            value: $ADRES
-      - name: GEBEURTENISSEN
+            value: $adres
+      - name: gebeurtenissen
         type: object
         source_reference:
           source_type: events
@@ -82,7 +82,7 @@ articles:
           - name: case_id
             description: Zaak identifier
             type: string
-            value: $ZAAK.id
+            value: $zaak.id
       output:
       - name: beroep_mogelijk
         type: boolean
@@ -109,25 +109,25 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $WET.name
+              subject: $wet.name
               value: wet_studiefinanciering
             then: CENTRALE_RAAD_VAN_BEROEP
           - when:
               operation: EQUALS
-              subject: $WET.name
+              subject: $wet.name
               value: wet_inkomstenbelasting
             then: GERECHTSHOF
           - when:
               operation: EQUALS
-              subject: $WET.name
+              subject: $wet.name
               value: vreemdelingenwet
-            then: $DEFAULT_COURT
+            then: $default_court
           - when:
               operation: EQUALS
-              subject: $WET.name
+              subject: $wet.name
               value: wet_marktordening_gezondheidszorg
             then: COLLEGE_VAN_BEROEP_BEDRIJFSLEVEN
-          default: $DEFAULT_COURT_TYPE
+          default: $default_court_type
         legal_basis:
           law: Algemene wet bestuursrecht
           bwb_id: BWBR0005537
@@ -150,19 +150,19 @@ articles:
                   operation: NOT
                   value:
                     operation: IS_NULL
-                    subject: $ADRES
-                then: $JURISDICTIE.rechtbank
-              default: $DEFAULT_COURT
+                    subject: $adres
+                then: $jurisdictie.rechtbank
+              default: $default_court
           - when:
               operation: EQUALS
               subject: $type_rechter
-              value: $DEFAULT_COURT
-            then: $DEFAULT_COURT
+              value: $default_court
+            then: $default_court
           - when:
               operation: EQUALS
               subject: $type_rechter
               value: GERECHTSHOF
-            then: $WET.competent_court
+            then: $wet.competent_court
           default: $type_rechter
         legal_basis:
           law: Algemene wet bestuursrecht
@@ -177,22 +177,22 @@ articles:
           operation: AND
           conditions:
           - operation: NOT_IN
-            subject: $WET.decision_type
-            values: $EXCLUDED_DECISION_TYPES
+            subject: $wet.decision_type
+            values: $excluded_decision_types
           - operation: IN
-            subject: $WET.legal_character
-            values: $REQUIRED_LEGAL_CHARACTER
+            subject: $wet.legal_character
+            values: $required_legal_character
           - operation: OR
             conditions:
             - operation: EQUALS
-              subject: $WET.voorbereidingsprocedure
+              subject: $wet.voorbereidingsprocedure
               value: UITGEBREID
             - operation: AND
               conditions:
               - operation: GREATER_THAN
                 subject:
                   operation: FOREACH
-                  subject: $GEBEURTENISSEN
+                  subject: $gebeurtenissen
                   value:
                   - operation: EQUALS
                     subject: $event_type
@@ -202,10 +202,10 @@ articles:
               - operation: AND
                 conditions:
                 - operation: EQUALS
-                  subject: $ZAAK.status
+                  subject: $zaak.status
                   value: DECIDED
                 - operation: EQUALS
-                  subject: $ZAAK.approved
+                  subject: $zaak.approved
                   value: false
         legal_basis:
           law: Algemene wet bestuursrecht
@@ -220,13 +220,13 @@ articles:
           cases:
           - when:
               operation: IN
-              subject: $WET.decision_type
-              values: $EXCLUDED_DECISION_TYPES
+              subject: $wet.decision_type
+              values: $excluded_decision_types
             then: tegen dit type besluit is geen beroep mogelijk
           - when:
               operation: NOT_IN
-              subject: $WET.legal_character
-              values: $REQUIRED_LEGAL_CHARACTER
+              subject: $wet.legal_character
+              values: $required_legal_character
             then: dit is geen besluit in de zin van de AWB
           - when:
               operation: AND
@@ -234,12 +234,12 @@ articles:
               - operation: NOT
                 value:
                   operation: EQUALS
-                  subject: $WET.voorbereidingsprocedure
+                  subject: $wet.voorbereidingsprocedure
                   value: UITGEBREID
               - operation: EQUALS
                 subject:
                   operation: FOREACH
-                  subject: $GEBEURTENISSEN
+                  subject: $gebeurtenissen
                   value:
                   - operation: EQUALS
                     subject: $event_type
@@ -253,7 +253,7 @@ articles:
               - operation: GREATER_THAN
                 subject:
                   operation: FOREACH
-                  subject: $GEBEURTENISSEN
+                  subject: $gebeurtenissen
                   value:
                   - operation: EQUALS
                     subject: $event_type
@@ -265,12 +265,12 @@ articles:
                 - operation: NOT
                   value:
                     operation: EQUALS
-                    subject: $ZAAK.status
+                    subject: $zaak.status
                     value: DECIDED
                 - operation: NOT
                   value:
                     operation: EQUALS
-                    subject: $ZAAK.approved
+                    subject: $zaak.approved
                     value: false
             then: er is nog geen afwijzende beslissing op bezwaar
         legal_basis:
@@ -288,9 +288,9 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $WET.beroepstermijn_weken
-            then: $WET.beroepstermijn_weken
-          default: $DEFAULT_TERMIJN_BEROEP_WEKEN
+                subject: $wet.beroepstermijn_weken
+            then: $wet.beroepstermijn_weken
+          default: $default_termijn_beroep_weken
         legal_basis:
           law: Algemene wet bestuursrecht
           bwb_id: BWBR0005537
@@ -301,7 +301,7 @@ articles:
       - output: direct_beroep
         value:
           operation: EQUALS
-          subject: $WET.voorbereidingsprocedure
+          subject: $wet.voorbereidingsprocedure
           value: UITGEBREID
         legal_basis:
           law: Algemene wet bestuursrecht
@@ -317,7 +317,7 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $WET.voorbereidingsprocedure
+              subject: $wet.voorbereidingsprocedure
               value: UITGEBREID
             then: besluit is voorbereid met uitgebreide procedure
         legal_basis:

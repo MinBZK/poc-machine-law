@@ -24,62 +24,62 @@ articles:
   url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Artikel2
   machine_readable:
     definitions:
-      VERMOGENSGRENS_ALGEMEEN:
+      vermogensgrens_algemeen:
         value: 24389200
-      VERMOGENSGRENS_OUDER:
+      vermogensgrens_ouder:
         value: 17072500
-      VERMOGENSGRENS_LAAG:
+      vermogensgrens_laag:
         value: 5803500
-      BEDRIJFSKAPITAAL_GEVESTIGD:
+      bedrijfskapitaal_gevestigd:
         value: 25342000
-      BEDRIJFSKAPITAAL_BEGINNEND:
+      bedrijfskapitaal_beginnend:
         value: 4665600
-      BEDRIJFSKAPITAAL_OUDER:
+      bedrijfskapitaal_ouder:
         value: 1267100
-      RENTE_PERCENTAGE:
+      rente_percentage:
         value: 0.08
-      BELASTING_PERCENTAGE:
+      belasting_percentage:
         value: 0.2
-      MIN_INKOMEN_OUDER:
+      min_inkomen_ouder:
         value: 1006500
-      GEBOREN_VOOR_DATUM:
+      geboren_voor_datum:
         value: '1960-01-01'
-      URENCRITERIUM_PER_JAAR:
+      urencriterium_per_jaar:
         value: 1225
-      MAX_DUUR_GEVESTIGD:
+      max_duur_gevestigd:
         value: 12
-      MAX_DUUR_BEGINNEND:
+      max_duur_beginnend:
         value: 36
-      MAX_DUUR_BEEINDIGEND:
+      max_duur_beeindigend:
         value: 12
-      MAX_DUUR_OUDER:
+      max_duur_ouder:
         value: 0
-      MINIMUM_LEEFTIJD:
+      minimum_leeftijd:
         value: 18
-      CATEGORIE_GEVESTIGD:
+      categorie_gevestigd:
         value: GEVESTIGD
-      CATEGORIE_BEGINNEND:
+      categorie_beginnend:
         value: BEGINNEND
-      CATEGORIE_OUDER:
+      categorie_ouder:
         value: OUDER
-      CATEGORIE_BEEINDIGEND:
+      categorie_beeindigend:
         value: BEEINDIGEND
-      TYPE_LENING_RENTE:
+      type_lening_rente:
         value: LENING_RENTE
-      TYPE_LENING_RENTELOOS:
+      type_lening_renteloos:
         value: LENING_RENTELOOS
-      TYPE_OM_NIET:
+      type_om_niet:
         value: OM_NIET
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         type_spec:
           unit: years
@@ -90,22 +90,22 @@ articles:
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: GEBOORTEDATUM
+      - name: geboortedatum
         type: date
         source:
           regulation: wet_brp
           output: geboortedatum
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PENSIOENLEEFTIJD
+      - name: pensioenleeftijd
         type: number
         type_spec:
           unit: years
@@ -116,16 +116,16 @@ articles:
           output: pensioenleeftijd
           service: SVB
           parameters:
-            GEBOORTEDATUM: $GEBOORTEDATUM
-      - name: IS_ACTIEVE_ONDERNEMER
+            geboortedatum: $geboortedatum
+      - name: is_actieve_ondernemer
         type: boolean
         source:
           regulation: handelsregisterwet
           output: is_actieve_ondernemer
           service: KVK
           parameters:
-            BSN: $BSN
-      - name: VERMOGEN
+            bsn: $bsn
+      - name: vermogen
         type: amount
         type_spec:
           unit: eurocent
@@ -136,16 +136,16 @@ articles:
           output: bezittingen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
-      - name: HEEFT_WW_UITKERING
+            bsn: $bsn
+      - name: heeft_ww_uitkering
         type: boolean
         source:
           regulation: werkloosheidswet
           output: heeft_recht_op_ww
           service: UWV
           parameters:
-            BSN: $BSN
-      - name: BASISBEDRAG_BIJSTAND
+            bsn: $bsn
+      - name: basisbedrag_bijstand
         type: amount
         type_spec:
           unit: eurocent
@@ -156,8 +156,8 @@ articles:
           output: basisbedrag
           service: SZW
           parameters:
-            BSN: $BSN
-      - name: BBZ_AANVRAAG
+            bsn: $bsn
+      - name: bbz_aanvraag
         type: object
         source_reference:
           table: bbz_aanvraag
@@ -171,7 +171,7 @@ articles:
           - name: bsn
             description: BSN van de zelfstandige
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_gerechtigd
         type: boolean
@@ -198,7 +198,7 @@ articles:
         type: string
       requirements:
       - all:
-        - subject: $IS_ACTIEVE_ONDERNEMER
+        - subject: $is_actieve_ondernemer
           operation: EQUALS
           value: true
           legal_basis:
@@ -210,9 +210,9 @@ articles:
             url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1
             juriconnect: jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01
             explanation: Artikel 1 lid 1 onder b vereist dat de persoon arbeid verricht in eigen bedrijf
-        - subject: $LEEFTIJD
+        - subject: $leeftijd
           operation: GREATER_THAN_OR_EQUAL
-          value: $MINIMUM_LEEFTIJD
+          value: $minimum_leeftijd
           legal_basis:
             law: Besluit bijstandverlening zelfstandigen 2004
             bwb_id: BWBR0015711
@@ -222,9 +222,9 @@ articles:
             url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1
             juriconnect: jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01
             explanation: Artikel 1 lid 1 onder b bepaalt minimumleeftijd van 18 jaar
-        - subject: $LEEFTIJD
+        - subject: $leeftijd
           operation: LESS_THAN
-          value: $PENSIOENLEEFTIJD
+          value: $pensioenleeftijd
           legal_basis:
             law: Besluit bijstandverlening zelfstandigen 2004
             bwb_id: BWBR0015711
@@ -247,19 +247,19 @@ articles:
           values:
           - operation: MULTIPLY
             values:
-            - $BBZ_AANVRAAG.uren_per_week
+            - $bbz_aanvraag.uren_per_week
             - 52
-          - $URENCRITERIUM_PER_JAAR
+          - $urencriterium_per_jaar
         - or:
           - operation: AND
             conditions:
-            - subject: $BBZ_AANVRAAG.type_zelfstandige
+            - subject: $bbz_aanvraag.type_zelfstandige
               operation: EQUALS
               value: OUDER
             - operation: LESS_THAN_OR_EQUAL
               values:
-              - $VERMOGEN
-              - $VERMOGENSGRENS_OUDER
+              - $vermogen
+              - $vermogensgrens_ouder
             legal_basis:
               law: Besluit bijstandverlening zelfstandigen 2004
               bwb_id: BWBR0015711
@@ -270,8 +270,8 @@ articles:
               explanation: Artikel 3 lid 2 bepaalt vermogensgrens €170.725 voor oudere zelfstandigen
           - operation: LESS_THAN_OR_EQUAL
             values:
-            - $VERMOGEN
-            - $VERMOGENSGRENS_ALGEMEEN
+            - $vermogen
+            - $vermogensgrens_algemeen
             legal_basis:
               law: Besluit bijstandverlening zelfstandigen 2004
               bwb_id: BWBR0015711
@@ -283,10 +283,10 @@ articles:
         - or:
           - operation: AND
             conditions:
-            - subject: $BBZ_AANVRAAG.type_zelfstandige
+            - subject: $bbz_aanvraag.type_zelfstandige
               operation: EQUALS
               value: GEVESTIGD
-            - subject: $BBZ_AANVRAAG.bedrijf_levensvatbaar
+            - subject: $bbz_aanvraag.bedrijf_levensvatbaar
               operation: EQUALS
               value: true
             legal_basis:
@@ -299,13 +299,13 @@ articles:
               explanation: Artikel 18 lid 1 vereist levensvatbaar bedrijf voor gevestigde zelfstandigen
           - operation: AND
             conditions:
-            - subject: $BBZ_AANVRAAG.type_zelfstandige
+            - subject: $bbz_aanvraag.type_zelfstandige
               operation: EQUALS
               value: BEGINNEND
-            - subject: $HEEFT_WW_UITKERING
+            - subject: $heeft_ww_uitkering
               operation: EQUALS
               value: true
-            - subject: $BBZ_AANVRAAG.bedrijf_levensvatbaar
+            - subject: $bbz_aanvraag.bedrijf_levensvatbaar
               operation: EQUALS
               value: true
             legal_basis:
@@ -318,18 +318,18 @@ articles:
               explanation: Artikel 23 lid 1 vereist WW-uitkering en levensvatbaar bedrijf voor beginnende zelfstandigen
           - operation: AND
             conditions:
-            - subject: $BBZ_AANVRAAG.type_zelfstandige
+            - subject: $bbz_aanvraag.type_zelfstandige
               operation: EQUALS
               value: OUDER
-            - subject: $GEBOORTEDATUM
+            - subject: $geboortedatum
               operation: LESS_THAN
-              value: $GEBOREN_VOOR_DATUM
-            - subject: $BBZ_AANVRAAG.bedrijf_levensvatbaar
+              value: $geboren_voor_datum
+            - subject: $bbz_aanvraag.bedrijf_levensvatbaar
               operation: EQUALS
               value: false
             - operation: GREATER_THAN_OR_EQUAL
               values:
-              - $BBZ_AANVRAAG.jaren_ondernemerschap
+              - $bbz_aanvraag.jaren_ondernemerschap
               - 10
             legal_basis:
               law: Besluit bijstandverlening zelfstandigen 2004
@@ -342,13 +342,13 @@ articles:
                 10 jaar ondernemerschap'
           - operation: AND
             conditions:
-            - subject: $BBZ_AANVRAAG.type_zelfstandige
+            - subject: $bbz_aanvraag.type_zelfstandige
               operation: EQUALS
               value: BEEINDIGEND
             - operation: NOT
               value:
                 operation: IS_NULL
-                subject: $BBZ_AANVRAAG.beeindigingsdatum
+                subject: $bbz_aanvraag.beeindigingsdatum
             legal_basis:
               law: Besluit bijstandverlening zelfstandigen 2004
               bwb_id: BWBR0015711
@@ -368,7 +368,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0015711&artikel=2&z=2025-01-01&g=2025-01-01
           explanation: Als aan alle voorwaarden is voldaan, is de zelfstandige gerechtigd tot Bbz
       - output: categorie_zelfstandige
-        value: $BBZ_AANVRAAG.type_zelfstandige
+        value: $bbz_aanvraag.type_zelfstandige
         legal_basis:
           law: Besluit bijstandverlening zelfstandigen 2004
           bwb_id: BWBR0015711
@@ -378,7 +378,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0015711&artikel=2&lid=1&z=2025-01-01&g=2025-01-01
           explanation: De categorie wordt overgenomen uit de aanvraag
       - output: algemene_bijstand_bedrag
-        value: $BASISBEDRAG_BIJSTAND
+        value: $basisbedrag_bijstand
         legal_basis:
           law: Besluit bijstandverlening zelfstandigen 2004
           bwb_id: BWBR0015711
@@ -392,20 +392,20 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $BBZ_AANVRAAG.type_zelfstandige
+              subject: $bbz_aanvraag.type_zelfstandige
               value: GEVESTIGD
-            then: $MAX_DUUR_GEVESTIGD
+            then: $max_duur_gevestigd
           - when:
               operation: EQUALS
-              subject: $BBZ_AANVRAAG.type_zelfstandige
+              subject: $bbz_aanvraag.type_zelfstandige
               value: BEGINNEND
-            then: $MAX_DUUR_BEGINNEND
+            then: $max_duur_beginnend
           - when:
               operation: EQUALS
-              subject: $BBZ_AANVRAAG.type_zelfstandige
+              subject: $bbz_aanvraag.type_zelfstandige
               value: OUDER
-            then: $MAX_DUUR_OUDER
-          default: $MAX_DUUR_BEEINDIGEND
+            then: $max_duur_ouder
+          default: $max_duur_beeindigend
         legal_basis:
           law: Besluit bijstandverlening zelfstandigen 2004
           bwb_id: BWBR0015711
@@ -419,19 +419,19 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $BBZ_AANVRAAG.type_zelfstandige
+              subject: $bbz_aanvraag.type_zelfstandige
               value: GEVESTIGD
-            then: $BEDRIJFSKAPITAAL_GEVESTIGD
+            then: $bedrijfskapitaal_gevestigd
           - when:
               operation: EQUALS
-              subject: $BBZ_AANVRAAG.type_zelfstandige
+              subject: $bbz_aanvraag.type_zelfstandige
               value: BEGINNEND
-            then: $BEDRIJFSKAPITAAL_BEGINNEND
+            then: $bedrijfskapitaal_beginnend
           - when:
               operation: EQUALS
-              subject: $BBZ_AANVRAAG.type_zelfstandige
+              subject: $bbz_aanvraag.type_zelfstandige
               value: OUDER
-            then: $BEDRIJFSKAPITAAL_OUDER
+            then: $bedrijfskapitaal_ouder
           default: 0
         legal_basis:
           law: Besluit bijstandverlening zelfstandigen 2004
@@ -446,15 +446,15 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $BBZ_AANVRAAG.type_zelfstandige
+              subject: $bbz_aanvraag.type_zelfstandige
               value: OUDER
-            then: $TYPE_OM_NIET
+            then: $type_om_niet
           - when:
               operation: EQUALS
-              subject: $BBZ_AANVRAAG.type_zelfstandige
+              subject: $bbz_aanvraag.type_zelfstandige
               value: BEEINDIGEND
             then: GEEN
-          default: $TYPE_LENING_RENTE
+          default: $type_lening_rente
         legal_basis:
           law: Besluit bijstandverlening zelfstandigen 2004
           bwb_id: BWBR0015711

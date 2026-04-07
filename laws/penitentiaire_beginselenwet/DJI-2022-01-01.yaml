@@ -19,11 +19,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: DETENTIESTATUS
+      - name: detentiestatus
         type: string
         source_reference:
           table: detenties
@@ -32,8 +32,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: INRICHTING_TYPE
+            value: $bsn
+      - name: inrichting_type
         type: string
         source_reference:
           table: detenties
@@ -42,7 +42,7 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_gedetineerd
         type: boolean
@@ -52,12 +52,12 @@ articles:
           operation: AND
           conditions:
           - operation: IN
-            subject: $INRICHTING_TYPE
+            subject: $inrichting_type
             values:
             - PENITENTIAIRE_INRICHTING
             - HUIS_VAN_BEWARING
           - operation: IN
-            subject: $DETENTIESTATUS
+            subject: $detentiestatus
             values:
             - INGESLOTEN
             - TIJDELIJK_AFWEZIG

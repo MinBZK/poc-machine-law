@@ -17,7 +17,7 @@ Feature: Bibob-advies Landelijk Bureau Bibob
       | kvk_nummer | advies_uitgebracht | mate_van_gevaar | advies_datum | relatie_strafbare_feiten | financieringsrisico | voorschriften_geadviseerd |
       | 12345678   | false              | null            | null         | false                    | false               | false                     |
     When de wet_bibob wordt uitgevoerd door LBB met
-      | BESCHIKKING_TYPE |
+      | beschikking_type |
       | vergunning       |
     Then is er geen advies uitgebracht
     And wordt verlening geadviseerd
@@ -31,7 +31,7 @@ Feature: Bibob-advies Landelijk Bureau Bibob
       | kvk_nummer | advies_uitgebracht | mate_van_gevaar | advies_datum | relatie_strafbare_feiten | financieringsrisico | voorschriften_geadviseerd |
       | 12345678   | true               | geen_gevaar     | 2024-05-15   | false                    | false               | false                     |
     When de wet_bibob wordt uitgevoerd door LBB met
-      | BESCHIKKING_TYPE |
+      | beschikking_type |
       | vergunning       |
     Then is er een advies uitgebracht
     And is de mate van gevaar "geen_gevaar"
@@ -47,7 +47,7 @@ Feature: Bibob-advies Landelijk Bureau Bibob
       | kvk_nummer | advies_uitgebracht | mate_van_gevaar | advies_datum | relatie_strafbare_feiten | financieringsrisico | voorschriften_geadviseerd |
       | 12345678   | true               | mindere_mate    | 2024-05-15   | true                     | false               | true                      |
     When de wet_bibob wordt uitgevoerd door LBB met
-      | BESCHIKKING_TYPE |
+      | beschikking_type |
       | vergunning       |
     Then is er een advies uitgebracht
     And is de mate van gevaar "mindere_mate"
@@ -63,7 +63,7 @@ Feature: Bibob-advies Landelijk Bureau Bibob
       | kvk_nummer | advies_uitgebracht | mate_van_gevaar | advies_datum | relatie_strafbare_feiten | financieringsrisico | voorschriften_geadviseerd |
       | 12345678   | true               | ernstig_gevaar  | 2024-05-15   | true                     | true                | false                     |
     When de wet_bibob wordt uitgevoerd door LBB met
-      | BESCHIKKING_TYPE |
+      | beschikking_type |
       | vergunning       |
     Then is er een advies uitgebracht
     And is de mate van gevaar "ernstig_gevaar"
@@ -79,7 +79,7 @@ Feature: Bibob-advies Landelijk Bureau Bibob
       | kvk_nummer | advies_uitgebracht | mate_van_gevaar | advies_datum | relatie_strafbare_feiten | financieringsrisico | voorschriften_geadviseerd |
       | 12345678   | true               | ernstig_gevaar  | 2024-05-15   | true                     | false               | true                      |
     When de wet_bibob wordt uitgevoerd door LBB met
-      | BESCHIKKING_TYPE |
+      | beschikking_type |
       | vergunning       |
     Then is er een advies uitgebracht
     And is de mate van gevaar "ernstig_gevaar"
@@ -94,7 +94,7 @@ Feature: Bibob-advies Landelijk Bureau Bibob
       | kvk_nummer | advies_uitgebracht | mate_van_gevaar | advies_datum | relatie_strafbare_feiten | financieringsrisico | voorschriften_geadviseerd |
       | 99999990   | true               | geen_gevaar     | 2024-05-15   | false                    | false               | false                     |
     When de wet_bibob wordt uitgevoerd door LBB met
-      | BESCHIKKING_TYPE |
+      | beschikking_type |
       | vergunning       |
     Then is er een advies uitgebracht
     And is de mate van gevaar "geen_gevaar"
@@ -108,7 +108,7 @@ Feature: Bibob-advies Landelijk Bureau Bibob
       | kvk_nummer | advies_uitgebracht | mate_van_gevaar | advies_datum | relatie_strafbare_feiten | financieringsrisico | voorschriften_geadviseerd |
       | 12345678   | true               | ernstig_gevaar  | 2024-05-15   | false                    | true                | false                     |
     When de wet_bibob wordt uitgevoerd door LBB met
-      | BESCHIKKING_TYPE |
+      | beschikking_type |
       | vergunning       |
     Then is er een advies uitgebracht
     And is de mate van gevaar "ernstig_gevaar"
@@ -124,7 +124,7 @@ Feature: Bibob-advies Landelijk Bureau Bibob
       | kvk_nummer | advies_uitgebracht | mate_van_gevaar | advies_datum | relatie_strafbare_feiten | financieringsrisico | voorschriften_geadviseerd |
       | 12345678   | true               | ernstig_gevaar  | 2024-05-15   | true                     | false               | false                     |
     When de wet_bibob wordt uitgevoerd door LBB met
-      | BESCHIKKING_TYPE |
+      | beschikking_type |
       | vergunning       |
     Then is er een advies uitgebracht
     And is de mate van gevaar "ernstig_gevaar"
@@ -139,7 +139,7 @@ Feature: Bibob-advies Landelijk Bureau Bibob
       | kvk_nummer | advies_uitgebracht | mate_van_gevaar | advies_datum | relatie_strafbare_feiten | financieringsrisico | voorschriften_geadviseerd |
       | 85234567   | true               | geen_gevaar     | 2024-05-20   | false                    | false               | false                     |
     When de wet_bibob wordt uitgevoerd door LBB met
-      | BESCHIKKING_TYPE |
+      | beschikking_type |
       | vergunning       |
     Then is er een advies uitgebracht
     And is de mate van gevaar "geen_gevaar"
@@ -153,7 +153,7 @@ Feature: Bibob-advies Landelijk Bureau Bibob
       | kvk_nummer | advies_uitgebracht | mate_van_gevaar | advies_datum | relatie_strafbare_feiten | financieringsrisico | voorschriften_geadviseerd |
       | 98765432   | true               | mindere_mate    | 2024-04-10   | false                    | true                | true                      |
     When de wet_bibob wordt uitgevoerd door LBB met
-      | BESCHIKKING_TYPE      |
+      | beschikking_type      |
       | vastgoedtransactie    |
     Then is er een advies uitgebracht
     And is de mate van gevaar "mindere_mate"

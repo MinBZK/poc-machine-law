@@ -15,35 +15,35 @@ articles:
   url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Artikel5
   machine_readable:
     definitions:
-      MINIMALE_BEWAARTERMIJN_JAREN:
+      minimale_bewaartermijn_jaren:
         value: 0
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: ARCHIEFSTUK_ID
+      - name: archiefstuk_id
         type: string
         required: true
-      - name: AANMAAKDATUM
+      - name: aanmaakdatum
         type: date
         required: true
-      - name: DOCUMENTTYPE
+      - name: documenttype
         type: string
         required: true
-      - name: OP_SELECTIELIJST_VERNIETIGING
+      - name: op_selectielijst_vernietiging
         type: boolean
         required: true
-      - name: BEWAARTERMIJN_JAREN
+      - name: bewaartermijn_jaren
         type: number
         type_spec:
           unit: years
           precision: 0
           min: 0
-      - name: SELECTIELIJST_VASTGESTELD
+      - name: selectielijst_vastgesteld
         type: boolean
         required: true
-      - name: SELECTIELIJST_GEPUBLICEERD
+      - name: selectielijst_gepubliceerd
         type: boolean
         required: true
       output:
@@ -59,13 +59,13 @@ articles:
           operation: AND
           conditions:
           - operation: EQUALS
-            subject: $OP_SELECTIELIJST_VERNIETIGING
+            subject: $op_selectielijst_vernietiging
             value: true
           - operation: EQUALS
-            subject: $SELECTIELIJST_VASTGESTELD
+            subject: $selectielijst_vastgesteld
             value: true
           - operation: EQUALS
-            subject: $SELECTIELIJST_GEPUBLICEERD
+            subject: $selectielijst_gepubliceerd
             value: true
           - operation: IF
             cases:
@@ -73,14 +73,14 @@ articles:
                 operation: NOT
                 value:
                   operation: IS_NULL
-                  subject: $BEWAARTERMIJN_JAREN
+                  subject: $bewaartermijn_jaren
               then:
                 operation: GREATER_THAN_OR_EQUAL
                 subject:
                   operation: AGE
                   reference_date: $calculation_date
-                  date_of_birth: $AANMAAKDATUM
-                value: $BEWAARTERMIJN_JAREN
+                  date_of_birth: $aanmaakdatum
+                value: $bewaartermijn_jaren
             default: true
         legal_basis:
           law: Archiefwet 1995
@@ -97,16 +97,16 @@ articles:
               operation: AND
               conditions:
               - operation: EQUALS
-                subject: $OP_SELECTIELIJST_VERNIETIGING
+                subject: $op_selectielijst_vernietiging
                 value: true
               - operation: NOT
                 value:
                   operation: IS_NULL
-                  subject: $BEWAARTERMIJN_JAREN
+                  subject: $bewaartermijn_jaren
             then:
               operation: DATE_ADD
-              date: $AANMAAKDATUM
-              years: $BEWAARTERMIJN_JAREN
+              date: $aanmaakdatum
+              years: $bewaartermijn_jaren
         legal_basis:
           law: Archiefwet 1995
           bwb_id: BWBR0007376
@@ -128,17 +128,17 @@ articles:
               cases:
               - when:
                   operation: EQUALS
-                  subject: $OP_SELECTIELIJST_VERNIETIGING
+                  subject: $op_selectielijst_vernietiging
                   value: false
                 then: Archiefstuk komt niet voor op een selectielijst voor vernietiging (mogelijk blijvend te bewaren)
               - when:
                   operation: EQUALS
-                  subject: $SELECTIELIJST_VASTGESTELD
+                  subject: $selectielijst_vastgesteld
                   value: false
                 then: Selectielijst is niet formeel vastgesteld volgens artikel 5 lid 2 Archiefwet
               - when:
                   operation: EQUALS
-                  subject: $SELECTIELIJST_GEPUBLICEERD
+                  subject: $selectielijst_gepubliceerd
                   value: false
                 then: Selectielijst is niet bekendgemaakt in de Staatscourant volgens artikel 5 lid 3 Archiefwet
               - when:
@@ -147,13 +147,13 @@ articles:
                   - operation: NOT
                     value:
                       operation: IS_NULL
-                      subject: $BEWAARTERMIJN_JAREN
+                      subject: $bewaartermijn_jaren
                   - operation: LESS_THAN
                     subject:
                       operation: AGE
                       reference_date: $calculation_date
-                      date_of_birth: $AANMAAKDATUM
-                    value: $BEWAARTERMIJN_JAREN
+                      date_of_birth: $aanmaakdatum
+                    value: $bewaartermijn_jaren
                 then: Bewaartermijn is nog niet verstreken
               default: Onbekende reden
         legal_basis:

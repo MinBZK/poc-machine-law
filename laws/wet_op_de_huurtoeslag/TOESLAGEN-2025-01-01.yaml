@@ -30,60 +30,60 @@ articles:
   url: https://wetten.overheid.nl/BWBR0008659/2025-01-01#Artikel1
   machine_readable:
     definitions:
-      MINIMUM_LEEFTIJD:
+      minimum_leeftijd:
         value: 18
-      KWALITEITSKORTINGSGRENS:
+      kwaliteitskortingsgrens:
         value: 47720
-      AFTOPPINGSGRENS_1_2:
+      aftoppingsgrens_1_2:
         value: 68296
-      AFTOPPINGSGRENS_3_PLUS:
+      aftoppingsgrens_3_plus:
         value: 73193
-      MAXIMALE_HUURGRENS:
+      maximale_huurgrens:
         value: 90007
-      VERMOGENSGRENS_ALLEENSTAANDE:
+      vermogensgrens_alleenstaande:
         value: 3695200
-      VERMOGENSGRENS_PARTNERS:
+      vermogensgrens_partners:
         value: 7390400
-      INKOMENSGRENS_ALLEENSTAANDE:
+      inkomensgrens_alleenstaande:
         value: 4400000
-      INKOMENSGRENS_PARTNERS:
+      inkomensgrens_partners:
         value: 5400000
-      SUBSIDIEPERCENTAGE_ONDER_KWALITEITSKORTINGSGRENS:
+      subsidiepercentage_onder_kwaliteitskortingsgrens:
         value: 1.0
-      SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP:
+      subsidiepercentage_tussen_kwaliteit_aftop:
         value: 0.65
-      SUBSIDIEPERCENTAGE_BOVEN_AFTOP:
+      subsidiepercentage_boven_aftop:
         value: 0.4
-      MINIMUM_BASISHUUR_PERCENTAGE:
+      minimum_basishuur_percentage:
         value: 0.0486
-      MAXIMALE_SERVICEKOSTEN:
+      maximale_servicekosten:
         value: 4800
-      KIND_VRIJSTELLING:
+      kind_vrijstelling:
         value: 543200
-      LEEFTIJDSGRENS_KIND_INKOMEN:
+      leeftijdsgrens_kind_inkomen:
         value: 23
-      MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE:
+      minimum_inkomensijkpunt_alleenstaande:
         value: 1800000
-      MINIMUM_INKOMENSIJKPUNT_PARTNERS:
+      minimum_inkomensijkpunt_partners:
         value: 2400000
-      REFERENTIE_INKOMENSIJKPUNT_ALLEENSTAANDE:
+      referentie_inkomensijkpunt_alleenstaande:
         value: 3262500
-      REFERENTIE_INKOMENSIJKPUNT_PARTNERS:
+      referentie_inkomensijkpunt_partners:
         value: 4247500
-      NORMHUUR_BIJ_MINIMUM_INKOMEN:
+      normhuur_bij_minimum_inkomen:
         value: 23801
-      NORMHUUR_BIJ_REFERENTIE_INKOMEN:
+      normhuur_bij_referentie_inkomen:
         value: 48378
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: HUISHOUDLEDEN
+      - name: huishoudleden
         type: array
         source:
           regulation: wet_brp
@@ -92,7 +92,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: KINDEREN
+      - name: kinderen
         type: array
         source:
           regulation: wet_brp
@@ -101,7 +101,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PARTNER_BSN
+      - name: partner_bsn
         type: string
         source:
           regulation: wet_brp
@@ -110,18 +110,18 @@ articles:
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PARTNER_ADRES
+      - name: partner_adres
         type: string
         source:
           regulation: wet_brp
           output: verblijfsadres
           service: RvIG
           parameters:
-            BSN: $PARTNER_BSN
+            bsn: $partner_bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         source:
           regulation: wet_brp
@@ -130,7 +130,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: HEEFT_PARTNER
+      - name: heeft_partner
         type: boolean
         source:
           regulation: wet_brp
@@ -139,7 +139,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: HUISHOUDGROOTTE
+      - name: huishoudgrootte
         type: number
         source:
           regulation: wet_brp
@@ -148,7 +148,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: VERBLIJFSADRES
+      - name: verblijfsadres
         type: string
         source:
           regulation: wet_brp
@@ -157,7 +157,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: INKOMEN
+      - name: inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -170,7 +170,7 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: PARTNER_INKOMEN
+      - name: partner_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -183,7 +183,7 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: VERMOGEN
+      - name: vermogen
         type: amount
         type_spec:
           unit: eurocent
@@ -196,7 +196,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $prev_january_first
-      - name: GEZAMENLIJK_VERMOGEN
+      - name: gezamenlijk_vermogen
         type: amount
         type_spec:
           unit: eurocent
@@ -209,19 +209,19 @@ articles:
         temporal:
           type: point_in_time
           reference: $prev_january_first
-      - name: HUURPRIJS
+      - name: huurprijs
         type: amount
         required: true
         source_reference:
           source_type: claim
           wallet_attribute: rent
-      - name: SERVICEKOSTEN
+      - name: servicekosten
         type: amount
         required: true
         source_reference:
           source_type: claim
           wallet_attribute: service_charges
-      - name: SUBSIDIABELE_SERVICEKOSTEN
+      - name: subsidiabele_servicekosten
         type: amount
         required: true
         source_reference:
@@ -244,9 +244,9 @@ articles:
           min: 0
       requirements:
       - all:
-        - subject: $LEEFTIJD
+        - subject: $leeftijd
           operation: GREATER_THAN_OR_EQUAL
-          value: $MINIMUM_LEEFTIJD
+          value: $minimum_leeftijd
           legal_basis:
             law: Wet op de huurtoeslag
             bwb_id: BWBR0008659
@@ -265,10 +265,10 @@ articles:
           values:
           - operation: ADD
             values:
-            - $INKOMEN
-            - $PARTNER_INKOMEN
+            - $inkomen
+            - $partner_inkomen
             - operation: FOREACH
-              subject: $HUISHOUDLEDEN
+              subject: $huishoudleden
               combine: ADD
               value:
                 operation: IF
@@ -283,9 +283,9 @@ articles:
                   operation: SUBTRACT
                   values:
                   - $inkomen
-                  - $KIND_VRIJSTELLING
+                  - $kind_vrijstelling
             - operation: FOREACH
-              subject: $KINDEREN
+              subject: $kinderen
               combine: ADD
               value:
                 operation: IF
@@ -294,21 +294,21 @@ articles:
                     operation: LESS_THAN
                     values:
                     - $leeftijd
-                    - $LEEFTIJDSGRENS_KIND_INKOMEN
+                    - $leeftijdsgrens_kind_inkomen
                   then:
                     operation: SUBTRACT
                     values:
                     - $inkomen
-                    - $KIND_VRIJSTELLING
+                    - $kind_vrijstelling
                 default: $inkomen
           - operation: IF
             cases:
             - when:
-                subject: $HEEFT_PARTNER
+                subject: $heeft_partner
                 operation: EQUALS
                 value: true
-              then: $INKOMENSGRENS_PARTNERS
-            default: $INKOMENSGRENS_ALLEENSTAANDE
+              then: $inkomensgrens_partners
+            default: $inkomensgrens_alleenstaande
         - operation: IF
           legal_basis:
             law: Algemene wet inkomensafhankelijke regelingen
@@ -320,14 +320,14 @@ articles:
             explanation: Partners moeten op hetzelfde adres wonen volgens artikel 3 lid 1 AWIR
           cases:
           - when:
-              subject: $HEEFT_PARTNER
+              subject: $heeft_partner
               operation: EQUALS
               value: true
             then:
               operation: EQUALS
               values:
-              - $VERBLIJFSADRES
-              - $PARTNER_ADRES
+              - $verblijfsadres
+              - $partner_adres
           default: true
         - operation: IF
           legal_basis:
@@ -339,19 +339,19 @@ articles:
             explanation: De vermogenstoets wordt bepaald conform artikel 8 AWIR
           cases:
           - when:
-              subject: $HEEFT_PARTNER
+              subject: $heeft_partner
               operation: EQUALS
               value: true
             then:
               operation: LESS_THAN
               values:
-              - $GEZAMENLIJK_VERMOGEN
-              - $VERMOGENSGRENS_PARTNERS
+              - $gezamenlijk_vermogen
+              - $vermogensgrens_partners
           default:
             operation: LESS_THAN
             values:
-            - $VERMOGEN
-            - $VERMOGENSGRENS_ALLEENSTAANDE
+            - $vermogen
+            - $vermogensgrens_alleenstaande
         - operation: IF
           legal_basis:
             law: Wet op de huurtoeslag
@@ -362,7 +362,7 @@ articles:
             explanation: De inkomenstoets voor huurtoeslag wordt bepaald conform artikel 14
           cases:
           - when:
-              subject: $HEEFT_PARTNER
+              subject: $heeft_partner
               operation: EQUALS
               value: true
             then:
@@ -370,14 +370,14 @@ articles:
               values:
               - operation: ADD
                 values:
-                - $INKOMEN
-                - $PARTNER_INKOMEN
-              - $INKOMENSGRENS_PARTNERS
+                - $inkomen
+                - $partner_inkomen
+              - $inkomensgrens_partners
           default:
             operation: LESS_THAN
             values:
-            - $INKOMEN
-            - $INKOMENSGRENS_ALLEENSTAANDE
+            - $inkomen
+            - $inkomensgrens_alleenstaande
         - operation: LESS_THAN
           legal_basis:
             law: Wet op de huurtoeslag
@@ -390,12 +390,12 @@ articles:
           values:
           - operation: ADD
             values:
-            - $HUURPRIJS
+            - $huurprijs
             - operation: MIN
               values:
-              - $SUBSIDIABELE_SERVICEKOSTEN
-              - $MAXIMALE_SERVICEKOSTEN
-          - $MAXIMALE_HUURGRENS
+              - $subsidiabele_servicekosten
+              - $maximale_servicekosten
+          - $maximale_huurgrens
       actions:
       - output: is_gerechtigd
         value: true
@@ -417,28 +417,28 @@ articles:
                 cases:
                 - when:
                     operation: EQUALS
-                    subject: $HEEFT_PARTNER
+                    subject: $heeft_partner
                     value: true
                   then:
                     operation: ADD
                     values:
-                    - $INKOMEN
-                    - $PARTNER_INKOMEN
-                default: $INKOMEN
+                    - $inkomen
+                    - $partner_inkomen
+                default: $inkomen
               value:
                 operation: IF
                 cases:
                 - when:
                     operation: EQUALS
-                    subject: $HEEFT_PARTNER
+                    subject: $heeft_partner
                     value: true
-                  then: $MINIMUM_INKOMENSIJKPUNT_PARTNERS
-                default: $MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE
-            then: $NORMHUUR_BIJ_MINIMUM_INKOMEN
+                  then: $minimum_inkomensijkpunt_partners
+                default: $minimum_inkomensijkpunt_alleenstaande
+            then: $normhuur_bij_minimum_inkomen
           default:
             operation: ADD
             values:
-            - $NORMHUUR_BIJ_MINIMUM_INKOMEN
+            - $normhuur_bij_minimum_inkomen
             - operation: MULTIPLY
               values:
               - operation: DIVIDE
@@ -449,44 +449,44 @@ articles:
                     cases:
                     - when:
                         operation: EQUALS
-                        subject: $HEEFT_PARTNER
+                        subject: $heeft_partner
                         value: true
                       then:
                         operation: ADD
                         values:
-                        - $INKOMEN
-                        - $PARTNER_INKOMEN
-                    default: $INKOMEN
+                        - $inkomen
+                        - $partner_inkomen
+                    default: $inkomen
                   - operation: IF
                     cases:
                     - when:
                         operation: EQUALS
-                        subject: $HEEFT_PARTNER
+                        subject: $heeft_partner
                         value: true
-                      then: $MINIMUM_INKOMENSIJKPUNT_PARTNERS
-                    default: $MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE
+                      then: $minimum_inkomensijkpunt_partners
+                    default: $minimum_inkomensijkpunt_alleenstaande
                 - operation: SUBTRACT
                   values:
                   - operation: IF
                     cases:
                     - when:
                         operation: EQUALS
-                        subject: $HEEFT_PARTNER
+                        subject: $heeft_partner
                         value: true
-                      then: $REFERENTIE_INKOMENSIJKPUNT_PARTNERS
-                    default: $REFERENTIE_INKOMENSIJKPUNT_ALLEENSTAANDE
+                      then: $referentie_inkomensijkpunt_partners
+                    default: $referentie_inkomensijkpunt_alleenstaande
                   - operation: IF
                     cases:
                     - when:
                         operation: EQUALS
-                        subject: $HEEFT_PARTNER
+                        subject: $heeft_partner
                         value: true
-                      then: $MINIMUM_INKOMENSIJKPUNT_PARTNERS
-                    default: $MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE
+                      then: $minimum_inkomensijkpunt_partners
+                    default: $minimum_inkomensijkpunt_alleenstaande
               - operation: SUBTRACT
                 values:
-                - $NORMHUUR_BIJ_REFERENTIE_INKOMEN
-                - $NORMHUUR_BIJ_MINIMUM_INKOMEN
+                - $normhuur_bij_referentie_inkomen
+                - $normhuur_bij_minimum_inkomen
         legal_basis:
           law: Wet op de huurtoeslag
           bwb_id: BWBR0008659
@@ -509,14 +509,14 @@ articles:
                   values:
                   - operation: ADD
                     values:
-                    - $HUURPRIJS
-                    - $SUBSIDIABELE_SERVICEKOSTEN
+                    - $huurprijs
+                    - $subsidiabele_servicekosten
                   - $basishuur
               - operation: SUBTRACT
                 values:
-                - $KWALITEITSKORTINGSGRENS
+                - $kwaliteitskortingsgrens
                 - $basishuur
-            - $SUBSIDIEPERCENTAGE_ONDER_KWALITEITSKORTINGSGRENS
+            - $subsidiepercentage_onder_kwaliteitskortingsgrens
           - operation: MULTIPLY
             values:
             - operation: MAX
@@ -528,21 +528,21 @@ articles:
                   values:
                   - operation: ADD
                     values:
-                    - $HUURPRIJS
-                    - $SUBSIDIABELE_SERVICEKOSTEN
-                  - $KWALITEITSKORTINGSGRENS
+                    - $huurprijs
+                    - $subsidiabele_servicekosten
+                  - $kwaliteitskortingsgrens
                 - operation: SUBTRACT
                   values:
                   - operation: IF
                     cases:
                     - when:
                         operation: LESS_THAN_OR_EQUAL
-                        subject: $HUISHOUDGROOTTE
+                        subject: $huishoudgrootte
                         value: 2
-                      then: $AFTOPPINGSGRENS_1_2
-                    default: $AFTOPPINGSGRENS_3_PLUS
-                  - $KWALITEITSKORTINGSGRENS
-            - $SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP
+                      then: $aftoppingsgrens_1_2
+                    default: $aftoppingsgrens_3_plus
+                  - $kwaliteitskortingsgrens
+            - $subsidiepercentage_tussen_kwaliteit_aftop
           - operation: MULTIPLY
             values:
             - operation: MAX
@@ -552,17 +552,17 @@ articles:
                 values:
                 - operation: ADD
                   values:
-                  - $HUURPRIJS
-                  - $SUBSIDIABELE_SERVICEKOSTEN
+                  - $huurprijs
+                  - $subsidiabele_servicekosten
                 - operation: IF
                   cases:
                   - when:
                       operation: LESS_THAN_OR_EQUAL
-                      subject: $HUISHOUDGROOTTE
+                      subject: $huishoudgrootte
                       value: 2
-                    then: $AFTOPPINGSGRENS_1_2
-                  default: $AFTOPPINGSGRENS_3_PLUS
-            - $SUBSIDIEPERCENTAGE_BOVEN_AFTOP
+                    then: $aftoppingsgrens_1_2
+                  default: $aftoppingsgrens_3_plus
+            - $subsidiepercentage_boven_aftop
         legal_basis:
           law: Wet op de huurtoeslag
           bwb_id: BWBR0008659

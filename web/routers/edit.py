@@ -523,7 +523,7 @@ async def update_situation(
             bsn=bsn,
             service=service,
             law=law,
-            parameters=parameters | {"BSN": bsn},
+            parameters=parameters | {"bsn": bsn},
             claimed_result=parameters,  # IMPROVE: other value?
             approved_claims_only=False,  # IMPROVE: or True?
             effective_date=effective_date,

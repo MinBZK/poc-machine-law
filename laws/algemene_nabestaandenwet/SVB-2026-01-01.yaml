@@ -24,24 +24,24 @@ articles:
   url: https://wetten.overheid.nl/BWBR0007795/2026-01-01#Artikel14
   machine_readable:
     definitions:
-      BRUTO_UITKERING:
+      bruto_uitkering:
         value: 146500
-      VRIJLATING_MAANDELIJKS:
+      vrijlating_maandelijks:
         value: 77000
-      AO_DREMPEL:
+      ao_drempel:
         value: 45
-      MAANDEN_PER_JAAR:
+      maanden_per_jaar:
         value: 12
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         type_spec:
           unit: years
@@ -52,22 +52,22 @@ articles:
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: GEBOORTEDATUM
+      - name: geboortedatum
         type: date
         source:
           regulation: wet_brp
           output: geboortedatum
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PENSIOENLEEFTIJD
+      - name: pensioenleeftijd
         type: number
         type_spec:
           unit: years
@@ -78,11 +78,11 @@ articles:
           output: pensioenleeftijd
           service: SVB
           parameters:
-            GEBOORTEDATUM: $GEBOORTEDATUM
+            geboortedatum: $geboortedatum
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: INKOMEN
+      - name: inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -93,11 +93,11 @@ articles:
           output: inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
-      - name: WAS_PARTNER_VERZEKERD
+      - name: was_partner_verzekerd
         type: boolean
         source_reference:
           table: anw_dossiers
@@ -106,8 +106,8 @@ articles:
           - name: bsn
             description: BSN van de nabestaande
             type: string
-            value: $BSN
-      - name: OVERLIJDENSDATUM_PARTNER
+            value: $bsn
+      - name: overlijdensdatum_partner
         type: date
         source_reference:
           table: anw_dossiers
@@ -116,8 +116,8 @@ articles:
           - name: bsn
             description: BSN van de nabestaande
             type: string
-            value: $BSN
-      - name: ARBEIDSONGESCHIKTHEIDSPERCENTAGE
+            value: $bsn
+      - name: arbeidsongeschiktheidspercentage
         type: number
         source_reference:
           table: anw_dossiers
@@ -126,8 +126,8 @@ articles:
           - name: bsn
             description: BSN van de nabestaande
             type: string
-            value: $BSN
-      - name: HEEFT_KINDEREN_ONDER_18
+            value: $bsn
+      - name: heeft_kinderen_onder_18
         type: boolean
         source_reference:
           table: anw_dossiers
@@ -136,7 +136,7 @@ articles:
           - name: bsn
             description: BSN van de nabestaande
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_gerechtigd
         type: boolean
@@ -160,23 +160,23 @@ articles:
           min: 0
       requirements:
       - all:
-        - subject: $WAS_PARTNER_VERZEKERD
+        - subject: $was_partner_verzekerd
           operation: EQUALS
           value: true
         - operation: NOT
           value:
             operation: IS_NULL
-            subject: $OVERLIJDENSDATUM_PARTNER
-        - subject: $LEEFTIJD
+            subject: $overlijdensdatum_partner
+        - subject: $leeftijd
           operation: LESS_THAN
-          value: $PENSIOENLEEFTIJD
+          value: $pensioenleeftijd
         - or:
-          - subject: $HEEFT_KINDEREN_ONDER_18
+          - subject: $heeft_kinderen_onder_18
             operation: EQUALS
             value: true
-          - subject: $ARBEIDSONGESCHIKTHEIDSPERCENTAGE
+          - subject: $arbeidsongeschiktheidspercentage
             operation: GREATER_THAN_OR_EQUAL
-            value: $AO_DREMPEL
+            value: $ao_drempel
       actions:
       - output: is_gerechtigd
         value: true
@@ -188,7 +188,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0007795&artikel=14&z=2024-01-01&g=2024-01-01
           explanation: 'Artikel 14 Anw: toekenning recht op nabestaandenuitkering'
       - output: bruto_uitkering
-        value: $BRUTO_UITKERING
+        value: $bruto_uitkering
         legal_basis:
           law: Algemene nabestaandenwet
           bwb_id: BWBR0007795
@@ -204,9 +204,9 @@ articles:
             values:
             - operation: DIVIDE
               values:
-              - $INKOMEN
-              - $MAANDEN_PER_JAAR
-            - $VRIJLATING_MAANDELIJKS
+              - $inkomen
+              - $maanden_per_jaar
+            - $vrijlating_maandelijks
           - 0
         legal_basis:
           law: Algemene nabestaandenwet

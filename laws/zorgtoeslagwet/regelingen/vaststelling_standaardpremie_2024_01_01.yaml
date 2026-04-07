@@ -15,7 +15,7 @@ articles:
   url: https://wetten.overheid.nl/BWBR0049005/2024-01-01#Artikel1
   machine_readable:
     definitions:
-      STANDAARDPREMIE_2024:
+      standaardpremie_2024:
         value: 198700
         legal_basis:
           law: Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2024
@@ -37,7 +37,7 @@ articles:
           min: 0
       actions:
       - output: standaardpremie
-        value: $STANDAARDPREMIE_2024
+        value: $standaardpremie_2024
         legal_basis:
           law: Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2024
           bwb_id: BWBR0049005

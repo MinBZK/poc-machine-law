@@ -81,11 +81,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: INKOMENSGEGEVENS
+      - name: inkomensgegevens
         type: object
         source_reference:
           table: uwv_toetsingsinkomen
@@ -95,10 +95,10 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: toetsingsinkomen
         type: amount
       actions:
       - output: toetsingsinkomen
-        value: $INKOMENSGEGEVENS.toetsingsinkomen
+        value: $inkomensgegevens.toetsingsinkomen

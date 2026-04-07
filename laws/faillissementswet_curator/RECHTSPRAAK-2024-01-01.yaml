@@ -22,7 +22,7 @@ articles:
   url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#Artikel68
   machine_readable:
     definitions:
-      CURATOR_BOEDEL_RECHTEN:
+      curator_boedel_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
@@ -32,11 +32,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: FAILLISSEMENT_REGISTRATIES
+      - name: faillissement_registraties
         type: array
         source_reference:
           table: faillissement_registraties
@@ -52,7 +52,7 @@ articles:
           - name: bsn_curator
             description: BSN nummer van de curator
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_delegaties
         type: boolean
@@ -74,7 +74,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $FAILLISSEMENT_REGISTRATIES
+          subject: $faillissement_registraties
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -86,7 +86,7 @@ articles:
       - output: actieve_faillissementen
         value:
           operation: FOREACH
-          subject: $FAILLISSEMENT_REGISTRATIES
+          subject: $faillissement_registraties
           where:
             operation: AND
             conditions:
@@ -187,7 +187,7 @@ articles:
         value:
           operation: FOREACH
           subject: $actieve_faillissementen
-          value: $CURATOR_BOEDEL_RECHTEN
+          value: $curator_boedel_rechten
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860

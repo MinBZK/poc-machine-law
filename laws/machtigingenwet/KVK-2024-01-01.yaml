@@ -19,23 +19,23 @@ articles:
   url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Artikel240
   machine_readable:
     definitions:
-      BESTUURDER_FUNCTIES:
+      bestuurder_functies:
         value:
         - BESTUURDER
         - DIRECTEUR
         - ALGEMEEN_DIRECTEUR
-      EIGENAAR_FUNCTIES:
+      eigenaar_functies:
         value:
         - EIGENAAR
         - VENNOOT
         - BEHEREND_VENNOOT
         - MAAT
-      GEMACHTIGDE_FUNCTIES:
+      gemachtigde_functies:
         value:
         - GEMACHTIGDE
         - PROCURATIEHOUDER
         - GEVOLMACHTIGDE
-      BEVOEGDE_FUNCTIES:
+      bevoegde_functies:
         value:
         - BESTUURDER
         - DIRECTEUR
@@ -48,12 +48,12 @@ articles:
         - GEMACHTIGDE
         - PROCURATIEHOUDER
         - GEVOLMACHTIGDE
-      VOLLEDIGE_BEVOEGDHEID_RECHTEN:
+      volledige_bevoegdheid_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
         - BESLUITEN_ONTVANGEN
-      BEPERKTE_BEVOEGDHEID_RECHTEN:
+      beperkte_bevoegdheid_rechten:
         value:
         - LEZEN
     execution:
@@ -61,11 +61,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: FUNCTIONARISSEN
+      - name: functionarissen
         type: array
         source_reference:
           table: functionarissen
@@ -82,7 +82,7 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_delegaties
         type: boolean
@@ -106,7 +106,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $FUNCTIONARISSEN
+          subject: $functionarissen
         legal_basis:
           law: Handelsregisterwet 2007
           bwb_id: BWBR0021777
@@ -118,11 +118,11 @@ articles:
       - output: bevoegde_functionarissen
         value:
           operation: FOREACH
-          subject: $FUNCTIONARISSEN
+          subject: $functionarissen
           where:
             operation: IN
             subject: $current.functie
-            values: $BEVOEGDE_FUNCTIES
+            values: $bevoegde_functies
           value: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 2
@@ -209,8 +209,8 @@ articles:
                 operation: EQUALS
                 subject: $current
                 value: VOLLEDIG
-              then: $VOLLEDIGE_BEVOEGDHEID_RECHTEN
-            default: $BEPERKTE_BEVOEGDHEID_RECHTEN
+              then: $volledige_bevoegdheid_rechten
+            default: $beperkte_bevoegdheid_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 2
           bwb_id: BWBR0003045

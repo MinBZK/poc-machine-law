@@ -26,11 +26,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: VERMOGENSGEGEVENS
+      - name: vermogensgegevens
         type: object
         source_reference:
           table: belastingdienst_vermogen
@@ -40,10 +40,10 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: vermogen
         type: amount
       actions:
       - output: vermogen
-        value: $VERMOGENSGEGEVENS.vermogen
+        value: $vermogensgegevens.vermogen

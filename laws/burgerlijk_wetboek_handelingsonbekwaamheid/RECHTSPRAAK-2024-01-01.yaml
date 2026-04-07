@@ -21,10 +21,10 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel381
   machine_readable:
     definitions:
-      HANDELINGSONBEKWAME_RECHTEN:
+      handelingsonbekwame_rechten:
         value:
         - LEZEN
-      VOLLEDIGE_RECHTEN:
+      volledige_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
@@ -34,11 +34,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: CURATELE_ALS_CURANDUS
+      - name: curatele_als_curandus
         type: array
         source_reference:
           table: curatele_registraties
@@ -53,7 +53,7 @@ articles:
           - name: bsn_curandus
             description: BSN van de persoon als curandus
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_onder_curatele
         type: boolean
@@ -83,7 +83,7 @@ articles:
       - output: actieve_curatele
         value:
           operation: FOREACH
-          subject: $CURATELE_ALS_CURANDUS
+          subject: $curatele_als_curandus
           where:
             operation: AND
             conditions:
@@ -156,8 +156,8 @@ articles:
           operation: IF
           cases:
           - when: $is_handelingsonbekwaam
-            then: $HANDELINGSONBEKWAME_RECHTEN
-          default: $VOLLEDIGE_RECHTEN
+            then: $handelingsonbekwame_rechten
+          default: $volledige_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -178,7 +178,7 @@ articles:
           explanation: Iedereen heeft een SELF delegatie
       - output: subject_ids
         value:
-        - $BSN
+        - $bsn
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

@@ -16,7 +16,7 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002761/2024-01-01#Artikel144
   machine_readable:
     definitions:
-      EXECUTEUR_RECHTEN:
+      executeur_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
@@ -26,11 +26,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: EXECUTEUR_REGISTRATIES
+      - name: executeur_registraties
         type: array
         source_reference:
           table: executeur_registraties
@@ -46,7 +46,7 @@ articles:
           - name: bsn_executeur
             description: BSN nummer van de executeur
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_delegaties
         type: boolean
@@ -68,7 +68,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $EXECUTEUR_REGISTRATIES
+          subject: $executeur_registraties
         legal_basis:
           law: Burgerlijk Wetboek Boek 4
           bwb_id: BWBR0002761
@@ -80,7 +80,7 @@ articles:
       - output: actief_executeurschap
         value:
           operation: FOREACH
-          subject: $EXECUTEUR_REGISTRATIES
+          subject: $executeur_registraties
           where:
             operation: AND
             conditions:
@@ -173,7 +173,7 @@ articles:
         value:
           operation: FOREACH
           subject: $actief_executeurschap
-          value: $EXECUTEUR_RECHTEN
+          value: $executeur_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 4
           bwb_id: BWBR0002761

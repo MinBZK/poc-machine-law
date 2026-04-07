@@ -19,24 +19,24 @@ articles:
   url: https://wetten.overheid.nl/BWBR0033715/2023-05-15#Artikel2.34
   machine_readable:
     definitions:
-      TWIJFEL_OBR_ENKEL:
+      twijfel_obr_enkel:
         value: Post eenmalig onbestelbaar retour (OBR)
-      TWIJFEL_OBR_HERHAALD:
+      twijfel_obr_herhaald:
         value: Post meerdere keren onbestelbaar retour (OBR)
-      OBR_DREMPEL_HERHAALD:
+      obr_drempel_herhaald:
         value: 2
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
-      - name: ADRES
+      - name: adres
         type: object
         required: true
       input:
-      - name: POST_ONBESTELBAAR
+      - name: post_onbestelbaar
         type: boolean
         source_reference:
           table: cjib_post
@@ -45,8 +45,8 @@ articles:
           - name: bsn
             description: BSN van de persoon (optioneel bij adresgerichte controles)
             type: string
-            value: $BSN
-      - name: AANTAL_ONBESTELBAAR
+            value: $bsn
+      - name: aantal_onbestelbaar
         type: number
         source_reference:
           table: cjib_post
@@ -55,7 +55,7 @@ articles:
           - name: bsn
             description: BSN van de persoon (optioneel bij adresgerichte controles)
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_gerede_twijfel_adres
         type: boolean
@@ -66,12 +66,12 @@ articles:
         - operation: NOT
           value:
             operation: IS_NULL
-            subject: $ADRES
+            subject: $adres
       actions:
       - output: heeft_gerede_twijfel_adres
         value:
           operation: EQUALS
-          subject: $POST_ONBESTELBAAR
+          subject: $post_onbestelbaar
           value: true
         legal_basis:
           law: Wet basisregistratie personen
@@ -86,14 +86,14 @@ articles:
           cases:
           - when:
               operation: GREATER_THAN_OR_EQUAL
-              subject: $AANTAL_ONBESTELBAAR
-              value: $OBR_DREMPEL_HERHAALD
-            then: $TWIJFEL_OBR_HERHAALD
+              subject: $aantal_onbestelbaar
+              value: $obr_drempel_herhaald
+            then: $twijfel_obr_herhaald
           - when:
               operation: EQUALS
-              subject: $POST_ONBESTELBAAR
+              subject: $post_onbestelbaar
               value: true
-            then: $TWIJFEL_OBR_ENKEL
+            then: $twijfel_obr_enkel
         legal_basis:
           law: Besluit basisregistratie personen
           bwb_id: BWBR0034306

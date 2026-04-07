@@ -25,11 +25,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: WIA_UITKERING_STATUS
+      - name: wia_uitkering_status
         type: object
         source_reference:
           table: wia_uitkeringen
@@ -41,7 +41,7 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_wia_uitkering
         type: boolean
@@ -49,5 +49,5 @@ articles:
       - output: heeft_wia_uitkering
         value:
           operation: EQUALS
-          subject: $WIA_UITKERING_STATUS.status
+          subject: $wia_uitkering_status.status
           value: ACTIEF

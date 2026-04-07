@@ -25,34 +25,34 @@ articles:
   url: https://wetten.overheid.nl/BWBR0018451/2024-01-01#Artikel1
   machine_readable:
     definitions:
-      MINIMUM_LEEFTIJD:
+      minimum_leeftijd:
         value: 18
-      PERCENTAGE_DREMPELINKOMEN_MET_PARTNER:
+      percentage_drempelinkomen_met_partner:
         value: 0.0486
-      PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND:
+      percentage_drempelinkomen_alleenstaand:
         value: 0.0486
-      AFBOUWPERCENTAGE_MINIMUM:
+      afbouwpercentage_minimum:
         value: 0.1367
-      AFBOUWPERCENTAGE_BOVEN_DREMPEL:
+      afbouwpercentage_boven_drempel:
         value: 0.0387
-      DREMPELINKOMEN_ALLEENSTAANDE:
+      drempelinkomen_alleenstaande:
         value: 3749600
-      DREMPELINKOMEN_TOESLAGPARTNER:
+      drempelinkomen_toeslagpartner:
         value: 4821800
-      VERMOGENSGRENS_ALLEENSTAANDE:
+      vermogensgrens_alleenstaande:
         value: 14193900
-      VERMOGENSGRENS_TOESLAGPARTNER:
+      vermogensgrens_toeslagpartner:
         value: 17942900
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         type_spec:
           unit: years
@@ -65,7 +65,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $prev_january_first
-      - name: HEEFT_PARTNER
+      - name: heeft_partner
         type: boolean
         source:
           regulation: wet_brp
@@ -74,7 +74,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $prev_january_first
-      - name: HEEFT_VERZEKERING
+      - name: heeft_verzekering
         type: boolean
         source:
           regulation: zvw
@@ -83,7 +83,7 @@ articles:
         temporal:
           type: period
           period_type: month
-      - name: HEEFT_VERDRAGSVERZEKERING
+      - name: heeft_verdragsverzekering
         type: boolean
         source:
           regulation: zvw
@@ -92,7 +92,7 @@ articles:
         temporal:
           type: period
           period_type: month
-      - name: IS_GEDETINEERD
+      - name: is_gedetineerd
         type: boolean
         source:
           regulation: penitentiaire_beginselenwet
@@ -101,7 +101,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $prev_january_first
-      - name: IS_FORENSISCH
+      - name: is_forensisch
         type: boolean
         source:
           regulation: wet_forensische_zorg
@@ -110,7 +110,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $prev_january_first
-      - name: INKOMEN
+      - name: inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -124,7 +124,7 @@ articles:
           type: period
           period_type: year
           immutable_after: P2Y
-      - name: VERMOGEN
+      - name: vermogen
         type: amount
         type_spec:
           unit: eurocent
@@ -137,7 +137,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $prev_january_first
-      - name: GEZAMENLIJK_VERMOGEN
+      - name: gezamenlijk_vermogen
         type: amount
         type_spec:
           unit: eurocent
@@ -150,7 +150,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $prev_january_first
-      - name: PARTNER_INKOMEN
+      - name: partner_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -164,7 +164,7 @@ articles:
           type: period
           period_type: year
           immutable_after: P2Y
-      - name: STANDAARDPREMIE
+      - name: standaardpremie
         type: amount
         type_spec:
           unit: eurocent
@@ -186,19 +186,19 @@ articles:
       requirements:
       - all:
         - or:
-          - subject: $HEEFT_VERZEKERING
+          - subject: $heeft_verzekering
             operation: EQUALS
             value: true
-          - subject: $HEEFT_VERDRAGSVERZEKERING
+          - subject: $heeft_verdragsverzekering
             operation: EQUALS
             value: true
-        - subject: $LEEFTIJD
+        - subject: $leeftijd
           operation: GREATER_THAN_OR_EQUAL
-          value: $MINIMUM_LEEFTIJD
-        - subject: $IS_GEDETINEERD
+          value: $minimum_leeftijd
+        - subject: $is_gedetineerd
           operation: EQUALS
           value: false
-        - subject: $IS_FORENSISCH
+        - subject: $is_forensisch
           operation: EQUALS
           value: false
       actions:
@@ -210,52 +210,52 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $HEEFT_PARTNER
+              subject: $heeft_partner
               value: false
             then:
               operation: IF
               cases:
               - when:
                   operation: GREATER_THAN
-                  subject: $INKOMEN
-                  value: $DREMPELINKOMEN_ALLEENSTAANDE
+                  subject: $inkomen
+                  value: $drempelinkomen_alleenstaande
                 then: 0
               - when:
                   operation: GREATER_THAN
-                  subject: $VERMOGEN
-                  value: $VERMOGENSGRENS_ALLEENSTAANDE
+                  subject: $vermogen
+                  value: $vermogensgrens_alleenstaande
                 then: 0
               default:
                 operation: SUBTRACT
                 values:
-                - $STANDAARDPREMIE
+                - $standaardpremie
                 - operation: ADD
                   values:
                   - operation: MULTIPLY
                     values:
-                    - $PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND
+                    - $percentage_drempelinkomen_alleenstaand
                     - operation: MIN
                       values:
-                      - $INKOMEN
-                      - $DREMPELINKOMEN_ALLEENSTAANDE
+                      - $inkomen
+                      - $drempelinkomen_alleenstaande
                   - operation: IF
                     cases:
                     - when:
                         operation: GREATER_THAN
-                        subject: $INKOMEN
-                        value: $DREMPELINKOMEN_ALLEENSTAANDE
+                        subject: $inkomen
+                        value: $drempelinkomen_alleenstaande
                       then:
                         operation: MULTIPLY
                         values:
                         - operation: SUBTRACT
                           values:
-                          - $INKOMEN
-                          - $DREMPELINKOMEN_ALLEENSTAANDE
-                        - $AFBOUWPERCENTAGE_MINIMUM
+                          - $inkomen
+                          - $drempelinkomen_alleenstaande
+                        - $afbouwpercentage_minimum
                     default: 0
           - when:
               operation: EQUALS
-              subject: $HEEFT_PARTNER
+              subject: $heeft_partner
               value: true
             then:
               operation: IF
@@ -265,34 +265,34 @@ articles:
                   subject:
                     operation: ADD
                     values:
-                    - $INKOMEN
-                    - $PARTNER_INKOMEN
-                  value: $DREMPELINKOMEN_TOESLAGPARTNER
+                    - $inkomen
+                    - $partner_inkomen
+                  value: $drempelinkomen_toeslagpartner
                 then: 0
               - when:
                   operation: GREATER_THAN
-                  subject: $GEZAMENLIJK_VERMOGEN
-                  value: $VERMOGENSGRENS_TOESLAGPARTNER
+                  subject: $gezamenlijk_vermogen
+                  value: $vermogensgrens_toeslagpartner
                 then: 0
               default:
                 operation: SUBTRACT
                 values:
                 - operation: MULTIPLY
                   values:
-                  - $STANDAARDPREMIE
+                  - $standaardpremie
                   - 2
                 - operation: ADD
                   values:
                   - operation: MULTIPLY
                     values:
-                    - $PERCENTAGE_DREMPELINKOMEN_MET_PARTNER
+                    - $percentage_drempelinkomen_met_partner
                     - operation: MIN
                       values:
                       - operation: ADD
                         values:
-                        - $INKOMEN
-                        - $PARTNER_INKOMEN
-                      - $DREMPELINKOMEN_TOESLAGPARTNER
+                        - $inkomen
+                        - $partner_inkomen
+                      - $drempelinkomen_toeslagpartner
                   - operation: IF
                     cases:
                     - when:
@@ -300,9 +300,9 @@ articles:
                         subject:
                           operation: ADD
                           values:
-                          - $INKOMEN
-                          - $PARTNER_INKOMEN
-                        value: $DREMPELINKOMEN_TOESLAGPARTNER
+                          - $inkomen
+                          - $partner_inkomen
+                        value: $drempelinkomen_toeslagpartner
                       then:
                         operation: MULTIPLY
                         values:
@@ -310,8 +310,8 @@ articles:
                           values:
                           - operation: ADD
                             values:
-                            - $INKOMEN
-                            - $PARTNER_INKOMEN
-                          - $DREMPELINKOMEN_TOESLAGPARTNER
-                        - $AFBOUWPERCENTAGE_BOVEN_DREMPEL
+                            - $inkomen
+                            - $partner_inkomen
+                          - $drempelinkomen_toeslagpartner
+                        - $afbouwpercentage_boven_drempel
                     default: 0

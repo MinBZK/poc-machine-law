@@ -16,55 +16,55 @@ articles:
   url: https://lokaleregelgeving.overheid.nl/CVDR719500/1#artikel_2
   machine_readable:
     definitions:
-      BELASTINGJAAR:
+      belastingjaar:
         value: 2024
-      PRECARIO_TARIEF_PER_M2:
+      precario_tarief_per_m2:
         value: 3610
-      VRIJSTELLINGSDREMPEL_M2:
+      vrijstellingsdrempel_m2:
         value: 50
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: KVK_NUMMER
+      - name: kvk_nummer
         type: string
         required: true
       input:
-      - name: HEEFT_ACTIEVE_VERGUNNING
+      - name: heeft_actieve_vergunning
         type: boolean
         source:
           regulation: algemene_plaatselijke_verordening/terrassen
           output: heeft_actieve_vergunning
           service: GEMEENTE_ROTTERDAM
           parameters:
-            KVK_NUMMER: $KVK_NUMMER
+            kvk_nummer: $kvk_nummer
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: VERGUNDE_OPPERVLAKTE
+      - name: vergunde_oppervlakte
         type: number
         source:
           regulation: algemene_plaatselijke_verordening/terrassen
           output: vergunde_oppervlakte
           service: GEMEENTE_ROTTERDAM
           parameters:
-            KVK_NUMMER: $KVK_NUMMER
+            kvk_nummer: $kvk_nummer
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: VESTIGINGSADRES
+      - name: vestigingsadres
         type: string
         source:
           regulation: handelsregisterwet/bedrijfsgegevens
           output: vestigingsadres
           service: KVK
           parameters:
-            KVK_NUMMER: $KVK_NUMMER
+            kvk_nummer: $kvk_nummer
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: HEEFT_TERRAS
+      - name: heeft_terras
         type: boolean
         source_reference:
           table: vestigingen
@@ -73,8 +73,8 @@ articles:
           - name: kvk_nummer
             description: KvK-nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
-      - name: LOCATIE_OP_OPENBARE_WEG
+            value: $kvk_nummer
+      - name: locatie_op_openbare_weg
         type: boolean
         source_reference:
           source_type: GEMEENTE_ROTTERDAM
@@ -84,7 +84,7 @@ articles:
           - name: adres
             description: Adres van de horecalocatie
             type: string
-            value: $VESTIGINGSADRES
+            value: $vestigingsadres
       output:
       - name: is_belastingplichtig
         type: boolean
@@ -96,7 +96,7 @@ articles:
         type: number
       requirements:
       - all:
-        - subject: $HEEFT_TERRAS
+        - subject: $heeft_terras
           operation: EQUALS
           value: true
           legal_basis:
@@ -104,7 +104,7 @@ articles:
             article: '2'
             url: https://lokaleregelgeving.overheid.nl/CVDR719500/1
             explanation: Het bedrijf moet een terras (voorwerp) op gemeentegrond hebben
-        - subject: $LOCATIE_OP_OPENBARE_WEG
+        - subject: $locatie_op_openbare_weg
           operation: EQUALS
           value: true
           legal_basis:
@@ -112,7 +112,7 @@ articles:
             article: '2'
             url: https://lokaleregelgeving.overheid.nl/CVDR719500/1
             explanation: Het terras moet zich bevinden op voor de openbare dienst bestemde gemeentegrond
-        - subject: $HEEFT_ACTIEVE_VERGUNNING
+        - subject: $heeft_actieve_vergunning
           operation: EQUALS
           value: true
           legal_basis:
@@ -129,7 +129,7 @@ articles:
           url: https://lokaleregelgeving.overheid.nl/CVDR719500/1
           explanation: Het bedrijf heeft een terras op openbare gemeentegrond; precariobelasting is verschuldigd
       - output: tarief_per_m2
-        value: $PRECARIO_TARIEF_PER_M2
+        value: $precario_tarief_per_m2
         legal_basis:
           law: Verordening precario- en reclamebelasting Rotterdam 2024
           article: '5'
@@ -142,8 +142,8 @@ articles:
           values:
           - operation: SUBTRACT
             values:
-            - $VERGUNDE_OPPERVLAKTE
-            - $VRIJSTELLINGSDREMPEL_M2
+            - $vergunde_oppervlakte
+            - $vrijstellingsdrempel_m2
           - 0
         legal_basis:
           law: Verordening precariobelasting Rotterdam 2024
@@ -156,7 +156,7 @@ articles:
           operation: MULTIPLY
           values:
           - $heffingsmaatstaf_m2
-          - $PRECARIO_TARIEF_PER_M2
+          - $precario_tarief_per_m2
         legal_basis:
           law: Verordening precariobelasting Rotterdam 2024
           article: '5'

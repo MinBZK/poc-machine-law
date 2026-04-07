@@ -20,22 +20,22 @@ articles:
   url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Artikel11
   machine_readable:
     definitions:
-      MINIMUM_LEEFTIJD:
+      minimum_leeftijd:
         value: 18
-      BASISBEDRAG_ALLEENSTAAND_21_PLUS:
+      basisbedrag_alleenstaand_21_plus:
         value: 108900
-      BASISBEDRAG_PARTNERS_21_PLUS:
+      basisbedrag_partners_21_plus:
         value: 155600
-      GELDIGE_VERBLIJFSVERGUNNINGEN:
+      geldige_verblijfsvergunningen:
         value:
         - PERMANENT
         - EU
         - FAMILY_REUNIFICATION
-      VERMOGENSGRENS_ALLEENSTAAND:
+      vermogensgrens_alleenstaand:
         value: 750000
-      VERMOGENSGRENS_PARTNER:
+      vermogensgrens_partner:
         value: 1500000
-      KOSTENDELERSNORM_FACTOREN:
+      kostendelersnorm_factoren:
         value:
           1: 1.0
           2: 0.5
@@ -43,62 +43,62 @@ articles:
           4: 0.4
     execution:
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         source:
           regulation: wet_brp
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: GEBOORTEDATUM
+            bsn: $bsn
+      - name: geboortedatum
         type: date
         source:
           regulation: wet_brp
           output: geboortedatum
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PENSIOENLEEFTIJD
+      - name: pensioenleeftijd
         type: number
         source:
           regulation: algemene_ouderdomswet/leeftijdsbepaling
           output: pensioenleeftijd
           service: SVB
           parameters:
-            GEBOORTEDATUM: $GEBOORTEDATUM
-      - name: HEEFT_NEDERLANDSE_NATIONALITEIT
+            geboortedatum: $geboortedatum
+      - name: heeft_nederlandse_nationaliteit
         type: boolean
         source:
           regulation: wet_brp
           output: heeft_nederlandse_nationaliteit
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: VERBLIJFSVERGUNNING_TYPE
+            bsn: $bsn
+      - name: verblijfsvergunning_type
         type: string
         source:
           regulation: vreemdelingenwet
           output: verblijfsvergunning_type
           service: IND
           parameters:
-            BSN: $BSN
-      - name: VERBLIJFSADRES
+            bsn: $bsn
+      - name: verblijfsadres
         type: string
         source:
           regulation: wet_brp
           output: verblijfsadres
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: INKOMEN
+            bsn: $bsn
+      - name: inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -109,8 +109,8 @@ articles:
           output: maandelijks_inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
-      - name: BEDRIJFSINKOMEN
+            bsn: $bsn
+      - name: bedrijfsinkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -121,8 +121,8 @@ articles:
           output: bedrijfsinkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
-      - name: BEZITTINGEN
+            bsn: $bsn
+      - name: bezittingen
         type: amount
         type_spec:
           unit: eurocent
@@ -133,24 +133,24 @@ articles:
           output: bezittingen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
-      - name: HEEFT_PARTNER
+            bsn: $bsn
+      - name: heeft_partner
         type: boolean
         source:
           regulation: wet_brp
           output: heeft_partner
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: PARTNER_BSN
+            bsn: $bsn
+      - name: partner_bsn
         type: string
         source:
           regulation: wet_brp
           output: partner_bsn
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: PARTNER_INKOMEN
+            bsn: $bsn
+      - name: partner_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -161,8 +161,8 @@ articles:
           output: maandelijks_inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $PARTNER_BSN
-      - name: PARTNER_BEZITTINGEN
+            bsn: $partner_bsn
+      - name: partner_bezittingen
         type: amount
         type_spec:
           unit: eurocent
@@ -173,39 +173,39 @@ articles:
           output: bezittingen
           service: BELASTINGDIENST
           parameters:
-            BSN: $PARTNER_BSN
-      - name: HUISHOUDLEDEN
+            bsn: $partner_bsn
+      - name: huishoudleden
         type: number
         source:
           regulation: wet_brp
           output: huishoudgrootte
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: IS_STUDENT
+            bsn: $bsn
+      - name: is_student
         type: boolean
         source:
           regulation: wet_studiefinanciering
           output: is_student
           service: DUO
           parameters:
-            BSN: $BSN
-      - name: ONTVANGT_STUDIEFINANCIERING
+            bsn: $bsn
+      - name: ontvangt_studiefinanciering
         type: boolean
         source:
           regulation: wet_studiefinanciering
           output: ontvangt_studiefinanciering
           service: DUO
           parameters:
-            BSN: $BSN
-      - name: IS_GEDETINEERDE
+            bsn: $bsn
+      - name: is_gedetineerde
         type: boolean
         source:
           regulation: penitentiaire_beginselenwet
           output: is_gedetineerd
           service: DJI
           parameters:
-            BSN: $BSN
+            bsn: $bsn
       output:
       - name: is_gerechtigd
         type: boolean
@@ -223,9 +223,9 @@ articles:
           max: 1
       requirements:
       - all:
-        - subject: $LEEFTIJD
+        - subject: $leeftijd
           operation: GREATER_THAN_OR_EQUAL
-          value: $MINIMUM_LEEFTIJD
+          value: $minimum_leeftijd
           legal_basis:
             law: Participatiewet
             bwb_id: BWBR0015703
@@ -234,9 +234,9 @@ articles:
             url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel9
             juriconnect: jci1.3:c:BWBR0015703&artikel=9&lid=1&z=2025-01-01&g=2025-01-01
             explanation: Artikel 9 lid 1 bepaalt de minimumleeftijd van 18 jaar
-        - subject: $LEEFTIJD
+        - subject: $leeftijd
           operation: LESS_THAN
-          value: $PENSIOENLEEFTIJD
+          value: $pensioenleeftijd
           legal_basis:
             law: Participatiewet
             bwb_id: BWBR0015703
@@ -246,7 +246,7 @@ articles:
             juriconnect: jci1.3:c:BWBR0015703&artikel=9&lid=1&z=2025-01-01&g=2025-01-01
             explanation: Artikel 9 lid 1 bepaalt de maximumleeftijd als de pensioengerechtigde leeftijd
         - or:
-          - subject: $HEEFT_NEDERLANDSE_NATIONALITEIT
+          - subject: $heeft_nederlandse_nationaliteit
             operation: EQUALS
             value: true
             legal_basis:
@@ -258,8 +258,8 @@ articles:
               juriconnect: jci1.3:c:BWBR0015703&artikel=11&lid=1&z=2025-01-01&g=2025-01-01
               explanation: Artikel 11 lid 1 geeft Nederlanders recht op bijstand
           - operation: IN
-            subject: $VERBLIJFSVERGUNNING_TYPE
-            values: $GELDIGE_VERBLIJFSVERGUNNINGEN
+            subject: $verblijfsvergunning_type
+            values: $geldige_verblijfsvergunningen
             legal_basis:
               law: Participatiewet
               bwb_id: BWBR0015703
@@ -271,7 +271,7 @@ articles:
         - operation: NOT
           value:
             operation: IS_NULL
-            subject: $VERBLIJFSADRES
+            subject: $verblijfsadres
           legal_basis:
             law: Participatiewet
             bwb_id: BWBR0015703
@@ -281,7 +281,7 @@ articles:
             juriconnect: jci1.3:c:BWBR0015703&artikel=11&lid=1&z=2025-01-01&g=2025-01-01
             explanation: Artikel 11 lid 1 vereist dat men in Nederland verblijft
         - or:
-          - subject: $IS_STUDENT
+          - subject: $is_student
             operation: EQUALS
             value: false
             legal_basis:
@@ -293,7 +293,7 @@ articles:
               url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel13
               juriconnect: jci1.3:c:BWBR0015703&artikel=13&lid=2&z=2025-01-01&g=2025-01-01
               explanation: Artikel 13 lid 2 onder h sluit studenten uit
-          - subject: $ONTVANGT_STUDIEFINANCIERING
+          - subject: $ontvangt_studiefinanciering
             operation: EQUALS
             value: false
             legal_basis:
@@ -305,7 +305,7 @@ articles:
               url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel13
               juriconnect: jci1.3:c:BWBR0015703&artikel=13&lid=2&z=2025-01-01&g=2025-01-01
               explanation: Artikel 13 lid 2 onder h sluit personen met studiefinanciering uit
-        - subject: $IS_GEDETINEERDE
+        - subject: $is_gedetineerde
           operation: EQUALS
           value: false
           legal_basis:
@@ -327,7 +327,7 @@ articles:
             explanation: Artikel 34 bepaalt de vermogenstoets voor het recht op bijstand
           cases:
           - when:
-              subject: $HEEFT_PARTNER
+              subject: $heeft_partner
               operation: EQUALS
               value: true
             then:
@@ -351,9 +351,9 @@ articles:
                   juriconnect: jci1.3:c:BWBR0015703&artikel=34&lid=2&z=2025-01-01&g=2025-01-01
                   explanation: Artikel 34 lid 2 bepaalt dat vermogen van beide partners meetelt
                 values:
-                - $BEZITTINGEN
-                - $PARTNER_BEZITTINGEN
-              - $VERMOGENSGRENS_PARTNER
+                - $bezittingen
+                - $partner_bezittingen
+              - $vermogensgrens_partner
           default:
             operation: LESS_THAN
             legal_basis:
@@ -365,8 +365,8 @@ articles:
               juriconnect: jci1.3:c:BWBR0015703&artikel=34&lid=3&z=2025-01-01&g=2025-01-01
               explanation: Artikel 34 lid 3 bepaalt de vermogensgrens voor alleenstaanden
             values:
-            - $BEZITTINGEN
-            - $VERMOGENSGRENS_ALLEENSTAAND
+            - $bezittingen
+            - $vermogensgrens_alleenstaand
         - operation: IF
           legal_basis:
             law: Participatiewet
@@ -378,7 +378,7 @@ articles:
               Artikel 19 bepaalt dat bijstand wordt verleend voor zover de belanghebbende niet over voldoende middelen beschikt om in de noodzakelijke kosten van het bestaan te voorzien
           cases:
           - when:
-              subject: $HEEFT_PARTNER
+              subject: $heeft_partner
               operation: EQUALS
               value: true
             then:
@@ -394,10 +394,10 @@ articles:
               values:
               - operation: ADD
                 values:
-                - $INKOMEN
-                - $BEDRIJFSINKOMEN
-                - $PARTNER_INKOMEN
-              - $BASISBEDRAG_PARTNERS_21_PLUS
+                - $inkomen
+                - $bedrijfsinkomen
+                - $partner_inkomen
+              - $basisbedrag_partners_21_plus
           default:
             operation: LESS_THAN
             legal_basis:
@@ -411,9 +411,9 @@ articles:
             values:
             - operation: ADD
               values:
-              - $INKOMEN
-              - $BEDRIJFSINKOMEN
-            - $BASISBEDRAG_ALLEENSTAAND_21_PLUS
+              - $inkomen
+              - $bedrijfsinkomen
+            - $basisbedrag_alleenstaand_21_plus
       actions:
       - output: is_gerechtigd
         value: true
@@ -431,10 +431,10 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $HEEFT_PARTNER
+              subject: $heeft_partner
               value: true
-            then: $BASISBEDRAG_PARTNERS_21_PLUS
-          default: $BASISBEDRAG_ALLEENSTAAND_21_PLUS
+            then: $basisbedrag_partners_21_plus
+          default: $basisbedrag_alleenstaand_21_plus
         legal_basis:
           law: Participatiewet
           bwb_id: BWBR0015703
@@ -450,12 +450,12 @@ articles:
           cases:
           - when:
               operation: IN
-              subject: $HUISHOUDLEDEN
-              values: $KOSTENDELERSNORM_FACTOREN
+              subject: $huishoudleden
+              values: $kostendelersnorm_factoren
             then:
               operation: GET
-              subject: $HUISHOUDLEDEN
-              values: $KOSTENDELERSNORM_FACTOREN
+              subject: $huishoudleden
+              values: $kostendelersnorm_factoren
           default: 0.38
         legal_basis:
           law: Participatiewet

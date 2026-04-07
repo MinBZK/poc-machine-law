@@ -1023,7 +1023,7 @@ class LawSimulator:
                 }
                 for bsn, children in children_by_bsn.items()
             ]
-            self.services.set_source_dataframe("RvIG", "CHILDREN_DATA", pd.DataFrame(children_data))
+            self.services.set_source_dataframe("RvIG", "children_data", pd.DataFrame(children_data))
 
             # Add childcare data for people with young children
             childcare_data = []

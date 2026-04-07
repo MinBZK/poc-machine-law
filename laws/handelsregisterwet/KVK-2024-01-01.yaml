@@ -19,17 +19,17 @@ articles:
   url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Artikel2
   machine_readable:
     definitions:
-      ACTIEVE_STATUSSEN:
+      actieve_statussen:
         value:
         - ACTIEF
         - TIJDELIJK_GESTAAKT
-      ONDERNEMERSVORMEN:
+      ondernemersvormen:
         value:
         - EENMANSZAAK
         - VOF
         - MAATSCHAP
         - COMMANDITAIRE_VENNOOTSCHAP
-      ONDERNEMERS_POSITIES:
+      ondernemers_posities:
         value:
         - EIGENAAR
         - VENNOOT
@@ -40,11 +40,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: INSCHRIJVINGEN
+      - name: inschrijvingen
         type: array
         source_reference:
           table: inschrijvingen
@@ -57,8 +57,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: POSITIES
+            value: $bsn
+      - name: posities
         type: array
         source_reference:
           table: functionarissen
@@ -70,7 +70,7 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_actieve_ondernemer
         type: boolean
@@ -84,19 +84,19 @@ articles:
           - operation: AND
             conditions:
             - operation: IN
-              subject: $INSCHRIJVINGEN.rechtsvorm
-              values: $ONDERNEMERSVORMEN
+              subject: $inschrijvingen.rechtsvorm
+              values: $ondernemersvormen
             - operation: IN
-              subject: $INSCHRIJVINGEN.status
-              values: $ACTIEVE_STATUSSEN
+              subject: $inschrijvingen.status
+              values: $actieve_statussen
           - operation: AND
             conditions:
             - operation: IN
-              subject: $POSITIES.functie
-              values: $ONDERNEMERS_POSITIES
+              subject: $posities.functie
+              values: $ondernemers_posities
             - operation: IN
-              subject: $POSITIES.status
-              values: $ACTIEVE_STATUSSEN
+              subject: $posities.status
+              values: $actieve_statussen
         legal_basis:
           law: Handelsregisterwet 2007
           bwb_id: BWBR0021777
@@ -105,7 +105,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0021777&artikel=7&z=2024-01-01&g=2024-01-01
           explanation: Artikel 7 Handelsregisterwet bepaalt wanneer sprake is van actief ondernemerschap
       - output: kvk_nummer
-        value: $INSCHRIJVINGEN.kvk_nummer
+        value: $inschrijvingen.kvk_nummer
         legal_basis:
           law: Handelsregisterwet 2007
           bwb_id: BWBR0021777

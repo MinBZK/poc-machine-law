@@ -97,19 +97,14 @@ engine = config_loader.config.get_default_engine()
 if engine is None:
     raise ValueError("Default engine not set")
 
-# If the default engine is regelrecht, verify the binary exists; fall back to Python if not
+# Verify the regelrecht binary exists
 if engine.type == "regelrecht":
     binary_path = Path(engine.domain) if engine.domain else Path("bin/evaluate-v0.2.0")
     if not binary_path.is_absolute():
         binary_path = Path(__file__).resolve().parent.parent / binary_path
     if not binary_path.exists():
-        logger.warning(f"Regelrecht binary not found at {binary_path}, falling back to Python engine")
-        fallback = config_loader.config.get_engine_by_id("py")
-        if fallback is None:
-            raise ValueError("Regelrecht binary not found and no Python engine configured as fallback")
-        engine = fallback
-    else:
-        logger.info(f"Using regelrecht engine with binary at {binary_path}")
+        raise ValueError(f"Regelrecht binary not found at {binary_path}")
+    logger.info(f"Using regelrecht engine with binary at {binary_path}")
 
 set_engine_id(engine.id)
 

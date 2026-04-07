@@ -41,11 +41,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: PENSIOENGEGEVENS
+      - name: pensioengegevens
         type: object
         source_reference:
           table: algemene_ouderdomswet_gegevens
@@ -55,7 +55,7 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: pensioenleeftijd
         type: number
@@ -65,4 +65,4 @@ articles:
           max: 70
       actions:
       - output: pensioenleeftijd
-        value: $PENSIOENGEGEVENS.pensioenleeftijd
+        value: $pensioengegevens.pensioenleeftijd

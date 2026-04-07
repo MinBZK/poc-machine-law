@@ -21,26 +21,26 @@ articles:
   url: https://wetten.overheid.nl/BWBR0015703/2024-01-01#Artikel11
   machine_readable:
     definitions:
-      JEUGD_TOESLAG:
+      jeugd_toeslag:
         value: 25000
-      JEUGD_MAX_LEEFTIJD:
+      jeugd_max_leeftijd:
         value: 27
-      ZZP_INKOMEN_VRIJLATING_PERCENTAGE:
+      zzp_inkomen_vrijlating_percentage:
         value: 0.2
-      MAANDEN_PER_JAAR:
+      maanden_per_jaar:
         value: 12
-      WOONKOSTENTOESLAG_BEDRAG:
+      woonkostentoeslag_bedrag:
         value: 60000
-      STARTKAPITAAL_MAXIMUM:
+      startkapitaal_maximum:
         value: 200000
-      RE_INTEGRATIE_TOESLAG:
+      re_integratie_toeslag:
         value: 15000
-      GELDIGE_POST_ADRESSEN:
+      geldige_post_adressen:
         value:
         - De Regenboog Groep 1, 1012NX Amsterdam
         - HVO-Querido
         - Leger des Heils Amsterdam
-      VOLLEDIGE_ONTHEFFING_REDENEN:
+      volledige_ontheffing_redenen:
         value:
         - MEDISCH_VOLLEDIG
         - MANTELZORG_VOLLEDIG
@@ -50,19 +50,19 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: VOLDOET_AAN_LANDELIJKE_VOORWAARDEN
+      - name: voldoet_aan_landelijke_voorwaarden
         type: boolean
         source:
           regulation: participatiewet/bijstand
           output: is_gerechtigd
           service: SZW
           parameters:
-            BSN: $BSN
-      - name: LANDELIJK_BASISBEDRAG
+            bsn: $bsn
+      - name: landelijk_basisbedrag
         type: amount
         type_spec:
           unit: eurocent
@@ -73,48 +73,48 @@ articles:
           output: basisbedrag
           service: SZW
           parameters:
-            BSN: $BSN
-      - name: KOSTENDELERSNORM
+            bsn: $bsn
+      - name: kostendelersnorm
         type: number
         source:
           regulation: participatiewet/bijstand
           output: kostendelersnorm
           service: SZW
           parameters:
-            BSN: $BSN
-      - name: LEEFTIJD
+            bsn: $bsn
+      - name: leeftijd
         type: number
         source:
           regulation: wet_brp
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: HEEFT_VAST_ADRES
+            bsn: $bsn
+      - name: heeft_vast_adres
         type: boolean
         source:
           regulation: wet_brp
           output: heeft_vast_adres
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: POSTADRES
+            bsn: $bsn
+      - name: postadres
         type: string
         source:
           regulation: wet_brp
           output: postadres
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: IS_ONDERNEMER
+            bsn: $bsn
+      - name: is_ondernemer
         type: boolean
         source:
           regulation: handelsregisterwet
           output: is_actieve_ondernemer
           service: KVK
           parameters:
-            BSN: $BSN
-      - name: BEDRIJFSINKOMEN
+            bsn: $bsn
+      - name: bedrijfsinkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -125,8 +125,8 @@ articles:
           output: bedrijfsinkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
-      - name: ARBEIDSVERMOGEN
+            bsn: $bsn
+      - name: arbeidsvermogen
         type: object
         source_reference:
           table: werk_en_re_integratie
@@ -139,7 +139,7 @@ articles:
           - name: bsn
             description: BSN van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_gerechtigd
         type: boolean
@@ -163,24 +163,24 @@ articles:
           min: 0
       requirements:
       - all:
-        - subject: $VOLDOET_AAN_LANDELIJKE_VOORWAARDEN
+        - subject: $voldoet_aan_landelijke_voorwaarden
           operation: EQUALS
           value: true
         - or:
-          - subject: $HEEFT_VAST_ADRES
+          - subject: $heeft_vast_adres
             operation: EQUALS
             value: true
           - operation: IN
-            subject: $POSTADRES
-            values: $GELDIGE_POST_ADRESSEN
+            subject: $postadres
+            values: $geldige_post_adressen
         - or:
           - operation: IN
-            subject: $ARBEIDSVERMOGEN.arbeidsvermogen
-            values: $VOLLEDIGE_ONTHEFFING_REDENEN
+            subject: $arbeidsvermogen.arbeidsvermogen
+            values: $volledige_ontheffing_redenen
           - operation: NOT
             value:
               operation: IS_NULL
-              subject: $ARBEIDSVERMOGEN.re_integratie_traject
+              subject: $arbeidsvermogen.re_integratie_traject
       actions:
       - output: is_gerechtigd
         value: true
@@ -190,20 +190,20 @@ articles:
           values:
           - operation: MULTIPLY
             values:
-            - $LANDELIJK_BASISBEDRAG
-            - $KOSTENDELERSNORM
+            - $landelijk_basisbedrag
+            - $kostendelersnorm
           - operation: IF
             cases:
             - when:
                 operation: AND
                 conditions:
                 - operation: LESS_THAN_OR_EQUAL
-                  subject: $LEEFTIJD
-                  value: $JEUGD_MAX_LEEFTIJD
+                  subject: $leeftijd
+                  value: $jeugd_max_leeftijd
                 - operation: EQUALS
-                  subject: $HEEFT_VAST_ADRES
+                  subject: $heeft_vast_adres
                   value: true
-              then: $JEUGD_TOESLAG
+              then: $jeugd_toeslag
             default: 0
           - operation: IF
             cases:
@@ -211,30 +211,30 @@ articles:
                 operation: AND
                 conditions:
                 - operation: EQUALS
-                  subject: $IS_ONDERNEMER
+                  subject: $is_ondernemer
                   value: true
                 - operation: GREATER_THAN
-                  subject: $BEDRIJFSINKOMEN
+                  subject: $bedrijfsinkomen
                   value: 0
                 - operation: LESS_THAN
                   subject:
                     operation: DIVIDE
                     values:
-                    - $BEDRIJFSINKOMEN
-                    - $MAANDEN_PER_JAAR
+                    - $bedrijfsinkomen
+                    - $maanden_per_jaar
                   value:
                     operation: MULTIPLY
                     values:
-                    - $LANDELIJK_BASISBEDRAG
-                    - $KOSTENDELERSNORM
+                    - $landelijk_basisbedrag
+                    - $kostendelersnorm
               then:
                 operation: MULTIPLY
                 values:
                 - operation: DIVIDE
                   values:
-                  - $BEDRIJFSINKOMEN
-                  - $MAANDEN_PER_JAAR
-                - $ZZP_INKOMEN_VRIJLATING_PERCENTAGE
+                  - $bedrijfsinkomen
+                  - $maanden_per_jaar
+                - $zzp_inkomen_vrijlating_percentage
             default: 0
           - operation: IF
             cases: []
@@ -247,12 +247,12 @@ articles:
               operation: AND
               conditions:
               - operation: EQUALS
-                subject: $HEEFT_VAST_ADRES
+                subject: $heeft_vast_adres
                 value: false
               - operation: IN
-                subject: $POSTADRES
-                values: $GELDIGE_POST_ADRESSEN
-            then: $WOONKOSTENTOESLAG_BEDRAG
+                subject: $postadres
+                values: $geldige_post_adressen
+            then: $woonkostentoeslag_bedrag
           default: 0
       - output: startkapitaal
         value:
@@ -262,18 +262,18 @@ articles:
               operation: AND
               conditions:
               - operation: EQUALS
-                subject: $IS_ONDERNEMER
+                subject: $is_ondernemer
                 value: true
               - operation: LESS_THAN
                 subject:
                   operation: DIVIDE
                   values:
-                  - $BEDRIJFSINKOMEN
-                  - $MAANDEN_PER_JAAR
+                  - $bedrijfsinkomen
+                  - $maanden_per_jaar
                 value:
                   operation: MULTIPLY
                   values:
-                  - $LANDELIJK_BASISBEDRAG
-                  - $KOSTENDELERSNORM
-            then: $STARTKAPITAAL_MAXIMUM
+                  - $landelijk_basisbedrag
+                  - $kostendelersnorm
+            then: $startkapitaal_maximum
           default: 0

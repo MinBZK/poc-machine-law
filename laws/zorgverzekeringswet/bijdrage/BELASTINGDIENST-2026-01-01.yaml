@@ -15,22 +15,22 @@ articles:
   url: https://wetten.overheid.nl/BWBR0018450/2026-01-01#Artikel41
   machine_readable:
     definitions:
-      MAXIMUM_BIJDRAGE_INKOMEN:
+      maximum_bijdrage_inkomen:
         value: 7541200
-      PERCENTAGE_HOOG:
+      percentage_hoog:
         value: 0.065
-      PERCENTAGE_LAAG:
+      percentage_laag:
         value: 0.0525
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: AANSLAG
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         type_spec:
           unit: years
@@ -41,22 +41,22 @@ articles:
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: GEBOORTEDATUM
+      - name: geboortedatum
         type: date
         source:
           regulation: wet_brp
           output: geboortedatum
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PENSIOENLEEFTIJD
+      - name: pensioenleeftijd
         type: number
         type_spec:
           unit: years
@@ -67,11 +67,11 @@ articles:
           output: pensioenleeftijd
           service: SVB
           parameters:
-            GEBOORTEDATUM: $GEBOORTEDATUM
+            geboortedatum: $geboortedatum
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: INKOMEN_LOON
+      - name: inkomen_loon
         type: amount
         type_spec:
           unit: eurocent
@@ -82,7 +82,7 @@ articles:
           output: box1_inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -111,15 +111,15 @@ articles:
           min: 0
       requirements:
       - all:
-        - subject: $INKOMEN_LOON
+        - subject: $inkomen_loon
           operation: GREATER_THAN
           value: 0
       actions:
       - output: is_aow_gerechtigd
         value:
           operation: GREATER_THAN_OR_EQUAL
-          subject: $LEEFTIJD
-          value: $PENSIOENLEEFTIJD
+          subject: $leeftijd
+          value: $pensioenleeftijd
         legal_basis:
           law: Zorgverzekeringswet
           bwb_id: BWBR0018450
@@ -146,7 +146,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0018450&artikel=43&z=2024-01-01&g=2024-01-01
           explanation: 'Artikel 43 Zvw: bepaling toepasselijk tarief'
       - output: bijdrage_inkomen
-        value: $INKOMEN_LOON
+        value: $inkomen_loon
         legal_basis:
           law: Zorgverzekeringswet
           bwb_id: BWBR0018450
@@ -159,7 +159,7 @@ articles:
           operation: MIN
           values:
           - $bijdrage_inkomen
-          - $MAXIMUM_BIJDRAGE_INKOMEN
+          - $maximum_bijdrage_inkomen
         legal_basis:
           law: Zorgverzekeringswet
           bwb_id: BWBR0018450
@@ -180,12 +180,12 @@ articles:
               operation: MULTIPLY
               values:
               - $bijdrage_inkomen_begrensd
-              - $PERCENTAGE_HOOG
+              - $percentage_hoog
           default:
             operation: MULTIPLY
             values:
             - $bijdrage_inkomen_begrensd
-            - $PERCENTAGE_LAAG
+            - $percentage_laag
         legal_basis:
           law: Zorgverzekeringswet
           bwb_id: BWBR0018450

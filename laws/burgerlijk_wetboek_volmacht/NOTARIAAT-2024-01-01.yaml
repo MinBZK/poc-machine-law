@@ -16,28 +16,28 @@ articles:
   url: https://wetten.overheid.nl/BWBR0005291/2024-01-01#Artikel60
   machine_readable:
     definitions:
-      ALGEMENE_VOLMACHT_RECHTEN:
+      algemene_volmacht_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
         - BESLUITEN_ONTVANGEN
-      BIJZONDERE_VOLMACHT_RECHTEN:
+      bijzondere_volmacht_rechten:
         value:
         - LEZEN
-      VOLMACHT_TYPEN:
+      volmacht_typen:
         value:
-          ALGEMENE_VOLMACHT: GEVOLMACHTIGDE_ALGEMEEN
-          BIJZONDERE_VOLMACHT: GEVOLMACHTIGDE_BIJZONDER
+          algemene_volmacht: GEVOLMACHTIGDE_ALGEMEEN
+          bijzondere_volmacht: GEVOLMACHTIGDE_BIJZONDER
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: VOLMACHT_REGISTRATIES
+      - name: volmacht_registraties
         type: array
         source_reference:
           table: volmacht_registraties
@@ -53,7 +53,7 @@ articles:
           - name: bsn_gevolmachtigde
             description: BSN nummer van de gevolmachtigde
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_delegaties
         type: boolean
@@ -75,7 +75,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $VOLMACHT_REGISTRATIES
+          subject: $volmacht_registraties
         legal_basis:
           law: Burgerlijk Wetboek Boek 3
           bwb_id: BWBR0005291
@@ -87,7 +87,7 @@ articles:
       - output: actieve_volmachten
         value:
           operation: FOREACH
-          subject: $VOLMACHT_REGISTRATIES
+          subject: $volmacht_registraties
           where:
             operation: AND
             conditions:
@@ -193,8 +193,8 @@ articles:
                 operation: EQUALS
                 subject: $current.volmacht_type
                 value: ALGEMENE_VOLMACHT
-              then: $ALGEMENE_VOLMACHT_RECHTEN
-            default: $BIJZONDERE_VOLMACHT_RECHTEN
+              then: $algemene_volmacht_rechten
+            default: $bijzondere_volmacht_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 3
           bwb_id: BWBR0005291

@@ -509,7 +509,7 @@ async def view_case(
 
     case.events = case_manager.get_events(case.id)
     # Extract KVK number from case parameters if available
-    kvk_nummer = case.parameters.get("KVK_NUMMER") if case.parameters else None
+    kvk_nummer = case.parameters.get("kvk_nummer") if case.parameters else None
     law, result, parameters = evaluate_law(case.bsn, case.law, case.service, machine_service, kvk_nummer=kvk_nummer)
     value_tree = machine_service.extract_value_tree(result.path)
     claims = claim_manager.get_claims_by_bsn(case.bsn, include_rejected=True)

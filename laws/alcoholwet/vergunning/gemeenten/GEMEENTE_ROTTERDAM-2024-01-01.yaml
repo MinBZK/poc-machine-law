@@ -17,100 +17,100 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Artikel3
   machine_readable:
     definitions:
-      BIBOB_ERNSTIG_GEVAAR:
+      bibob_ernstig_gevaar:
         value: ernstig_gevaar
-      BIBOB_BESCHIKKING_TYPE:
+      bibob_beschikking_type:
         value: vergunning
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: KVK_NUMMER
+      - name: kvk_nummer
         type: string
         required: true
       input:
-      - name: LEEFTIJD_EXPLOITANT
+      - name: leeftijd_exploitant
         type: number
         source:
           regulation: wet_brp
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN_LEIDINGGEVENDE
+            bsn: $bsn_leidinggevende
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: IS_ONDER_CURATELE_EXPLOITANT
+      - name: is_onder_curatele_exploitant
         type: boolean
         source:
           regulation: burgerlijk_wetboek_handelingsonbekwaamheid
           output: is_onder_curatele
           service: RECHTSPRAAK
           parameters:
-            BSN: $BSN_LEIDINGGEVENDE
+            bsn: $bsn_leidinggevende
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: BEDRIJF_STATUS
+      - name: bedrijf_status
         type: string
         source:
           regulation: handelsregisterwet/bedrijfsgegevens
           output: status
           service: KVK
           parameters:
-            KVK_NUMMER: $KVK_NUMMER
-      - name: SVH_REGISTRATIE_GELDIG
+            kvk_nummer: $kvk_nummer
+      - name: svh_registratie_geldig
         type: boolean
         source:
           regulation: alcoholwet/register_sociale_hygiene
           output: is_geregistreerd
           service: SVH
           parameters:
-            BSN: $BSN_LEIDINGGEVENDE
-      - name: SVH_REGISTRATIENUMMER
+            bsn: $bsn_leidinggevende
+      - name: svh_registratienummer
         type: string
         source:
           regulation: alcoholwet/register_sociale_hygiene
           output: registratienummer
           service: SVH
           parameters:
-            BSN: $BSN_LEIDINGGEVENDE
-      - name: VOLDOET_AAN_NATIONALE_EISEN
+            bsn: $bsn_leidinggevende
+      - name: voldoet_aan_nationale_eisen
         type: boolean
         source:
           regulation: alcoholwet/vergunning
           output: voldoet_aan_nationale_eisen
           service: VWS
           parameters:
-            LEEFTIJD_LEIDINGGEVENDE: $LEEFTIJD_EXPLOITANT
-            IS_ONDER_CURATELE: $IS_ONDER_CURATELE_EXPLOITANT
-            VLOEROPPERVLAKTE: $VLOEROPPERVLAKTE_HORECALOKALITEIT
-            TYPE_BEDRIJF: $TYPE_BEDRIJF
-      - name: WEIGERINGSGROND_NATIONAAL
+            leeftijd_leidinggevende: $leeftijd_exploitant
+            is_onder_curatele: $is_onder_curatele_exploitant
+            vloeroppervlakte: $vloeroppervlakte_horecalokaliteit
+            type_bedrijf: $type_bedrijf
+      - name: weigeringsgrond_nationaal
         type: string
         source:
           regulation: alcoholwet/vergunning
           output: weigeringsgrond_nationaal
           service: VWS
           parameters:
-            LEEFTIJD_LEIDINGGEVENDE: $LEEFTIJD_EXPLOITANT
-            IS_ONDER_CURATELE: $IS_ONDER_CURATELE_EXPLOITANT
-            VLOEROPPERVLAKTE: $VLOEROPPERVLAKTE_HORECALOKALITEIT
-            TYPE_BEDRIJF: $TYPE_BEDRIJF
-      - name: BIBOB_MATE_VAN_GEVAAR
+            leeftijd_leidinggevende: $leeftijd_exploitant
+            is_onder_curatele: $is_onder_curatele_exploitant
+            vloeroppervlakte: $vloeroppervlakte_horecalokaliteit
+            type_bedrijf: $type_bedrijf
+      - name: bibob_mate_van_gevaar
         type: string
         source:
           regulation: wet_bibob
           output: mate_van_gevaar
           service: LBB
           parameters:
-            KVK_NUMMER: $KVK_NUMMER
-            BESCHIKKING_TYPE: $BIBOB_BESCHIKKING_TYPE
+            kvk_nummer: $kvk_nummer
+            beschikking_type: $bibob_beschikking_type
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: BSN_LEIDINGGEVENDE
+      - name: bsn_leidinggevende
         type: string
         source_reference:
           table: leidinggevenden
@@ -119,8 +119,8 @@ articles:
           - name: kvk_nummer
             description: KVK-nummer van de onderneming
             type: string
-            value: $KVK_NUMMER
-      - name: VLOEROPPERVLAKTE_HORECALOKALITEIT
+            value: $kvk_nummer
+      - name: vloeroppervlakte_horecalokaliteit
         type: number
         source_reference:
           table: inrichtingen
@@ -129,8 +129,8 @@ articles:
           - name: kvk_nummer
             description: KVK-nummer van de onderneming
             type: string
-            value: $KVK_NUMMER
-      - name: TYPE_BEDRIJF
+            value: $kvk_nummer
+      - name: type_bedrijf
         type: string
         source_reference:
           table: inrichtingen
@@ -139,8 +139,8 @@ articles:
           - name: kvk_nummer
             description: KVK-nummer van de onderneming
             type: string
-            value: $KVK_NUMMER
-      - name: HEEFT_ACTIEVE_ALCOHOLWETVERGUNNING
+            value: $kvk_nummer
+      - name: heeft_actieve_alcoholwetvergunning
         type: boolean
         source_reference:
           table: vergunningen
@@ -149,7 +149,7 @@ articles:
           - name: kvk_nummer
             description: KVK-nummer van de onderneming
             type: string
-            value: $KVK_NUMMER
+            value: $kvk_nummer
       output:
       - name: heeft_recht_op_vergunning
         type: boolean
@@ -159,7 +159,7 @@ articles:
         type: string
       requirements:
       - all:
-        - subject: $BEDRIJF_STATUS
+        - subject: $bedrijf_status
           operation: EQUALS
           value: Actief
           legal_basis:
@@ -168,7 +168,7 @@ articles:
             article: '2'
             url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Artikel2
             explanation: De onderneming moet actief geregistreerd zijn
-        - subject: $SVH_REGISTRATIE_GELDIG
+        - subject: $svh_registratie_geldig
           operation: EQUALS
           value: true
           legal_basis:
@@ -178,7 +178,7 @@ articles:
             paragraph: '4'
             url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8
             explanation: Leidinggevenden moeten ingeschreven staan in het Register Sociale Hygiëne
-        - subject: $VOLDOET_AAN_NATIONALE_EISEN
+        - subject: $voldoet_aan_nationale_eisen
           operation: EQUALS
           value: true
           legal_basis:
@@ -189,13 +189,13 @@ articles:
             url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27
             explanation: Moet voldoen aan alle nationale eisen uit artikel 8 en 10
         - or:
-          - subject: $BIBOB_MATE_VAN_GEVAAR
+          - subject: $bibob_mate_van_gevaar
             operation: IS_NULL
           - operation: NOT
             value:
               operation: EQUALS
-              subject: $BIBOB_MATE_VAN_GEVAAR
-              value: $BIBOB_ERNSTIG_GEVAAR
+              subject: $bibob_mate_van_gevaar
+              value: $bibob_ernstig_gevaar
           legal_basis:
             law: Wet bevordering integriteitsbeoordelingen door het openbaar bestuur
             bwb_id: BWBR0013798
@@ -212,7 +212,7 @@ articles:
           url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27
           explanation: Geen weigeringsgrond is van toepassing, dus de vergunning wordt verleend
       - output: heeft_actieve_vergunning
-        value: $HEEFT_ACTIEVE_ALCOHOLWETVERGUNNING
+        value: $heeft_actieve_alcoholwetvergunning
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458
@@ -227,18 +227,18 @@ articles:
               operation: NOT
               value:
                 operation: EQUALS
-                subject: $BEDRIJF_STATUS
+                subject: $bedrijf_status
                 value: Actief
             then: Onderneming is niet actief in het handelsregister
           - when:
               operation: EQUALS
-              subject: $VOLDOET_AAN_NATIONALE_EISEN
+              subject: $voldoet_aan_nationale_eisen
               value: false
-            then: $WEIGERINGSGROND_NATIONAAL
+            then: $weigeringsgrond_nationaal
           - when:
               operation: EQUALS
-              subject: $BIBOB_MATE_VAN_GEVAAR
-              value: $BIBOB_ERNSTIG_GEVAAR
+              subject: $bibob_mate_van_gevaar
+              value: $bibob_ernstig_gevaar
             then: Ernstig gevaar volgens Bibob-advies
           default: ''
         legal_basis:

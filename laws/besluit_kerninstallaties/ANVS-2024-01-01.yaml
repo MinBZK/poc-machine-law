@@ -69,9 +69,9 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002667/2024-01-01#Artikel1
   machine_readable:
     definitions:
-      MINIMAAL_FINANCIELE_ZEKERHEID:
+      minimaal_financiele_zekerheid:
         value: 100000000
-      MINIMUM_AANTAL_DESKUNDIGEN:
+      minimum_aantal_deskundigen:
         value: 1
     execution:
       produces:
@@ -122,7 +122,7 @@ articles:
           - when:
               operation: GREATER_THAN_OR_EQUAL
               subject: $financiele_zekerheid_bedrag
-              value: $MINIMAAL_FINANCIELE_ZEKERHEID
+              value: $minimaal_financiele_zekerheid
             then: true
           default: false
         legal_basis:
@@ -156,7 +156,7 @@ articles:
           - when:
               operation: GREATER_THAN_OR_EQUAL
               subject: $aantal_deskundigen
-              value: $MINIMUM_AANTAL_DESKUNDIGEN
+              value: $minimum_aantal_deskundigen
             then: true
           default: false
         legal_basis:

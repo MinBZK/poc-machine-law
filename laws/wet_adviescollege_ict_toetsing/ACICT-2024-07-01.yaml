@@ -25,18 +25,18 @@ articles:
   url: https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1
   machine_readable:
     definitions:
-      KOSTEN_DREMPEL:
+      kosten_drempel:
         value: 500000000
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: PROJECT_ID
+      - name: project_id
         type: string
         required: true
       input:
-      - name: PROJECT_KOSTEN
+      - name: project_kosten
         type: number
         source_reference:
           source_type: ACICT
@@ -46,8 +46,8 @@ articles:
           - name: project_id
             description: Project identificatie
             type: string
-            value: $PROJECT_ID
-      - name: ORGANISATIE_TYPE
+            value: $project_id
+      - name: organisatie_type
         type: string
         source_reference:
           source_type: ACICT
@@ -57,8 +57,8 @@ articles:
           - name: project_id
             description: Project identificatie
             type: string
-            value: $PROJECT_ID
-      - name: PROJECT_TYPE
+            value: $project_id
+      - name: project_type
         type: string
         source_reference:
           source_type: ACICT
@@ -68,7 +68,7 @@ articles:
           - name: project_id
             description: Project identificatie
             type: string
-            value: $PROJECT_ID
+            value: $project_id
       output:
       - name: adviesplicht
         type: boolean
@@ -84,10 +84,10 @@ articles:
           operation: AND
           conditions:
           - operation: GREATER_THAN_OR_EQUAL
-            subject: $PROJECT_KOSTEN
-            value: $KOSTEN_DREMPEL
+            subject: $project_kosten
+            value: $kosten_drempel
           - operation: IN
-            subject: $ORGANISATIE_TYPE
+            subject: $organisatie_type
             values:
             - MINISTERIE
             - ZBO
@@ -96,7 +96,7 @@ articles:
           - operation: NOT
             value:
               operation: EQUALS
-              subject: $PROJECT_TYPE
+              subject: $project_type
               value: WAPENSYSTEEM
         legal_basis:
           law: Wet Adviescollege ICT-toetsing
@@ -106,7 +106,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0049412&artikel=7&z=2024-07-01&g=2024-07-01
           explanation: De adviesplicht wordt bepaald door de cumulatieve voorwaarden uit artikel 1, 7 en 14
       - output: project_kosten
-        value: $PROJECT_KOSTEN
+        value: $project_kosten
         legal_basis:
           law: Wet Adviescollege ICT-toetsing
           bwb_id: BWBR0049412

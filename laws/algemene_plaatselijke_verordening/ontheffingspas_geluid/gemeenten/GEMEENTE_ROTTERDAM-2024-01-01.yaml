@@ -17,34 +17,34 @@ articles:
   url: https://lokaleregelgeving.overheid.nl/CVDR373493#artikel_4:2
   machine_readable:
     definitions:
-      MAX_ONTHEFFINGEN_PER_JAAR:
+      max_ontheffingen_per_jaar:
         value: 12
-      MIN_AANVRAAGTERMIJN_UREN:
+      min_aanvraagtermijn_uren:
         value: 48
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: KVK_NUMMER
+      - name: kvk_nummer
         type: string
         required: true
-      - name: ACTIVITEITSDATUM
+      - name: activiteitsdatum
         type: date
         required: true
-      - name: ACTIVITEITSSTARTTIJD
+      - name: activiteitsstarttijd
         type: time
         required: true
       input:
-      - name: KVK_STATUS
+      - name: kvk_status
         type: string
         source:
           regulation: handelsregisterwet/bedrijfsgegevens
           output: status
           service: KVK
           parameters:
-            KVK_NUMMER: $KVK_NUMMER
-      - name: VERLEENDE_ONTHEFFINGEN_DIT_JAAR
+            kvk_nummer: $kvk_nummer
+      - name: verleende_ontheffingen_dit_jaar
         type: array
         source_reference:
           source_type: cases
@@ -61,15 +61,15 @@ articles:
             description: Alleen goedgekeurde zaken
             type: boolean
             value: true
-          - name: KVK_NUMMER
+          - name: kvk_nummer
             description: KVK nummer van het horecabedrijf
             type: string
-            value: $KVK_NUMMER
+            value: $kvk_nummer
           - name: year
             description: Kalenderjaar
             type: number
             value: $year
-      - name: HEEFT_GELUIDSKLACHTEN
+      - name: heeft_geluidsklachten
         type: boolean
         source_reference:
           source_type: GEMEENTE_ROTTERDAM
@@ -79,7 +79,7 @@ articles:
           - name: kvk_nummer
             description: KVK nummer van het horecabedrijf
             type: string
-            value: $KVK_NUMMER
+            value: $kvk_nummer
       output:
       - name: komt_in_aanmerking_voor_geluidsontheffing
         type: boolean
@@ -98,7 +98,7 @@ articles:
       requirements:
       - all:
         - operation: EQUALS
-          subject: $KVK_STATUS
+          subject: $kvk_status
           value: Actief
           legal_basis:
             law: Algemene plaatselijke verordening Rotterdam 2012
@@ -106,7 +106,7 @@ articles:
             url: https://lokaleregelgeving.overheid.nl/CVDR373493
             explanation: Het bedrijf moet actief zijn in het Handelsregister
         - operation: EQUALS
-          subject: $HEEFT_GELUIDSKLACHTEN
+          subject: $heeft_geluidsklachten
           value: false
           legal_basis:
             law: Algemene plaatselijke verordening Rotterdam 2012
@@ -116,8 +116,8 @@ articles:
         - operation: LESS_THAN
           subject:
             operation: LENGTH
-            subject: $VERLEENDE_ONTHEFFINGEN_DIT_JAAR
-          value: $MAX_ONTHEFFINGEN_PER_JAAR
+            subject: $verleende_ontheffingen_dit_jaar
+          value: $max_ontheffingen_per_jaar
           legal_basis:
             law: Algemene plaatselijke verordening Rotterdam 2012
             article: '4:2'
@@ -128,11 +128,11 @@ articles:
             operation: SUBTRACT_DATE
             values:
             - operation: COMBINE_DATETIME
-              date: $ACTIVITEITSDATUM
-              time: $ACTIVITEITSSTARTTIJD
+              date: $activiteitsdatum
+              time: $activiteitsstarttijd
             - $calculation_date
             unit: hours
-          value: $MIN_AANVRAAGTERMIJN_UREN
+          value: $min_aanvraagtermijn_uren
           legal_basis:
             law: Algemene plaatselijke verordening Rotterdam 2012
             article: '4:2'
@@ -142,7 +142,7 @@ articles:
       - output: aantal_verleende_ontheffingen_dit_jaar
         value:
           operation: LENGTH
-          subject: $VERLEENDE_ONTHEFFINGEN_DIT_JAAR
+          subject: $verleende_ontheffingen_dit_jaar
         legal_basis:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: '4:2'
@@ -152,9 +152,9 @@ articles:
         value:
           operation: SUBTRACT
           values:
-          - $MAX_ONTHEFFINGEN_PER_JAAR
+          - $max_ontheffingen_per_jaar
           - operation: LENGTH
-            subject: $VERLEENDE_ONTHEFFINGEN_DIT_JAAR
+            subject: $verleende_ontheffingen_dit_jaar
         legal_basis:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: '4:2'
@@ -167,11 +167,11 @@ articles:
             operation: SUBTRACT_DATE
             values:
             - operation: COMBINE_DATETIME
-              date: $ACTIVITEITSDATUM
-              time: $ACTIVITEITSSTARTTIJD
+              date: $activiteitsdatum
+              time: $activiteitsstarttijd
             - $calculation_date
             unit: hours
-          value: $MIN_AANVRAAGTERMIJN_UREN
+          value: $min_aanvraagtermijn_uren
         legal_basis:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: '4:2'
@@ -180,7 +180,7 @@ articles:
       - output: geen_geluidsklachten
         value:
           operation: EQUALS
-          subject: $HEEFT_GELUIDSKLACHTEN
+          subject: $heeft_geluidsklachten
           value: false
         legal_basis:
           law: Algemene plaatselijke verordening Rotterdam 2012
@@ -190,7 +190,7 @@ articles:
       - output: bedrijf_actief
         value:
           operation: EQUALS
-          subject: $KVK_STATUS
+          subject: $kvk_status
           value: Actief
         legal_basis:
           law: Algemene plaatselijke verordening Rotterdam 2012
@@ -205,7 +205,7 @@ articles:
               operation: IN
               subject:
                 operation: DAY_OF_WEEK
-                date: $ACTIVITEITSDATUM
+                date: $activiteitsdatum
               values:
               - 4
               - 5

@@ -15,12 +15,12 @@ articles:
   url: https://wetten.overheid.nl/BWBR0040635/2022-01-01#Artikel1.1
   machine_readable:
     definitions:
-      FORENSISCHE_ZORGTYPEN:
+      forensische_zorgtypen:
         value:
         - GGZ
         - VERSLAVINGSZORG
         - VG_ZORG
-      GELDIGE_JURIDISCHE_TITELS:
+      geldige_juridische_titels:
         value:
         - VOORWAARDELIJKE_VEROORDELING
         - TBS
@@ -35,11 +35,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: ZORGTYPE
+      - name: zorgtype
         type: string
         source_reference:
           table: forensische_zorg
@@ -48,8 +48,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: JURIDISCHE_GRONDSLAG
+            value: $bsn
+      - name: juridische_grondslag
         type: string
         source_reference:
           table: forensische_zorg
@@ -58,7 +58,7 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_forensisch
         type: boolean
@@ -68,11 +68,11 @@ articles:
           operation: AND
           conditions:
           - operation: IN
-            subject: $ZORGTYPE
-            values: $FORENSISCHE_ZORGTYPEN
+            subject: $zorgtype
+            values: $forensische_zorgtypen
           - operation: IN
-            subject: $JURIDISCHE_GRONDSLAG
-            values: $GELDIGE_JURIDISCHE_TITELS
+            subject: $juridische_grondslag
+            values: $geldige_juridische_titels
         legal_basis:
           law: Wet forensische zorg
           bwb_id: BWBR0040635

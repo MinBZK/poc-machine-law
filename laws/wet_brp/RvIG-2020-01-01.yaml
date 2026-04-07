@@ -16,33 +16,33 @@ articles:
   url: https://wetten.overheid.nl/BWBR0033715/2020-01-01#Artikel1.1
   machine_readable:
     definitions:
-      NEDERLANDSE_NATIONALITEITEN:
+      nederlandse_nationaliteiten:
         value:
         - NEDERLANDS
-      ADDRESS_MATCH_DISTANCE_M:
+      address_match_distance_m:
         value: 100
-      GELDIGE_PARTNERTYPEN:
+      geldige_partnertypen:
         value:
         - HUWELIJK
         - GEREGISTREERD_PARTNERSCHAP
-      VASTE_ADRES_TYPEN:
+      vaste_adres_typen:
         value:
         - WOONADRES
-      POST_ADRES_TYPEN:
+      post_adres_typen:
         value:
         - BRIEFADRES
-      KIND_MAX_LEEFTIJD_COMBINATIEKORTING:
+      kind_max_leeftijd_combinatiekorting:
         value: 12
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: GEBOORTEDATUM
+      - name: geboortedatum
         type: date
         source_reference:
           table: personen
@@ -51,8 +51,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: PARTNER_GEBOORTEDATUM
+            value: $bsn
+      - name: partner_geboortedatum
         type: date
         source_reference:
           table: personen
@@ -61,8 +61,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNERTYPE
+            value: $partner_bsn
+      - name: partnertype
         type: object
         source_reference:
           table: relaties
@@ -71,8 +71,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: PARTNER_BSN
+            value: $bsn
+      - name: partner_bsn
         type: string
         source_reference:
           table: relaties
@@ -81,8 +81,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: KINDEREN_GEGEVENS
+            value: $bsn
+      - name: kinderen_gegevens
         type: array
         source_reference:
           table: relaties
@@ -91,8 +91,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: VERBLIJFSADRES
+            value: $bsn
+      - name: verblijfsadres
         type: object
         source_reference:
           table: personen
@@ -101,8 +101,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: OUDER_ADRESSEN
+            value: $bsn
+      - name: ouder_adressen
         type: array
         source_reference:
           table: relaties
@@ -111,8 +111,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: LAND_VAN_VERBLIJF
+            value: $bsn
+      - name: land_van_verblijf
         type: string
         source_reference:
           table: personen
@@ -121,8 +121,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: NATIONALITEIT
+            value: $bsn
+      - name: nationaliteit
         type: string
         source_reference:
           table: personen
@@ -131,8 +131,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: ADRES
+            value: $bsn
+      - name: adres
         type: object
         source_reference:
           table: verblijfplaats
@@ -146,19 +146,19 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: HUISHOUDEN
+            value: $bsn
+      - name: huishouden
         type: array
         source_reference:
           table: bewoners
           field: medebewoners
           select_on:
           - name: postcode
-            value: $ADRES.postcode
+            value: $adres.postcode
             description: Postcode van het adres van de persoon
             type: string
           - name: huisnummer
-            value: $ADRES.huisnummer
+            value: $adres.huisnummer
             description: Huisnummer van het adres van de persoon
             type: string
       output:
@@ -210,26 +210,26 @@ articles:
         - operation: NOT
           value:
             operation: IS_NULL
-            subject: $GEBOORTEDATUM
+            subject: $geboortedatum
       actions:
       - output: geboortedatum
-        value: $GEBOORTEDATUM
+        value: $geboortedatum
       - output: partner_geboortedatum
-        value: $PARTNER_GEBOORTEDATUM
+        value: $partner_geboortedatum
       - output: partner_bsn
         value:
           operation: IF
           cases:
           - when:
               operation: IN
-              subject: $PARTNERTYPE
-              values: $GELDIGE_PARTNERTYPEN
-            then: $PARTNER_BSN
+              subject: $partnertype
+              values: $geldige_partnertypen
+            then: $partner_bsn
       - output: leeftijd
         value:
           operation: AGE
           reference_date: $calculation_date
-          date_of_birth: $GEBOORTEDATUM
+          date_of_birth: $geboortedatum
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -240,7 +240,7 @@ articles:
       - output: kinderen_bsns
         value:
           operation: FOREACH
-          subject: $KINDEREN_GEGEVENS
+          subject: $kinderen_gegevens
           value: $bsn
         legal_basis:
           law: Wet basisregistratie personen
@@ -252,8 +252,8 @@ articles:
       - output: heeft_partner
         value:
           operation: IN
-          subject: $PARTNERTYPE
-          values: $GELDIGE_PARTNERTYPEN
+          subject: $partnertype
+          values: $geldige_partnertypen
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -267,8 +267,8 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $VERBLIJFSADRES
-              value: $OUDER_ADRESSEN
+              subject: $verblijfsadres
+              value: $ouder_adressen
             then: THUIS
           default: UIT
         legal_basis:
@@ -279,7 +279,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0033715&artikel=2.4&z=2024-01-01&g=2024-01-01
           explanation: Artikel 2.4 Wet BRP bepaalt meldingsplicht bij adreswijziging en woonsituatie
       - output: land_van_verblijf
-        value: $LAND_VAN_VERBLIJF
+        value: $land_van_verblijf
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -290,8 +290,8 @@ articles:
       - output: heeft_nederlandse_nationaliteit
         value:
           operation: IN
-          subject: $NATIONALITEIT
-          values: $NEDERLANDSE_NATIONALITEITEN
+          subject: $nationaliteit
+          values: $nederlandse_nationaliteiten
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -303,7 +303,7 @@ articles:
       - output: woont_in_nederland
         value:
           operation: EQUALS
-          subject: $LAND_VAN_VERBLIJF
+          subject: $land_van_verblijf
           value: NEDERLAND
         legal_basis:
           law: Wet basisregistratie personen
@@ -315,8 +315,8 @@ articles:
       - output: heeft_vast_adres
         value:
           operation: IN
-          subject: $ADRES.type
-          values: $VASTE_ADRES_TYPEN
+          subject: $adres.type
+          values: $vaste_adres_typen
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -332,17 +332,17 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $ADRES
+                subject: $adres
             then:
               operation: CONCAT
               values:
-              - $ADRES.straat
+              - $adres.straat
               - ' '
-              - $ADRES.huisnummer
+              - $adres.huisnummer
               - ', '
-              - $ADRES.postcode
+              - $adres.postcode
               - ' '
-              - $ADRES.woonplaats
+              - $adres.woonplaats
       - output: huishoudgrootte
         value:
           operation: IF
@@ -351,13 +351,13 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $HUISHOUDEN
+                subject: $huishouden
             then:
               operation: ADD
               values:
               - 1
               - operation: FOREACH
-                subject: $HUISHOUDEN
+                subject: $huishouden
                 value: 1
                 combine: ADD
           default: 1
@@ -367,20 +367,20 @@ articles:
           cases:
           - when:
               operation: IN
-              subject: $ADRES.type
-              values: $POST_ADRES_TYPEN
+              subject: $adres.type
+              values: $post_adres_typen
             then:
               operation: CONCAT
               values:
-              - $ADRES.straat
+              - $adres.straat
               - ' '
-              - $ADRES.huisnummer
+              - $adres.huisnummer
               - ', '
-              - $ADRES.postcode
+              - $adres.postcode
               - ' '
-              - $ADRES.woonplaats
+              - $adres.woonplaats
       - output: woonplaats
-        value: $ADRES.woonplaats
+        value: $adres.woonplaats
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -396,8 +396,8 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $HUISHOUDEN
-            then: $HUISHOUDEN
+                subject: $huishouden
+            then: $huishouden
           default:
             value: null
         legal_basis:
@@ -415,8 +415,8 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $KINDEREN_GEGEVENS
-            then: $KINDEREN_GEGEVENS
+                subject: $kinderen_gegevens
+            then: $kinderen_gegevens
           default:
             value: null
         legal_basis:
@@ -434,12 +434,12 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $KINDEREN_GEGEVENS
+                subject: $kinderen_gegevens
             then:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $KINDEREN_GEGEVENS
+                subject: $kinderen_gegevens
           default: false
         legal_basis:
           law: Wet basisregistratie personen

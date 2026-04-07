@@ -23,35 +23,35 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Artikel8
   machine_readable:
     definitions:
-      MINIMALE_LEEFTIJD:
+      minimale_leeftijd:
         value: 21
-      MINIMALE_VLOEROPPERVLAKTE_HORECA:
+      minimale_vloeroppervlakte_horeca:
         value: 35
-      MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ:
+      minimale_vloeroppervlakte_slijterij:
         value: 15
-      TYPE_HORECABEDRIJF:
+      type_horecabedrijf:
         value: horecabedrijf
-      TYPE_SLIJTERSBEDRIJF:
+      type_slijtersbedrijf:
         value: slijtersbedrijf
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: LEEFTIJD_LEIDINGGEVENDE
+      - name: leeftijd_leidinggevende
         type: number
         required: true
-      - name: IS_ONDER_CURATELE
+      - name: is_onder_curatele
         type: boolean
         required: true
-      - name: IS_VAN_SLECHT_LEVENSGEDRAG
+      - name: is_van_slecht_levensgedrag
         type: boolean
-      - name: IS_INGESCHREVEN_SVH_REGISTER
+      - name: is_ingeschreven_svh_register
         type: boolean
-      - name: VLOEROPPERVLAKTE
+      - name: vloeroppervlakte
         type: number
         required: true
-      - name: TYPE_BEDRIJF
+      - name: type_bedrijf
         type: string
         required: true
       output:
@@ -74,8 +74,8 @@ articles:
       requirements:
       - all:
         - operation: GREATER_THAN_OR_EQUAL
-          subject: $LEEFTIJD_LEIDINGGEVENDE
-          value: $MINIMALE_LEEFTIJD
+          subject: $leeftijd_leidinggevende
+          value: $minimale_leeftijd
           legal_basis:
             law: Alcoholwet
             bwb_id: BWBR0002458
@@ -83,7 +83,7 @@ articles:
             paragraph: '1'
             url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8
             explanation: 'Artikel 8 lid 1 onder a: leidinggevenden moeten de leeftijd van eenentwintig jaar hebben bereikt'
-        - subject: $IS_ONDER_CURATELE
+        - subject: $is_onder_curatele
           operation: EQUALS
           value: false
           legal_basis:
@@ -97,11 +97,11 @@ articles:
           - operation: NOT
             value:
               operation: EQUALS
-              subject: $TYPE_BEDRIJF
-              value: $TYPE_HORECABEDRIJF
+              subject: $type_bedrijf
+              value: $type_horecabedrijf
           - operation: GREATER_THAN_OR_EQUAL
-            subject: $VLOEROPPERVLAKTE
-            value: $MINIMALE_VLOEROPPERVLAKTE_HORECA
+            subject: $vloeroppervlakte
+            value: $minimale_vloeroppervlakte_horeca
           legal_basis:
             law: Alcoholwet
             bwb_id: BWBR0002458
@@ -113,11 +113,11 @@ articles:
           - operation: NOT
             value:
               operation: EQUALS
-              subject: $TYPE_BEDRIJF
-              value: $TYPE_SLIJTERSBEDRIJF
+              subject: $type_bedrijf
+              value: $type_slijtersbedrijf
           - operation: GREATER_THAN_OR_EQUAL
-            subject: $VLOEROPPERVLAKTE
-            value: $MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ
+            subject: $vloeroppervlakte
+            value: $minimale_vloeroppervlakte_slijterij
           legal_basis:
             law: Alcoholwet
             bwb_id: BWBR0002458
@@ -129,8 +129,8 @@ articles:
       - output: voldoet_aan_leeftijdseis
         value:
           operation: GREATER_THAN_OR_EQUAL
-          subject: $LEEFTIJD_LEIDINGGEVENDE
-          value: $MINIMALE_LEEFTIJD
+          subject: $leeftijd_leidinggevende
+          value: $minimale_leeftijd
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458
@@ -141,7 +141,7 @@ articles:
       - output: voldoet_aan_curatele_eis
         value:
           operation: EQUALS
-          subject: $IS_ONDER_CURATELE
+          subject: $is_onder_curatele
           value: false
         legal_basis:
           law: Alcoholwet
@@ -156,11 +156,11 @@ articles:
           cases:
           - when:
               operation: IS_NULL
-              subject: $IS_VAN_SLECHT_LEVENSGEDRAG
+              subject: $is_van_slecht_levensgedrag
             then: true
           - when:
               operation: EQUALS
-              subject: $IS_VAN_SLECHT_LEVENSGEDRAG
+              subject: $is_van_slecht_levensgedrag
               value: false
             then: true
           default: false
@@ -177,11 +177,11 @@ articles:
           cases:
           - when:
               operation: IS_NULL
-              subject: $IS_INGESCHREVEN_SVH_REGISTER
+              subject: $is_ingeschreven_svh_register
             then: true
           - when:
               operation: EQUALS
-              subject: $IS_INGESCHREVEN_SVH_REGISTER
+              subject: $is_ingeschreven_svh_register
               value: true
             then: true
           default: false
@@ -200,21 +200,21 @@ articles:
               operation: AND
               conditions:
               - operation: EQUALS
-                subject: $TYPE_BEDRIJF
-                value: $TYPE_HORECABEDRIJF
+                subject: $type_bedrijf
+                value: $type_horecabedrijf
               - operation: GREATER_THAN_OR_EQUAL
-                subject: $VLOEROPPERVLAKTE
-                value: $MINIMALE_VLOEROPPERVLAKTE_HORECA
+                subject: $vloeroppervlakte
+                value: $minimale_vloeroppervlakte_horeca
             then: true
           - when:
               operation: AND
               conditions:
               - operation: EQUALS
-                subject: $TYPE_BEDRIJF
-                value: $TYPE_SLIJTERSBEDRIJF
+                subject: $type_bedrijf
+                value: $type_slijtersbedrijf
               - operation: GREATER_THAN_OR_EQUAL
-                subject: $VLOEROPPERVLAKTE
-                value: $MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ
+                subject: $vloeroppervlakte
+                value: $minimale_vloeroppervlakte_slijterij
             then: true
           - when:
               operation: AND
@@ -222,13 +222,13 @@ articles:
               - operation: NOT
                 value:
                   operation: EQUALS
-                  subject: $TYPE_BEDRIJF
-                  value: $TYPE_HORECABEDRIJF
+                  subject: $type_bedrijf
+                  value: $type_horecabedrijf
               - operation: NOT
                 value:
                   operation: EQUALS
-                  subject: $TYPE_BEDRIJF
-                  value: $TYPE_SLIJTERSBEDRIJF
+                  subject: $type_bedrijf
+                  value: $type_slijtersbedrijf
             then: true
           default: false
         legal_basis:
@@ -243,10 +243,10 @@ articles:
           operation: AND
           conditions:
           - operation: GREATER_THAN_OR_EQUAL
-            subject: $LEEFTIJD_LEIDINGGEVENDE
-            value: $MINIMALE_LEEFTIJD
+            subject: $leeftijd_leidinggevende
+            value: $minimale_leeftijd
           - operation: EQUALS
-            subject: $IS_ONDER_CURATELE
+            subject: $is_onder_curatele
             value: false
         legal_basis:
           law: Alcoholwet
@@ -270,33 +270,33 @@ articles:
           cases:
           - when:
               operation: LESS_THAN
-              subject: $LEEFTIJD_LEIDINGGEVENDE
-              value: $MINIMALE_LEEFTIJD
+              subject: $leeftijd_leidinggevende
+              value: $minimale_leeftijd
             then: Leidinggevende heeft de leeftijd van 21 jaar niet bereikt (artikel 8 lid 1 onder a)
           - when:
               operation: EQUALS
-              subject: $IS_ONDER_CURATELE
+              subject: $is_onder_curatele
               value: true
             then: Leidinggevende staat onder curatele (artikel 8 lid 1 onder c)
           - when:
               operation: AND
               conditions:
               - operation: EQUALS
-                subject: $TYPE_BEDRIJF
-                value: $TYPE_HORECABEDRIJF
+                subject: $type_bedrijf
+                value: $type_horecabedrijf
               - operation: LESS_THAN
-                subject: $VLOEROPPERVLAKTE
-                value: $MINIMALE_VLOEROPPERVLAKTE_HORECA
+                subject: $vloeroppervlakte
+                value: $minimale_vloeroppervlakte_horeca
             then: Horecalokaliteit heeft minder dan 35 m² vloeroppervlakte (artikel 10 lid 2)
           - when:
               operation: AND
               conditions:
               - operation: EQUALS
-                subject: $TYPE_BEDRIJF
-                value: $TYPE_SLIJTERSBEDRIJF
+                subject: $type_bedrijf
+                value: $type_slijtersbedrijf
               - operation: LESS_THAN
-                subject: $VLOEROPPERVLAKTE
-                value: $MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ
+                subject: $vloeroppervlakte
+                value: $minimale_vloeroppervlakte_slijterij
             then: Slijtlokaliteit heeft minder dan 15 m² vloeroppervlakte (artikel 10 lid 2)
           default: ''
         legal_basis:

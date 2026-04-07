@@ -16,30 +16,30 @@ articles:
   url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Artikel5.15d
   machine_readable:
     definitions:
-      DREMPEL_ELEKTRICITEIT_KWH:
+      drempel_elektriciteit_kwh:
         value: 50000
-      DREMPEL_GAS_M3:
+      drempel_gas_m3:
         value: 25000
-      DREMPEL_ONDERZOEK_ELEKTRICITEIT_KWH:
+      drempel_onderzoek_elektriciteit_kwh:
         value: 10000000
-      DREMPEL_ONDERZOEK_GAS_M3:
+      drempel_onderzoek_gas_m3:
         value: 170000
-      RAPPORTAGE_FREQUENTIE_JAREN:
+      rapportage_frequentie_jaren:
         value: 4
-      VOLGENDE_DEADLINE:
+      volgende_deadline:
         value: '2027-12-01'
-      RAPPORTAGE_METHODE:
+      rapportage_methode:
         value: RVO eLoket (mijn.rvo.nl) met eHerkenning niveau 2+
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: KVK_NUMMER
+      - name: kvk_nummer
         type: string
         required: true
       input:
-      - name: BAG_GEBRUIKSDOEL
+      - name: bag_gebruiksdoel
         type: string
         source:
           regulation: wet_bag
@@ -48,7 +48,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: ADRES
+      - name: adres
         type: string
         source:
           regulation: handelsregisterwet/bedrijfsgegevens
@@ -57,7 +57,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: JAARLIJKS_ELEKTRICITEITSVERBRUIK_KWH
+      - name: jaarlijks_elektriciteitsverbruik_kwh
         type: number
         source_reference:
           source_type: RVO
@@ -67,8 +67,8 @@ articles:
           - name: kvk_nummer
             description: KvK-nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
-      - name: JAARLIJKS_GASVERBRUIK_M3
+            value: $kvk_nummer
+      - name: jaarlijks_gasverbruik_m3
         type: number
         source_reference:
           source_type: RVO
@@ -78,8 +78,8 @@ articles:
           - name: kvk_nummer
             description: KvK-nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
-      - name: IS_WOONFUNCTIE
+            value: $kvk_nummer
+      - name: is_woonfunctie
         type: boolean
         source_reference:
           source_type: RVO
@@ -89,7 +89,7 @@ articles:
           - name: kvk_nummer
             description: KvK-nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
+            value: $kvk_nummer
       output:
       - name: heeft_energiebesparingsplicht
         type: boolean
@@ -107,7 +107,7 @@ articles:
         type: string
       requirements:
       - all:
-        - subject: $IS_WOONFUNCTIE
+        - subject: $is_woonfunctie
           operation: EQUALS
           value: false
           legal_basis:
@@ -119,9 +119,9 @@ articles:
             juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01
             explanation: Gebouwen met uitsluitend een woonfunctie zijn uitgezonderd van de energiebesparingsplicht
         - or:
-          - subject: $JAARLIJKS_ELEKTRICITEITSVERBRUIK_KWH
+          - subject: $jaarlijks_elektriciteitsverbruik_kwh
             operation: GREATER_THAN_OR_EQUAL
-            value: $DREMPEL_ELEKTRICITEIT_KWH
+            value: $drempel_elektriciteit_kwh
             legal_basis:
               law: Besluit activiteiten leefomgeving
               bwb_id: BWBR0041330
@@ -130,9 +130,9 @@ articles:
               url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
               juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01
               explanation: Drempelwaarde van 50.000 kWh elektriciteitsverbruik per jaar
-          - subject: $JAARLIJKS_GASVERBRUIK_M3
+          - subject: $jaarlijks_gasverbruik_m3
             operation: GREATER_THAN_OR_EQUAL
-            value: $DREMPEL_GAS_M3
+            value: $drempel_gas_m3
             legal_basis:
               law: Besluit activiteiten leefomgeving
               bwb_id: BWBR0041330
@@ -167,11 +167,11 @@ articles:
           operation: OR
           conditions:
           - operation: GREATER_THAN_OR_EQUAL
-            subject: $JAARLIJKS_ELEKTRICITEITSVERBRUIK_KWH
-            value: $DREMPEL_ONDERZOEK_ELEKTRICITEIT_KWH
+            subject: $jaarlijks_elektriciteitsverbruik_kwh
+            value: $drempel_onderzoek_elektriciteit_kwh
           - operation: GREATER_THAN_OR_EQUAL
-            subject: $JAARLIJKS_GASVERBRUIK_M3
-            value: $DREMPEL_ONDERZOEK_GAS_M3
+            subject: $jaarlijks_gasverbruik_m3
+            value: $drempel_onderzoek_gas_m3
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330
@@ -181,7 +181,7 @@ articles:
           explanation: |-
             De onderzoeksplicht geldt voor grote verbruikers met meer dan 10 miljoen kWh elektriciteit of 170.000 m³ aardgas per jaar
       - output: rapportage_frequentie_jaren
-        value: $RAPPORTAGE_FREQUENTIE_JAREN
+        value: $rapportage_frequentie_jaren
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330
@@ -190,7 +190,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01
           explanation: Rapportage is vierjaarlijks verplicht
       - output: volgende_rapportage_deadline
-        value: $VOLGENDE_DEADLINE
+        value: $volgende_deadline
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330
@@ -199,7 +199,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01
           explanation: De volgende rapportagedeadline is 1 december 2027
       - output: rapportage_methode
-        value: $RAPPORTAGE_METHODE
+        value: $rapportage_methode
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330

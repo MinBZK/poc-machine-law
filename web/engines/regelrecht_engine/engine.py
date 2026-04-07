@@ -149,8 +149,6 @@ class RegelrechtMachineService(EngineInterface):
             if "law_uuid" in cli_result:
                 last_uuid = cli_result["law_uuid"]
 
-        # Build enriched output: match what PythonMachineService produces
-        # The Python engine returns {name: raw_value} in RuleResult.output
         enriched_output = {}
         for name, value in merged_outputs.items():
             enriched_output[name] = value

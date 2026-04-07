@@ -15,37 +15,37 @@ articles:
   url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Artikel15
   machine_readable:
     definitions:
-      MAXIMALE_BEPERKING_JAREN:
+      maximale_beperking_jaren:
         value: 75
-      BEPERKING_PRIVACY:
+      beperking_privacy:
         value: PRIVACY
-      BEPERKING_STAATSBELANG:
+      beperking_staatsbelang:
         value: STAATSBELANG
-      BEPERKING_ONEVENREDIGE_GEVOLGEN:
+      beperking_onevenredige_gevolgen:
         value: ONEVENREDIGE_GEVOLGEN
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: ARCHIEFSTUK_ID
+      - name: archiefstuk_id
         type: string
         required: true
-      - name: AANMAAKDATUM
+      - name: aanmaakdatum
         type: date
         required: true
-      - name: OVERBRENGDATUM
+      - name: overbrengdatum
         type: date
-      - name: BEPERKING_TYPE
+      - name: beperking_type
         type: string
-      - name: BEPERKING_TERMIJN_JAREN
+      - name: beperking_termijn_jaren
         type: number
         type_spec:
           unit: years
           precision: 0
           min: 0
           max: 75
-      - name: MINISTERRAAD_BESLUIT_STAATSBELANG
+      - name: ministerraad_besluit_staatsbelang
         type: boolean
       output:
       - name: is_openbaar
@@ -62,50 +62,50 @@ articles:
           - operation: AND
             conditions:
             - operation: IS_NULL
-              subject: $BEPERKING_TYPE
+              subject: $beperking_type
             - operation: NOT
               value:
                 operation: IS_NULL
-                subject: $OVERBRENGDATUM
+                subject: $overbrengdatum
           - operation: AND
             conditions:
             - operation: GREATER_THAN_OR_EQUAL
               subject:
                 operation: AGE
                 reference_date: $calculation_date
-                date_of_birth: $AANMAAKDATUM
-              value: $MAXIMALE_BEPERKING_JAREN
+                date_of_birth: $aanmaakdatum
+              value: $maximale_beperking_jaren
             - operation: OR
               conditions:
               - operation: NOT
                 value:
                   operation: EQUALS
-                  subject: $BEPERKING_TYPE
-                  value: $BEPERKING_STAATSBELANG
+                  subject: $beperking_type
+                  value: $beperking_staatsbelang
               - operation: AND
                 conditions:
                 - operation: EQUALS
-                  subject: $BEPERKING_TYPE
-                  value: $BEPERKING_STAATSBELANG
+                  subject: $beperking_type
+                  value: $beperking_staatsbelang
                 - operation: EQUALS
-                  subject: $MINISTERRAAD_BESLUIT_STAATSBELANG
+                  subject: $ministerraad_besluit_staatsbelang
                   value: false
           - operation: AND
             conditions:
             - operation: NOT
               value:
                 operation: IS_NULL
-                subject: $BEPERKING_TERMIJN_JAREN
+                subject: $beperking_termijn_jaren
             - operation: NOT
               value:
                 operation: IS_NULL
-                subject: $OVERBRENGDATUM
+                subject: $overbrengdatum
             - operation: GREATER_THAN_OR_EQUAL
               subject:
                 operation: AGE
                 reference_date: $calculation_date
-                date_of_birth: $OVERBRENGDATUM
-              value: $BEPERKING_TERMIJN_JAREN
+                date_of_birth: $overbrengdatum
+              value: $beperking_termijn_jaren
         legal_basis:
           law: Archiefwet 1995
           bwb_id: BWBR0007376
@@ -126,18 +126,18 @@ articles:
               cases:
               - when:
                   operation: EQUALS
-                  subject: $BEPERKING_TYPE
-                  value: $BEPERKING_PRIVACY
+                  subject: $beperking_type
+                  value: $beperking_privacy
                 then: Beperkt vanwege eerbiediging van de persoonlijke levenssfeer
               - when:
                   operation: EQUALS
-                  subject: $BEPERKING_TYPE
-                  value: $BEPERKING_STAATSBELANG
+                  subject: $beperking_type
+                  value: $beperking_staatsbelang
                 then: Beperkt vanwege het belang van de Staat of zijn bondgenoten
               - when:
                   operation: EQUALS
-                  subject: $BEPERKING_TYPE
-                  value: $BEPERKING_ONEVENREDIGE_GEVOLGEN
+                  subject: $beperking_type
+                  value: $beperking_onevenredige_gevolgen
                 then: Beperkt om onevenredige bevoordeling of benadeling te voorkomen
               default: Beperkt, reden onbekend
         legal_basis:
@@ -163,16 +163,16 @@ articles:
                   operation: AND
                   conditions:
                   - operation: EQUALS
-                    subject: $BEPERKING_TYPE
-                    value: $BEPERKING_STAATSBELANG
+                    subject: $beperking_type
+                    value: $beperking_staatsbelang
                   - operation: EQUALS
-                    subject: $MINISTERRAAD_BESLUIT_STAATSBELANG
+                    subject: $ministerraad_besluit_staatsbelang
                     value: true
                 then: null
               default:
                 operation: DATE_ADD
-                date: $AANMAAKDATUM
-                years: $MAXIMALE_BEPERKING_JAREN
+                date: $aanmaakdatum
+                years: $maximale_beperking_jaren
         legal_basis:
           law: Archiefwet 1995
           bwb_id: BWBR0007376

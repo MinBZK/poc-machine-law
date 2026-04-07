@@ -18,11 +18,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: LEVENSVERWACHTING_GEGEVENS
+      - name: levensverwachting_gegevens
         type: number
         source_reference:
           table: levensverwachting
@@ -41,4 +41,4 @@ articles:
           min: 0
       actions:
       - output: levensverwachting_65
-        value: $LEVENSVERWACHTING_GEGEVENS
+        value: $levensverwachting_gegevens

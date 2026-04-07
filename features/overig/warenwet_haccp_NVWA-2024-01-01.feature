@@ -34,7 +34,7 @@ Feature: Bepalen HACCP-voedselveiligheidsverplichting
       | kvk_nummer | is_geregistreerd_nvwa | heeft_haccp_systeem | type_haccp_systeem |
       | 85234567   | true                  | true                | hygienecode        |
     When de warenwet/haccp wordt uitgevoerd door NVWA met
-      | BEREIDT_OF_SERVEERT_VOEDSEL |
+      | bereidt_of_serveert_voedsel |
       | true                        |
     Then is voldaan aan de voorwaarden
     And is de output "is_levensmiddelenbedrijf" waar
@@ -58,7 +58,7 @@ Feature: Bepalen HACCP-voedselveiligheidsverplichting
       | kvk_nummer | is_geregistreerd_nvwa | heeft_haccp_systeem |
       | 85234567   | true                  | false               |
     When de warenwet/haccp wordt uitgevoerd door NVWA met
-      | BEREIDT_OF_SERVEERT_VOEDSEL |
+      | bereidt_of_serveert_voedsel |
       | true                        |
     Then is voldaan aan de voorwaarden
     And is de output "is_levensmiddelenbedrijf" waar
@@ -78,7 +78,7 @@ Feature: Bepalen HACCP-voedselveiligheidsverplichting
       | kvk_nummer | is_geregistreerd_nvwa | heeft_haccp_systeem | type_haccp_systeem |
       | 85234567   | true                  | true                | eigen_haccp_plan   |
     When de warenwet/haccp wordt uitgevoerd door NVWA met
-      | BEREIDT_OF_SERVEERT_VOEDSEL |
+      | bereidt_of_serveert_voedsel |
       | true                        |
     Then is voldaan aan de voorwaarden
     And is de output "is_levensmiddelenbedrijf" waar
@@ -102,7 +102,7 @@ Feature: Bepalen HACCP-voedselveiligheidsverplichting
       | kvk_nummer | is_geregistreerd_nvwa | heeft_haccp_systeem |
       | 85234567   | false                 | false               |
     When de warenwet/haccp wordt uitgevoerd door NVWA met
-      | BEREIDT_OF_SERVEERT_VOEDSEL |
+      | bereidt_of_serveert_voedsel |
       | true                        |
     Then is voldaan aan de voorwaarden
     And is de output "is_levensmiddelenbedrijf" waar
@@ -123,7 +123,7 @@ Feature: Bepalen HACCP-voedselveiligheidsverplichting
       | kvk_nummer | sbi_code |
       | 99999999   | 4771     |
     When de warenwet/haccp wordt uitgevoerd door NVWA met
-      | BEREIDT_OF_SERVEERT_VOEDSEL |
+      | bereidt_of_serveert_voedsel |
       | false                       |
     Then is niet voldaan aan de voorwaarden
 
@@ -135,6 +135,6 @@ Feature: Bepalen HACCP-voedselveiligheidsverplichting
       | kvk_nummer | sbi_code |
       | 99999999   | 6201     |
     When de warenwet/haccp wordt uitgevoerd door NVWA met
-      | BEREIDT_OF_SERVEERT_VOEDSEL |
+      | bereidt_of_serveert_voedsel |
       | false                       |
     Then is niet voldaan aan de voorwaarden

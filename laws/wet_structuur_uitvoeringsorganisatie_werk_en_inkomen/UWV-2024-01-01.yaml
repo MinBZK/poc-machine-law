@@ -51,27 +51,27 @@ articles:
   url: https://wetten.overheid.nl/BWBR0013060/2024-01-01#Artikel33
   machine_readable:
     definitions:
-      GELDIGE_UITKERING_TYPEN:
+      geldige_uitkering_typen:
         value:
         - WW
         - WIA
         - WAO
         - ZW
         - WAZO
-      DAGEN_PER_JAAR:
+      dagen_per_jaar:
         value: 365.25
-      UREN_PER_DAG:
+      uren_per_dag:
         value: 8
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: DIENSTVERBANDPERIODES
+      - name: dienstverbandperiodes
         type: array
         source_reference:
           table: dienstverbanden
@@ -82,8 +82,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: UITKERINGSPERIODES
+            value: $bsn
+      - name: uitkeringsperiodes
         type: array
         source_reference:
           table: uitkeringen
@@ -94,13 +94,13 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
           - name: type
             description: Uitkerkingen die meetellen
             type: string
             value:
               operation: IN
-              values: $GELDIGE_UITKERING_TYPEN
+              values: $geldige_uitkering_typen
       output:
       - name: verzekerde_jaren
         type: number
@@ -120,7 +120,7 @@ articles:
           - operation: ADD
             values:
             - operation: FOREACH
-              subject: $DIENSTVERBANDPERIODES
+              subject: $dienstverbandperiodes
               value:
               - operation: SUBTRACT_DATE
                 unit: days
@@ -129,7 +129,7 @@ articles:
                 - $start_date
               combine: ADD
             - operation: FOREACH
-              subject: $UITKERINGSPERIODES
+              subject: $uitkeringsperiodes
               value:
               - operation: SUBTRACT_DATE
                 unit: days
@@ -137,13 +137,13 @@ articles:
                 - $end_date
                 - $start_date
               combine: ADD
-          - $DAGEN_PER_JAAR
+          - $dagen_per_jaar
       - output: gewerkte_uren
         value:
           operation: MULTIPLY
           values:
           - operation: FOREACH
-            subject: $DIENSTVERBANDPERIODES
+            subject: $dienstverbandperiodes
             value:
             - operation: SUBTRACT_DATE
               unit: days
@@ -151,4 +151,4 @@ articles:
               - $end_date
               - $start_date
             combine: ADD
-          - $UREN_PER_DAG
+          - $uren_per_dag

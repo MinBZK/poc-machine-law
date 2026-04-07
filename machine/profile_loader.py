@@ -102,7 +102,7 @@ def get_profile_properties(profile: dict) -> list[str]:
         properties.append(f"🗓️ {age} jaar")
 
     # Add children
-    children_data = rvig_data.get("CHILDREN_DATA", [])
+    children_data = rvig_data.get("children_data", [])
     for child_entry in children_data:
         if "kinderen" in child_entry:
             num_children = len(child_entry["kinderen"])

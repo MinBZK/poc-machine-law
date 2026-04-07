@@ -20,36 +20,36 @@ articles:
   url: https://wetten.overheid.nl/BWBR0017017/2024-01-01#Artikel1.5
   machine_readable:
     definitions:
-      MAX_UURTARIEF_DAGOPVANG:
+      max_uurtarief_dagopvang:
         value: 902
-      MAX_UURTARIEF_BSO:
+      max_uurtarief_bso:
         value: 766
-      MAX_HOURS_PER_YEAR:
+      max_hours_per_year:
         value: 2760
-      INKOMENSDREMPEL_1:
+      inkomensdrempel_1:
         value: 3500000
-      INKOMENSDREMPEL_2:
+      inkomensdrempel_2:
         value: 7000000
-      PERCENTAGE_1:
+      percentage_1:
         value: 0.96
-      PERCENTAGE_2:
+      percentage_2:
         value: 0.8
-      PERCENTAGE_3:
+      percentage_3:
         value: 0.33
-      MIN_HOURS_PARTNER:
+      min_hours_partner:
         value: 1040
-      MIN_HOURS_PER_WEEK:
+      min_hours_per_week:
         value: 20
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: INKOMEN
+      - name: inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -58,16 +58,16 @@ articles:
           output: inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
-      - name: PARTNER_BSN
+            bsn: $bsn
+      - name: partner_bsn
         type: string
         source:
           regulation: wet_brp
           output: partner_bsn
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: PARTNER_INKOMEN
+            bsn: $bsn
+      - name: partner_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -76,42 +76,42 @@ articles:
           output: inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $PARTNER_BSN
-      - name: KINDEREN_BSNS
+            bsn: $partner_bsn
+      - name: kinderen_bsns
         type: array
         source:
           regulation: wet_brp
           output: kinderen_bsns
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: GEWERKTE_UREN
+            bsn: $bsn
+      - name: gewerkte_uren
         type: number
         source:
           regulation: wet_structuur_uitvoeringsorganisatie_werk_en_inkomen
           output: gewerkte_uren
           service: UWV
           parameters:
-            BSN: $BSN
-      - name: PARTNER_GEWERKTE_UREN
+            bsn: $bsn
+      - name: partner_gewerkte_uren
         type: number
         source:
           regulation: wet_structuur_uitvoeringsorganisatie_werk_en_inkomen
           output: gewerkte_uren
           service: UWV
           parameters:
-            BSN: $PARTNER_BSN
-      - name: KINDEROPVANG_KVK
+            bsn: $partner_bsn
+      - name: kinderopvang_kvk
         type: string
         required: true
         source_reference:
           source_type: claim
-      - name: AANGEGEVEN_UREN
+      - name: aangegeven_uren
         type: array
         required: true
         source_reference:
           source_type: claim
-      - name: VERWACHTE_PARTNER_UREN
+      - name: verwachte_partner_uren
         type: number
         required: true
         source_reference:
@@ -129,17 +129,17 @@ articles:
       - all:
         - operation: OR
           conditions:
-          - subject: $PARTNER_BSN
+          - subject: $partner_bsn
             operation: IS_NULL
           - operation: OR
             conditions:
-            - subject: $PARTNER_GEWERKTE_UREN
+            - subject: $partner_gewerkte_uren
               operation: GREATER_THAN_OR_EQUAL
-              value: $MIN_HOURS_PARTNER
-            - subject: $VERWACHTE_PARTNER_UREN
+              value: $min_hours_partner
+            - subject: $verwachte_partner_uren
               operation: GREATER_THAN_OR_EQUAL
-              value: $MIN_HOURS_PER_WEEK
-        - subject: $GEWERKTE_UREN
+              value: $min_hours_per_week
+        - subject: $gewerkte_uren
           operation: GREATER_THAN
           value: 0
       actions:
@@ -148,7 +148,7 @@ articles:
       - output: jaarbedrag
         value:
           operation: FOREACH
-          subject: $AANGEGEVEN_UREN
+          subject: $aangegeven_uren
           value:
           - operation: MULTIPLY
             values:
@@ -160,13 +160,13 @@ articles:
                     operation: EQUALS
                     subject: $soort_opvang
                     value: DAGOPVANG
-                  then: $MAX_UURTARIEF_DAGOPVANG
-                default: $MAX_UURTARIEF_BSO
+                  then: $max_uurtarief_dagopvang
+                default: $max_uurtarief_bso
               - $uurtarief
             - operation: MIN
               values:
               - $uren_per_jaar
-              - $MAX_HOURS_PER_YEAR
+              - $max_hours_per_year
             - operation: IF
               cases:
               - when:
@@ -174,36 +174,36 @@ articles:
                   subject:
                     operation: ADD
                     values:
-                    - $INKOMEN
+                    - $inkomen
                     - operation: IF
                       cases:
                       - when:
                           operation: NOT
                           value:
                             operation: IS_NULL
-                            subject: $PARTNER_BSN
-                        then: $PARTNER_INKOMEN
+                            subject: $partner_bsn
+                        then: $partner_inkomen
                       default: 0
-                  value: $INKOMENSDREMPEL_1
-                then: $PERCENTAGE_1
+                  value: $inkomensdrempel_1
+                then: $percentage_1
               - when:
                   operation: LESS_THAN
                   subject:
                     operation: ADD
                     values:
-                    - $INKOMEN
+                    - $inkomen
                     - operation: IF
                       cases:
                       - when:
                           operation: NOT
                           value:
                             operation: IS_NULL
-                            subject: $PARTNER_BSN
-                        then: $PARTNER_INKOMEN
+                            subject: $partner_bsn
+                        then: $partner_inkomen
                       default: 0
-                  value: $INKOMENSDREMPEL_2
-                then: $PERCENTAGE_2
-              default: $PERCENTAGE_3
+                  value: $inkomensdrempel_2
+                then: $percentage_2
+              default: $percentage_3
           combine: ADD
         legal_basis:
           law: Wet kinderopvang

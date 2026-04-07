@@ -41,52 +41,52 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002221/2024-01-01#Artikel7a
   machine_readable:
     definitions:
-      BASIS_PENSIOENLEEFTIJD:
+      basis_pensioenleeftijd:
         value: 65
-      VERHOGING_2013:
+      verhoging_2013:
         value: 1
-      VERHOGING_2014:
+      verhoging_2014:
         value: 2
-      VERHOGING_2015:
+      verhoging_2015:
         value: 3
-      VERHOGING_2016:
+      verhoging_2016:
         value: 6
-      VERHOGING_2017:
+      verhoging_2017:
         value: 9
-      VERHOGING_2018:
+      verhoging_2018:
         value: 12
-      VERHOGING_2019:
+      verhoging_2019:
         value: 16
-      VERHOGING_2020:
+      verhoging_2020:
         value: 16
-      VERHOGING_2021:
+      verhoging_2021:
         value: 18
-      VERHOGING_2022:
+      verhoging_2022:
         value: 21
-      VERHOGING_2023:
+      verhoging_2023:
         value: 24
-      VERHOGING_2024:
+      verhoging_2024:
         value: 24
-      VERHOGING_2025:
+      verhoging_2025:
         value: 24
-      REFERENTIE_LEEFTIJD:
+      referentie_leeftijd:
         value: 65
-      REFERENTIE_LEVENSVERWACHTING:
+      referentie_levensverwachting:
         value: 20.0
-      MAANDEN_VERHOGING_PER_JAAR:
+      maanden_verhoging_per_jaar:
         value: 3
-      AANKONDIGINGSPERIODE_JAREN:
+      aankondigingsperiode_jaren:
         value: 5
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: GEBOORTEDATUM
+      - name: geboortedatum
         type: date
         required: true
       input:
-      - name: LEVENSVERWACHTING_65
+      - name: levensverwachting_65
         type: number
         type_spec:
           unit: years
@@ -110,135 +110,135 @@ articles:
         - operation: NOT
           value:
             operation: IS_NULL
-            subject: $GEBOORTEDATUM
+            subject: $geboortedatum
       actions:
       - output: pensioenleeftijd
         value:
           operation: ADD
           values:
-          - $BASIS_PENSIOENLEEFTIJD
+          - $basis_pensioenleeftijd
           - operation: IF
             cases:
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1948-01-01'
               then: 0
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1949-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2013
+                - $verhoging_2013
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1950-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2014
+                - $verhoging_2014
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1951-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2015
+                - $verhoging_2015
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1952-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2016
+                - $verhoging_2016
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1953-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2017
+                - $verhoging_2017
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1954-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2018
+                - $verhoging_2018
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1955-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2019
+                - $verhoging_2019
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1956-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2020
+                - $verhoging_2020
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1957-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2021
+                - $verhoging_2021
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1958-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2022
+                - $verhoging_2022
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1959-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2023
+                - $verhoging_2023
                 - 12
             - when:
                 operation: LESS_THAN
-                subject: $GEBOORTEDATUM
+                subject: $geboortedatum
                 value: '1960-01-01'
               then:
                 operation: DIVIDE
                 values:
-                - $VERHOGING_2024
+                - $verhoging_2024
                 - 12
             default:
               operation: IF
               cases:
               - when:
                   operation: GREATER_THAN
-                  subject: $LEVENSVERWACHTING_65
-                  value: $REFERENTIE_LEVENSVERWACHTING
+                  subject: $levensverwachting_65
+                  value: $referentie_levensverwachting
                 then:
                   operation: MIN
                   values:
@@ -246,10 +246,10 @@ articles:
                     values:
                     - operation: SUBTRACT
                       values:
-                      - $LEVENSVERWACHTING_65
-                      - $REFERENTIE_LEVENSVERWACHTING
+                      - $levensverwachting_65
+                      - $referentie_levensverwachting
                     - operation: DIVIDE
                       values:
-                      - $MAANDEN_VERHOGING_PER_JAAR
+                      - $maanden_verhoging_per_jaar
                       - 12
                   - 2

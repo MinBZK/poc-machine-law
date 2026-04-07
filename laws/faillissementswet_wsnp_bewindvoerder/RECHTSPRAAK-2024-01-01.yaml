@@ -19,7 +19,7 @@ articles:
   url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#Artikel316
   machine_readable:
     definitions:
-      WSNP_BEWINDVOERDER_RECHTEN:
+      wsnp_bewindvoerder_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
@@ -29,11 +29,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: WSNP_REGISTRATIES
+      - name: wsnp_registraties
         type: array
         source_reference:
           table: wsnp_registraties
@@ -48,7 +48,7 @@ articles:
           - name: bsn_bewindvoerder
             description: BSN nummer van de WSNP-bewindvoerder
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_delegaties
         type: boolean
@@ -70,7 +70,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $WSNP_REGISTRATIES
+          subject: $wsnp_registraties
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -82,7 +82,7 @@ articles:
       - output: actieve_wsnp
         value:
           operation: FOREACH
-          subject: $WSNP_REGISTRATIES
+          subject: $wsnp_registraties
           where:
             operation: AND
             conditions:
@@ -175,7 +175,7 @@ articles:
         value:
           operation: FOREACH
           subject: $actieve_wsnp
-          value: $WSNP_BEWINDVOERDER_RECHTEN
+          value: $wsnp_bewindvoerder_rechten
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860

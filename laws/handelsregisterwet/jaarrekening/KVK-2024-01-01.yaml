@@ -43,7 +43,7 @@ articles:
   url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Artikel394
   machine_readable:
     definitions:
-      DEPONERINGSPLICHTIGE_RECHTSVORMEN:
+      deponeringsplichtige_rechtsvormen:
         value:
         - BV
         - NV
@@ -51,20 +51,20 @@ articles:
         - ONDERLINGE_WAARBORGMAATSCHAPPIJ
         - STICHTING
         - VERENIGING
-      RAPPORTAGE_METHODE:
+      rapportage_methode:
         value: SBR/XBRL via KVK (kvk.nl/deponeren)
-      DEPONERINGS_TERMIJN_MAANDEN:
+      deponerings_termijn_maanden:
         value: 12
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: KVK_NUMMER
+      - name: kvk_nummer
         type: string
         required: true
       input:
-      - name: RECHTSVORM
+      - name: rechtsvorm
         type: string
         source_reference:
           source_type: KVK
@@ -74,8 +74,8 @@ articles:
           - name: kvk_nummer
             description: KvK-nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
-      - name: LAATSTE_BOEKJAAR_EINDE
+            value: $kvk_nummer
+      - name: laatste_boekjaar_einde
         type: date
         source_reference:
           source_type: KVK
@@ -85,7 +85,7 @@ articles:
           - name: kvk_nummer
             description: KvK-nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
+            value: $kvk_nummer
       output:
       - name: heeft_deponeringsplicht
         type: boolean
@@ -97,9 +97,9 @@ articles:
         type: string
       requirements:
       - all:
-        - subject: $RECHTSVORM
+        - subject: $rechtsvorm
           operation: IN
-          value: $DEPONERINGSPLICHTIGE_RECHTSVORMEN
+          value: $deponeringsplichtige_rechtsvormen
           legal_basis:
             law: Burgerlijk Wetboek Boek 2
             bwb_id: BWBR0003045
@@ -118,7 +118,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01
           explanation: De organisatie is een rechtspersoon; de deponeringsplicht is van toepassing
       - output: rapportage_methode
-        value: $RAPPORTAGE_METHODE
+        value: $rapportage_methode
         legal_basis:
           law: Burgerlijk Wetboek Boek 2
           bwb_id: BWBR0003045
@@ -127,7 +127,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01
           explanation: De jaarrekening wordt digitaal gedeponeerd via SBR in XBRL-formaat
       - output: volgende_deadline
-        value: $LAATSTE_BOEKJAAR_EINDE
+        value: $laatste_boekjaar_einde
         legal_basis:
           law: Burgerlijk Wetboek Boek 2
           bwb_id: BWBR0003045

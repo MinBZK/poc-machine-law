@@ -15,29 +15,29 @@ articles:
   url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Artikel12
   machine_readable:
     definitions:
-      MINIMALE_LEEFTIJD_JAREN:
+      minimale_leeftijd_jaren:
         value: 20
-      MAXIMALE_TERMIJN_OVERBRENGEN_JAREN:
+      maximale_termijn_overbrengen_jaren:
         value: 10
-      UITERSTE_LEEFTIJD_JAREN:
+      uiterste_leeftijd_jaren:
         value: 30
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: ARCHIEFSTUK_ID
+      - name: archiefstuk_id
         type: string
         required: true
-      - name: AANMAAKDATUM
+      - name: aanmaakdatum
         type: date
         required: true
-      - name: VOOR_VERNIETIGING
+      - name: voor_vernietiging
         type: boolean
         required: true
-      - name: VEELVULDIG_GEBRUIK
+      - name: veelvuldig_gebruik
         type: boolean
-      - name: OPSCHORTINGSMACHTIGING
+      - name: opschortingsmachtiging
         type: boolean
       output:
       - name: moet_overgebracht_worden
@@ -50,25 +50,25 @@ articles:
           operation: AND
           conditions:
           - operation: EQUALS
-            subject: $VOOR_VERNIETIGING
+            subject: $voor_vernietiging
             value: false
           - operation: GREATER_THAN_OR_EQUAL
             subject:
               operation: AGE
               reference_date: $calculation_date
-              date_of_birth: $AANMAAKDATUM
-            value: $MINIMALE_LEEFTIJD_JAREN
+              date_of_birth: $aanmaakdatum
+            value: $minimale_leeftijd_jaren
           - operation: OR
             conditions:
             - operation: NOT
               value:
                 operation: EQUALS
-                subject: $OPSCHORTINGSMACHTIGING
+                subject: $opschortingsmachtiging
                 value: true
             - operation: NOT
               value:
                 operation: EQUALS
-                subject: $VEELVULDIG_GEBRUIK
+                subject: $veelvuldig_gebruik
                 value: true
         legal_basis:
           law: Archiefwet 1995
@@ -88,8 +88,8 @@ articles:
               value: true
             then:
               operation: DATE_ADD
-              date: $AANMAAKDATUM
-              years: $UITERSTE_LEEFTIJD_JAREN
+              date: $aanmaakdatum
+              years: $uiterste_leeftijd_jaren
         legal_basis:
           law: Archiefbesluit 1995
           bwb_id: BWBR0007748

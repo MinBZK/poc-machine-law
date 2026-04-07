@@ -5,8 +5,3 @@ engines:
     type: regelrecht
     default: true
     domain: bin/evaluate-v0.2.0
-  - id: py
-    name: Python engine
-    description: Python processing engine (fallback)
-    type: internal
-    default: false

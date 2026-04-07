@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from enum import Enum
 
 import pandas as pd
 
@@ -13,22 +12,14 @@ from .claim_manager_interface import ClaimManagerInterface
 from .engine_interface import EngineInterface
 from .py_engine import CaseManager as PythonCaseManager
 from .py_engine import ClaimManager as PythonClaimManager
-from .py_engine import PythonMachineService
 from .regelrecht_engine import RegelrechtMachineService
 
 logger = logging.getLogger(__name__)
 
 
-class MachineType(Enum):
-    """Enum to specify which machine implementation to use."""
-
-    INTERNAL = "internal"
-    REGELRECHT = "regelrecht"
-
-
 config_loader = ConfigLoader()
 
-# Configure service for the internal engine
+# Configure the Python Services instance (used by regelrecht for fallback/case management)
 services = Services(datetime.today().strftime("%Y-%m-%d"))
 
 
@@ -272,25 +263,18 @@ class MachineFactory:
             engine_id: The engine identifier from config
 
         Returns:
-            An instance of an EngineInterface implementation
+            An instance of a RegelrechtMachineService
         """
 
         engine = config_loader.get_engine(engine_id)
-        engine_type = MachineType(engine.type)
+        if engine.type != "regelrecht":
+            raise ValueError(f"Unknown engine type: {engine.type}. Only 'regelrecht' is supported.")
 
-        if engine_type == MachineType.INTERNAL:
-            if services is None:
-                raise ValueError("Services instance is required for internal Python implementation")
-            logger.info(f"[MachineFactory] Creating PythonMachineService for engine: {engine_id}")
-            return PythonMachineService(services)
-        elif engine_type == MachineType.REGELRECHT:
-            binary_path = engine.domain  # Reuse domain field for binary path
-            logger.info(
-                f"[MachineFactory] Creating RegelrechtMachineService for engine: {engine_id}, binary: {binary_path}"
-            )
-            return RegelrechtMachineService(binary_path=binary_path, services=services)
-        else:
-            raise ValueError(f"Unknown machine type: {engine_type}")
+        binary_path = engine.domain  # Reuse domain field for binary path
+        logger.info(
+            f"[MachineFactory] Creating RegelrechtMachineService for engine: {engine_id}, binary: {binary_path}"
+        )
+        return RegelrechtMachineService(binary_path=binary_path, services=services)
 
 
 class CaseManagerFactory:
@@ -299,7 +283,7 @@ class CaseManagerFactory:
     @staticmethod
     def create_case_manager(engine_id: str) -> CaseManagerInterface:
         """
-        Create a case manager of the specified type.
+        Create a case manager.
 
         Args:
             engine_id: The engine identifier from config
@@ -307,17 +291,10 @@ class CaseManagerFactory:
         Returns:
             An instance of a CaseManagerInterface implementation
         """
-
-        engine = config_loader.get_engine(engine_id)
-        engine_type = MachineType(engine.type)
-
-        if engine_type in (MachineType.INTERNAL, MachineType.REGELRECHT):
-            if services is None:
-                raise ValueError("Services instance is required for internal Python implementation")
-            logger.info(f"[CaseManagerFactory] Creating PythonCaseManager for engine: {engine_id}")
-            return PythonCaseManager(services)
-        else:
-            raise ValueError(f"Unknown machine type: {engine_type}")
+        if services is None:
+            raise ValueError("Services instance is required for case management")
+        logger.info(f"[CaseManagerFactory] Creating PythonCaseManager for engine: {engine_id}")
+        return PythonCaseManager(services)
 
 
 class ClaimManagerFactory:
@@ -326,7 +303,7 @@ class ClaimManagerFactory:
     @staticmethod
     def create_claim_manager(engine_id: str) -> ClaimManagerInterface:
         """
-        Create a claim manager of the specified type.
+        Create a claim manager.
 
         Args:
             engine_id: The engine identifier from config
@@ -334,14 +311,7 @@ class ClaimManagerFactory:
         Returns:
             An instance of a ClaimManagerInterface implementation
         """
-
-        engine = config_loader.get_engine(engine_id)
-        engine_type = MachineType(engine.type)
-
-        if engine_type in (MachineType.INTERNAL, MachineType.REGELRECHT):
-            if services is None:
-                raise ValueError("Services instance is required for internal Python implementation")
-            logger.info(f"[ClaimManagerFactory] Creating PythonClaimManager for engine: {engine_id}")
-            return PythonClaimManager(services)
-        else:
-            raise ValueError(f"Unknown machine type: {engine_type}")
+        if services is None:
+            raise ValueError("Services instance is required for claim management")
+        logger.info(f"[ClaimManagerFactory] Creating PythonClaimManager for engine: {engine_id}")
+        return PythonClaimManager(services)

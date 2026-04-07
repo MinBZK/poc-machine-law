@@ -120,16 +120,28 @@ class RulesEngine:
         return sorted_outputs
 
     @staticmethod
-    def analyze_dependencies(action):
-        """Find all outputs this action depends on"""
+    def analyze_dependencies(action, output_names: set[str] | None = None):
+        """Find all outputs this action depends on.
+
+        Only variable references that match known output names are treated
+        as dependencies. All other $variable references (inputs, parameters,
+        definitions) are external values and not tracked here.
+        """
         deps = set()
 
         def traverse(obj) -> None:
             if isinstance(obj, str):
                 if obj.startswith("$"):
                     value = obj[1:]  # Remove $ prefix
-                    if value.islower():  # Output reference
-                        deps.add(value)
+                    # Handle dotted paths like $current.field - only the base name matters
+                    base = value.split(".")[0]
+                    if output_names is not None:
+                        if base in output_names:
+                            deps.add(base)
+                    else:
+                        # Fallback: treat all lowercase refs as outputs (legacy behaviour)
+                        if base.islower():
+                            deps.add(base)
             elif isinstance(obj, dict):
                 for v in obj.values():
                     traverse(v)
@@ -146,13 +158,20 @@ class RulesEngine:
         if not requested_output:
             return actions
 
+        # Collect all known output names from actions
+        output_names = {action["output"] for action in actions}
+
         # Build dependency graph
         dependencies = {}
         action_by_output = {}
         for action in actions:
             output = action["output"]
             action_by_output[output] = action
-            dependencies[output] = RulesEngine.analyze_dependencies(action)
+            deps = RulesEngine.analyze_dependencies(action, output_names)
+            # An action referencing its own output name is reading the *input*
+            # with that name, not depending on itself.
+            deps.discard(output)
+            dependencies[output] = deps
 
         # Find all required outputs
         required = set()
@@ -193,8 +212,8 @@ class RulesEngine:
         root = PathNode(type="root", name="evaluation", result=None)
 
         claims = None
-        if "BSN" in parameters:
-            bsn = parameters["BSN"]
+        if "bsn" in parameters:
+            bsn = parameters["bsn"]
             claims = self.service_provider.claim_manager.get_claim_by_bsn_service_law(
                 bsn, self.service_name, self.law, approved=approved
             )

@@ -19,22 +19,22 @@ articles:
   url: https://wetten.overheid.nl/BWBR0033715/2023-05-15#Artikel2.34
   machine_readable:
     definitions:
-      TWIJFEL_ADRES_AFWIJKING:
+      twijfel_adres_afwijking:
         value: Adres bij Dienst Toeslagen wijkt af van BRP
-      TWIJFEL_ONDERZOEK:
+      twijfel_onderzoek:
         value: Adresonderzoek Toeslagen bevestigt adres niet
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
-      - name: ADRES
+      - name: adres
         type: object
         required: true
       input:
-      - name: TOESLAG_ADRES
+      - name: toeslag_adres
         type: object
         source_reference:
           table: toeslagen_adressen
@@ -47,8 +47,8 @@ articles:
           - name: bsn
             description: BSN van de toeslagontvanger
             type: string
-            value: $BSN
-      - name: TOESLAGEN_ONDERZOEK
+            value: $bsn
+      - name: toeslagen_onderzoek
         type: object
         source_reference:
           table: toeslagen_adresonderzoek
@@ -60,7 +60,7 @@ articles:
           - name: bsn
             description: BSN van de toeslagontvanger
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_gerede_twijfel_adres
         type: boolean
@@ -71,7 +71,7 @@ articles:
         - operation: NOT
           value:
             operation: IS_NULL
-            subject: $ADRES
+            subject: $adres
       actions:
       - output: heeft_gerede_twijfel_adres
         value:
@@ -81,10 +81,10 @@ articles:
             value:
               operation: EQUALS
               values:
-              - $ADRES
-              - $TOESLAG_ADRES
+              - $adres
+              - $toeslag_adres
           - operation: EQUALS
-            subject: $TOESLAGEN_ONDERZOEK.adres_geverifieerd
+            subject: $toeslagen_onderzoek.adres_geverifieerd
             value: false
         legal_basis:
           law: Wet basisregistratie personen
@@ -102,14 +102,14 @@ articles:
               value:
                 operation: EQUALS
                 values:
-                - $ADRES
-                - $TOESLAG_ADRES
-            then: $TWIJFEL_ADRES_AFWIJKING
+                - $adres
+                - $toeslag_adres
+            then: $twijfel_adres_afwijking
           - when:
               operation: EQUALS
-              subject: $TOESLAGEN_ONDERZOEK.adres_geverifieerd
+              subject: $toeslagen_onderzoek.adres_geverifieerd
               value: false
-            then: $TWIJFEL_ONDERZOEK
+            then: $twijfel_onderzoek
         legal_basis:
           law: Besluit basisregistratie personen
           bwb_id: BWBR0034306

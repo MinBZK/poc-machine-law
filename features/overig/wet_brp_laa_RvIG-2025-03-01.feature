@@ -15,7 +15,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | postcode | huisnummer | gebruiksdoel | is_woonfunctie |
       | 1234AB   | 10         | woonfunctie  | true           |
     When de wet_brp/laa wordt uitgevoerd door RvIG met
-      | ADRES |
+      | adres |
       | {"postcode": "1234AB", "huisnummer": "10"} |
     Then is voldaan aan de voorwaarden
     And genereert wet_brp/laa een signaal
@@ -32,7 +32,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | postcode | huisnummer | gebruiksdoel | is_woonfunctie |
       | 5678CD   | 25         | woonfunctie  | true           |
     When de wet_brp/laa wordt uitgevoerd door RvIG met
-      | ADRES |
+      | adres |
       | {"postcode": "5678CD", "huisnummer": "25"} |
     Then is voldaan aan de voorwaarden
     And genereert wet_brp/laa een signaal
@@ -47,7 +47,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | postcode | huisnummer | gebruiksdoel | is_woonfunctie |
       | 9012EF   | 42         | woonfunctie  | true           |
     When de wet_brp/laa wordt uitgevoerd door RvIG met
-      | ADRES |
+      | adres |
       | {"postcode": "9012EF", "huisnummer": "42"} |
     Then is voldaan aan de voorwaarden
     And genereert wet_brp/laa een signaal
@@ -71,7 +71,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | bsn       | postcode | huisnummer | onbestelbaar |
       | 999993657 | 3456GH   | 100        | false        |
     When de wet_brp/laa wordt uitgevoerd door RvIG met
-      | ADRES |
+      | adres |
       | {"postcode": "3456GH", "huisnummer": "100"} |
     Then is voldaan aan de voorwaarden
     And genereert wet_brp/laa een signaal
@@ -97,7 +97,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | bsn       | postcode | huisnummer | onbestelbaar |
       | 999993658 | 7890IJ   | 15         | false        |
     When de wet_brp/laa wordt uitgevoerd door RvIG met
-      | ADRES |
+      | adres |
       | {"postcode": "7890IJ", "huisnummer": "15"} |
     Then is voldaan aan de voorwaarden
     And genereert wet_brp/laa geen signaal
@@ -120,7 +120,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | bsn       | postcode | huisnummer | onbestelbaar |
       | 999993659 | 2345KL   | 200        | false        |
     When de wet_brp/laa wordt uitgevoerd door RvIG met
-      | ADRES |
+      | adres |
       | {"postcode": "2345KL", "huisnummer": "200"} |
     Then is voldaan aan de voorwaarden
     And genereert wet_brp/laa geen signaal
@@ -143,7 +143,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | bsn       | postcode | huisnummer | onbestelbaar |
       | 999993660 | 6789MN   | 50         | false        |
     When de wet_brp/laa wordt uitgevoerd door RvIG met
-      | ADRES |
+      | adres |
       | {"postcode": "6789MN", "huisnummer": "50"} |
     Then is voldaan aan de voorwaarden
     And genereert wet_brp/laa geen signaal
@@ -160,7 +160,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | postcode | huisnummer | gebruiksdoel      | is_woonfunctie |
       | 4567OP   | 75         | kantoorfunctie    | false          |
     When de wet_brp/laa wordt uitgevoerd door RvIG met
-      | ADRES |
+      | adres |
       | {"postcode": "4567OP", "huisnummer": "75"} |
     Then is voldaan aan de voorwaarden
     And genereert wet_brp/laa een signaal

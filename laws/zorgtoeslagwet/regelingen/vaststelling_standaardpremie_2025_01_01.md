@@ -15,4 +15,4 @@ Regel bepaal/bereken standaardpremie \
 Geldig vanaf: 2025-01-01
 
 De <span style="color: green">standaardpremie</span> is
-<span style="color:blue">$STANDAARDPREMIE_2025</span>
+<span style="color:blue">$standaardpremie_2025</span>

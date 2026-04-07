@@ -19,7 +19,7 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel450
   machine_readable:
     definitions:
-      MENTOR_RECHTEN:
+      mentor_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
@@ -29,11 +29,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: MENTORSCHAP_REGISTRATIES
+      - name: mentorschap_registraties
         type: array
         source_reference:
           table: mentorschap_registraties
@@ -47,7 +47,7 @@ articles:
           - name: bsn_mentor
             description: BSN nummer van de mentor
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_delegaties
         type: boolean
@@ -69,7 +69,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $MENTORSCHAP_REGISTRATIES
+          subject: $mentorschap_registraties
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -81,7 +81,7 @@ articles:
       - output: actief_mentorschap
         value:
           operation: FOREACH
-          subject: $MENTORSCHAP_REGISTRATIES
+          subject: $mentorschap_registraties
           where:
             operation: AND
             conditions:
@@ -167,7 +167,7 @@ articles:
         value:
           operation: FOREACH
           subject: $actief_mentorschap
-          value: $MENTOR_RECHTEN
+          value: $mentor_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

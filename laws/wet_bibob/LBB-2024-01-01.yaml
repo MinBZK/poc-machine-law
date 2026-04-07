@@ -29,24 +29,24 @@ articles:
   url: https://wetten.overheid.nl/BWBR0013798/2024-01-01#Artikel9
   machine_readable:
     definitions:
-      MATE_GEEN_GEVAAR:
+      mate_geen_gevaar:
         value: geen_gevaar
-      MATE_MINDERE_MATE:
+      mate_mindere_mate:
         value: mindere_mate
-      MATE_ERNSTIG_GEVAAR:
+      mate_ernstig_gevaar:
         value: ernstig_gevaar
-      ADVIESTERMIJN_WEKEN:
+      adviestermijn_weken:
         value: 8
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: KVK_NUMMER
+      - name: kvk_nummer
         type: string
-      - name: BSN
+      - name: bsn
         type: string
-      - name: BESCHIKKING_TYPE
+      - name: beschikking_type
         type: enum
         required: true
         type_spec:
@@ -61,7 +61,7 @@ articles:
             overheidsopdracht: Overheidsopdracht of aanbesteding
             vastgoedtransactie: Vastgoedtransactie
       input:
-      - name: ADVIES_UITGEBRACHT
+      - name: advies_uitgebracht
         type: boolean
         source_reference:
           table: bibob_adviezen
@@ -70,8 +70,8 @@ articles:
           - name: kvk_nummer
             description: KVK-nummer van de onderneming
             type: string
-            value: $KVK_NUMMER
-      - name: ADVIES_MATE_VAN_GEVAAR
+            value: $kvk_nummer
+      - name: advies_mate_van_gevaar
         type: enum
         source_reference:
           table: bibob_adviezen
@@ -80,8 +80,8 @@ articles:
           - name: kvk_nummer
             description: KVK-nummer van de onderneming
             type: string
-            value: $KVK_NUMMER
-      - name: ADVIES_DATUM
+            value: $kvk_nummer
+      - name: advies_datum
         type: date
         source_reference:
           table: bibob_adviezen
@@ -90,8 +90,8 @@ articles:
           - name: kvk_nummer
             description: KVK-nummer van de onderneming
             type: string
-            value: $KVK_NUMMER
-      - name: RELATIE_TOT_STRAFBARE_FEITEN
+            value: $kvk_nummer
+      - name: relatie_tot_strafbare_feiten
         type: boolean
         source_reference:
           table: bibob_adviezen
@@ -100,8 +100,8 @@ articles:
           - name: kvk_nummer
             description: KVK-nummer van de onderneming
             type: string
-            value: $KVK_NUMMER
-      - name: FINANCIERINGSRISICO
+            value: $kvk_nummer
+      - name: financieringsrisico
         type: boolean
         source_reference:
           table: bibob_adviezen
@@ -110,8 +110,8 @@ articles:
           - name: kvk_nummer
             description: KVK-nummer van de onderneming
             type: string
-            value: $KVK_NUMMER
-      - name: VOORSCHRIFTEN_GEADVISEERD
+            value: $kvk_nummer
+      - name: voorschriften_geadviseerd
         type: boolean
         source_reference:
           table: bibob_adviezen
@@ -120,7 +120,7 @@ articles:
           - name: kvk_nummer
             description: KVK-nummer van de onderneming
             type: string
-            value: $KVK_NUMMER
+            value: $kvk_nummer
       output:
       - name: advies_uitgebracht
         type: boolean
@@ -138,7 +138,7 @@ articles:
         type: boolean
       actions:
       - output: advies_uitgebracht
-        value: $ADVIES_UITGEBRACHT
+        value: $advies_uitgebracht
         legal_basis:
           law: Wet bevordering integriteitsbeoordelingen door het openbaar bestuur
           bwb_id: BWBR0013798
@@ -151,9 +151,9 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $ADVIES_UITGEBRACHT
+              subject: $advies_uitgebracht
               value: true
-            then: $ADVIES_MATE_VAN_GEVAAR
+            then: $advies_mate_van_gevaar
         legal_basis:
           law: Wet bevordering integriteitsbeoordelingen door het openbaar bestuur
           bwb_id: BWBR0013798
@@ -165,11 +165,11 @@ articles:
           operation: AND
           conditions:
           - operation: EQUALS
-            subject: $ADVIES_UITGEBRACHT
+            subject: $advies_uitgebracht
             value: true
           - operation: EQUALS
-            subject: $ADVIES_MATE_VAN_GEVAAR
-            value: $MATE_ERNSTIG_GEVAAR
+            subject: $advies_mate_van_gevaar
+            value: $mate_ernstig_gevaar
         legal_basis:
           law: Wet bevordering integriteitsbeoordelingen door het openbaar bestuur
           bwb_id: BWBR0013798
@@ -182,20 +182,20 @@ articles:
           operation: AND
           conditions:
           - operation: EQUALS
-            subject: $ADVIES_UITGEBRACHT
+            subject: $advies_uitgebracht
             value: true
           - operation: OR
             conditions:
             - operation: EQUALS
-              subject: $ADVIES_MATE_VAN_GEVAAR
-              value: $MATE_MINDERE_MATE
+              subject: $advies_mate_van_gevaar
+              value: $mate_mindere_mate
             - operation: AND
               conditions:
               - operation: EQUALS
-                subject: $ADVIES_MATE_VAN_GEVAAR
-                value: $MATE_ERNSTIG_GEVAAR
+                subject: $advies_mate_van_gevaar
+                value: $mate_ernstig_gevaar
               - operation: EQUALS
-                subject: $VOORSCHRIFTEN_GEADVISEERD
+                subject: $voorschriften_geadviseerd
                 value: true
         legal_basis:
           law: Wet bevordering integriteitsbeoordelingen door het openbaar bestuur
@@ -210,11 +210,11 @@ articles:
           operation: OR
           conditions:
           - operation: EQUALS
-            subject: $ADVIES_UITGEBRACHT
+            subject: $advies_uitgebracht
             value: false
           - operation: EQUALS
-            subject: $ADVIES_MATE_VAN_GEVAAR
-            value: $MATE_GEEN_GEVAAR
+            subject: $advies_mate_van_gevaar
+            value: $mate_geen_gevaar
         legal_basis:
           law: Wet bevordering integriteitsbeoordelingen door het openbaar bestuur
           bwb_id: BWBR0013798
@@ -222,7 +222,7 @@ articles:
           url: https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3
           explanation: Verlening wordt geadviseerd als er geen advies is of als er geen gevaar is gebleken
       - output: financieringsrisico
-        value: $FINANCIERINGSRISICO
+        value: $financieringsrisico
         legal_basis:
           law: Wet bevordering integriteitsbeoordelingen door het openbaar bestuur
           bwb_id: BWBR0013798
@@ -231,7 +231,7 @@ articles:
           url: https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3
           explanation: Geeft door of er sprake is van financieringsrisico
       - output: relatie_strafbare_feiten
-        value: $RELATIE_TOT_STRAFBARE_FEITEN
+        value: $relatie_tot_strafbare_feiten
         legal_basis:
           law: Wet bevordering integriteitsbeoordelingen door het openbaar bestuur
           bwb_id: BWBR0013798

@@ -16,15 +16,15 @@ articles:
   url: https://wetten.overheid.nl/BWBR0005537/1994-01-01#Artikel1
   machine_readable:
     definitions:
-      TWEE_DERDE_DREMPEL:
+      twee_derde_drempel:
         value: 66.67
     execution:
       parameters:
-      - name: ORGANISATIE_ID
+      - name: organisatie_id
         type: string
         required: true
       input:
-      - name: IS_ORGAAN_VAN_RECHTSPERSOON
+      - name: is_orgaan_van_rechtspersoon
         type: boolean
         source_reference:
           source_type: AWB
@@ -34,8 +34,8 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
-      - name: PUBLIEKRECHTELIJKE_RECHTSPERSOON_TYPE
+            value: $organisatie_id
+      - name: publiekrechtelijke_rechtspersoon_type
         type: string
         source_reference:
           source_type: AWB
@@ -45,8 +45,8 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
-      - name: HEEFT_PUBLIEKRECHTELIJKE_BEVOEGDHEID
+            value: $organisatie_id
+      - name: heeft_publiekrechtelijke_bevoegdheid
         type: boolean
         source_reference:
           source_type: AWB
@@ -56,8 +56,8 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
-      - name: BEVOEGDHEID_BIJ_OF_KRACHTENS_WET
+            value: $organisatie_id
+      - name: bevoegdheid_bij_of_krachtens_wet
         type: boolean
         source_reference:
           source_type: AWB
@@ -67,8 +67,8 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
-      - name: OVERHEIDSFINANCIERING_PERCENTAGE
+            value: $organisatie_id
+      - name: overheidsfinanciering_percentage
         type: number
         source_reference:
           source_type: AWB
@@ -78,8 +78,8 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
-      - name: CRITERIA_DOOR_OVERHEID_BEPAALD
+            value: $organisatie_id
+      - name: criteria_door_overheid_bepaald
         type: boolean
         source_reference:
           source_type: AWB
@@ -89,8 +89,8 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
-      - name: IS_UITSLUITEND_FINANCIELE_UITKERING
+            value: $organisatie_id
+      - name: is_uitsluitend_financiele_uitkering
         type: boolean
         source_reference:
           source_type: AWB
@@ -100,8 +100,8 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
-      - name: IS_VOLKSVERTEGENWOORDIGEND_ORGAAN
+            value: $organisatie_id
+      - name: is_volksvertegenwoordigend_orgaan
         type: boolean
         source_reference:
           source_type: AWB
@@ -111,8 +111,8 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
-      - name: IS_RECHTERLIJK_ORGAAN
+            value: $organisatie_id
+      - name: is_rechterlijk_orgaan
         type: boolean
         source_reference:
           source_type: AWB
@@ -122,8 +122,8 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
-      - name: IS_OMBUDSMAN
+            value: $organisatie_id
+      - name: is_ombudsman
         type: boolean
         source_reference:
           source_type: AWB
@@ -133,8 +133,8 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
-      - name: IS_ALGEMENE_REKENKAMER
+            value: $organisatie_id
+      - name: is_algemene_rekenkamer
         type: boolean
         source_reference:
           source_type: AWB
@@ -144,7 +144,7 @@ articles:
           - name: organisatie_id
             description: Identifier van de organisatie
             type: string
-            value: $ORGANISATIE_ID
+            value: $organisatie_id
       output:
       - name: is_bestuursorgaan
         type: boolean
@@ -166,16 +166,16 @@ articles:
           operation: OR
           conditions:
           - operation: EQUALS
-            subject: $IS_VOLKSVERTEGENWOORDIGEND_ORGAAN
+            subject: $is_volksvertegenwoordigend_orgaan
             value: true
           - operation: EQUALS
-            subject: $IS_RECHTERLIJK_ORGAAN
+            subject: $is_rechterlijk_orgaan
             value: true
           - operation: EQUALS
-            subject: $IS_OMBUDSMAN
+            subject: $is_ombudsman
             value: true
           - operation: EQUALS
-            subject: $IS_ALGEMENE_REKENKAMER
+            subject: $is_algemene_rekenkamer
             value: true
       - output: qualifies_as_bestuursorgaan
         value:
@@ -184,10 +184,10 @@ articles:
           - operation: AND
             conditions:
             - operation: EQUALS
-              subject: $IS_ORGAAN_VAN_RECHTSPERSOON
+              subject: $is_orgaan_van_rechtspersoon
               value: true
             - operation: IN
-              subject: $PUBLIEKRECHTELIJKE_RECHTSPERSOON_TYPE
+              subject: $publiekrechtelijke_rechtspersoon_type
               values:
               - RIJK
               - PROVINCIE
@@ -197,24 +197,24 @@ articles:
           - operation: AND
             conditions:
             - operation: EQUALS
-              subject: $HEEFT_PUBLIEKRECHTELIJKE_BEVOEGDHEID
+              subject: $heeft_publiekrechtelijke_bevoegdheid
               value: true
             - operation: EQUALS
-              subject: $BEVOEGDHEID_BIJ_OF_KRACHTENS_WET
+              subject: $bevoegdheid_bij_of_krachtens_wet
               value: true
             - operation: EQUALS
-              subject: $IS_UITSLUITEND_FINANCIELE_UITKERING
+              subject: $is_uitsluitend_financiele_uitkering
               value: false
           - operation: AND
             conditions:
             - operation: EQUALS
-              subject: $IS_UITSLUITEND_FINANCIELE_UITKERING
+              subject: $is_uitsluitend_financiele_uitkering
               value: true
             - operation: GREATER_THAN_OR_EQUAL
-              subject: $OVERHEIDSFINANCIERING_PERCENTAGE
-              value: $TWEE_DERDE_DREMPEL
+              subject: $overheidsfinanciering_percentage
+              value: $twee_derde_drempel
             - operation: EQUALS
-              subject: $CRITERIA_DOOR_OVERHEID_BEPAALD
+              subject: $criteria_door_overheid_bepaald
               value: true
       - output: is_bestuursorgaan
         value:
@@ -233,10 +233,10 @@ articles:
           operation: AND
           conditions:
           - operation: EQUALS
-            subject: $IS_ORGAAN_VAN_RECHTSPERSOON
+            subject: $is_orgaan_van_rechtspersoon
             value: true
           - operation: IN
-            subject: $PUBLIEKRECHTELIJKE_RECHTSPERSOON_TYPE
+            subject: $publiekrechtelijke_rechtspersoon_type
             values:
             - RIJK
             - PROVINCIE
@@ -250,24 +250,24 @@ articles:
           - operation: AND
             conditions:
             - operation: EQUALS
-              subject: $HEEFT_PUBLIEKRECHTELIJKE_BEVOEGDHEID
+              subject: $heeft_publiekrechtelijke_bevoegdheid
               value: true
             - operation: EQUALS
-              subject: $BEVOEGDHEID_BIJ_OF_KRACHTENS_WET
+              subject: $bevoegdheid_bij_of_krachtens_wet
               value: true
             - operation: EQUALS
-              subject: $IS_UITSLUITEND_FINANCIELE_UITKERING
+              subject: $is_uitsluitend_financiele_uitkering
               value: false
           - operation: AND
             conditions:
             - operation: EQUALS
-              subject: $IS_UITSLUITEND_FINANCIELE_UITKERING
+              subject: $is_uitsluitend_financiele_uitkering
               value: true
             - operation: GREATER_THAN_OR_EQUAL
-              subject: $OVERHEIDSFINANCIERING_PERCENTAGE
-              value: $TWEE_DERDE_DREMPEL
+              subject: $overheidsfinanciering_percentage
+              value: $twee_derde_drempel
             - operation: EQUALS
-              subject: $CRITERIA_DOOR_OVERHEID_BEPAALD
+              subject: $criteria_door_overheid_bepaald
               value: true
       - output: bestuursorgaan_type
         value: GEEN_BESTUURSORGAAN
@@ -302,7 +302,7 @@ articles:
           operation: STATIC
           condition:
             operation: EQUALS
-            subject: $IS_VOLKSVERTEGENWOORDIGEND_ORGAAN
+            subject: $is_volksvertegenwoordigend_orgaan
             value: true
           value: VOLKSVERTEGENWOORDIGEND_ORGAAN
       - output: exclusion_reason
@@ -310,7 +310,7 @@ articles:
           operation: STATIC
           condition:
             operation: EQUALS
-            subject: $IS_RECHTERLIJK_ORGAAN
+            subject: $is_rechterlijk_orgaan
             value: true
           value: RECHTERLIJK_ORGAAN
       - output: exclusion_reason
@@ -318,7 +318,7 @@ articles:
           operation: STATIC
           condition:
             operation: EQUALS
-            subject: $IS_OMBUDSMAN
+            subject: $is_ombudsman
             value: true
           value: OMBUDSMAN
       - output: exclusion_reason
@@ -326,6 +326,6 @@ articles:
           operation: STATIC
           condition:
             operation: EQUALS
-            subject: $IS_ALGEMENE_REKENKAMER
+            subject: $is_algemene_rekenkamer
             value: true
           value: ALGEMENE_REKENKAMER

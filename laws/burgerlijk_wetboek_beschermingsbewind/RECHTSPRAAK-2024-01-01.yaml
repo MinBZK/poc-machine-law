@@ -22,7 +22,7 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel431
   machine_readable:
     definitions:
-      BEWINDVOERDER_RECHTEN:
+      bewindvoerder_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
@@ -32,11 +32,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: BEWIND_REGISTRATIES
+      - name: bewind_registraties
         type: array
         source_reference:
           table: bewind_registraties
@@ -51,7 +51,7 @@ articles:
           - name: bsn_bewindvoerder
             description: BSN nummer van de bewindvoerder
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_delegaties
         type: boolean
@@ -73,7 +73,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $BEWIND_REGISTRATIES
+          subject: $bewind_registraties
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -85,7 +85,7 @@ articles:
       - output: actief_bewind
         value:
           operation: FOREACH
-          subject: $BEWIND_REGISTRATIES
+          subject: $bewind_registraties
           where:
             operation: AND
             conditions:
@@ -171,7 +171,7 @@ articles:
         value:
           operation: FOREACH
           subject: $actief_bewind
-          value: $BEWINDVOERDER_RECHTEN
+          value: $bewindvoerder_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

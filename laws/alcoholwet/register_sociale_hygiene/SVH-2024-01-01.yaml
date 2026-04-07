@@ -29,11 +29,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: REGISTRATIE
+      - name: registratie
         type: object
         source_reference:
           table: registraties
@@ -41,7 +41,7 @@ articles:
           - name: bsn
             description: BSN van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_geregistreerd
         type: boolean
@@ -53,7 +53,7 @@ articles:
         type: date
       actions:
       - output: is_geregistreerd
-        value: $REGISTRATIE.is_geregistreerd
+        value: $registratie.is_geregistreerd
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458
@@ -62,7 +62,7 @@ articles:
           url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8
           explanation: Controle of persoon in register voorkomt
       - output: registratienummer
-        value: $REGISTRATIE.registratienummer
+        value: $registratie.registratienummer
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458
@@ -71,7 +71,7 @@ articles:
           url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8
           explanation: Ophalen registratienummer
       - output: naam
-        value: $REGISTRATIE.naam
+        value: $registratie.naam
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458
@@ -80,7 +80,7 @@ articles:
           url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8
           explanation: Ophalen naam
       - output: registratiedatum
-        value: $REGISTRATIE.registratiedatum
+        value: $registratie.registratiedatum
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458

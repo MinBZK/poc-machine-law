@@ -16,51 +16,51 @@ articles:
   url: https://wetten.overheid.nl/BWBR0004627/2024-01-01#ArtikelB1
   machine_readable:
     definitions:
-      MINIMUM_LEEFTIJD:
+      minimum_leeftijd:
         value: 18
     execution:
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         source:
           regulation: wet_brp
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN
-            REFERENTIEDATUM: $VERKIEZINGSDATUM
-      - name: NATIONALITEIT
+            bsn: $bsn
+            referentiedatum: $verkiezingsdatum
+      - name: nationaliteit
         type: boolean
         source:
           regulation: wet_brp
           output: heeft_nederlandse_nationaliteit
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: IS_GEDETINEERD
+            bsn: $bsn
+      - name: is_gedetineerd
         type: boolean
         source:
           regulation: penitentiaire_beginselenwet
           output: is_gedetineerd
           service: DJI
           parameters:
-            BSN: $BSN
-      - name: GERECHTELIJKE_UITSLUITING
+            bsn: $bsn
+      - name: gerechtelijke_uitsluiting
         type: boolean
         source:
           regulation: wetboek_van_strafrecht
           output: heeft_stemrecht_uitsluiting
           service: JUSTID
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $VERKIEZINGSDATUM
-      - name: VERKIEZINGSDATUM
+          reference: $verkiezingsdatum
+      - name: verkiezingsdatum
         type: date
         source_reference:
           table: verkiezingen
@@ -82,13 +82,13 @@ articles:
           juriconnect: jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12
           explanation: De vereisten voor kiesrecht zijn bepaald in artikel B1 en B3 van de Kieswet
         all:
-        - subject: $NATIONALITEIT
+        - subject: $nationaliteit
           operation: EQUALS
           value: true
-        - subject: $LEEFTIJD
+        - subject: $leeftijd
           operation: GREATER_THAN_OR_EQUAL
-          value: $MINIMUM_LEEFTIJD
-        - subject: $GERECHTELIJKE_UITSLUITING
+          value: $minimum_leeftijd
+        - subject: $gerechtelijke_uitsluiting
           operation: EQUALS
           value: false
       actions:
@@ -97,13 +97,13 @@ articles:
           operation: AND
           conditions:
           - operation: EQUALS
-            subject: $NATIONALITEIT
+            subject: $nationaliteit
             value: true
           - operation: GREATER_THAN_OR_EQUAL
-            subject: $LEEFTIJD
-            value: $MINIMUM_LEEFTIJD
+            subject: $leeftijd
+            value: $minimum_leeftijd
           - operation: EQUALS
-            subject: $GERECHTELIJKE_UITSLUITING
+            subject: $gerechtelijke_uitsluiting
             value: false
         legal_basis:
           law: Kieswet

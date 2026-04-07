@@ -147,9 +147,9 @@ def evaluate_law(
 
     # Determine parameters based on law type
     # Business laws may need KVK_NUMMER as the primary parameter
-    parameters = {"BSN": bsn}
+    parameters = {"bsn": bsn}
     if kvk_nummer:
-        parameters["KVK_NUMMER"] = kvk_nummer
+        parameters["kvk_nummer"] = kvk_nummer
     overwrite_input = None
 
     # If not approved (i.e., showing pending changes), get claims and apply them as overwrites
@@ -703,9 +703,9 @@ async def update_profile_table(
     machine_service.set_source_dataframe(service, table, df)
 
     # Re-evaluate the law and return the updated tile
-    parameters = {"BSN": bsn}
+    parameters = {"bsn": bsn}
     if kvk:
-        parameters["KVK_NUMMER"] = kvk
+        parameters["kvk_nummer"] = kvk
     result = machine_service.evaluate(
         service=service,
         law=law,

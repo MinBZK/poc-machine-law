@@ -23,22 +23,22 @@ articles:
   url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Artikel18.14
   machine_readable:
     definitions:
-      CO2_FACTOR_AUTO_BENZINE:
+      co2_factor_auto_benzine:
         value: 170
-      CO2_FACTOR_AUTO_DIESEL:
+      co2_factor_auto_diesel:
         value: 150
-      CO2_FACTOR_OPENBAAR_VERVOER:
+      co2_factor_openbaar_vervoer:
         value: 30
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: KVK_NUMMER
+      - name: kvk_nummer
         type: string
         required: true
       input:
-      - name: WOON_WERK_AUTO_BENZINE
+      - name: woon_werk_auto_benzine
         type: number
         source_reference:
           source_type: RVO
@@ -48,8 +48,8 @@ articles:
           - name: kvk_nummer
             description: KvK nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
-      - name: WOON_WERK_AUTO_DIESEL
+            value: $kvk_nummer
+      - name: woon_werk_auto_diesel
         type: number
         source_reference:
           source_type: RVO
@@ -59,8 +59,8 @@ articles:
           - name: kvk_nummer
             description: KvK nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
-      - name: ZAKELIJK_AUTO_BENZINE
+            value: $kvk_nummer
+      - name: zakelijk_auto_benzine
         type: number
         source_reference:
           source_type: RVO
@@ -70,8 +70,8 @@ articles:
           - name: kvk_nummer
             description: KvK nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
-      - name: ZAKELIJK_AUTO_DIESEL
+            value: $kvk_nummer
+      - name: zakelijk_auto_diesel
         type: number
         source_reference:
           source_type: RVO
@@ -81,8 +81,8 @@ articles:
           - name: kvk_nummer
             description: KvK nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
-      - name: WOON_WERK_OPENBAAR_VERVOER
+            value: $kvk_nummer
+      - name: woon_werk_openbaar_vervoer
         type: number
         source_reference:
           source_type: RVO
@@ -92,7 +92,7 @@ articles:
           - name: kvk_nummer
             description: KvK nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
+            value: $kvk_nummer
       output:
       - name: woon_werk_auto_benzine
         type: number
@@ -121,7 +121,7 @@ articles:
             explanation: Gegevensverzameling is altijd mogelijk voor organisaties die rapportageverplichting hebben
       actions:
       - output: woon_werk_auto_benzine
-        value: $WOON_WERK_AUTO_BENZINE
+        value: $woon_werk_auto_benzine
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330
@@ -131,7 +131,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01
           explanation: Woon-werkverkeer benzine kilometers voor CO2-berekening
       - output: woon_werk_auto_diesel
-        value: $WOON_WERK_AUTO_DIESEL
+        value: $woon_werk_auto_diesel
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330
@@ -141,7 +141,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01
           explanation: Woon-werkverkeer diesel kilometers voor CO2-berekening
       - output: zakelijk_auto_benzine
-        value: $ZAKELIJK_AUTO_BENZINE
+        value: $zakelijk_auto_benzine
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330
@@ -151,7 +151,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01
           explanation: Zakelijk verkeer benzine kilometers voor CO2-berekening
       - output: zakelijk_auto_diesel
-        value: $ZAKELIJK_AUTO_DIESEL
+        value: $zakelijk_auto_diesel
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330
@@ -161,7 +161,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01
           explanation: Zakelijk verkeer diesel kilometers voor CO2-berekening
       - output: woon_werk_openbaar_vervoer
-        value: $WOON_WERK_OPENBAAR_VERVOER
+        value: $woon_werk_openbaar_vervoer
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330
@@ -176,24 +176,24 @@ articles:
           values:
           - operation: MULTIPLY
             values:
-            - $WOON_WERK_AUTO_BENZINE
-            - $CO2_FACTOR_AUTO_BENZINE
+            - $woon_werk_auto_benzine
+            - $co2_factor_auto_benzine
           - operation: MULTIPLY
             values:
-            - $WOON_WERK_AUTO_DIESEL
-            - $CO2_FACTOR_AUTO_DIESEL
+            - $woon_werk_auto_diesel
+            - $co2_factor_auto_diesel
           - operation: MULTIPLY
             values:
-            - $ZAKELIJK_AUTO_BENZINE
-            - $CO2_FACTOR_AUTO_BENZINE
+            - $zakelijk_auto_benzine
+            - $co2_factor_auto_benzine
           - operation: MULTIPLY
             values:
-            - $ZAKELIJK_AUTO_DIESEL
-            - $CO2_FACTOR_AUTO_DIESEL
+            - $zakelijk_auto_diesel
+            - $co2_factor_auto_diesel
           - operation: MULTIPLY
             values:
-            - $WOON_WERK_OPENBAAR_VERVOER
-            - $CO2_FACTOR_OPENBAAR_VERVOER
+            - $woon_werk_openbaar_vervoer
+            - $co2_factor_openbaar_vervoer
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330

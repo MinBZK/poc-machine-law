@@ -27,11 +27,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: KINDEREN_DATA
+      - name: kinderen_data
         type: object
         source_reference:
           table: algemene_kinderbijslagwet
@@ -43,7 +43,7 @@ articles:
           - name: ouder_bsn
             description: BSN van de ouder
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: ontvangt_kinderbijslag
         type: boolean
@@ -56,8 +56,8 @@ articles:
         type: array
       actions:
       - output: ontvangt_kinderbijslag
-        value: $KINDEREN_DATA.ontvangt_kinderbijslag
+        value: $kinderen_data.ontvangt_kinderbijslag
       - output: aantal_kinderen
-        value: $KINDEREN_DATA.aantal_kinderen
+        value: $kinderen_data.aantal_kinderen
       - output: kinderen_leeftijden
-        value: $KINDEREN_DATA.kinderen_leeftijden
+        value: $kinderen_data.kinderen_leeftijden

@@ -183,51 +183,51 @@ def step_impl(context, date):
 
 @given('een persoon met BSN "{bsn}"')
 def step_impl(context, bsn):
-    context.parameters["BSN"] = bsn
+    context.parameters["bsn"] = bsn
 
 
 @given('een organisatie met KVK-nummer "{kvk_nummer}"')
 def step_impl(context, kvk_nummer):
-    context.parameters["KVK_NUMMER"] = kvk_nummer
+    context.parameters["kvk_nummer"] = kvk_nummer
 
 
 @given('een {entity_type} met ID "{entity_id}"')
 def step_impl(context, entity_type, entity_id):
     """Generic entity setup. Converts entity_type to UPPER_CASE_ID parameter."""
     param_mapping = {
-        "ICT-project": "PROJECT_ID",
-        "organisatie": "ORGANISATIE_ID",
-        "archiefstuk": "ARCHIEFSTUK_ID",
-        "project": "PROJECT_ID",
+        "ICT-project": "project_id",
+        "organisatie": "organisatie_id",
+        "archiefstuk": "archiefstuk_id",
+        "project": "project_id",
     }
-    param_name = param_mapping.get(entity_type, f"{entity_type.upper().replace('-', '_')}_ID")
+    param_name = param_mapping.get(entity_type, f"{entity_type.lower().replace('-', '_')}_id")
     context.parameters[param_name] = entity_id
 
 
 @given('een werkgever met loonheffingennummer "{number}"')
 def step_impl(context, number):
-    context.parameters["LOONHEFFINGENNUMMER"] = number
+    context.parameters["loonheffingennummer"] = number
 
 
 @given('een werknemer met bruto jaarloon "{amount}" euro')
 def step_impl(context, amount):
-    context.parameters["BRUTO_LOON"] = float(amount)
+    context.parameters["bruto_loon"] = float(amount)
 
 
 @given('een onderneming met KVK nummer "{kvk_nummer}"')
 def step_impl(context, kvk_nummer):
-    context.parameters["KVK_NUMMER"] = kvk_nummer
-    context.test_data["KVK_NUMMER"] = kvk_nummer
+    context.parameters["kvk_nummer"] = kvk_nummer
+    context.test_data["kvk_nummer"] = kvk_nummer
 
 
 @given("er is geen Bibob-advies uitgebracht voor deze onderneming")
 def step_impl(context):
-    context.test_data["NO_BIBOB_ADVIES"] = True
+    context.test_data["no_bibob_advies"] = True
 
 
 @given('de aanvraag betreft een "{aanvraag_type}"')
 def step_impl(context, aanvraag_type):
-    context.parameters["AANVRAAG_TYPE"] = aanvraag_type
+    context.parameters["aanvraag_type"] = aanvraag_type
 
 
 @given("een archiefstuk met de volgende eigenschappen")
@@ -238,8 +238,8 @@ def step_impl(context):
     for row in context.table:
         for heading in context.table.headings:
             value = parse_value(row[heading])
-            context.parameters[heading.upper()] = value
-            context.test_data[heading.upper()] = value
+            context.parameters[heading] = value
+            context.test_data[heading] = value
 
 
 @given("alle aanvragen worden beoordeeld")
@@ -284,7 +284,7 @@ def step_impl(context, law, service):
 @when("de persoon dit aanvraagt")
 def step_impl(context):
     case_id = context.services.case_manager.submit_case(
-        bsn=context.parameters["BSN"],
+        bsn=context.parameters["bsn"],
         service_type=context.service,
         law=context.law,
         parameters=context.result.input,
@@ -355,7 +355,7 @@ def step_impl(context, chance):
         context.claims = []
 
     for row in context.table:
-        identifier = context.parameters.get("BSN") or context.parameters.get("KVK_NUMMER")
+        identifier = context.parameters.get("bsn") or context.parameters.get("kvk_nummer")
         claim_id = context.services.claim_manager.submit_claim(
             service=row["service"],
             key=row["key"],

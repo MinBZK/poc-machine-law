@@ -21,7 +21,7 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel378
   machine_readable:
     definitions:
-      CURATOR_RECHTEN:
+      curator_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
@@ -31,11 +31,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: CURATELE_REGISTRATIES
+      - name: curatele_registraties
         type: array
         source_reference:
           table: curatele_registraties
@@ -49,7 +49,7 @@ articles:
           - name: bsn_curator
             description: BSN nummer van de curator
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_delegaties
         type: boolean
@@ -71,7 +71,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $CURATELE_REGISTRATIES
+          subject: $curatele_registraties
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -83,7 +83,7 @@ articles:
       - output: actieve_curatele
         value:
           operation: FOREACH
-          subject: $CURATELE_REGISTRATIES
+          subject: $curatele_registraties
           where:
             operation: AND
             conditions:
@@ -169,7 +169,7 @@ articles:
         value:
           operation: FOREACH
           subject: $actieve_curatele
-          value: $CURATOR_RECHTEN
+          value: $curator_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

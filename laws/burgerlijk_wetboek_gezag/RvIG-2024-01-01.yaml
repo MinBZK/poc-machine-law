@@ -20,20 +20,20 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel245
   machine_readable:
     definitions:
-      BEVOEGDE_GEZAG_TYPEN:
+      bevoegde_gezag_typen:
         value:
         - OUDERLIJK_GEZAG
         - GEZAMENLIJK_GEZAG
         - VOOGDIJ
         - VOOGDIJ_INSTELLING
-      MEERDERJARIGHEID_LEEFTIJD:
+      meerderjarigheid_leeftijd:
         value: 18
-      GEZAG_RECHTEN:
+      gezag_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
         - BESLUITEN_ONTVANGEN
-      BEPERKTE_GEZAG_RECHTEN:
+      beperkte_gezag_rechten:
         value:
         - LEZEN
     execution:
@@ -41,11 +41,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: GEZAG_RELATIES
+      - name: gezag_relaties
         type: array
         source_reference:
           table: gezag_relaties
@@ -62,7 +62,7 @@ articles:
           - name: bsn_gezagdrager
             description: BSN nummer van de gezagsdrager
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_delegaties
         type: boolean
@@ -84,7 +84,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $GEZAG_RELATIES
+          subject: $gezag_relaties
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -96,13 +96,13 @@ articles:
       - output: bevoegde_gezag_relaties
         value:
           operation: FOREACH
-          subject: $GEZAG_RELATIES
+          subject: $gezag_relaties
           where:
             operation: AND
             conditions:
             - operation: IN
               subject: $current.type_gezag
-              values: $BEVOEGDE_GEZAG_TYPEN
+              values: $bevoegde_gezag_typen
             - operation: EQUALS
               subject: $current.status
               value: ACTIEF
@@ -111,7 +111,7 @@ articles:
                 operation: AGE
                 reference_date: $calculation_date
                 date_of_birth: $current.geboortedatum_kind
-              value: $MEERDERJARIGHEID_LEEFTIJD
+              value: $meerderjarigheid_leeftijd
             - operation: OR
               conditions:
               - operation: IS_NULL
@@ -196,8 +196,8 @@ articles:
                 operation: EQUALS
                 subject: $current.heeft_handlichting
                 value: true
-              then: $BEPERKTE_GEZAG_RECHTEN
-            default: $GEZAG_RECHTEN
+              then: $beperkte_gezag_rechten
+            default: $gezag_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

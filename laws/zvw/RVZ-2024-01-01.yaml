@@ -45,11 +45,11 @@ articles:
   url: https://wetten.overheid.nl/BWBR0018450/2024-01-01#Artikel1
   machine_readable:
     definitions:
-      ACTIEVE_POLIS_STATUSSEN:
+      actieve_polis_statussen:
         value:
         - ACTIEF
         - GESCHORST_MET_TERUGWERKENDE_KRACHT
-      GELDIGE_VERDRAGSLANDEN:
+      geldige_verdragslanden:
         value:
         - BELGIE
         - DUITSLAND
@@ -61,11 +61,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: VERBLIJFSLAND
+      - name: verblijfsland
         type: string
         source:
           regulation: wet_brp
@@ -74,7 +74,7 @@ articles:
         temporal:
           type: period
           period_type: continuous
-      - name: IS_GEDETINEERD
+      - name: is_gedetineerd
         type: boolean
         source:
           regulation: penitentiaire_beginselenwet
@@ -83,7 +83,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $prev_january_first
-      - name: VERZEKERINGSPOLIS
+      - name: verzekeringspolis
         type: object
         source_reference:
           table: verzekeringen
@@ -92,8 +92,8 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
-      - name: VERDRAGSINSCHRIJVING
+            value: $bsn
+      - name: verdragsinschrijving
         type: object
         source_reference:
           table: verdragsverzekeringen
@@ -102,7 +102,7 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_verzekering
         type: boolean
@@ -118,10 +118,10 @@ articles:
           - operation: NOT
             value:
               operation: IS_NULL
-              subject: $VERZEKERINGSPOLIS
+              subject: $verzekeringspolis
           - operation: IN
-            subject: $VERZEKERINGSPOLIS
-            values: $ACTIEVE_POLIS_STATUSSEN
+            subject: $verzekeringspolis
+            values: $actieve_polis_statussen
         legal_basis:
           law: Zorgverzekeringswet
           bwb_id: BWBR0018450
@@ -136,12 +136,12 @@ articles:
           - operation: NOT
             value:
               operation: IS_NULL
-              subject: $VERDRAGSINSCHRIJVING
+              subject: $verdragsinschrijving
           - operation: IN
-            subject: $VERBLIJFSLAND
-            values: $GELDIGE_VERDRAGSLANDEN
+            subject: $verblijfsland
+            values: $geldige_verdragslanden
           - operation: EQUALS
-            subject: $VERDRAGSINSCHRIJVING
+            subject: $verdragsinschrijving
             value: ACTIEF
         legal_basis:
           law: Zorgverzekeringswet
@@ -165,7 +165,7 @@ articles:
           - operation: NOT
             value:
               operation: EQUALS
-              subject: $IS_GEDETINEERD
+              subject: $is_gedetineerd
               value: true
         legal_basis:
           law: Zorgverzekeringswet

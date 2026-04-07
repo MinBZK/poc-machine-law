@@ -28,18 +28,18 @@ articles:
   url: https://wetten.overheid.nl/BWBR0011823/2024-01-01#Artikel8
   machine_readable:
     definitions:
-      VALID_PERMIT_STATUSES:
+      valid_permit_statuses:
         value:
         - VERLEEND
         - VERLENGD
         - VAN_RECHTSWEGE
-      PERMANENT_TYPES:
+      permanent_types:
         value:
         - ONBEPAALDE_TIJD_REGULIER
         - ONBEPAALDE_TIJD_ASIEL
         - ONBEPAALDE_TIJD_EU
         - DUURZAAM_VERBLIJF_EU
-      EU_TYPES:
+      eu_types:
         value:
         - EU_BURGER
         - FAMILIE_EU_BURGER
@@ -48,11 +48,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: VERGUNNING_GEGEVENS
+      - name: vergunning_gegevens
         type: object
         source_reference:
           table: verblijfsvergunningen
@@ -65,8 +65,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: EU_INSCHRIJVING
+            value: $bsn
+      - name: eu_inschrijving
         type: object
         source_reference:
           table: eu_registraties
@@ -77,7 +77,7 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: verblijfsvergunning_type
         type: string
@@ -90,28 +90,28 @@ articles:
               operation: AND
               conditions:
               - operation: IN
-                subject: $VERGUNNING_GEGEVENS.type
-                values: $PERMANENT_TYPES
+                subject: $vergunning_gegevens.type
+                values: $permanent_types
               - operation: IN
-                subject: $VERGUNNING_GEGEVENS.status
-                values: $VALID_PERMIT_STATUSES
+                subject: $vergunning_gegevens.status
+                values: $valid_permit_statuses
             then: PERMANENT
           - when:
               operation: IN
-              subject: $EU_INSCHRIJVING.type
-              values: $EU_TYPES
+              subject: $eu_inschrijving.type
+              values: $eu_types
             then: EU
           - when:
               operation: AND
               conditions:
               - operation: IN
-                subject: $VERGUNNING_GEGEVENS.status
-                values: $VALID_PERMIT_STATUSES
+                subject: $vergunning_gegevens.status
+                values: $valid_permit_statuses
               - operation: LESS_THAN_OR_EQUAL
-                subject: $VERGUNNING_GEGEVENS.ingangsdatum
+                subject: $vergunning_gegevens.ingangsdatum
                 value: $calculation_date
               - operation: GREATER_THAN_OR_EQUAL
-                subject: $VERGUNNING_GEGEVENS.einddatum
+                subject: $vergunning_gegevens.einddatum
                 value: $calculation_date
             then: TIJDELIJK
         legal_basis:

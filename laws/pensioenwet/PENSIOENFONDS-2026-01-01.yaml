@@ -119,35 +119,35 @@ articles:
   url: https://wetten.overheid.nl/BWBR0020809/2026-01-01#Artikel1
   machine_readable:
     definitions:
-      OPBOUW_MIDDELLOON:
+      opbouw_middelloon:
         value: 0.0175
-      OPBOUW_EINDLOON:
+      opbouw_eindloon:
         value: 0.0167
-      OMREKENFACTOR_KAPITAAL:
+      omrekenfactor_kapitaal:
         value: 0.05
-      MAANDEN_PER_JAAR:
+      maanden_per_jaar:
         value: 12
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: GEBOORTEDATUM
+      - name: geboortedatum
         type: date
         source:
           regulation: wet_brp
           output: geboortedatum
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         type_spec:
           unit: years
@@ -158,11 +158,11 @@ articles:
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PENSIOENKAPITAAL
+      - name: pensioenkapitaal
         type: amount
         source_reference:
           table: pensioen_deelnemers
@@ -171,8 +171,8 @@ articles:
           - name: bsn
             description: BSN van de deelnemer
             type: string
-            value: $BSN
-      - name: PENSIOENJAREN
+            value: $bsn
+      - name: pensioenjaren
         type: number
         source_reference:
           table: pensioen_deelnemers
@@ -181,8 +181,8 @@ articles:
           - name: bsn
             description: BSN van de deelnemer
             type: string
-            value: $BSN
-      - name: TYPE_REGELING
+            value: $bsn
+      - name: type_regeling
         type: string
         source_reference:
           table: pensioen_deelnemers
@@ -191,8 +191,8 @@ articles:
           - name: bsn
             description: BSN van de deelnemer
             type: string
-            value: $BSN
-      - name: FRANCHISE
+            value: $bsn
+      - name: franchise
         type: amount
         source_reference:
           table: pensioen_deelnemers
@@ -201,8 +201,8 @@ articles:
           - name: bsn
             description: BSN van de deelnemer
             type: string
-            value: $BSN
-      - name: PENSIOENGEVEND_LOON
+            value: $bsn
+      - name: pensioengevend_loon
         type: amount
         source_reference:
           table: pensioen_deelnemers
@@ -211,8 +211,8 @@ articles:
           - name: bsn
             description: BSN van de deelnemer
             type: string
-            value: $BSN
-      - name: PENSIOEN_LEEFTIJD_FONDS
+            value: $bsn
+      - name: pensioen_leeftijd_fonds
         type: number
         source_reference:
           table: pensioen_deelnemers
@@ -221,7 +221,7 @@ articles:
           - name: bsn
             description: BSN van de deelnemer
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_gepensioneerd
         type: boolean
@@ -251,10 +251,10 @@ articles:
           min: 60
       requirements:
       - all:
-        - subject: $LEEFTIJD
+        - subject: $leeftijd
           operation: GREATER_THAN_OR_EQUAL
-          value: $PENSIOEN_LEEFTIJD_FONDS
-        - subject: $PENSIOENKAPITAAL
+          value: $pensioen_leeftijd_fonds
+        - subject: $pensioenkapitaal
           operation: GREATER_THAN
           value: 0
       actions:
@@ -269,7 +269,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0020809&artikel=10&lid=1&z=2024-01-01&g=2024-01-01
           explanation: 'Artikel 10 lid 1 Pensioenwet: toekenning ouderdomspensioen'
       - output: pensioenkapitaal
-        value: $PENSIOENKAPITAAL
+        value: $pensioenkapitaal
         legal_basis:
           law: Pensioenwet
           bwb_id: BWBR0020809
@@ -278,7 +278,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0020809&artikel=51&z=2024-01-01&g=2024-01-01
           explanation: 'Artikel 51 Pensioenwet: informatieverstrekking over opgebouwd kapitaal'
       - output: pensioenleeftijd
-        value: $PENSIOEN_LEEFTIJD_FONDS
+        value: $pensioen_leeftijd_fonds
         legal_basis:
           law: Pensioenwet
           bwb_id: BWBR0020809
@@ -293,44 +293,44 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $TYPE_REGELING
+              subject: $type_regeling
               value: beschikbare_premie
             then:
               operation: MULTIPLY
               values:
-              - $PENSIOENKAPITAAL
-              - $OMREKENFACTOR_KAPITAAL
+              - $pensioenkapitaal
+              - $omrekenfactor_kapitaal
           - when:
               operation: EQUALS
-              subject: $TYPE_REGELING
+              subject: $type_regeling
               value: middelloon
             then:
               operation: MULTIPLY
               values:
-              - $OPBOUW_MIDDELLOON
-              - $PENSIOENJAREN
+              - $opbouw_middelloon
+              - $pensioenjaren
               - operation: SUBTRACT
                 values:
-                - $PENSIOENGEVEND_LOON
-                - $FRANCHISE
+                - $pensioengevend_loon
+                - $franchise
           - when:
               operation: EQUALS
-              subject: $TYPE_REGELING
+              subject: $type_regeling
               value: eindloon
             then:
               operation: MULTIPLY
               values:
-              - $OPBOUW_EINDLOON
-              - $PENSIOENJAREN
+              - $opbouw_eindloon
+              - $pensioenjaren
               - operation: SUBTRACT
                 values:
-                - $PENSIOENGEVEND_LOON
-                - $FRANCHISE
+                - $pensioengevend_loon
+                - $franchise
           default:
             operation: MULTIPLY
             values:
-            - $PENSIOENKAPITAAL
-            - $OMREKENFACTOR_KAPITAAL
+            - $pensioenkapitaal
+            - $omrekenfactor_kapitaal
         legal_basis:
           law: Pensioenwet
           bwb_id: BWBR0020809
@@ -343,7 +343,7 @@ articles:
           operation: DIVIDE
           values:
           - $pensioen_uitkering_bruto
-          - $MAANDEN_PER_JAAR
+          - $maanden_per_jaar
         legal_basis:
           law: Pensioenwet
           bwb_id: BWBR0020809

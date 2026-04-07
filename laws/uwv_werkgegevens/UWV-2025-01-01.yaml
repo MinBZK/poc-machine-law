@@ -81,11 +81,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: WERKGEGEVENS
+      - name: werkgegevens
         type: object
         source_reference:
           table: uwv_werkgegevens
@@ -99,7 +99,7 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de werknemer
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: gemiddeld_uren_per_week
         type: number
@@ -128,12 +128,12 @@ articles:
         type: amount
       actions:
       - output: gemiddeld_uren_per_week
-        value: $WERKGEGEVENS.gemiddeld_uren_per_week
+        value: $werkgegevens.gemiddeld_uren_per_week
       - output: huidige_uren_per_week
-        value: $WERKGEGEVENS.huidige_uren_per_week
+        value: $werkgegevens.huidige_uren_per_week
       - output: gewerkte_weken_36
-        value: $WERKGEGEVENS.gewerkte_weken_36
+        value: $werkgegevens.gewerkte_weken_36
       - output: arbeidsverleden_jaren
-        value: $WERKGEGEVENS.arbeidsverleden_jaren
+        value: $werkgegevens.arbeidsverleden_jaren
       - output: jaarloon
-        value: $WERKGEGEVENS.jaarloon
+        value: $werkgegevens.jaarloon

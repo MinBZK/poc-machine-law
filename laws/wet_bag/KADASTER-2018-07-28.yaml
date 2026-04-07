@@ -29,10 +29,10 @@ articles:
   url: https://wetten.overheid.nl/BWBR0023466/2018-07-28#Artikel1
   machine_readable:
     definitions:
-      WOON_GEBRUIKSDOELEN:
+      woon_gebruiksdoelen:
         value:
         - woonfunctie
-      NIET_WOON_GEBRUIKSDOELEN:
+      niet_woon_gebruiksdoelen:
         value:
         - bijeenkomstfunctie
         - celfunctie
@@ -49,11 +49,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: ADRES
+      - name: adres
         type: string
         required: true
       input:
-      - name: VERBLIJFSOBJECT
+      - name: verblijfsobject
         type: object
         source_reference:
           table: bag_verblijfsobjecten
@@ -66,7 +66,7 @@ articles:
           - name: adres
             description: Volledig adres
             type: string
-            value: $ADRES
+            value: $adres
       output:
       - name: gebruiksdoel
         type: string
@@ -84,7 +84,7 @@ articles:
         - operation: NOT
           value:
             operation: IS_NULL
-            subject: $ADRES
+            subject: $adres
           legal_basis:
             law: Wet basisregistratie adressen en gebouwen
             bwb_id: BWBR0023466
@@ -94,7 +94,7 @@ articles:
             explanation: Artikel 1 vereist adresgegevens voor opzoeken verblijfsobject
       actions:
       - output: gebruiksdoel
-        value: $VERBLIJFSOBJECT.gebruiksdoel
+        value: $verblijfsobject.gebruiksdoel
         legal_basis:
           law: Wet basisregistratie adressen en gebouwen
           bwb_id: BWBR0023466
@@ -103,7 +103,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28
           explanation: Artikel 1 bepaalt registratie van gebruiksdoel
       - output: oppervlakte
-        value: $VERBLIJFSOBJECT.oppervlakte
+        value: $verblijfsobject.oppervlakte
         legal_basis:
           law: Wet basisregistratie adressen en gebouwen
           bwb_id: BWBR0023466
@@ -112,7 +112,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28
           explanation: Artikel 1 bepaalt registratie van oppervlakte
       - output: status
-        value: $VERBLIJFSOBJECT.status
+        value: $verblijfsobject.status
         legal_basis:
           law: Wet basisregistratie adressen en gebouwen
           bwb_id: BWBR0023466
@@ -123,8 +123,8 @@ articles:
       - output: is_woonfunctie
         value:
           operation: IN
-          subject: $VERBLIJFSOBJECT.gebruiksdoel
-          values: $WOON_GEBRUIKSDOELEN
+          subject: $verblijfsobject.gebruiksdoel
+          values: $woon_gebruiksdoelen
         legal_basis:
           law: Wet basisregistratie adressen en gebouwen
           bwb_id: BWBR0023466

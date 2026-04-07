@@ -28,17 +28,17 @@ articles:
   url: https://wetten.overheid.nl/BWBR0040179/2018-01-01#Artikel3.7
   machine_readable:
     definitions:
-      DOSIS_LIMIET_BEVOLKING_ALGEMEEN:
+      dosis_limiet_bevolking_algemeen:
         value: 1.0
-      DOSIS_LIMIET_BEVOLKING_BUITEN_LOCATIE:
+      dosis_limiet_bevolking_buiten_locatie:
         value: 0.1
-      DOSIS_LIMIET_HUID:
+      dosis_limiet_huid:
         value: 50.0
-      LIMIET_TYPE_ALGEMEEN:
+      limiet_type_algemeen:
         value: effectieve_dosis_algemeen
-      LIMIET_TYPE_BUITEN_LOCATIE:
+      limiet_type_buiten_locatie:
         value: effectieve_dosis_buiten_locatie
-      LIMIET_TYPE_HUID:
+      limiet_type_huid:
         value: equivalente_dosis_huid
     execution:
       produces:
@@ -94,7 +94,7 @@ articles:
           - when:
               operation: GREATER_THAN
               subject: $verwachte_dosis_jaar
-              value: $DOSIS_LIMIET_BEVOLKING_ALGEMEEN
+              value: $dosis_limiet_bevolking_algemeen
             then:
             - effectieve_dosis_algemeen
           - when:
@@ -106,7 +106,7 @@ articles:
                   subject: $dosis_buiten_locatie
               - operation: GREATER_THAN
                 subject: $dosis_buiten_locatie
-                value: $DOSIS_LIMIET_BEVOLKING_BUITEN_LOCATIE
+                value: $dosis_limiet_bevolking_buiten_locatie
             then:
             - effectieve_dosis_buiten_locatie
           - when:
@@ -118,7 +118,7 @@ articles:
                   subject: $verwachte_dosis_huid
               - operation: GREATER_THAN
                 subject: $verwachte_dosis_huid
-                value: $DOSIS_LIMIET_HUID
+                value: $dosis_limiet_huid
             then:
             - equivalente_dosis_huid
           default: []

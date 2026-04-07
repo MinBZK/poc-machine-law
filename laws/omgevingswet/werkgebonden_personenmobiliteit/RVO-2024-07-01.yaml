@@ -32,18 +32,18 @@ articles:
   url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Artikel18.11
   machine_readable:
     definitions:
-      WERKNEMERS_DREMPEL:
+      werknemers_drempel:
         value: 100
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: KVK_NUMMER
+      - name: kvk_nummer
         type: string
         required: true
       input:
-      - name: AANTAL_WERKNEMERS
+      - name: aantal_werknemers
         type: number
         source_reference:
           source_type: RVO
@@ -53,8 +53,8 @@ articles:
           - name: kvk_nummer
             description: KvK nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
-      - name: VERSTREKT_MOBILITEITSVERGOEDING
+            value: $kvk_nummer
+      - name: verstrekt_mobiliteitsvergoeding
         type: boolean
         source_reference:
           source_type: RVO
@@ -64,7 +64,7 @@ articles:
           - name: kvk_nummer
             description: KvK nummer van de organisatie
             type: string
-            value: $KVK_NUMMER
+            value: $kvk_nummer
       output:
       - name: rapportageverplichting
         type: boolean
@@ -72,7 +72,7 @@ articles:
         type: number
       requirements:
       - all:
-        - subject: $VERSTREKT_MOBILITEITSVERGOEDING
+        - subject: $verstrekt_mobiliteitsvergoeding
           operation: EQUALS
           value: true
           legal_basis:
@@ -84,8 +84,8 @@ articles:
             juriconnect: jci1.3:c:BWBR0041330&artikel=18.11&lid=2&z=2024-07-01&g=2024-07-01
             explanation: Organisaties moeten mobiliteitsvergoeding verstrekken om onder rapportageverplichting te vallen
         - operation: GREATER_THAN_OR_EQUAL
-          subject: $AANTAL_WERKNEMERS
-          value: $WERKNEMERS_DREMPEL
+          subject: $aantal_werknemers
+          value: $werknemers_drempel
           legal_basis:
             law: Besluit activiteiten leefomgeving
             bwb_id: BWBR0041330
@@ -106,7 +106,7 @@ articles:
           juriconnect: jci1.3:c:BWBR0041330&artikel=18.11&lid=1&z=2024-07-01&g=2024-07-01
           explanation: De organisatie voldoet aan alle voorwaarden voor rapportageverplichting van werkgebonden personenmobiliteit
       - output: aantal_werknemers
-        value: $AANTAL_WERKNEMERS
+        value: $aantal_werknemers
         legal_basis:
           law: Besluit activiteiten leefomgeving
           bwb_id: BWBR0041330

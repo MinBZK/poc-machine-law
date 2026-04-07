@@ -18,11 +18,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: BOX1_INKOMEN
+      - name: box1_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -34,7 +34,7 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: BOX2_INKOMEN
+      - name: box2_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -46,7 +46,7 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: BOX3_INKOMEN
+      - name: box3_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -58,7 +58,7 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: BUITENLANDS_INKOMEN
+      - name: buitenlands_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -70,7 +70,7 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: PARTNER_BOX1_INKOMEN
+      - name: partner_box1_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -82,7 +82,7 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: PARTNER_BOX2_INKOMEN
+      - name: partner_box2_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -94,7 +94,7 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: PARTNER_BOX3_INKOMEN
+      - name: partner_box3_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -106,7 +106,7 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: PARTNER_BUITENLANDS_INKOMEN
+      - name: partner_buitenlands_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -136,15 +136,15 @@ articles:
         value:
           operation: ADD
           values:
-          - $BOX1_INKOMEN
-          - $BOX2_INKOMEN
-          - $BOX3_INKOMEN
-          - $BUITENLANDS_INKOMEN
+          - $box1_inkomen
+          - $box2_inkomen
+          - $box3_inkomen
+          - $buitenlands_inkomen
       - output: partner_inkomen
         value:
           operation: ADD
           values:
-          - $PARTNER_BOX1_INKOMEN
-          - $PARTNER_BOX2_INKOMEN
-          - $PARTNER_BOX3_INKOMEN
-          - $PARTNER_BUITENLANDS_INKOMEN
+          - $partner_box1_inkomen
+          - $partner_box2_inkomen
+          - $partner_box3_inkomen
+          - $partner_buitenlands_inkomen

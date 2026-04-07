@@ -21,7 +21,7 @@ articles:
   url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Artikel465
   machine_readable:
     definitions:
-      WGBO_RELATIE_HIERARCHIE:
+      wgbo_relatie_hierarchie:
         value:
         - ECHTGENOOT
         - GEREGISTREERD_PARTNER
@@ -30,7 +30,7 @@ articles:
         - KIND
         - BROER
         - ZUS
-      WGBO_VERTEGENWOORDIGER_RECHTEN:
+      wgbo_vertegenwoordiger_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
@@ -40,11 +40,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: FAMILIE_RELATIES
+      - name: familie_relaties
         type: array
         source_reference:
           table: wgbo_familie_relaties
@@ -58,7 +58,7 @@ articles:
           - name: bsn_familielid
             description: BSN nummer van het familielid (potentiele vertegenwoordiger)
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: heeft_delegaties
         type: boolean
@@ -80,7 +80,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $FAMILIE_RELATIES
+          subject: $familie_relaties
         legal_basis:
           law: Burgerlijk Wetboek Boek 7
           bwb_id: BWBR0005290
@@ -92,7 +92,7 @@ articles:
       - output: wgbo_vertegenwoordigingen
         value:
           operation: FOREACH
-          subject: $FAMILIE_RELATIES
+          subject: $familie_relaties
           where:
             operation: AND
             conditions:
@@ -101,7 +101,7 @@ articles:
               value: true
             - operation: IN
               subject: $current.relatie_type
-              values: $WGBO_RELATIE_HIERARCHIE
+              values: $wgbo_relatie_hierarchie
           value: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 7
@@ -194,7 +194,7 @@ articles:
         value:
           operation: FOREACH
           subject: $wgbo_vertegenwoordigingen
-          value: $WGBO_VERTEGENWOORDIGER_RECHTEN
+          value: $wgbo_vertegenwoordiger_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 7
           bwb_id: BWBR0005290

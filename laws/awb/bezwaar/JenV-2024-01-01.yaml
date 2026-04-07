@@ -23,28 +23,28 @@ articles:
   url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Artikel7:1
   machine_readable:
     definitions:
-      EXCLUDED_DECISION_TYPES:
+      excluded_decision_types:
         value:
         - ALGEMEEN_VERBINDEND_VOORSCHRIFT
         - BELEIDSREGEL
         - VOORBEREIDINGSBESLUIT
         - ANDERE_HANDELING
-      REQUIRED_LEGAL_CHARACTER:
+      required_legal_character:
         value:
         - BESCHIKKING
         - BESLUIT_VAN_ALGEMENE_STREKKING
-      DEFAULT_TERMIJN_BEZWAAR_WEKEN:
+      default_termijn_bezwaar_weken:
         value: 6
-      DEFAULT_TERMIJN_BESLISSING_WEKEN:
+      default_termijn_beslissing_weken:
         value: 6
-      DEFAULT_TERMIJN_VERDAGING_WEKEN:
+      default_termijn_verdaging_weken:
         value: 6
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       input:
-      - name: WET
+      - name: wet
         type: object
         source_reference:
           source_type: laws
@@ -61,8 +61,8 @@ articles:
           - name: uuid
             description: UUID van de wet
             type: string
-            value: $ZAAK.rulespec_uuid
-      - name: GEBEURTENISSEN
+            value: $zaak.rulespec_uuid
+      - name: gebeurtenissen
         type: object
         source_reference:
           source_type: events
@@ -74,7 +74,7 @@ articles:
           - name: case_id
             description: Zaak identifier
             type: string
-            value: $ZAAK.id
+            value: $zaak.id
       output:
       - name: bezwaar_mogelijk
         type: boolean
@@ -104,15 +104,15 @@ articles:
           operation: AND
           conditions:
           - operation: NOT_IN
-            subject: $WET.decision_type
-            values: $EXCLUDED_DECISION_TYPES
+            subject: $wet.decision_type
+            values: $excluded_decision_types
           - operation: IN
-            subject: $WET.legal_character
-            values: $REQUIRED_LEGAL_CHARACTER
+            subject: $wet.legal_character
+            values: $required_legal_character
           - operation: EQUALS
             subject:
               operation: FOREACH
-              subject: $GEBEURTENISSEN
+              subject: $gebeurtenissen
               value:
               - operation: EQUALS
                 subject: $event_type
@@ -133,13 +133,13 @@ articles:
           cases:
           - when:
               operation: IN
-              subject: $WET.decision_type
-              values: $EXCLUDED_DECISION_TYPES
+              subject: $wet.decision_type
+              values: $excluded_decision_types
             then: tegen dit type besluit is geen bezwaar mogelijk
           - when:
               operation: NOT_IN
-              subject: $WET.legal_character
-              values: $REQUIRED_LEGAL_CHARACTER
+              subject: $wet.legal_character
+              values: $required_legal_character
             then: dit is geen besluit in de zin van de AWB
           - when:
               operation: NOT
@@ -147,7 +147,7 @@ articles:
                 operation: EQUALS
                 values:
                 - operation: FOREACH
-                  subject: $GEBEURTENISSEN
+                  subject: $gebeurtenissen
                   value:
                   - operation: EQUALS
                     subject: $event_type
@@ -170,9 +170,9 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $WET.bezwaartermijn_weken
-            then: $WET.bezwaartermijn_weken
-          default: $DEFAULT_TERMIJN_BEZWAAR_WEKEN
+                subject: $wet.bezwaartermijn_weken
+            then: $wet.bezwaartermijn_weken
+          default: $default_termijn_bezwaar_weken
         legal_basis:
           law: Algemene wet bestuursrecht
           bwb_id: BWBR0005537
@@ -188,9 +188,9 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $WET.beslistermijn_weken
-            then: $WET.beslistermijn_weken
-          default: $DEFAULT_TERMIJN_BESLISSING_WEKEN
+                subject: $wet.beslistermijn_weken
+            then: $wet.beslistermijn_weken
+          default: $default_termijn_beslissing_weken
         legal_basis:
           law: Algemene wet bestuursrecht
           bwb_id: BWBR0005537
@@ -207,9 +207,9 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $WET.verdagingstermijn_weken
-            then: $WET.verdagingstermijn_weken
-          default: $DEFAULT_TERMIJN_VERDAGING_WEKEN
+                subject: $wet.verdagingstermijn_weken
+            then: $wet.verdagingstermijn_weken
+          default: $default_termijn_verdaging_weken
         legal_basis:
           law: Algemene wet bestuursrecht
           bwb_id: BWBR0005537

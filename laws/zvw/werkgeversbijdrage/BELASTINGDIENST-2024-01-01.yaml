@@ -46,14 +46,14 @@ articles:
   url: https://wetten.overheid.nl/BWBR0018450/2024-01-01#Artikel42
   machine_readable:
     definitions:
-      ZVW_PERCENTAGE:
+      zvw_percentage:
         value: 6.57
         legal_basis:
           law: Regeling Zorgverzekeringswet
           article: '1'
           url: https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/werk_en_inkomen/zorgverzekeringswet/bijdrage_zorgverzekeringswet/tabel_werkgeversheffing_zvw_of_bijdrage_zvw/tabel_werkgeversheffing_zvw_of_bijdrage_zvw
           explanation: Voor 2024 bedraagt het percentage werkgeversbijdrage Zvw 6,57% volgens ministeriële regeling
-      MAXIMUM_BIJDRAGE_INKOMEN:
+      maximum_bijdrage_inkomen:
         value: 7162800
         legal_basis:
           law: Zorgverzekeringswet
@@ -69,10 +69,10 @@ articles:
         legal_character: BESCHIKKING
         decision_type: AANSLAG
       parameters:
-      - name: LOONHEFFINGENNUMMER
+      - name: loonheffingennummer
         type: string
         required: true
-      - name: BRUTO_LOON
+      - name: bruto_loon
         type: number
         required: true
         type_spec:
@@ -98,9 +98,9 @@ articles:
           values:
           - operation: MULTIPLY
             values:
-            - $BRUTO_LOON
+            - $bruto_loon
             - 100
-          - $MAXIMUM_BIJDRAGE_INKOMEN
+          - $maximum_bijdrage_inkomen
         legal_basis:
           law: Zorgverzekeringswet
           bwb_id: BWBR0018450
@@ -115,7 +115,7 @@ articles:
           - $bijdrage_inkomen
           - operation: DIVIDE
             values:
-            - $ZVW_PERCENTAGE
+            - $zvw_percentage
             - 100
         legal_basis:
           law: Zorgverzekeringswet

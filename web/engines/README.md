@@ -1,6 +1,6 @@
 # Machine Law Interface
 
-This package provides interfaces to interact with the law evaluation engine in a uniform way, regardless of whether you're using the embedded Python implementation or the Regelrecht Rust engine.
+This package provides interfaces to interact with the law evaluation engine (regelrecht Rust engine) in a uniform way.
 
 ## Usage
 
@@ -16,11 +16,6 @@ engines:
     type: regelrecht
     default: true
     domain: bin/evaluate-v0.2.0
-  - id: py
-    name: Python engine
-    description: Python processing engine (fallback)
-    type: internal
-    default: false
 ```
 
 ### Using the Interfaces
@@ -69,5 +64,4 @@ async def get_discoverable_laws(
 
 - `CaseManagerInterface`: Interface for case management functionality
 - `EngineInterface`: Interface for law evaluation functionality
-- `MachineType`: Enum to specify which machine implementation to use
 - `CaseManagerFactory` and `MachineFactory`: Factories to create instances of the interfaces

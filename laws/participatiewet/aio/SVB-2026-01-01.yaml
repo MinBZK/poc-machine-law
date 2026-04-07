@@ -20,26 +20,26 @@ articles:
   url: https://wetten.overheid.nl/BWBR0015703/2026-01-01#Artikel47a
   machine_readable:
     definitions:
-      NORM_ALLEENSTAAND:
+      norm_alleenstaand:
         value: 138000
-      NORM_GEHUWDEN:
+      norm_gehuwden:
         value: 197000
-      VERMOGENSGRENS_ALLEENSTAAND:
+      vermogensgrens_alleenstaand:
         value: 800000
-      VERMOGENSGRENS_GEHUWDEN:
+      vermogensgrens_gehuwden:
         value: 1600000
-      MAANDEN_PER_JAAR:
+      maanden_per_jaar:
         value: 12
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         type_spec:
           unit: years
@@ -50,22 +50,22 @@ articles:
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: GEBOORTEDATUM
+      - name: geboortedatum
         type: date
         source:
           regulation: wet_brp
           output: geboortedatum
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PENSIOENLEEFTIJD
+      - name: pensioenleeftijd
         type: number
         type_spec:
           unit: years
@@ -76,22 +76,22 @@ articles:
           output: pensioenleeftijd
           service: SVB
           parameters:
-            GEBOORTEDATUM: $GEBOORTEDATUM
+            geboortedatum: $geboortedatum
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: HEEFT_PARTNER
+      - name: heeft_partner
         type: boolean
         source:
           regulation: wet_brp
           output: heeft_partner
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: INKOMEN
+      - name: inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -102,11 +102,11 @@ articles:
           output: inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
-      - name: VERMOGEN
+      - name: vermogen
         type: amount
         type_spec:
           unit: eurocent
@@ -117,11 +117,11 @@ articles:
           output: vermogen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: AOW_UITKERING
+      - name: aow_uitkering
         type: amount
         type_spec:
           unit: eurocent
@@ -132,7 +132,7 @@ articles:
           output: pensioenbedrag
           service: SVB
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: period
           period_type: month
@@ -159,24 +159,24 @@ articles:
           min: 0
       requirements:
       - all:
-        - subject: $LEEFTIJD
+        - subject: $leeftijd
           operation: GREATER_THAN_OR_EQUAL
-          value: $PENSIOENLEEFTIJD
+          value: $pensioenleeftijd
         - any:
           - all:
-            - subject: $HEEFT_PARTNER
+            - subject: $heeft_partner
               operation: EQUALS
               value: false
-            - subject: $VERMOGEN
+            - subject: $vermogen
               operation: LESS_THAN
-              value: $VERMOGENSGRENS_ALLEENSTAAND
+              value: $vermogensgrens_alleenstaand
           - all:
-            - subject: $HEEFT_PARTNER
+            - subject: $heeft_partner
               operation: EQUALS
               value: true
-            - subject: $VERMOGEN
+            - subject: $vermogen
               operation: LESS_THAN
-              value: $VERMOGENSGRENS_GEHUWDEN
+              value: $vermogensgrens_gehuwden
       actions:
       - output: is_gerechtigd
         value: true
@@ -193,10 +193,10 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $HEEFT_PARTNER
+              subject: $heeft_partner
               value: true
-            then: $NORM_GEHUWDEN
-          default: $NORM_ALLEENSTAAND
+            then: $norm_gehuwden
+          default: $norm_alleenstaand
         legal_basis:
           law: Participatiewet
           bwb_id: BWBR0015703
@@ -208,14 +208,14 @@ articles:
         value:
           operation: ADD
           values:
-          - $AOW_UITKERING
+          - $aow_uitkering
           - operation: SUBTRACT
             values:
             - operation: DIVIDE
               values:
-              - $INKOMEN
-              - $MAANDEN_PER_JAAR
-            - $AOW_UITKERING
+              - $inkomen
+              - $maanden_per_jaar
+            - $aow_uitkering
         legal_basis:
           law: Participatiewet
           bwb_id: BWBR0015703

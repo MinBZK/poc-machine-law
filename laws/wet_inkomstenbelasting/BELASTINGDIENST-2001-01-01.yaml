@@ -19,128 +19,128 @@ articles:
   url: https://wetten.overheid.nl/BWBR0011353/2001-01-01#Artikel2.1
   machine_readable:
     definitions:
-      BOX1_SCHIJF1_GRENS:
+      box1_schijf1_grens:
         value: 7457300
-      BOX1_SCHIJF2_GRENS:
+      box1_schijf2_grens:
         value: 11932700
-      BOX1_TARIEF1:
+      box1_tarief1:
         value: 0.3693
-      BOX1_TARIEF2:
+      box1_tarief2:
         value: 0.4953
-      BOX1_TARIEF1_AOW:
+      box1_tarief1_aow:
         value: 0.1975
-      BOX1_TARIEF2_AOW:
+      box1_tarief2_aow:
         value: 0.4953
-      BOX2_SCHIJF1_GRENS:
+      box2_schijf1_grens:
         value: 6700000
-      BOX2_TARIEF1:
+      box2_tarief1:
         value: 0.245
-      BOX2_TARIEF2:
+      box2_tarief2:
         value: 0.33
-      BOX3_HEFFINGSVRIJE_VOET_ALLEENSTAAND:
+      box3_heffingsvrije_voet_alleenstaand:
         value: 5772900
-      BOX3_HEFFINGSVRIJE_VOET_PARTNERS:
+      box3_heffingsvrije_voet_partners:
         value: 11545800
-      BOX3_FORFAITAIR_RENDEMENT:
+      box3_forfaitair_rendement:
         value: 0.06
-      BOX3_BELASTINGTARIEF:
+      box3_belastingtarief:
         value: 0.34
-      BOX3_RENDEMENT:
+      box3_rendement:
         value: 0.0674
-      HEFFINGSVRIJ_VERMOGEN:
+      heffingsvrij_vermogen:
         value: 5720000
-      ALGEMENE_HEFFINGSKORTING_MAX:
+      algemene_heffingskorting_max:
         value: 310400
-      ALGEMENE_HEFFINGSKORTING_AFBOUW_START:
+      algemene_heffingskorting_afbouw_start:
         value: 2466800
-      ALGEMENE_HEFFINGSKORTING_AFBOUW:
+      algemene_heffingskorting_afbouw:
         value: 0.06578
-      ALGEMENE_HEFFINGSKORTING_NULPUNT:
+      algemene_heffingskorting_nulpunt:
         value: 7243000
-      ALGEMENE_HEFFINGSKORTING_MAX_AOW:
+      algemene_heffingskorting_max_aow:
         value: 165800
-      ALGEMENE_HEFFINGSKORTING_AFBOUW_AOW:
+      algemene_heffingskorting_afbouw_aow:
         value: 0.03427
-      ARBEIDSKORTING_MAX:
+      arbeidskorting_max:
         value: 446400
-      ARBEIDSKORTING_AFBOUW_START:
+      arbeidskorting_afbouw_start:
         value: 4081200
-      ARBEIDSKORTING_AFBOUW:
+      arbeidskorting_afbouw:
         value: 0.0651
-      ARBEIDSKORTING_NULPUNT:
+      arbeidskorting_nulpunt:
         value: 11932700
-      ARBEIDSKORTING_MAX_AOW:
+      arbeidskorting_max_aow:
         value: 238500
-      ARBEIDSKORTING_AFBOUW_AOW:
+      arbeidskorting_afbouw_aow:
         value: 0.034
-      INKOMENSAFHANKELIJKE_COMBINATIEKORTING_BASIS:
+      inkomensafhankelijke_combinatiekorting_basis:
         value: 88800
-      INKOMENSAFHANKELIJKE_COMBINATIEKORTING_PERCENTAGE:
+      inkomensafhankelijke_combinatiekorting_percentage:
         value: 0.11213
-      INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN:
+      inkomensafhankelijke_combinatiekorting_min_inkomen:
         value: 550300
-      INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MAX:
+      inkomensafhankelijke_combinatiekorting_max:
         value: 265000
-      MIN_PERSONAL_INCOME:
+      min_personal_income:
         value: 0
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: AANSLAG
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         source:
           regulation: wet_brp
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: GEBOORTEDATUM
+            bsn: $bsn
+      - name: geboortedatum
         type: date
         source:
           regulation: wet_brp
           output: geboortedatum
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: PENSIOENLEEFTIJD
+            bsn: $bsn
+      - name: pensioenleeftijd
         type: number
         source:
           regulation: algemene_ouderdomswet/leeftijdsbepaling
           output: pensioenleeftijd
           service: SVB
           parameters:
-            GEBOORTEDATUM: $GEBOORTEDATUM
-      - name: HEEFT_PARTNER
+            geboortedatum: $geboortedatum
+      - name: heeft_partner
         type: boolean
         source:
           regulation: wet_brp
           output: heeft_partner
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: PARTNER_BSN
+            bsn: $bsn
+      - name: partner_bsn
         type: string
         source:
           regulation: wet_brp
           output: partner_bsn
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: HEEFT_KINDEREN_ONDER_12
+            bsn: $bsn
+      - name: heeft_kinderen_onder_12
         type: boolean
         source:
           regulation: wet_brp
           output: heeft_kinderen_onder_12
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: BOX1_DIENSTBETREKKING
+            bsn: $bsn
+      - name: box1_dienstbetrekking
         type: amount
         source_reference:
           table: box1
@@ -149,8 +149,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: BOX1_UITKERINGEN
+            value: $bsn
+      - name: box1_uitkeringen
         type: amount
         source_reference:
           table: box1
@@ -159,8 +159,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: BOX1_ONDERNEMING
+            value: $bsn
+      - name: box1_onderneming
         type: amount
         source_reference:
           table: box1
@@ -169,8 +169,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: BOX1_OVERIGE_WERKZAAMHEDEN
+            value: $bsn
+      - name: box1_overige_werkzaamheden
         type: amount
         source_reference:
           table: box1
@@ -179,8 +179,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: BOX1_EIGEN_WONING
+            value: $bsn
+      - name: box1_eigen_woning
         type: amount
         source_reference:
           table: box1
@@ -189,8 +189,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: BOX2_DIVIDEND
+            value: $bsn
+      - name: box2_dividend
         type: amount
         source_reference:
           table: box2
@@ -199,8 +199,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: BOX2_AANDELEN
+            value: $bsn
+      - name: box2_aandelen
         type: amount
         source_reference:
           table: box2
@@ -209,8 +209,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: BOX3_SPAREN
+            value: $bsn
+      - name: box3_sparen
         type: amount
         source_reference:
           table: box3
@@ -219,8 +219,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: BOX3_BELEGGEN
+            value: $bsn
+      - name: box3_beleggen
         type: amount
         source_reference:
           table: box3
@@ -229,8 +229,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: BOX3_ONROEREND_GOED
+            value: $bsn
+      - name: box3_onroerend_goed
         type: amount
         source_reference:
           table: box3
@@ -239,8 +239,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: BOX3_SCHULDEN
+            value: $bsn
+      - name: box3_schulden
         type: amount
         source_reference:
           table: box3
@@ -249,8 +249,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: PERSOONSGEBONDEN_AFTREK
+            value: $bsn
+      - name: persoonsgebonden_aftrek
         type: amount
         source_reference:
           table: aftrekposten
@@ -259,8 +259,8 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
-      - name: PARTNER_BOX1_DIENSTBETREKKING
+            value: $bsn
+      - name: partner_box1_dienstbetrekking
         type: amount
         source_reference:
           table: box1
@@ -269,8 +269,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BOX1_UITKERINGEN
+            value: $partner_bsn
+      - name: partner_box1_uitkeringen
         type: amount
         source_reference:
           table: box1
@@ -279,8 +279,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BOX1_ONDERNEMING
+            value: $partner_bsn
+      - name: partner_box1_onderneming
         type: amount
         source_reference:
           table: box1
@@ -289,8 +289,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BOX1_OVERIGE_WERKZAAMHEDEN
+            value: $partner_bsn
+      - name: partner_box1_overige_werkzaamheden
         type: amount
         source_reference:
           table: box1
@@ -299,8 +299,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BOX1_EIGEN_WONING
+            value: $partner_bsn
+      - name: partner_box1_eigen_woning
         type: amount
         source_reference:
           table: box1
@@ -309,8 +309,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BOX2_DIVIDEND
+            value: $partner_bsn
+      - name: partner_box2_dividend
         type: amount
         source_reference:
           table: box2
@@ -319,8 +319,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BOX2_AANDELEN
+            value: $partner_bsn
+      - name: partner_box2_aandelen
         type: amount
         source_reference:
           table: box2
@@ -329,8 +329,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BOX3_SPAREN
+            value: $partner_bsn
+      - name: partner_box3_sparen
         type: amount
         source_reference:
           table: box3
@@ -339,8 +339,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BOX3_BELEGGEN
+            value: $partner_bsn
+      - name: partner_box3_beleggen
         type: amount
         source_reference:
           table: box3
@@ -349,8 +349,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BOX3_ONROEREND_GOED
+            value: $partner_bsn
+      - name: partner_box3_onroerend_goed
         type: amount
         source_reference:
           table: box3
@@ -359,8 +359,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BOX3_SCHULDEN
+            value: $partner_bsn
+      - name: partner_box3_schulden
         type: amount
         source_reference:
           table: box3
@@ -369,8 +369,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: PARTNER_BUITENLANDS_INKOMEN
+            value: $partner_bsn
+      - name: partner_buitenlands_inkomen
         type: amount
         source_reference:
           table: buitenlands
@@ -379,8 +379,8 @@ articles:
           - name: bsn
             description: BSN nummer van de partner
             type: string
-            value: $PARTNER_BSN
-      - name: BUITENLANDS_INKOMEN
+            value: $partner_bsn
+      - name: buitenlands_inkomen
         type: amount
         source_reference:
           table: buitenlands
@@ -389,7 +389,7 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: totale_belastingschuld
         type: amount
@@ -524,17 +524,17 @@ articles:
         value:
           operation: ADD
           values:
-          - $BOX1_DIENSTBETREKKING
-          - $BOX1_ONDERNEMING
-          - $BOX1_UITKERINGEN
-          - $BOX1_OVERIGE_WERKZAAMHEDEN
-          - $BOX1_EIGEN_WONING
+          - $box1_dienstbetrekking
+          - $box1_onderneming
+          - $box1_uitkeringen
+          - $box1_overige_werkzaamheden
+          - $box1_eigen_woning
       - output: box2_inkomen
         value:
           operation: ADD
           values:
-          - $BOX2_DIVIDEND
-          - $BOX2_AANDELEN
+          - $box2_dividend
+          - $box2_aandelen
       - output: box3_bezittingen
         value:
           operation: MAX
@@ -543,25 +543,25 @@ articles:
             values:
             - operation: ADD
               values:
-              - $BOX3_SPAREN
-              - $BOX3_BELEGGEN
-              - $BOX3_ONROEREND_GOED
-            - $BOX3_SCHULDEN
+              - $box3_sparen
+              - $box3_beleggen
+              - $box3_onroerend_goed
+            - $box3_schulden
             - operation: IF
               cases:
               - when:
                   operation: EQUALS
-                  subject: $HEEFT_PARTNER
+                  subject: $heeft_partner
                   value: true
-                then: $BOX3_HEFFINGSVRIJE_VOET_PARTNERS
-              default: $BOX3_HEFFINGSVRIJE_VOET_ALLEENSTAAND
+                then: $box3_heffingsvrije_voet_partners
+              default: $box3_heffingsvrije_voet_alleenstaand
           - 0
       - output: box3_inkomen
         value:
           operation: MULTIPLY
           values:
           - $box3_bezittingen
-          - $BOX3_FORFAITAIR_RENDEMENT
+          - $box3_forfaitair_rendement
       - output: belastbaar_inkomen
         value:
           operation: ADD
@@ -572,7 +572,7 @@ articles:
           - operation: SUBTRACT
             values:
             - 0
-            - $PERSOONSGEBONDEN_AFTREK
+            - $persoonsgebonden_aftrek
       - output: box1_inkomen_na_aftrek
         value:
           operation: MAX
@@ -580,7 +580,7 @@ articles:
           - operation: SUBTRACT
             values:
             - $box1_inkomen
-            - $PERSOONSGEBONDEN_AFTREK
+            - $persoonsgebonden_aftrek
           - 0
       - output: resterende_aftrek_na_box1
         value:
@@ -588,7 +588,7 @@ articles:
           values:
           - operation: SUBTRACT
             values:
-            - $PERSOONSGEBONDEN_AFTREK
+            - $persoonsgebonden_aftrek
             - $box1_inkomen
           - 0
       - output: box3_inkomen_na_aftrek
@@ -621,8 +621,8 @@ articles:
       - output: is_aow_leeftijd
         value:
           operation: GREATER_THAN_OR_EQUAL
-          subject: $LEEFTIJD
-          value: $PENSIOENLEEFTIJD
+          subject: $leeftijd
+          value: $pensioenleeftijd
       - output: box1_belasting
         value:
           operation: IF
@@ -637,52 +637,52 @@ articles:
               - when:
                   operation: LESS_THAN_OR_EQUAL
                   subject: $box1_inkomen_na_aftrek
-                  value: $BOX1_SCHIJF1_GRENS
+                  value: $box1_schijf1_grens
                 then:
                   operation: MULTIPLY
                   values:
                   - $box1_inkomen_na_aftrek
-                  - $BOX1_TARIEF1_AOW
+                  - $box1_tarief1_aow
               default:
                 operation: ADD
                 values:
                 - operation: MULTIPLY
                   values:
-                  - $BOX1_SCHIJF1_GRENS
-                  - $BOX1_TARIEF1_AOW
+                  - $box1_schijf1_grens
+                  - $box1_tarief1_aow
                 - operation: MULTIPLY
                   values:
                   - operation: SUBTRACT
                     values:
                     - $box1_inkomen_na_aftrek
-                    - $BOX1_SCHIJF1_GRENS
-                  - $BOX1_TARIEF2_AOW
+                    - $box1_schijf1_grens
+                  - $box1_tarief2_aow
           default:
             operation: IF
             cases:
             - when:
                 operation: LESS_THAN_OR_EQUAL
                 subject: $box1_inkomen_na_aftrek
-                value: $BOX1_SCHIJF1_GRENS
+                value: $box1_schijf1_grens
               then:
                 operation: MULTIPLY
                 values:
                 - $box1_inkomen_na_aftrek
-                - $BOX1_TARIEF1
+                - $box1_tarief1
             default:
               operation: ADD
               values:
               - operation: MULTIPLY
                 values:
-                - $BOX1_SCHIJF1_GRENS
-                - $BOX1_TARIEF1
+                - $box1_schijf1_grens
+                - $box1_tarief1
               - operation: MULTIPLY
                 values:
                 - operation: SUBTRACT
                   values:
                   - $box1_inkomen_na_aftrek
-                  - $BOX1_SCHIJF1_GRENS
-                - $BOX1_TARIEF2
+                  - $box1_schijf1_grens
+                - $box1_tarief2
       - output: box2_belasting
         value:
           operation: IF
@@ -690,32 +690,32 @@ articles:
           - when:
               operation: LESS_THAN_OR_EQUAL
               subject: $box2_inkomen_na_aftrek
-              value: $BOX2_SCHIJF1_GRENS
+              value: $box2_schijf1_grens
             then:
               operation: MULTIPLY
               values:
               - $box2_inkomen_na_aftrek
-              - $BOX2_TARIEF1
+              - $box2_tarief1
           default:
             operation: ADD
             values:
             - operation: MULTIPLY
               values:
-              - $BOX2_SCHIJF1_GRENS
-              - $BOX2_TARIEF1
+              - $box2_schijf1_grens
+              - $box2_tarief1
             - operation: MULTIPLY
               values:
               - operation: SUBTRACT
                 values:
                 - $box2_inkomen_na_aftrek
-                - $BOX2_SCHIJF1_GRENS
-              - $BOX2_TARIEF2
+                - $box2_schijf1_grens
+              - $box2_tarief2
       - output: box3_belasting
         value:
           operation: MULTIPLY
           values:
           - $box3_inkomen_na_aftrek
-          - $BOX3_BELASTINGTARIEF
+          - $box3_belastingtarief
       - output: algemene_heffingskorting
         value:
           operation: IF
@@ -729,13 +729,13 @@ articles:
               values:
               - operation: SUBTRACT
                 values:
-                - $ALGEMENE_HEFFINGSKORTING_MAX_AOW
+                - $algemene_heffingskorting_max_aow
                 - operation: IF
                   cases:
                   - when:
                       operation: GREATER_THAN
                       subject: $box1_inkomen
-                      value: $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
+                      value: $algemene_heffingskorting_afbouw_start
                     then:
                       operation: MULTIPLY
                       values:
@@ -744,12 +744,12 @@ articles:
                         - operation: SUBTRACT
                           values:
                           - $box1_inkomen
-                          - $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
+                          - $algemene_heffingskorting_afbouw_start
                         - operation: SUBTRACT
                           values:
-                          - $ALGEMENE_HEFFINGSKORTING_NULPUNT
-                          - $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
-                      - $ALGEMENE_HEFFINGSKORTING_AFBOUW_AOW
+                          - $algemene_heffingskorting_nulpunt
+                          - $algemene_heffingskorting_afbouw_start
+                      - $algemene_heffingskorting_afbouw_aow
                   default: 0
               - 0
           default:
@@ -757,13 +757,13 @@ articles:
             values:
             - operation: SUBTRACT
               values:
-              - $ALGEMENE_HEFFINGSKORTING_MAX
+              - $algemene_heffingskorting_max
               - operation: IF
                 cases:
                 - when:
                     operation: GREATER_THAN
                     subject: $box1_inkomen
-                    value: $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
+                    value: $algemene_heffingskorting_afbouw_start
                   then:
                     operation: MULTIPLY
                     values:
@@ -772,12 +772,12 @@ articles:
                       - operation: SUBTRACT
                         values:
                         - $box1_inkomen
-                        - $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
+                        - $algemene_heffingskorting_afbouw_start
                       - operation: SUBTRACT
                         values:
-                        - $ALGEMENE_HEFFINGSKORTING_NULPUNT
-                        - $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
-                    - $ALGEMENE_HEFFINGSKORTING_AFBOUW
+                        - $algemene_heffingskorting_nulpunt
+                        - $algemene_heffingskorting_afbouw_start
+                    - $algemene_heffingskorting_afbouw
                 default: 0
             - 0
       - output: arbeidskorting
@@ -793,13 +793,13 @@ articles:
               values:
               - operation: SUBTRACT
                 values:
-                - $ARBEIDSKORTING_MAX_AOW
+                - $arbeidskorting_max_aow
                 - operation: IF
                   cases:
                   - when:
                       operation: GREATER_THAN
-                      subject: $BOX1_DIENSTBETREKKING
-                      value: $ARBEIDSKORTING_AFBOUW_START
+                      subject: $box1_dienstbetrekking
+                      value: $arbeidskorting_afbouw_start
                     then:
                       operation: MULTIPLY
                       values:
@@ -807,13 +807,13 @@ articles:
                         values:
                         - operation: SUBTRACT
                           values:
-                          - $BOX1_DIENSTBETREKKING
-                          - $ARBEIDSKORTING_AFBOUW_START
+                          - $box1_dienstbetrekking
+                          - $arbeidskorting_afbouw_start
                         - operation: SUBTRACT
                           values:
-                          - $ARBEIDSKORTING_NULPUNT
-                          - $ARBEIDSKORTING_AFBOUW_START
-                      - $ARBEIDSKORTING_AFBOUW_AOW
+                          - $arbeidskorting_nulpunt
+                          - $arbeidskorting_afbouw_start
+                      - $arbeidskorting_afbouw_aow
                   default: 0
               - 0
           default:
@@ -821,13 +821,13 @@ articles:
             values:
             - operation: SUBTRACT
               values:
-              - $ARBEIDSKORTING_MAX
+              - $arbeidskorting_max
               - operation: IF
                 cases:
                 - when:
                     operation: GREATER_THAN
-                    subject: $BOX1_DIENSTBETREKKING
-                    value: $ARBEIDSKORTING_AFBOUW_START
+                    subject: $box1_dienstbetrekking
+                    value: $arbeidskorting_afbouw_start
                   then:
                     operation: MULTIPLY
                     values:
@@ -835,13 +835,13 @@ articles:
                       values:
                       - operation: SUBTRACT
                         values:
-                        - $BOX1_DIENSTBETREKKING
-                        - $ARBEIDSKORTING_AFBOUW_START
+                        - $box1_dienstbetrekking
+                        - $arbeidskorting_afbouw_start
                       - operation: SUBTRACT
                         values:
-                        - $ARBEIDSKORTING_NULPUNT
-                        - $ARBEIDSKORTING_AFBOUW_START
-                    - $ARBEIDSKORTING_AFBOUW
+                        - $arbeidskorting_nulpunt
+                        - $arbeidskorting_afbouw_start
+                    - $arbeidskorting_afbouw
                 default: 0
             - 0
       - output: inkomensafhankelijke_combinatiekorting
@@ -852,25 +852,25 @@ articles:
               operation: AND
               conditions:
               - operation: EQUALS
-                subject: $HEEFT_KINDEREN_ONDER_12
+                subject: $heeft_kinderen_onder_12
                 value: true
               - operation: GREATER_THAN
-                subject: $BOX1_DIENSTBETREKKING
-                value: $INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN
+                subject: $box1_dienstbetrekking
+                value: $inkomensafhankelijke_combinatiekorting_min_inkomen
             then:
               operation: MIN
               values:
               - operation: ADD
                 values:
-                - $INKOMENSAFHANKELIJKE_COMBINATIEKORTING_BASIS
+                - $inkomensafhankelijke_combinatiekorting_basis
                 - operation: MULTIPLY
                   values:
                   - operation: SUBTRACT
                     values:
-                    - $BOX1_DIENSTBETREKKING
-                    - $INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN
-                  - $INKOMENSAFHANKELIJKE_COMBINATIEKORTING_PERCENTAGE
-              - $INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MAX
+                    - $box1_dienstbetrekking
+                    - $inkomensafhankelijke_combinatiekorting_min_inkomen
+                  - $inkomensafhankelijke_combinatiekorting_percentage
+              - $inkomensafhankelijke_combinatiekorting_max
           default: 0
       - output: totale_heffingskortingen
         value:
@@ -893,7 +893,7 @@ articles:
             - $totale_heffingskortingen
           - 0
       - output: buitenlands_inkomen
-        value: $BUITENLANDS_INKOMEN
+        value: $buitenlands_inkomen
       - output: inkomen
         value:
           operation: ADD
@@ -908,10 +908,10 @@ articles:
           values:
           - operation: ADD
             values:
-            - $BOX3_SPAREN
-            - $BOX3_BELEGGEN
-            - $BOX3_ONROEREND_GOED
-          - $BOX3_SCHULDEN
+            - $box3_sparen
+            - $box3_beleggen
+            - $box3_onroerend_goed
+          - $box3_schulden
       - output: partner_box1_inkomen
         value:
           operation: ADD
@@ -922,15 +922,15 @@ articles:
                 operation: NOT
                 value:
                   operation: IS_NULL
-                  subject: $PARTNER_BSN
+                  subject: $partner_bsn
               then:
                 operation: ADD
                 values:
-                - $PARTNER_BOX1_DIENSTBETREKKING
-                - $PARTNER_BOX1_UITKERINGEN
-                - $PARTNER_BOX1_ONDERNEMING
-                - $PARTNER_BOX1_OVERIGE_WERKZAAMHEDEN
-                - $PARTNER_BOX1_EIGEN_WONING
+                - $partner_box1_dienstbetrekking
+                - $partner_box1_uitkeringen
+                - $partner_box1_onderneming
+                - $partner_box1_overige_werkzaamheden
+                - $partner_box1_eigen_woning
             default: 0
       - output: partner_box2_inkomen
         value:
@@ -942,12 +942,12 @@ articles:
                 operation: NOT
                 value:
                   operation: IS_NULL
-                  subject: $PARTNER_BSN
+                  subject: $partner_bsn
               then:
                 operation: ADD
                 values:
-                - $PARTNER_BOX2_DIVIDEND
-                - $PARTNER_BOX2_AANDELEN
+                - $partner_box2_dividend
+                - $partner_box2_aandelen
             default: 0
       - output: partner_box3_inkomen
         value:
@@ -957,7 +957,7 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $PARTNER_BSN
+                subject: $partner_bsn
             then:
               operation: MULTIPLY
               values:
@@ -967,16 +967,16 @@ articles:
                   values:
                   - operation: ADD
                     values:
-                    - $PARTNER_BOX3_SPAREN
-                    - $PARTNER_BOX3_BELEGGEN
-                    - $PARTNER_BOX3_ONROEREND_GOED
-                  - $PARTNER_BOX3_SCHULDEN
-                  - $HEFFINGSVRIJ_VERMOGEN
+                    - $partner_box3_sparen
+                    - $partner_box3_beleggen
+                    - $partner_box3_onroerend_goed
+                  - $partner_box3_schulden
+                  - $heffingsvrij_vermogen
                 - 0
-              - $BOX3_RENDEMENT
+              - $box3_rendement
           default: 0
       - output: partner_buitenlands_inkomen
-        value: $PARTNER_BUITENLANDS_INKOMEN
+        value: $partner_buitenlands_inkomen
       - output: partner_inkomen
         value:
           operation: ADD
@@ -993,7 +993,7 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $PARTNER_BSN
+                subject: $partner_bsn
             then:
               operation: ADD
               values:
@@ -1002,23 +1002,23 @@ articles:
                 values:
                 - operation: ADD
                   values:
-                  - $PARTNER_BOX3_SPAREN
-                  - $PARTNER_BOX3_BELEGGEN
-                  - $PARTNER_BOX3_ONROEREND_GOED
-                - $PARTNER_BOX3_SCHULDEN
+                  - $partner_box3_sparen
+                  - $partner_box3_beleggen
+                  - $partner_box3_onroerend_goed
+                - $partner_box3_schulden
           default: $vermogen
       - output: bezittingen
         value:
           operation: ADD
           values:
-          - $BOX3_SPAREN
-          - $BOX3_BELEGGEN
-          - $BOX3_ONROEREND_GOED
+          - $box3_sparen
+          - $box3_beleggen
+          - $box3_onroerend_goed
       - output: bedrijfsinkomen
         value:
           operation: DIVIDE
           values:
-          - $BOX1_ONDERNEMING
+          - $box1_onderneming
           - 12
       - output: maandelijks_inkomen
         value:

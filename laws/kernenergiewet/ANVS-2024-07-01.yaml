@@ -19,37 +19,37 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002402/2024-07-01#Artikel15
   machine_readable:
     definitions:
-      ACTIVITEIT_TRANSPORT:
+      activiteit_transport:
         value: transport
-      ACTIVITEIT_BEZIT:
+      activiteit_bezit:
         value: bezit
-      ACTIVITEIT_INVOER:
+      activiteit_invoer:
         value: invoer
-      ACTIVITEIT_UITVOER:
+      activiteit_uitvoer:
         value: uitvoer
-      ACTIVITEIT_INRICHTING_OPRICHTEN:
+      activiteit_inrichting_oprichten:
         value: inrichting_oprichten
-      ACTIVITEIT_INRICHTING_EXPLOITEREN:
+      activiteit_inrichting_exploiteren:
         value: inrichting_exploiteren
-      ACTIVITEIT_KERNVOORTSTUWING:
+      activiteit_kernvoortstuwing:
         value: kernvoortstuwing
-      MATERIAAL_SPLIJTSTOF:
+      materiaal_splijtstof:
         value: splijtstof
-      MATERIAAL_ERTS:
+      materiaal_erts:
         value: erts
-      WEIGERINGSGROND_VEILIGHEID:
+      weigeringsgrond_veiligheid:
         value: bescherming_mensen_dieren_planten_goederen
-      WEIGERINGSGROND_STAATSVEILIGHEID:
+      weigeringsgrond_staatsveiligheid:
         value: staatsveiligheid
-      WEIGERINGSGROND_BEVEILIGING:
+      weigeringsgrond_beveiliging:
         value: behoud_beveiliging_splijtstoffen
-      WEIGERINGSGROND_SCHADEVERGOEDING:
+      weigeringsgrond_schadevergoeding:
         value: zekerheid_betaling_schadevergoeding
-      WEIGERINGSGROND_INTERNATIONALE_VERPLICHTINGEN:
+      weigeringsgrond_internationale_verplichtingen:
         value: internationale_verplichtingen
-      WEIGERINGSGROND_TECHNOLOGIE_VEROUDERD:
+      weigeringsgrond_technologie_verouderd:
         value: technologie_verouderd
-      DOSIS_LIMIET_BEVOLKING:
+      dosis_limiet_bevolking:
         value: 1.0
     execution:
       produces:
@@ -81,7 +81,7 @@ articles:
       - name: aantal_deskundigen
         type: number
       input:
-      - name: VERWACHTE_STRALINGSDOSIS
+      - name: verwachte_stralingsdosis
         type: number
         type_spec:
           precision: 2
@@ -94,7 +94,7 @@ articles:
             verwachte_dosis_jaar: $verwachte_dosis_jaar
             verwachte_dosis_huid: $verwachte_dosis_huid
             dosis_buiten_locatie: $dosis_buiten_locatie
-      - name: HEEFT_FINANCIELE_ZEKERHEID
+      - name: heeft_financiele_zekerheid
         type: boolean
         source:
           regulation: besluit_kerninstallaties
@@ -139,13 +139,13 @@ articles:
           cases:
           - when:
               operation: GREATER_THAN
-              subject: $VERWACHTE_STRALINGSDOSIS
-              value: $DOSIS_LIMIET_BEVOLKING
+              subject: $verwachte_stralingsdosis
+              value: $dosis_limiet_bevolking
             then:
             - bescherming_mensen_dieren_planten_goederen
           - when:
               operation: EQUALS
-              subject: $HEEFT_FINANCIELE_ZEKERHEID
+              subject: $heeft_financiele_zekerheid
               value: false
             then:
             - zekerheid_betaling_schadevergoeding

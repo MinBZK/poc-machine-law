@@ -19,30 +19,30 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002221/2024-01-01#Artikel7
   machine_readable:
     definitions:
-      JAREN_VOOR_VOLLEDIG_PENSIOEN:
+      jaren_voor_volledig_pensioen:
         value: 50
-      OPBOUW_PER_JAAR:
+      opbouw_per_jaar:
         value: 0.02
-      BASISBEDRAG_ALLEENSTAAND:
+      basisbedrag_alleenstaand:
         value: 138000
-      BASISBEDRAG_GEDEELD:
+      basisbedrag_gedeeld:
         value: 95200
-      PARTNER_TOESLAG_MAXIMUM:
+      partner_toeslag_maximum:
         value: 25800
-      INKOMENSGRENS_PARTNER:
+      inkomensgrens_partner:
         value: 280000
-      KORTINGSPERCENTAGE:
+      kortingspercentage:
         value: 0.02
     execution:
       produces:
         legal_character: BESCHIKKING
         decision_type: TOEKENNING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: WERKZAME_VERZEKERDE_JAREN
+      - name: werkzame_verzekerde_jaren
         type: number
         type_spec:
           precision: 2
@@ -53,33 +53,33 @@ articles:
           output: verzekerde_jaren
           service: UWV
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: period
           period_type: continuous
-      - name: GEBOORTEDATUM
+      - name: geboortedatum
         type: date
         source:
           regulation: wet_brp
           output: geboortedatum
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PARTNER_GEBOORTEDATUM
+      - name: partner_geboortedatum
         type: date
         source:
           regulation: wet_brp
           output: partner_geboortedatum
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: LEEFTIJD
+      - name: leeftijd
         type: number
         type_spec:
           unit: years
@@ -90,30 +90,30 @@ articles:
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: HEEFT_PARTNER
+      - name: heeft_partner
         type: boolean
         source:
           regulation: wet_brp
           output: heeft_partner
           service: RvIG
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PARTNER_BSN
+      - name: partner_bsn
         type: string
         source:
           regulation: wet_brp
           output: partner_bsn
           service: RvIG
           parameters:
-            BSN: $BSN
-      - name: PARTNER_LEEFTIJD
+            bsn: $bsn
+      - name: partner_leeftijd
         type: number
         type_spec:
           unit: years
@@ -124,11 +124,11 @@ articles:
           output: leeftijd
           service: RvIG
           parameters:
-            BSN: $PARTNER_BSN
+            bsn: $partner_bsn
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: INKOMEN
+      - name: inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -139,11 +139,11 @@ articles:
           output: inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
-      - name: PARTNER_INKOMEN
+      - name: partner_inkomen
         type: amount
         type_spec:
           unit: eurocent
@@ -154,11 +154,11 @@ articles:
           output: partner_inkomen
           service: BELASTINGDIENST
           parameters:
-            BSN: $BSN
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
-      - name: PENSIOENLEEFTIJD
+      - name: pensioenleeftijd
         type: number
         type_spec:
           unit: years
@@ -169,11 +169,11 @@ articles:
           output: pensioenleeftijd
           service: SVB
           parameters:
-            GEBOORTEDATUM: $GEBOORTEDATUM
+            geboortedatum: $geboortedatum
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: PARTNER_PENSIOENLEEFTIJD
+      - name: partner_pensioenleeftijd
         type: number
         type_spec:
           unit: years
@@ -184,11 +184,11 @@ articles:
           output: pensioenleeftijd
           service: SVB
           parameters:
-            GEBOORTEDATUM: $PARTNER_GEBOORTEDATUM
+            geboortedatum: $partner_geboortedatum
         temporal:
           type: point_in_time
           reference: $calculation_date
-      - name: WOONACHTIGE_VERZEKERDE_JAREN
+      - name: woonachtige_verzekerde_jaren
         type: number
         source_reference:
           table: verzekerde_tijdvakken
@@ -197,7 +197,7 @@ articles:
           - name: bsn
             description: Burgerservicenummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_gerechtigd
         type: boolean
@@ -221,15 +221,15 @@ articles:
           min: 0
       requirements:
       - all:
-        - subject: $LEEFTIJD
+        - subject: $leeftijd
           operation: GREATER_THAN_OR_EQUAL
-          value: $PENSIOENLEEFTIJD
+          value: $pensioenleeftijd
         - operation: GREATER_THAN
           values:
           - operation: ADD
             values:
-            - $WOONACHTIGE_VERZEKERDE_JAREN
-            - $WERKZAME_VERZEKERDE_JAREN
+            - $woonachtige_verzekerde_jaren
+            - $werkzame_verzekerde_jaren
           - 0
       actions:
       - output: is_gerechtigd
@@ -248,10 +248,10 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $HEEFT_PARTNER
+              subject: $heeft_partner
               value: true
-            then: $BASISBEDRAG_GEDEELD
-          default: $BASISBEDRAG_ALLEENSTAAND
+            then: $basisbedrag_gedeeld
+          default: $basisbedrag_alleenstaand
         legal_basis:
           law: Algemene Ouderdomswet
           bwb_id: BWBR0002221
@@ -268,10 +268,10 @@ articles:
             values:
             - operation: ADD
               values:
-              - $WOONACHTIGE_VERZEKERDE_JAREN
-              - $WERKZAME_VERZEKERDE_JAREN
-            - $JAREN_VOOR_VOLLEDIG_PENSIOEN
-          - $JAREN_VOOR_VOLLEDIG_PENSIOEN
+              - $woonachtige_verzekerde_jaren
+              - $werkzame_verzekerde_jaren
+            - $jaren_voor_volledig_pensioen
+          - $jaren_voor_volledig_pensioen
         legal_basis:
           law: Algemene Ouderdomswet
           bwb_id: BWBR0002221
@@ -290,7 +290,7 @@ articles:
             cases:
             - when:
                 operation: EQUALS
-                subject: $HEEFT_PARTNER
+                subject: $heeft_partner
                 value: true
               then:
                 operation: ADD
@@ -302,25 +302,25 @@ articles:
                       operation: AND
                       conditions:
                       - operation: LESS_THAN
-                        subject: $PARTNER_LEEFTIJD
-                        value: $PARTNER_PENSIOENLEEFTIJD
+                        subject: $partner_leeftijd
+                        value: $partner_pensioenleeftijd
                       - operation: LESS_THAN
-                        subject: $PARTNER_INKOMEN
-                        value: $INKOMENSGRENS_PARTNER
+                        subject: $partner_inkomen
+                        value: $inkomensgrens_partner
                     then:
                       operation: MIN
                       values:
                       - operation: DIVIDE
                         values:
-                        - $PARTNER_TOESLAG_MAXIMUM
-                        - $BASISBEDRAG_GEDEELD
+                        - $partner_toeslag_maximum
+                        - $basisbedrag_gedeeld
                       - operation: MULTIPLY
                         values:
                         - operation: SUBTRACT
                           values:
-                          - $INKOMENSGRENS_PARTNER
-                          - $PARTNER_INKOMEN
-                        - $KORTINGSPERCENTAGE
+                          - $inkomensgrens_partner
+                          - $partner_inkomen
+                        - $kortingspercentage
                   default: 0
             default: 1
         legal_basis:

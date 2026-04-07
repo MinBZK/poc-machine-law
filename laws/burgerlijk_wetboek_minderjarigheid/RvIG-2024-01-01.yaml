@@ -18,12 +18,12 @@ articles:
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel234
   machine_readable:
     definitions:
-      MEERDERJARIGHEID_LEEFTIJD:
+      meerderjarigheid_leeftijd:
         value: 18
-      MINDERJARIGE_RECHTEN:
+      minderjarige_rechten:
         value:
         - LEZEN
-      VOLLEDIGE_RECHTEN:
+      volledige_rechten:
         value:
         - LEZEN
         - CLAIMS_INDIENEN
@@ -33,11 +33,11 @@ articles:
         legal_character: BESCHIKKING
         decision_type: ANDERE_HANDELING
       parameters:
-      - name: BSN
+      - name: bsn
         type: string
         required: true
       input:
-      - name: PERSOONSGEGEVENS
+      - name: persoonsgegevens
         type: object
         source_reference:
           table: personen
@@ -49,7 +49,7 @@ articles:
           - name: bsn
             description: BSN nummer van de persoon
             type: string
-            value: $BSN
+            value: $bsn
       output:
       - name: is_minderjarig
         type: boolean
@@ -81,7 +81,7 @@ articles:
       - operation: NOT
         value:
           operation: IS_NULL
-          subject: $PERSOONSGEGEVENS
+          subject: $persoonsgegevens
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -94,7 +94,7 @@ articles:
         value:
           operation: AGE
           reference_date: $calculation_date
-          date_of_birth: $PERSOONSGEGEVENS.geboortedatum
+          date_of_birth: $persoonsgegevens.geboortedatum
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -106,7 +106,7 @@ articles:
         value:
           operation: LESS_THAN
           subject: $leeftijd
-          value: $MEERDERJARIGHEID_LEEFTIJD
+          value: $meerderjarigheid_leeftijd
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -122,8 +122,8 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $PERSOONSGEGEVENS.heeft_handlichting
-            then: $PERSOONSGEGEVENS.heeft_handlichting
+                subject: $persoonsgegevens.heeft_handlichting
+            then: $persoonsgegevens.heeft_handlichting
           default: false
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
@@ -140,8 +140,8 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $PERSOONSGEGEVENS.handlichting_gebieden
-            then: $PERSOONSGEGEVENS.handlichting_gebieden
+                subject: $persoonsgegevens.handlichting_gebieden
+            then: $persoonsgegevens.handlichting_gebieden
           default: []
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
@@ -161,8 +161,8 @@ articles:
               - operation: EQUALS
                 subject: $heeft_handlichting
                 value: false
-            then: $MINDERJARIGE_RECHTEN
-          default: $VOLLEDIGE_RECHTEN
+            then: $minderjarige_rechten
+          default: $volledige_rechten
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -183,7 +183,7 @@ articles:
           explanation: Iedereen heeft een SELF delegatie
       - output: subject_ids
         value:
-        - $BSN
+        - $bsn
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

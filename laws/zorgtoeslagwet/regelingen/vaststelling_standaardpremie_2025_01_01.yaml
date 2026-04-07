@@ -14,7 +14,7 @@ articles:
   url: https://wetten.overheid.nl/BWBR0050536/2025-01-01#Artikel1
   machine_readable:
     definitions:
-      STANDAARDPREMIE_2025:
+      standaardpremie_2025:
         value: 211200
         legal_basis:
           law: Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2025
@@ -36,7 +36,7 @@ articles:
           min: 0
       actions:
       - output: standaardpremie
-        value: $STANDAARDPREMIE_2025
+        value: $standaardpremie_2025
         legal_basis:
           law: Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2025
           bwb_id: BWBR0050536
