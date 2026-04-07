@@ -10,12 +10,12 @@ service: KVK
 uuid: 8b59ef92-03f8-4294-bce9-4eaac01ba0ed
 articles:
 - number: '2'
-  text: "Er is een handelsregister van ondernemingen en rechtspersonen:\n  a. ter bevordering van de rechtszekerheid in het\
-    \ economisch verkeer;\n  b. voor de verstrekking van gegevens van algemene, feitelijke aard omtrent de samenstelling van\
-    \ ondernemingen en rechtspersonen ter bevordering van de economische belangen van handel, industrie, ambacht en dienstverlening;\n\
-    \  c. voor het registreren van alle ondernemingen en rechtspersonen als onderdeel van de gegevenshuishouding die bijdraagt\
-    \ aan het efficiënt functioneren van en de rechtshandhaving door de overheid;\n  d. voor het registreren van uiteindelijk\
-    \ belanghebbenden ter voorkoming van het gebruik van het financiële stelsel voor het witwassen van geld en terrorismefinanciering."
+  text: |-
+    Er is een handelsregister van ondernemingen en rechtspersonen:
+      a. ter bevordering van de rechtszekerheid in het economisch verkeer;
+      b. voor de verstrekking van gegevens van algemene, feitelijke aard omtrent de samenstelling van ondernemingen en rechtspersonen ter bevordering van de economische belangen van handel, industrie, ambacht en dienstverlening;
+      c. voor het registreren van alle ondernemingen en rechtspersonen als onderdeel van de gegevenshuishouding die bijdraagt aan het efficiënt functioneren van en de rechtshandhaving door de overheid;
+      d. voor het registreren van uiteindelijk belanghebbenden ter voorkoming van het gebruik van het financiële stelsel voor het witwassen van geld en terrorismefinanciering.
   url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Artikel2
   machine_readable:
     definitions:
@@ -80,9 +80,9 @@ articles:
       - output: is_actieve_ondernemer
         value:
           operation: OR
-          values:
+          conditions:
           - operation: AND
-            values:
+            conditions:
             - operation: IN
               subject: $INSCHRIJVINGEN.rechtsvorm
               values: $ONDERNEMERSVORMEN
@@ -90,7 +90,7 @@ articles:
               subject: $INSCHRIJVINGEN.status
               values: $ACTIEVE_STATUSSEN
           - operation: AND
-            values:
+            conditions:
             - operation: IN
               subject: $POSITIES.functie
               values: $ONDERNEMERS_POSITIES

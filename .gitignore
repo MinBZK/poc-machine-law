@@ -27,3 +27,5 @@ machinev2/backend/backend
 __debug_bin*
 
 .claude
+bin/
+tests/baseline/results.json

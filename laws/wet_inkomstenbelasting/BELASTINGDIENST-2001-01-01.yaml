@@ -11,9 +11,11 @@ uuid: cdd0ec9f-4975-4969-9d8a-808f2d6abfc9
 discoverable: CITIZEN
 articles:
 - number: '2.1'
-  text: "1 Belastingplichtigen voor de inkomstenbelasting zijn de natuurlijke personen die:\n  a. in Nederland wonen (binnenlandse\
-    \ belastingplichtigen) of\n  b. niet in Nederland wonen maar wel Nederlands inkomen genieten (buitenlandse belastingplichtigen).\n\
-    2 Nederlands inkomen is inkomen bedoeld in hoofdstuk 7."
+  text: |-
+    1 Belastingplichtigen voor de inkomstenbelasting zijn de natuurlijke personen die:
+      a. in Nederland wonen (binnenlandse belastingplichtigen) of
+      b. niet in Nederland wonen maar wel Nederlands inkomen genieten (buitenlandse belastingplichtigen).
+    2 Nederlands inkomen is inkomen bedoeld in hoofdstuk 7.
   url: https://wetten.overheid.nl/BWBR0011353/2001-01-01#Artikel2.1
   machine_readable:
     definitions:
@@ -546,13 +548,13 @@ articles:
               - $BOX3_ONROEREND_GOED
             - $BOX3_SCHULDEN
             - operation: IF
-              conditions:
-              - test:
+              cases:
+              - when:
                   operation: EQUALS
                   subject: $HEEFT_PARTNER
                   value: true
                 then: $BOX3_HEFFINGSVRIJE_VOET_PARTNERS
-              - else: $BOX3_HEFFINGSVRIJE_VOET_ALLEENSTAAND
+              default: $BOX3_HEFFINGSVRIJE_VOET_ALLEENSTAAND
           - 0
       - output: box3_inkomen
         value:
@@ -618,22 +620,22 @@ articles:
           - 0
       - output: is_aow_leeftijd
         value:
-          operation: GREATER_OR_EQUAL
+          operation: GREATER_THAN_OR_EQUAL
           subject: $LEEFTIJD
           value: $PENSIOENLEEFTIJD
       - output: box1_belasting
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $is_aow_leeftijd
               value: true
             then:
               operation: IF
-              conditions:
-              - test:
-                  operation: LESS_OR_EQUAL
+              cases:
+              - when:
+                  operation: LESS_THAN_OR_EQUAL
                   subject: $box1_inkomen_na_aftrek
                   value: $BOX1_SCHIJF1_GRENS
                 then:
@@ -641,52 +643,52 @@ articles:
                   values:
                   - $box1_inkomen_na_aftrek
                   - $BOX1_TARIEF1_AOW
-              - else:
-                  operation: ADD
+              default:
+                operation: ADD
+                values:
+                - operation: MULTIPLY
                   values:
-                  - operation: MULTIPLY
+                  - $BOX1_SCHIJF1_GRENS
+                  - $BOX1_TARIEF1_AOW
+                - operation: MULTIPLY
+                  values:
+                  - operation: SUBTRACT
                     values:
+                    - $box1_inkomen_na_aftrek
                     - $BOX1_SCHIJF1_GRENS
-                    - $BOX1_TARIEF1_AOW
-                  - operation: MULTIPLY
-                    values:
-                    - operation: SUBTRACT
-                      values:
-                      - $box1_inkomen_na_aftrek
-                      - $BOX1_SCHIJF1_GRENS
-                    - $BOX1_TARIEF2_AOW
-          - else:
-              operation: IF
-              conditions:
-              - test:
-                  operation: LESS_OR_EQUAL
-                  subject: $box1_inkomen_na_aftrek
-                  value: $BOX1_SCHIJF1_GRENS
-                then:
-                  operation: MULTIPLY
+                  - $BOX1_TARIEF2_AOW
+          default:
+            operation: IF
+            cases:
+            - when:
+                operation: LESS_THAN_OR_EQUAL
+                subject: $box1_inkomen_na_aftrek
+                value: $BOX1_SCHIJF1_GRENS
+              then:
+                operation: MULTIPLY
+                values:
+                - $box1_inkomen_na_aftrek
+                - $BOX1_TARIEF1
+            default:
+              operation: ADD
+              values:
+              - operation: MULTIPLY
+                values:
+                - $BOX1_SCHIJF1_GRENS
+                - $BOX1_TARIEF1
+              - operation: MULTIPLY
+                values:
+                - operation: SUBTRACT
                   values:
                   - $box1_inkomen_na_aftrek
-                  - $BOX1_TARIEF1
-              - else:
-                  operation: ADD
-                  values:
-                  - operation: MULTIPLY
-                    values:
-                    - $BOX1_SCHIJF1_GRENS
-                    - $BOX1_TARIEF1
-                  - operation: MULTIPLY
-                    values:
-                    - operation: SUBTRACT
-                      values:
-                      - $box1_inkomen_na_aftrek
-                      - $BOX1_SCHIJF1_GRENS
-                    - $BOX1_TARIEF2
+                  - $BOX1_SCHIJF1_GRENS
+                - $BOX1_TARIEF2
       - output: box2_belasting
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: LESS_OR_EQUAL
+          cases:
+          - when:
+              operation: LESS_THAN_OR_EQUAL
               subject: $box2_inkomen_na_aftrek
               value: $BOX2_SCHIJF1_GRENS
             then:
@@ -694,20 +696,20 @@ articles:
               values:
               - $box2_inkomen_na_aftrek
               - $BOX2_TARIEF1
-          - else:
-              operation: ADD
+          default:
+            operation: ADD
+            values:
+            - operation: MULTIPLY
               values:
-              - operation: MULTIPLY
+              - $BOX2_SCHIJF1_GRENS
+              - $BOX2_TARIEF1
+            - operation: MULTIPLY
+              values:
+              - operation: SUBTRACT
                 values:
+                - $box2_inkomen_na_aftrek
                 - $BOX2_SCHIJF1_GRENS
-                - $BOX2_TARIEF1
-              - operation: MULTIPLY
-                values:
-                - operation: SUBTRACT
-                  values:
-                  - $box2_inkomen_na_aftrek
-                  - $BOX2_SCHIJF1_GRENS
-                - $BOX2_TARIEF2
+              - $BOX2_TARIEF2
       - output: box3_belasting
         value:
           operation: MULTIPLY
@@ -717,8 +719,8 @@ articles:
       - output: algemene_heffingskorting
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $is_aow_leeftijd
               value: true
@@ -729,8 +731,8 @@ articles:
                 values:
                 - $ALGEMENE_HEFFINGSKORTING_MAX_AOW
                 - operation: IF
-                  conditions:
-                  - test:
+                  cases:
+                  - when:
                       operation: GREATER_THAN
                       subject: $box1_inkomen
                       value: $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
@@ -748,41 +750,41 @@ articles:
                           - $ALGEMENE_HEFFINGSKORTING_NULPUNT
                           - $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
                       - $ALGEMENE_HEFFINGSKORTING_AFBOUW_AOW
-                  - else: 0
+                  default: 0
               - 0
-          - else:
-              operation: MAX
+          default:
+            operation: MAX
+            values:
+            - operation: SUBTRACT
               values:
-              - operation: SUBTRACT
-                values:
-                - $ALGEMENE_HEFFINGSKORTING_MAX
-                - operation: IF
-                  conditions:
-                  - test:
-                      operation: GREATER_THAN
-                      subject: $box1_inkomen
-                      value: $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
-                    then:
-                      operation: MULTIPLY
+              - $ALGEMENE_HEFFINGSKORTING_MAX
+              - operation: IF
+                cases:
+                - when:
+                    operation: GREATER_THAN
+                    subject: $box1_inkomen
+                    value: $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
+                  then:
+                    operation: MULTIPLY
+                    values:
+                    - operation: MIN
                       values:
-                      - operation: MIN
+                      - operation: SUBTRACT
                         values:
-                        - operation: SUBTRACT
-                          values:
-                          - $box1_inkomen
-                          - $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
-                        - operation: SUBTRACT
-                          values:
-                          - $ALGEMENE_HEFFINGSKORTING_NULPUNT
-                          - $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
-                      - $ALGEMENE_HEFFINGSKORTING_AFBOUW
-                  - else: 0
-              - 0
+                        - $box1_inkomen
+                        - $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
+                      - operation: SUBTRACT
+                        values:
+                        - $ALGEMENE_HEFFINGSKORTING_NULPUNT
+                        - $ALGEMENE_HEFFINGSKORTING_AFBOUW_START
+                    - $ALGEMENE_HEFFINGSKORTING_AFBOUW
+                default: 0
+            - 0
       - output: arbeidskorting
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $is_aow_leeftijd
               value: true
@@ -793,8 +795,8 @@ articles:
                 values:
                 - $ARBEIDSKORTING_MAX_AOW
                 - operation: IF
-                  conditions:
-                  - test:
+                  cases:
+                  - when:
                       operation: GREATER_THAN
                       subject: $BOX1_DIENSTBETREKKING
                       value: $ARBEIDSKORTING_AFBOUW_START
@@ -812,43 +814,43 @@ articles:
                           - $ARBEIDSKORTING_NULPUNT
                           - $ARBEIDSKORTING_AFBOUW_START
                       - $ARBEIDSKORTING_AFBOUW_AOW
-                  - else: 0
+                  default: 0
               - 0
-          - else:
-              operation: MAX
+          default:
+            operation: MAX
+            values:
+            - operation: SUBTRACT
               values:
-              - operation: SUBTRACT
-                values:
-                - $ARBEIDSKORTING_MAX
-                - operation: IF
-                  conditions:
-                  - test:
-                      operation: GREATER_THAN
-                      subject: $BOX1_DIENSTBETREKKING
-                      value: $ARBEIDSKORTING_AFBOUW_START
-                    then:
-                      operation: MULTIPLY
+              - $ARBEIDSKORTING_MAX
+              - operation: IF
+                cases:
+                - when:
+                    operation: GREATER_THAN
+                    subject: $BOX1_DIENSTBETREKKING
+                    value: $ARBEIDSKORTING_AFBOUW_START
+                  then:
+                    operation: MULTIPLY
+                    values:
+                    - operation: MIN
                       values:
-                      - operation: MIN
+                      - operation: SUBTRACT
                         values:
-                        - operation: SUBTRACT
-                          values:
-                          - $BOX1_DIENSTBETREKKING
-                          - $ARBEIDSKORTING_AFBOUW_START
-                        - operation: SUBTRACT
-                          values:
-                          - $ARBEIDSKORTING_NULPUNT
-                          - $ARBEIDSKORTING_AFBOUW_START
-                      - $ARBEIDSKORTING_AFBOUW
-                  - else: 0
-              - 0
+                        - $BOX1_DIENSTBETREKKING
+                        - $ARBEIDSKORTING_AFBOUW_START
+                      - operation: SUBTRACT
+                        values:
+                        - $ARBEIDSKORTING_NULPUNT
+                        - $ARBEIDSKORTING_AFBOUW_START
+                    - $ARBEIDSKORTING_AFBOUW
+                default: 0
+            - 0
       - output: inkomensafhankelijke_combinatiekorting
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: AND
-              values:
+              conditions:
               - operation: EQUALS
                 subject: $HEEFT_KINDEREN_ONDER_12
                 value: true
@@ -869,7 +871,7 @@ articles:
                     - $INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN
                   - $INKOMENSAFHANKELIJKE_COMBINATIEKORTING_PERCENTAGE
               - $INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MAX
-          - else: 0
+          default: 0
       - output: totale_heffingskortingen
         value:
           operation: ADD
@@ -915,10 +917,12 @@ articles:
           operation: ADD
           values:
           - operation: IF
-            conditions:
-            - test:
-                operation: NOT_NULL
-                subject: $PARTNER_BSN
+            cases:
+            - when:
+                operation: NOT
+                value:
+                  operation: IS_NULL
+                  subject: $PARTNER_BSN
               then:
                 operation: ADD
                 values:
@@ -927,29 +931,33 @@ articles:
                 - $PARTNER_BOX1_ONDERNEMING
                 - $PARTNER_BOX1_OVERIGE_WERKZAAMHEDEN
                 - $PARTNER_BOX1_EIGEN_WONING
-            - else: 0
+            default: 0
       - output: partner_box2_inkomen
         value:
           operation: ADD
           values:
           - operation: IF
-            conditions:
-            - test:
-                operation: NOT_NULL
-                subject: $PARTNER_BSN
+            cases:
+            - when:
+                operation: NOT
+                value:
+                  operation: IS_NULL
+                  subject: $PARTNER_BSN
               then:
                 operation: ADD
                 values:
                 - $PARTNER_BOX2_DIVIDEND
                 - $PARTNER_BOX2_AANDELEN
-            - else: 0
+            default: 0
       - output: partner_box3_inkomen
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_NULL
-              subject: $PARTNER_BSN
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $PARTNER_BSN
             then:
               operation: MULTIPLY
               values:
@@ -966,7 +974,7 @@ articles:
                   - $HEFFINGSVRIJ_VERMOGEN
                 - 0
               - $BOX3_RENDEMENT
-          - else: 0
+          default: 0
       - output: partner_buitenlands_inkomen
         value: $PARTNER_BUITENLANDS_INKOMEN
       - output: partner_inkomen
@@ -980,10 +988,12 @@ articles:
       - output: gezamenlijk_vermogen
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_NULL
-              subject: $PARTNER_BSN
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $PARTNER_BSN
             then:
               operation: ADD
               values:
@@ -996,7 +1006,7 @@ articles:
                   - $PARTNER_BOX3_BELEGGEN
                   - $PARTNER_BOX3_ONROEREND_GOED
                 - $PARTNER_BOX3_SCHULDEN
-          - else: $vermogen
+          default: $vermogen
       - output: bezittingen
         value:
           operation: ADD

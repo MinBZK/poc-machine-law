@@ -10,24 +10,12 @@ service: TOESLAGEN
 uuid: 5f9d3e7a-4c8b-4e1f-9a6c-3d7e8f2a5b4c
 articles:
 - number: '2.34'
-  text: '1 Een bestuursorgaan dat in verband met de verstrekking van een authentiek gegeven uit de basisregistratie gerede
-    twijfel heeft over de juistheid van dat gegeven, doet hiervan mededeling aan het college van burgemeester en wethouders
-    van de bijhoudingsgemeente.
-
-    2 Onze Minister wijst de bestuursorganen aan die tevens mededeling doen in verband met de verstrekking van andere dan
-    authentieke gegevens.
-
-    3 Bij of krachtens algemene maatregel van bestuur worden de gevallen waarin en de wijze waarop de mededeling wordt gedaan,
-    alsmede de kennisgeving van het college van burgemeester en wethouders aan het bestuursorgaan naar aanleiding van een
-    mededeling, geregeld.
-
-    4 Het college van burgemeester en wethouders kan nadere regels stellen omtrent het doen van mededeling door en de kennisgeving
-    aan bestuursorganen die een orgaan zijn van de desbetreffende gemeente en kan een of meer van deze bestuursorganen aanwijzen
-    om tevens mededeling te doen in verband met de verstrekking van andere dan authentieke gegevens.
-
-    5 Voor zover een mededeling als bedoeld in het eerste lid betrekking heeft op een gegeven dat op grond van een andere
-    wet is overgenomen uit een andere registratie, zendt het college van burgemeester en wethouders die mededeling door aan
-    de verantwoordelijke voor de verwerking van dat gegeven in die andere registratie.'
+  text: |-
+    1 Een bestuursorgaan dat in verband met de verstrekking van een authentiek gegeven uit de basisregistratie gerede twijfel heeft over de juistheid van dat gegeven, doet hiervan mededeling aan het college van burgemeester en wethouders van de bijhoudingsgemeente.
+    2 Onze Minister wijst de bestuursorganen aan die tevens mededeling doen in verband met de verstrekking van andere dan authentieke gegevens.
+    3 Bij of krachtens algemene maatregel van bestuur worden de gevallen waarin en de wijze waarop de mededeling wordt gedaan, alsmede de kennisgeving van het college van burgemeester en wethouders aan het bestuursorgaan naar aanleiding van een mededeling, geregeld.
+    4 Het college van burgemeester en wethouders kan nadere regels stellen omtrent het doen van mededeling door en de kennisgeving aan bestuursorganen die een orgaan zijn van de desbetreffende gemeente en kan een of meer van deze bestuursorganen aanwijzen om tevens mededeling te doen in verband met de verstrekking van andere dan authentieke gegevens.
+    5 Voor zover een mededeling als bedoeld in het eerste lid betrekking heeft op een gegeven dat op grond van een andere wet is overgenomen uit een andere registratie, zendt het college van burgemeester en wethouders die mededeling door aan de verantwoordelijke voor de verwerking van dat gegeven in die andere registratie.
   url: https://wetten.overheid.nl/BWBR0033715/2023-05-15#Artikel2.34
   machine_readable:
     definitions:
@@ -80,17 +68,21 @@ articles:
         type: string
       requirements:
       - all:
-        - subject: $ADRES
-          operation: NOT_NULL
+        - operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $ADRES
       actions:
       - output: heeft_gerede_twijfel_adres
         value:
           operation: OR
-          values:
-          - operation: NOT_EQUALS
-            values:
-            - $ADRES
-            - $TOESLAG_ADRES
+          conditions:
+          - operation: NOT
+            value:
+              operation: EQUALS
+              values:
+              - $ADRES
+              - $TOESLAG_ADRES
           - operation: EQUALS
             subject: $TOESLAGEN_ONDERZOEK.adres_geverifieerd
             value: false
@@ -104,19 +96,20 @@ articles:
       - output: twijfel_reden
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_EQUALS
-              values:
-              - $ADRES
-              - $TOESLAG_ADRES
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: EQUALS
+                values:
+                - $ADRES
+                - $TOESLAG_ADRES
             then: $TWIJFEL_ADRES_AFWIJKING
-          - test:
+          - when:
               operation: EQUALS
               subject: $TOESLAGEN_ONDERZOEK.adres_geverifieerd
               value: false
             then: $TWIJFEL_ONDERZOEK
-          - else: null
         legal_basis:
           law: Besluit basisregistratie personen
           bwb_id: BWBR0034306

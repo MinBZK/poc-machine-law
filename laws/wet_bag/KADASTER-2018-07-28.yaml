@@ -10,28 +10,22 @@ service: KADASTER
 uuid: 9c4e8f2a-7d3b-4e1f-8a5c-6f9d2e3a7b4c
 articles:
 - number: '1'
-  text: "In deze wet en de daarop berustende bepalingen wordt verstaan onder:\n  a. adres: door het bevoegde gemeentelijke\
-    \ orgaan aan een verblijfsobject, een standplaats of een ligplaats toegekende benaming, bestaande uit een combinatie van\
-    \ de naam van een openbare ruimte, een nummeraanduiding en de naam van een woonplaats;\n  b. authentiek gegeven: in een\
-    \ basisregistratie opgenomen gegeven dat bij of krachtens de wet als authentiek is aangemerkt;\n  e. basisregistratie:\
-    \ basisregistratie adressen en gebouwen als bedoeld in artikel 2;\n  d. brondocument: document in welke vorm dan ook waarin\
-    \ rechtsfeiten en andere voor de registraties relevante feiten zijn neergelegd;\n  e. Dienst: Dienst voor het kadaster\
-    \ en de openbare registers, genoemd in artikel 2 van de Organisatiewet Kadaster;\n  f. landelijke voorziening: landelijke\
-    \ voorziening als bedoeld in artikel 26;\n  g. ligplaats: door het bevoegde gemeentelijke orgaan als zodanig aangewezen\
-    \ plaats in het water al dan niet aangevuld met een op de oever aanwezig terrein of een gedeelte daarvan, die bestemd\
-    \ is voor het permanent afmeren van een voor woon-, bedrijfsmatige of recreatieve doeleinden geschikt drijvend object;\n\
-    \  h. nummeraanduiding: door het bevoegde gemeentelijke orgaan als zodanig toegekende aanduiding van een verblijfsobject,\
-    \ een standplaats of een ligplaats;\n  i. Onze Minister: Onze Minister van Infrastructuur en Milieu;\n  j. openbare ruimte:\
-    \ door het bevoegde gemeentelijke orgaan als zodanig aangewezen en van een naam voorziene buitenruimte die binnen één\
-    \ woonplaats is gelegen;\n  k. pand: kleinste bij de totstandkoming functioneel en bouwkundig-constructief zelfstandige\
-    \ eenheid die direct en duurzaam met de aarde is verbonden en betreedbaar en afsluitbaar is;\n  l. standplaats: door het\
-    \ bevoegde gemeentelijke orgaan als zodanig aangewezen terrein of gedeelte daarvan dat bestemd is voor het permanent plaatsen\
-    \ van een niet direct en niet duurzaam met de aarde verbonden en voor woon-, bedrijfsmatige, of recreatieve doeleinden\
-    \ geschikte ruimte;\n  m. verblijfsobject: kleinste binnen één of meer panden gelegen en voor woon-, bedrijfsmatige, of\
-    \ recreatieve doeleinden geschikte eenheid van gebruik die ontsloten wordt via een eigen afsluitbare toegang vanaf de\
-    \ openbare weg, een erf of een gedeelde verkeersruimte, onderwerp kan zijn van goederenrechtelijke rechtshandelingen en\
-    \ in functioneel opzicht zelfstandig is;\n  n. woonplaats: door het bevoegde gemeentelijke orgaan als zodanig aangewezen\
-    \ en van een naam voorzien gedeelte van het grondgebied van de gemeente."
+  text: |-
+    In deze wet en de daarop berustende bepalingen wordt verstaan onder:
+      a. adres: door het bevoegde gemeentelijke orgaan aan een verblijfsobject, een standplaats of een ligplaats toegekende benaming, bestaande uit een combinatie van de naam van een openbare ruimte, een nummeraanduiding en de naam van een woonplaats;
+      b. authentiek gegeven: in een basisregistratie opgenomen gegeven dat bij of krachtens de wet als authentiek is aangemerkt;
+      e. basisregistratie: basisregistratie adressen en gebouwen als bedoeld in artikel 2;
+      d. brondocument: document in welke vorm dan ook waarin rechtsfeiten en andere voor de registraties relevante feiten zijn neergelegd;
+      e. Dienst: Dienst voor het kadaster en de openbare registers, genoemd in artikel 2 van de Organisatiewet Kadaster;
+      f. landelijke voorziening: landelijke voorziening als bedoeld in artikel 26;
+      g. ligplaats: door het bevoegde gemeentelijke orgaan als zodanig aangewezen plaats in het water al dan niet aangevuld met een op de oever aanwezig terrein of een gedeelte daarvan, die bestemd is voor het permanent afmeren van een voor woon-, bedrijfsmatige of recreatieve doeleinden geschikt drijvend object;
+      h. nummeraanduiding: door het bevoegde gemeentelijke orgaan als zodanig toegekende aanduiding van een verblijfsobject, een standplaats of een ligplaats;
+      i. Onze Minister: Onze Minister van Infrastructuur en Milieu;
+      j. openbare ruimte: door het bevoegde gemeentelijke orgaan als zodanig aangewezen en van een naam voorziene buitenruimte die binnen één woonplaats is gelegen;
+      k. pand: kleinste bij de totstandkoming functioneel en bouwkundig-constructief zelfstandige eenheid die direct en duurzaam met de aarde is verbonden en betreedbaar en afsluitbaar is;
+      l. standplaats: door het bevoegde gemeentelijke orgaan als zodanig aangewezen terrein of gedeelte daarvan dat bestemd is voor het permanent plaatsen van een niet direct en niet duurzaam met de aarde verbonden en voor woon-, bedrijfsmatige, of recreatieve doeleinden geschikte ruimte;
+      m. verblijfsobject: kleinste binnen één of meer panden gelegen en voor woon-, bedrijfsmatige, of recreatieve doeleinden geschikte eenheid van gebruik die ontsloten wordt via een eigen afsluitbare toegang vanaf de openbare weg, een erf of een gedeelde verkeersruimte, onderwerp kan zijn van goederenrechtelijke rechtshandelingen en in functioneel opzicht zelfstandig is;
+      n. woonplaats: door het bevoegde gemeentelijke orgaan als zodanig aangewezen en van een naam voorzien gedeelte van het grondgebied van de gemeente.
   url: https://wetten.overheid.nl/BWBR0023466/2018-07-28#Artikel1
   machine_readable:
     definitions:
@@ -87,8 +81,10 @@ articles:
         type: boolean
       requirements:
       - all:
-        - subject: $ADRES
-          operation: NOT_NULL
+        - operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $ADRES
           legal_basis:
             law: Wet basisregistratie adressen en gebouwen
             bwb_id: BWBR0023466

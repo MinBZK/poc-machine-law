@@ -11,19 +11,17 @@ uuid: 50a9a87f-f222-473b-978f-6846f3cee076
 discoverable: BUSINESS
 articles:
 - number: '1'
-  text: "In deze wet wordt verstaan onder:\n  – Adviescollege: het Adviescollege ICT-toetsing, bedoeld in artikel 2;\n  –\
-    \ centrale overheid: de ministeries, de krachtens publiekrecht ingestelde zelfstandige bestuursorganen als bedoeld in\
-    \ artikel 4 van de Kaderwet zelfstandige bestuursorganen, de politie en de Raad voor de rechtspraak;\n  – ICT-project:\
-    \ een project of programma, dan wel projecten of programma’s die onderlinge samenhang hebben, van de centrale overheid\
-    \ waarvan de kosten voor de ICT-componenten over de gehele looptijd van het project of programma ten minste € 5.000.000\
-    \ bedragen;\n  – informatiesysteem: een samenhangend geheel van gegevensverzamelingen, procedures, processen en programmatuur\
-    \ van de centrale overheid, alsmede de voor het informatiesysteem getroffen voorzieningen voor opslag, verwerking en communicatie;\n\
-    \  – korpschef van politie: de korpschef, bedoeld in artikel 27 van de Politiewet 2012;\n  – Onze Minister: Onze Minister\
-    \ van Binnenlandse Zaken en Koninkrijksrelaties;\n  – Onze Minister die verantwoordelijk is voor de ICT-voorziening: Onze\
-    \ Minister die verantwoordelijk is voor het ICT-project of het informatiesysteem waarop het advies betrekking heeft;\n\
-    \  – Onze Minister die het aangaat: Onze Minister die de eerste ondertekenaar is van de wet of lagere regelgeving bij\
-    \ welke een zelfstandig bestuursorgaan is ingesteld;\n  – zelfstandig bestuursorgaan: een krachtens publiekrecht ingesteld\
-    \ zelfstandig bestuursorgaan als bedoeld in artikel 4 van de Kaderwet zelfstandige bestuursorganen."
+  text: |-
+    In deze wet wordt verstaan onder:
+      – Adviescollege: het Adviescollege ICT-toetsing, bedoeld in artikel 2;
+      – centrale overheid: de ministeries, de krachtens publiekrecht ingestelde zelfstandige bestuursorganen als bedoeld in artikel 4 van de Kaderwet zelfstandige bestuursorganen, de politie en de Raad voor de rechtspraak;
+      – ICT-project: een project of programma, dan wel projecten of programma’s die onderlinge samenhang hebben, van de centrale overheid waarvan de kosten voor de ICT-componenten over de gehele looptijd van het project of programma ten minste € 5.000.000 bedragen;
+      – informatiesysteem: een samenhangend geheel van gegevensverzamelingen, procedures, processen en programmatuur van de centrale overheid, alsmede de voor het informatiesysteem getroffen voorzieningen voor opslag, verwerking en communicatie;
+      – korpschef van politie: de korpschef, bedoeld in artikel 27 van de Politiewet 2012;
+      – Onze Minister: Onze Minister van Binnenlandse Zaken en Koninkrijksrelaties;
+      – Onze Minister die verantwoordelijk is voor de ICT-voorziening: Onze Minister die verantwoordelijk is voor het ICT-project of het informatiesysteem waarop het advies betrekking heeft;
+      – Onze Minister die het aangaat: Onze Minister die de eerste ondertekenaar is van de wet of lagere regelgeving bij welke een zelfstandig bestuursorgaan is ingesteld;
+      – zelfstandig bestuursorgaan: een krachtens publiekrecht ingesteld zelfstandig bestuursorgaan als bedoeld in artikel 4 van de Kaderwet zelfstandige bestuursorganen.
   url: https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1
   machine_readable:
     definitions:
@@ -84,8 +82,8 @@ articles:
       - output: adviesplicht
         value:
           operation: AND
-          values:
-          - operation: GREATER_OR_EQUAL
+          conditions:
+          - operation: GREATER_THAN_OR_EQUAL
             subject: $PROJECT_KOSTEN
             value: $KOSTEN_DREMPEL
           - operation: IN
@@ -95,9 +93,11 @@ articles:
             - ZBO
             - POLITIE
             - RECHTERLIJKE_MACHT
-          - operation: NOT_EQUALS
-            subject: $PROJECT_TYPE
-            value: WAPENSYSTEEM
+          - operation: NOT
+            value:
+              operation: EQUALS
+              subject: $PROJECT_TYPE
+              value: WAPENSYSTEEM
         legal_basis:
           law: Wet Adviescollege ICT-toetsing
           bwb_id: BWBR0049412

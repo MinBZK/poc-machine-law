@@ -10,22 +10,8 @@ uuid: 3e7f9b2a-5d8c-4a1e-9f6b-8c2d4e7a3b1f
 discoverable: BUSINESS
 articles:
 - number: 2:30b
-  text: 'Artikel 2:30b Terrassen 1. Ingeval van een exploitatievergunningaanvraag die tevens van toepassing is voor een of
-    meer bij de openbare inrichting behorende terrassen, beslist de burgemeester – gelet op de openbare orde en veiligheid
-    ter plaatse hetgeen mede omvat de kwaliteit en het uiterlijk aanzien van de terrassen – tevens omtrent de ingebruikneming
-    van de openbare weg. 2. Onverminderd het bepaalde in de artikelen 1:6, 1:8 en 2:28, kan de burgemeester de in het eerste
-    lid bedoelde ingebruikneming van de openbare weg weigeren of verbieden indien het de verwachting is dat het gebruik: a.
-    schade toebrengt aan de weg dan wel gevaar kan veroorzaken voor de bruikbaarheid van de weg of voor het doelmatig en veilig
-    gebruik daarvan; b. een belemmering vormt voor het doelmatig beheer en onderhoud van de weg; c. afbreuk doet aan andere
-    publieke functies van de openbare ruimte, inclusief de bescherming van het uiterlijk aanzien daarvan. 3. Als voor het
-    uitvoeren van openbare werken of om enigerlei andere reden verwijdering van het terras noodzakelijk is, is de exploitant
-    van de openbare inrichting verplicht dit binnen de door het bevoegde bestuursorgaan gestelde termijn, te verwijderen.
-    4. Het is verboden dranken of eetwaren voor gebruik ter plaatse te verstrekken buiten dat deel van de weg waarvan het
-    gebruik ingevolge het eerste lid is toegestaan. 5. De exploitant of de beheerder is verplicht te zorgen dat dagelijks,
-    uiterlijk een uur na sluiting van de openbare inrichting, doch in ieder geval onverwijld op eerste aanzegging van een
-    ambtenaar, belast met het toezicht op de naleving van het bepaalde in dit artikel, in de nabijheid van het terras op de
-    weg achtergebleven stoffen of voorwerpen, voor zover kennelijk uit of van dat terras afkomstig, worden verwijderd. <section
-    class="section-chapter js-scrollSection"'
+  text: |-
+    Artikel 2:30b Terrassen 1. Ingeval van een exploitatievergunningaanvraag die tevens van toepassing is voor een of meer bij de openbare inrichting behorende terrassen, beslist de burgemeester – gelet op de openbare orde en veiligheid ter plaatse hetgeen mede omvat de kwaliteit en het uiterlijk aanzien van de terrassen – tevens omtrent de ingebruikneming van de openbare weg. 2. Onverminderd het bepaalde in de artikelen 1:6, 1:8 en 2:28, kan de burgemeester de in het eerste lid bedoelde ingebruikneming van de openbare weg weigeren of verbieden indien het de verwachting is dat het gebruik: a. schade toebrengt aan de weg dan wel gevaar kan veroorzaken voor de bruikbaarheid van de weg of voor het doelmatig en veilig gebruik daarvan; b. een belemmering vormt voor het doelmatig beheer en onderhoud van de weg; c. afbreuk doet aan andere publieke functies van de openbare ruimte, inclusief de bescherming van het uiterlijk aanzien daarvan. 3. Als voor het uitvoeren van openbare werken of om enigerlei andere reden verwijdering van het terras noodzakelijk is, is de exploitant van de openbare inrichting verplicht dit binnen de door het bevoegde bestuursorgaan gestelde termijn, te verwijderen. 4. Het is verboden dranken of eetwaren voor gebruik ter plaatse te verstrekken buiten dat deel van de weg waarvan het gebruik ingevolge het eerste lid is toegestaan. 5. De exploitant of de beheerder is verplicht te zorgen dat dagelijks, uiterlijk een uur na sluiting van de openbare inrichting, doch in ieder geval onverwijld op eerste aanzegging van een ambtenaar, belast met het toezicht op de naleving van het bepaalde in dit artikel, in de nabijheid van het terras op de weg achtergebleven stoffen of voorwerpen, voor zover kennelijk uit of van dat terras afkomstig, worden verwijderd. <section class="section-chapter js-scrollSection"
   url: https://lokaleregelgeving.overheid.nl/CVDR373493/11#artikel_2:30b
   machine_readable:
     definitions:
@@ -381,7 +367,7 @@ articles:
             article: '6'
             url: https://wetten.overheid.nl/BWBR0023466/2022-01-01#Hoofdstuk2_Artikel6
             explanation: Het pand moet een horecafunctie hebben volgens BAG
-        - operation: GREATER_OR_EQUAL
+        - operation: GREATER_THAN_OR_EQUAL
           values:
           - $OBSTAKELVRIJE_RUIMTE
           - $MINIMALE_OBSTAKELVRIJE_RUIMTE
@@ -391,7 +377,7 @@ articles:
             paragraph: '3'
             url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
             explanation: Er moet minimaal 1,8 meter obstakelvrije ruimte blijven voor voetgangers en hulpdiensten
-        - operation: LESS_OR_EQUAL
+        - operation: LESS_THAN_OR_EQUAL
           values:
           - $TERRAS_OPPERVLAKTE
           - $BGT_OPPERVLAKTE_BESCHIKBAAR
@@ -408,7 +394,7 @@ articles:
             article: 2:30b
             url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
             explanation: Een terras mag alleen op daarvoor geschikte oppervlakken worden geplaatst
-        - operation: LESS_OR_EQUAL
+        - operation: LESS_THAN_OR_EQUAL
           values:
           - $GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS
           - $MAXIMALE_SLUITINGSTIJD_DOORDEWEEKS
@@ -417,7 +403,7 @@ articles:
             article: '2:29'
             url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
             explanation: Terrassen mogen doordeweeks (zo-do) maximaal tot 01:00 uur open zijn
-        - operation: LESS_OR_EQUAL
+        - operation: LESS_THAN_OR_EQUAL
           values:
           - $GEWENSTE_SLUITINGSTIJD_WEEKEND
           - $MAXIMALE_SLUITINGSTIJD_WEEKEND
@@ -443,30 +429,30 @@ articles:
       - output: heeft_recht_op_terrasvergunning
         value:
           operation: AND
-          values:
+          conditions:
           - operation: EQUALS
             subject: $HEEFT_EXPLOITATIEVERGUNNING
             value: true
           - operation: IN
             subject: $BAG_GEBRUIKSDOEL
             values: $TOEGESTANE_GEBRUIKSDOELEN
-          - operation: GREATER_OR_EQUAL
+          - operation: GREATER_THAN_OR_EQUAL
             subject: $OBSTAKELVRIJE_RUIMTE
             value: $MINIMALE_OBSTAKELVRIJE_RUIMTE
-          - operation: LESS_OR_EQUAL
+          - operation: LESS_THAN_OR_EQUAL
             subject: $TERRAS_OPPERVLAKTE
             value: $BGT_OPPERVLAKTE_BESCHIKBAAR
           - operation: IN
             subject: $BGT_FUNCTIE_OPPERVLAK
             values: $TOEGESTANE_BGT_FUNCTIES
-          - operation: LESS_OR_EQUAL
+          - operation: LESS_THAN_OR_EQUAL
             subject: $GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS
             value: $MAXIMALE_SLUITINGSTIJD_DOORDEWEEKS
-          - operation: LESS_OR_EQUAL
+          - operation: LESS_THAN_OR_EQUAL
             subject: $GEWENSTE_SLUITINGSTIJD_WEEKEND
             value: $MAXIMALE_SLUITINGSTIJD_WEEKEND
           - operation: OR
-            values:
+            conditions:
             - operation: EQUALS
               subject: $SCHENKT_ALCOHOL
               value: false
@@ -488,45 +474,45 @@ articles:
       - output: weigeringsgrond
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $HEEFT_EXPLOITATIEVERGUNNING
               value: false
             then: Geen geldige exploitatievergunning
-          - test:
+          - when:
               operation: NOT_IN
               subject: $BAG_GEBRUIKSDOEL
               values: $TOEGESTANE_GEBRUIKSDOELEN
             then: Pand heeft geen horecagerelateerd gebruiksdoel
-          - test:
+          - when:
               operation: LESS_THAN
               subject: $OBSTAKELVRIJE_RUIMTE
               value: $MINIMALE_OBSTAKELVRIJE_RUIMTE
             then: Obstakelvrije ruimte is minder dan 1,8 meter
-          - test:
+          - when:
               operation: GREATER_THAN
               subject: $TERRAS_OPPERVLAKTE
               value: $BGT_OPPERVLAKTE_BESCHIKBAAR
             then: Gevraagde oppervlakte groter dan beschikbare ruimte
-          - test:
+          - when:
               operation: NOT_IN
               subject: $BGT_FUNCTIE_OPPERVLAK
               values: $TOEGESTANE_BGT_FUNCTIES
             then: Locatie niet geschikt voor terras (verkeerde BGT-functie)
-          - test:
+          - when:
               operation: GREATER_THAN
               subject: $GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS
               value: $MAXIMALE_SLUITINGSTIJD_DOORDEWEEKS
             then: Gevraagde sluitingstijd doordeweeks (zo-do) later dan toegestaan in dit gebied
-          - test:
+          - when:
               operation: GREATER_THAN
               subject: $GEWENSTE_SLUITINGSTIJD_WEEKEND
               value: $MAXIMALE_SLUITINGSTIJD_WEEKEND
             then: Gevraagde sluitingstijd weekend (vr-za) later dan toegestaan in dit gebied
-          - test:
+          - when:
               operation: AND
-              values:
+              conditions:
               - operation: EQUALS
                 subject: $SCHENKT_ALCOHOL
                 value: true
@@ -534,7 +520,7 @@ articles:
                 subject: $HEEFT_ALCOHOLVERGUNNING
                 value: false
             then: Geen alcoholvergunning terwijl alcohol wordt geschonken
-          - else: ''
+          default: ''
         legal_basis:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: 2:30b
@@ -585,8 +571,8 @@ articles:
       - output: precariobelasting_per_jaar
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $LOCATIE_OP_OPENBARE_WEG
               value: true
@@ -604,7 +590,7 @@ articles:
                   - 50
                 - 0
               - $PRECARIO_TARIEF_PER_M2
-          - else: 0
+          default: 0
         legal_basis:
           law: Verordening precario- en reclamebelasting Rotterdam 2024
           article: '5'

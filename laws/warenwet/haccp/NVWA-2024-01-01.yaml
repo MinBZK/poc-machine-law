@@ -11,21 +11,12 @@ uuid: a7f3b2c1-8d4e-4f6a-9c5b-3e1d7a2f8b04
 discoverable: BUSINESS
 articles:
 - number: '2'
-  text: '1 Het is verboden te handelen in strijd met de artikelen 3, 4, eerste, tweede en derde lid, 5, eerste lid, tweede
-    lid, laatste alinea, en vierde lid, en 6, tweede lid en derde lid, onderdelen a en b, van verordening (EG) 852/2004 en
-    de krachtens de artikelen 4, vierde lid, en 6, derde lid, onderdeel c, van verordening (EG) 852/2004 vastgestelde bepalingen.
-
-    2 Het is verboden te handelen in strijd met de artikelen 3, 4, eerste tot en met vierde lid, 5, 6, eerste, derde, en vierde
-    lid, 7, eerste lid, en 8, eerste lid, van verordening (EG) 853/2004 en de krachtens artikel 11 van verordening (EG) 853/2004
-    vastgestelde bepalingen.
-
-    3 Het is verboden te handelen in strijd met de artikelen 3, 4, 5, eerste, tweede en vierde lid, 6, eerste lid, 7, en 9,
-    van verordening (EG) 2073/2005.
-
+  text: |-
+    1 Het is verboden te handelen in strijd met de artikelen 3, 4, eerste, tweede en derde lid, 5, eerste lid, tweede lid, laatste alinea, en vierde lid, en 6, tweede lid en derde lid, onderdelen a en b, van verordening (EG) 852/2004 en de krachtens de artikelen 4, vierde lid, en 6, derde lid, onderdeel c, van verordening (EG) 852/2004 vastgestelde bepalingen.
+    2 Het is verboden te handelen in strijd met de artikelen 3, 4, eerste tot en met vierde lid, 5, 6, eerste, derde, en vierde lid, 7, eerste lid, en 8, eerste lid, van verordening (EG) 853/2004 en de krachtens artikel 11 van verordening (EG) 853/2004 vastgestelde bepalingen.
+    3 Het is verboden te handelen in strijd met de artikelen 3, 4, 5, eerste, tweede en vierde lid, 6, eerste lid, 7, en 9, van verordening (EG) 2073/2005.
     4 Het is verboden te handelen in strijd met artikel 7, eerste lid.
-
-    5 Het is verboden rauwe melk en rauwe room, bestemd voor rechtstreekse menselijke consumptie, te verhandelen, anders dan
-    met inachtneming van de artikelen 8 en 8a.'
+    5 Het is verboden rauwe melk en rauwe room, bestemd voor rechtstreekse menselijke consumptie, te verhandelen, anders dan met inachtneming van de artikelen 8 en 8a.
   url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
   machine_readable:
     definitions:
@@ -210,7 +201,7 @@ articles:
       - output: voldoet_aan_verplichting
         value:
           operation: AND
-          values:
+          conditions:
           - operation: EQUALS
             subject: $IS_GEREGISTREERD_NVWA
             value: true

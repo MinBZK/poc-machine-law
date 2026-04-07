@@ -11,17 +11,15 @@ uuid: 8a3f9b5c-4d2e-4f0a-b6c3-1e9d8f7a5b4c
 discoverable: HIDDEN
 articles:
 - number: '8'
-  text: "1 Leidinggevenden van het horecabedrijf en het slijtersbedrijf voldoen aan de volgende eisen:\n  a. zij hebben de\
-    \ leeftijd van eenentwintig jaar bereikt;\n  b. zij zijn niet in enig opzicht van slecht levensgedrag;\n  c. zij mogen\
-    \ niet onder curatele staan.\n2 Bij of krachtens algemene maatregel van bestuur worden naast de in het eerste lid gestelde\
-    \ eisen andere eisen ten aanzien van het zedelijk gedrag van leidinggevenden gesteld en kan de in dat lid, onder b, gestelde\
-    \ eis nader worden omschreven.\n3 Leidinggevenden beschikken tevens over voldoende kennis en inzicht met betrekking tot\
-    \ sociale hygiëne en zijn ingeschreven in het Register sociale hygiëne, genoemd in artikel 11c.\n4 De in het derde lid\
-    \ gestelde eis geldt niet voor leidinggevenden voor wier rekening en risico het horecabedrijf of het slijtersbedrijf wordt\
-    \ uitgeoefend, indien die leidinggevenden geen bemoeienis hebben met de bedrijfsvoering of de exploitatie van het horecabedrijf\
-    \ of het slijtersbedrijf waarvoor vergunning wordt gevraagd of is verkregen en de vergunninghouder dit in een schriftelijke\
-    \ verklaring bevestigt.\n5 Indien een paracommerciële rechtspersoon het horecabedrijf uitoefent, voldoen ten minste twee\
-    \ leidinggevenden aan de bij of krachtens dit artikel gestelde eisen."
+  text: |-
+    1 Leidinggevenden van het horecabedrijf en het slijtersbedrijf voldoen aan de volgende eisen:
+      a. zij hebben de leeftijd van eenentwintig jaar bereikt;
+      b. zij zijn niet in enig opzicht van slecht levensgedrag;
+      c. zij mogen niet onder curatele staan.
+    2 Bij of krachtens algemene maatregel van bestuur worden naast de in het eerste lid gestelde eisen andere eisen ten aanzien van het zedelijk gedrag van leidinggevenden gesteld en kan de in dat lid, onder b, gestelde eis nader worden omschreven.
+    3 Leidinggevenden beschikken tevens over voldoende kennis en inzicht met betrekking tot sociale hygiëne en zijn ingeschreven in het Register sociale hygiëne, genoemd in artikel 11c.
+    4 De in het derde lid gestelde eis geldt niet voor leidinggevenden voor wier rekening en risico het horecabedrijf of het slijtersbedrijf wordt uitgeoefend, indien die leidinggevenden geen bemoeienis hebben met de bedrijfsvoering of de exploitatie van het horecabedrijf of het slijtersbedrijf waarvoor vergunning wordt gevraagd of is verkregen en de vergunninghouder dit in een schriftelijke verklaring bevestigt.
+    5 Indien een paracommerciële rechtspersoon het horecabedrijf uitoefent, voldoen ten minste twee leidinggevenden aan de bij of krachtens dit artikel gestelde eisen.
   url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Artikel8
   machine_readable:
     definitions:
@@ -75,7 +73,7 @@ articles:
         type: string
       requirements:
       - all:
-        - operation: GREATER_OR_EQUAL
+        - operation: GREATER_THAN_OR_EQUAL
           subject: $LEEFTIJD_LEIDINGGEVENDE
           value: $MINIMALE_LEEFTIJD
           legal_basis:
@@ -96,10 +94,12 @@ articles:
             url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8
             explanation: 'Artikel 8 lid 1 onder c: leidinggevenden mogen niet onder curatele staan'
         - or:
-          - subject: $TYPE_BEDRIJF
-            operation: NOT_EQUALS
-            value: $TYPE_HORECABEDRIJF
-          - operation: GREATER_OR_EQUAL
+          - operation: NOT
+            value:
+              operation: EQUALS
+              subject: $TYPE_BEDRIJF
+              value: $TYPE_HORECABEDRIJF
+          - operation: GREATER_THAN_OR_EQUAL
             subject: $VLOEROPPERVLAKTE
             value: $MINIMALE_VLOEROPPERVLAKTE_HORECA
           legal_basis:
@@ -110,10 +110,12 @@ articles:
             url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10
             explanation: 'Artikel 10 lid 2: een horecalokaliteit moet ten minste 35 m² vloeroppervlakte hebben'
         - or:
-          - subject: $TYPE_BEDRIJF
-            operation: NOT_EQUALS
-            value: $TYPE_SLIJTERSBEDRIJF
-          - operation: GREATER_OR_EQUAL
+          - operation: NOT
+            value:
+              operation: EQUALS
+              subject: $TYPE_BEDRIJF
+              value: $TYPE_SLIJTERSBEDRIJF
+          - operation: GREATER_THAN_OR_EQUAL
             subject: $VLOEROPPERVLAKTE
             value: $MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ
           legal_basis:
@@ -126,7 +128,7 @@ articles:
       actions:
       - output: voldoet_aan_leeftijdseis
         value:
-          operation: GREATER_OR_EQUAL
+          operation: GREATER_THAN_OR_EQUAL
           subject: $LEEFTIJD_LEIDINGGEVENDE
           value: $MINIMALE_LEEFTIJD
         legal_basis:
@@ -151,17 +153,17 @@ articles:
       - output: voldoet_aan_levensgedrag_eis
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: IS_NULL
               subject: $IS_VAN_SLECHT_LEVENSGEDRAG
             then: true
-          - test:
+          - when:
               operation: EQUALS
               subject: $IS_VAN_SLECHT_LEVENSGEDRAG
               value: false
             then: true
-          - else: false
+          default: false
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458
@@ -172,17 +174,17 @@ articles:
       - output: voldoet_aan_svh_eis
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: IS_NULL
               subject: $IS_INGESCHREVEN_SVH_REGISTER
             then: true
-          - test:
+          - when:
               operation: EQUALS
               subject: $IS_INGESCHREVEN_SVH_REGISTER
               value: true
             then: true
-          - else: false
+          default: false
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458
@@ -193,38 +195,42 @@ articles:
       - output: voldoet_aan_inrichtingseis
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: AND
-              values:
+              conditions:
               - operation: EQUALS
                 subject: $TYPE_BEDRIJF
                 value: $TYPE_HORECABEDRIJF
-              - operation: GREATER_OR_EQUAL
+              - operation: GREATER_THAN_OR_EQUAL
                 subject: $VLOEROPPERVLAKTE
                 value: $MINIMALE_VLOEROPPERVLAKTE_HORECA
             then: true
-          - test:
+          - when:
               operation: AND
-              values:
+              conditions:
               - operation: EQUALS
                 subject: $TYPE_BEDRIJF
                 value: $TYPE_SLIJTERSBEDRIJF
-              - operation: GREATER_OR_EQUAL
+              - operation: GREATER_THAN_OR_EQUAL
                 subject: $VLOEROPPERVLAKTE
                 value: $MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ
             then: true
-          - test:
+          - when:
               operation: AND
-              values:
-              - operation: NOT_EQUALS
-                subject: $TYPE_BEDRIJF
-                value: $TYPE_HORECABEDRIJF
-              - operation: NOT_EQUALS
-                subject: $TYPE_BEDRIJF
-                value: $TYPE_SLIJTERSBEDRIJF
+              conditions:
+              - operation: NOT
+                value:
+                  operation: EQUALS
+                  subject: $TYPE_BEDRIJF
+                  value: $TYPE_HORECABEDRIJF
+              - operation: NOT
+                value:
+                  operation: EQUALS
+                  subject: $TYPE_BEDRIJF
+                  value: $TYPE_SLIJTERSBEDRIJF
             then: true
-          - else: false
+          default: false
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458
@@ -235,8 +241,8 @@ articles:
       - output: voldoet_aan_artikel_8
         value:
           operation: AND
-          values:
-          - operation: GREATER_OR_EQUAL
+          conditions:
+          - operation: GREATER_THAN_OR_EQUAL
             subject: $LEEFTIJD_LEIDINGGEVENDE
             value: $MINIMALE_LEEFTIJD
           - operation: EQUALS
@@ -261,20 +267,20 @@ articles:
       - output: weigeringsgrond_nationaal
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: LESS_THAN
               subject: $LEEFTIJD_LEIDINGGEVENDE
               value: $MINIMALE_LEEFTIJD
             then: Leidinggevende heeft de leeftijd van 21 jaar niet bereikt (artikel 8 lid 1 onder a)
-          - test:
+          - when:
               operation: EQUALS
               subject: $IS_ONDER_CURATELE
               value: true
             then: Leidinggevende staat onder curatele (artikel 8 lid 1 onder c)
-          - test:
+          - when:
               operation: AND
-              values:
+              conditions:
               - operation: EQUALS
                 subject: $TYPE_BEDRIJF
                 value: $TYPE_HORECABEDRIJF
@@ -282,9 +288,9 @@ articles:
                 subject: $VLOEROPPERVLAKTE
                 value: $MINIMALE_VLOEROPPERVLAKTE_HORECA
             then: Horecalokaliteit heeft minder dan 35 m² vloeroppervlakte (artikel 10 lid 2)
-          - test:
+          - when:
               operation: AND
-              values:
+              conditions:
               - operation: EQUALS
                 subject: $TYPE_BEDRIJF
                 value: $TYPE_SLIJTERSBEDRIJF
@@ -292,7 +298,7 @@ articles:
                 subject: $VLOEROPPERVLAKTE
                 value: $MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ
             then: Slijtlokaliteit heeft minder dan 15 m² vloeroppervlakte (artikel 10 lid 2)
-          - else: ''
+          default: ''
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458

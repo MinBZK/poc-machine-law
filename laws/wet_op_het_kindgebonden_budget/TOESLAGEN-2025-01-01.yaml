@@ -11,44 +11,29 @@ uuid: 5d8e4b3a-6f9c-4a2d-8e7b-1c9f2a5b8d3e
 discoverable: CITIZEN
 articles:
 - number: '2'
-  text: "1 Aanspraak op een kindgebonden budget heeft de ouder voor een kind voor wie aan die ouder op grond van artikel 18\
-    \ van de Algemene Kinderbijslagwet kinderbijslag wordt betaald of zou worden betaald indien artikel 7, tweede lid van\
-    \ die wet niet van toepassing zou zijn, met dien verstande dat de aanspraak op een kindgebonden budget bestaat met ingang\
-    \ van de kalendermaand na de maand waarin het kind is geboren dan wel tot het huishouden is gaan behoren tot en met de\
-    \ kalendermaand waarin het kind de leeftijd van 18 jaar bereikt.\n2 Het kindgebonden budget bedraagt voor een berekeningsjaar:\n\
-    \  a. indien de ouder aanspraak heeft voor een kind: € 2.511;\n  b. indien de ouder aanspraak heeft voor twee of meer\
-    \ kinderen: € 2.511 per kind voor het tweede of volgende kind.\n3 Een ouder heeft aanspraak op een verhoging van het kindgebonden\
-    \ budget in een berekeningsjaar voor een kind met ingang van de kalendermaand na de maand waarin dat kind de leeftijd\
-    \ van 12 jaar heeft bereikt.\n4 Voor een kind dat 12 jaar of ouder is, maar jonger is dan 16 jaar bedraagt de verhoging\
-    \ van het kindgebonden budget € 703.\n5 Voor een kind dat 16 of 17 jaar is, bedraagt de verhoging van het kindgebonden\
-    \ budget met ingang van de kalendermaand na de maand waarin het kind de leeftijd van 16 jaar heeft bereikt € 936,00.\n\
-    6 De ouder die geen partner heeft, heeft aanspraak op een verhoging van het kindgebonden budget van € 3.389.\n7 Bij een\
-    \ toetsingsinkomen van de ouder die geen partner heeft, van meer dan het drempelinkomen wordt de som van de bedragen waarop\
-    \ recht bestaat op grond van het tweede, vierde, vijfde en zesde lid verminderd met 7,10% van het verschil tussen het\
-    \ toetsingsinkomen en het drempelinkomen.\n8 Bij een gezamenlijk toetsingsinkomen van de ouder en zijn partner van meer\
-    \ dan het met € 9.139,00 verhoogde drempelinkomen wordt de som van de bedragen waarop recht bestaat op grond van het tweede,\
-    \ vierde en vijfde lid verminderd met 7,10% van het verschil tussen het gezamenlijk toetsingsinkomen en het met € 9.139,00\
-    \ verhoogde drempelinkomen.\n9 Een ouder als bedoeld in het eerste en derde lid en zijn partner die tevens ouder is als\
-    \ bedoeld in het eerste lid worden voor de toepassing van deze wet geacht gezamenlijk één aanspraak te hebben.\n10 Indien\
-    \ aan twee ouders kinderbijslag wordt uitbetaald op basis van het recht op kinderbijslag van één van die ouders, heeft\
-    \ alleen de ouder, wiens recht op kinderbijslag wordt uitbetaald aanspraak op een kindgebonden budget.\n11 De aanspraak\
-    \ op een kindgebonden budget wordt voor iedere kalendermaand afzonderlijk bepaald.\n12 Indien de ouder:\n  a. aanspraak\
-    \ heeft op kindgebonden budget voor een kind, en\n  b. voor dat kind voor de toepassing van de Algemene Kinderbijslagwet\
-    \ een ander land dan Nederland, een van de andere lidstaten van de Europese Unie, een andere staat die partij is bij de\
-    \ Overeenkomst betreffende de Europese Economische Ruimte en Zwitserland als woonland in aanmerking wordt genomen,\nbedraagt\
-    \ het kindgebonden budget een bij ministeriële regeling vastgesteld percentage van de in het tweede lid, onderdeel a,\
-    \ en vierde tot en met zesde lid bedoelde bedragen. Het percentage wordt zo bepaald dat het een weergave is van de verhouding\
-    \ tussen het kostenniveau van het land dat als woonland in aanmerking wordt genomen en dat van Nederland. Het percentage\
-    \ bedraagt maximaal 100.\n13 Indien de ouder:\n  a. aanspraak heeft op kindgebonden budget voor meer dan een kind, en\n\
-    \  b. voor een of meer van die kinderen voor de toepassing van de Algemene Kinderbijslagwet een ander land dan Nederland,\
-    \ een van de andere lidstaten van de Europese Unie, een andere staat die partij is bij de Overeenkomst betreffende de\
-    \ Europese Economische Ruimte en Zwitserland als woonland in aanmerking wordt genomen,\nbedraagt het kindgebonden budget\
-    \ een volgens bij ministeriële regeling te stellen regels vastgesteld bedrag. Dat bedrag is gebaseerd op de in het tweede\
-    \ en vierde tot en met zesde lid, opgenomen bedragen en de verhouding tussen het kostenniveau van het land dat als woonland\
-    \ in aanmerking wordt genomen voor het desbetreffende kind of voor de desbetreffende kinderen en dat van Nederland uitgedrukt\
-    \ in procenten. Het percentage bedraagt maximaal 100.\n14 Het twaalfde en dertiende lid zijn niet van toepassing indien\
-    \ het een kind betreft dat op de eerste dag van een kalenderkwartaal niet in Nederland woont doch langer dan drie maanden\
-    \ onafgebroken in Nederland verblijft."
+  text: |-
+    1 Aanspraak op een kindgebonden budget heeft de ouder voor een kind voor wie aan die ouder op grond van artikel 18 van de Algemene Kinderbijslagwet kinderbijslag wordt betaald of zou worden betaald indien artikel 7, tweede lid van die wet niet van toepassing zou zijn, met dien verstande dat de aanspraak op een kindgebonden budget bestaat met ingang van de kalendermaand na de maand waarin het kind is geboren dan wel tot het huishouden is gaan behoren tot en met de kalendermaand waarin het kind de leeftijd van 18 jaar bereikt.
+    2 Het kindgebonden budget bedraagt voor een berekeningsjaar:
+      a. indien de ouder aanspraak heeft voor een kind: € 2.511;
+      b. indien de ouder aanspraak heeft voor twee of meer kinderen: € 2.511 per kind voor het tweede of volgende kind.
+    3 Een ouder heeft aanspraak op een verhoging van het kindgebonden budget in een berekeningsjaar voor een kind met ingang van de kalendermaand na de maand waarin dat kind de leeftijd van 12 jaar heeft bereikt.
+    4 Voor een kind dat 12 jaar of ouder is, maar jonger is dan 16 jaar bedraagt de verhoging van het kindgebonden budget € 703.
+    5 Voor een kind dat 16 of 17 jaar is, bedraagt de verhoging van het kindgebonden budget met ingang van de kalendermaand na de maand waarin het kind de leeftijd van 16 jaar heeft bereikt € 936,00.
+    6 De ouder die geen partner heeft, heeft aanspraak op een verhoging van het kindgebonden budget van € 3.389.
+    7 Bij een toetsingsinkomen van de ouder die geen partner heeft, van meer dan het drempelinkomen wordt de som van de bedragen waarop recht bestaat op grond van het tweede, vierde, vijfde en zesde lid verminderd met 7,10% van het verschil tussen het toetsingsinkomen en het drempelinkomen.
+    8 Bij een gezamenlijk toetsingsinkomen van de ouder en zijn partner van meer dan het met € 9.139,00 verhoogde drempelinkomen wordt de som van de bedragen waarop recht bestaat op grond van het tweede, vierde en vijfde lid verminderd met 7,10% van het verschil tussen het gezamenlijk toetsingsinkomen en het met € 9.139,00 verhoogde drempelinkomen.
+    9 Een ouder als bedoeld in het eerste en derde lid en zijn partner die tevens ouder is als bedoeld in het eerste lid worden voor de toepassing van deze wet geacht gezamenlijk één aanspraak te hebben.
+    10 Indien aan twee ouders kinderbijslag wordt uitbetaald op basis van het recht op kinderbijslag van één van die ouders, heeft alleen de ouder, wiens recht op kinderbijslag wordt uitbetaald aanspraak op een kindgebonden budget.
+    11 De aanspraak op een kindgebonden budget wordt voor iedere kalendermaand afzonderlijk bepaald.
+    12 Indien de ouder:
+      a. aanspraak heeft op kindgebonden budget voor een kind, en
+      b. voor dat kind voor de toepassing van de Algemene Kinderbijslagwet een ander land dan Nederland, een van de andere lidstaten van de Europese Unie, een andere staat die partij is bij de Overeenkomst betreffende de Europese Economische Ruimte en Zwitserland als woonland in aanmerking wordt genomen,
+    bedraagt het kindgebonden budget een bij ministeriële regeling vastgesteld percentage van de in het tweede lid, onderdeel a, en vierde tot en met zesde lid bedoelde bedragen. Het percentage wordt zo bepaald dat het een weergave is van de verhouding tussen het kostenniveau van het land dat als woonland in aanmerking wordt genomen en dat van Nederland. Het percentage bedraagt maximaal 100.
+    13 Indien de ouder:
+      a. aanspraak heeft op kindgebonden budget voor meer dan een kind, en
+      b. voor een of meer van die kinderen voor de toepassing van de Algemene Kinderbijslagwet een ander land dan Nederland, een van de andere lidstaten van de Europese Unie, een andere staat die partij is bij de Overeenkomst betreffende de Europese Economische Ruimte en Zwitserland als woonland in aanmerking wordt genomen,
+    bedraagt het kindgebonden budget een volgens bij ministeriële regeling te stellen regels vastgesteld bedrag. Dat bedrag is gebaseerd op de in het tweede en vierde tot en met zesde lid, opgenomen bedragen en de verhouding tussen het kostenniveau van het land dat als woonland in aanmerking wordt genomen voor het desbetreffende kind of voor de desbetreffende kinderen en dat van Nederland uitgedrukt in procenten. Het percentage bedraagt maximaal 100.
+    14 Het twaalfde en dertiende lid zijn niet van toepassing indien het een kind betreft dat op de eerste dag van een kalenderkwartaal niet in Nederland woont doch langer dan drie maanden onafgebroken in Nederland verblijft.
   url: https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2
   machine_readable:
     definitions:
@@ -226,8 +211,8 @@ articles:
             url: https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel3
             juriconnect: jci1.3:c:BWBR0022751&artikel=3&lid=1&z=2025-01-01&g=2025-01-01
             explanation: Artikel 3 lid 1 bepaalt de vermogensgrenzen
-          conditions:
-          - test:
+          cases:
+          - when:
               subject: $HEEFT_PARTNER
               operation: EQUALS
               value: true
@@ -239,11 +224,11 @@ articles:
                 - $VERMOGEN
                 - $PARTNER_VERMOGEN
               - $VERMOGENSGRENS_PARTNER
-          - else:
-              operation: LESS_THAN
-              values:
-              - $VERMOGEN
-              - $VERMOGENSGRENS_ALLEENSTAAND
+          default:
+            operation: LESS_THAN
+            values:
+            - $VERMOGEN
+            - $VERMOGENSGRENS_ALLEENSTAAND
       actions:
       - output: leeftijdstoeslagen
         value:
@@ -251,46 +236,46 @@ articles:
           subject: $KINDEREN_LEEFTIJDEN
           value:
           - operation: IF
-            conditions:
-            - test:
-                operation: GREATER_OR_EQUAL
+            cases:
+            - when:
+                operation: GREATER_THAN_OR_EQUAL
                 subject: $leeftijd
                 value: 16
               then:
                 operation: IF
-                conditions:
-                - test:
-                    operation: LESS_OR_EQUAL
+                cases:
+                - when:
+                    operation: LESS_THAN_OR_EQUAL
                     subject: $leeftijd
                     value: 17
                   then: $EXTRA_16_17_JAAR
-                - else: 0
-            - test:
-                operation: GREATER_OR_EQUAL
+                default: 0
+            - when:
+                operation: GREATER_THAN_OR_EQUAL
                 subject: $leeftijd
                 value: 12
               then:
                 operation: IF
-                conditions:
-                - test:
-                    operation: LESS_OR_EQUAL
+                cases:
+                - when:
+                    operation: LESS_THAN_OR_EQUAL
                     subject: $leeftijd
                     value: 15
                   then: $EXTRA_12_15_JAAR
-                - else: 0
-            - else: 0
+                default: 0
+            default: 0
           combine: ADD
           as: leeftijd
       - output: alo_kop_bedrag
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $HEEFT_PARTNER
               value: false
             then: $ALO_KOP
-          - else: 0
+          default: 0
         legal_basis:
           law: Wet op het kindgebonden budget
           bwb_id: BWBR0022751
@@ -312,8 +297,8 @@ articles:
       - output: kindgebonden_budget_jaar
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $HEEFT_PARTNER
               value: false
@@ -331,8 +316,8 @@ articles:
                   - $leeftijdstoeslagen
                   - $alo_kop_bedrag
                 - operation: IF
-                  conditions:
-                  - test:
+                  cases:
+                  - when:
                       operation: GREATER_THAN
                       subject: $TOETSINGSINKOMEN
                       value: $DREMPELINKOMEN_ALLEENSTAAND
@@ -344,9 +329,9 @@ articles:
                         - $TOETSINGSINKOMEN
                         - $DREMPELINKOMEN_ALLEENSTAAND
                       - $AFBOUWPERCENTAGE
-                  - else: 0
+                  default: 0
               - 0
-          - test:
+          - when:
               operation: EQUALS
               subject: $HEEFT_PARTNER
               value: true
@@ -363,8 +348,8 @@ articles:
                     - $BASISBEDRAG_PER_KIND
                   - $leeftijdstoeslagen
                 - operation: IF
-                  conditions:
-                  - test:
+                  cases:
+                  - when:
                       operation: GREATER_THAN
                       subject:
                         operation: ADD
@@ -390,7 +375,7 @@ articles:
                           - $DREMPELINKOMEN_PARTNER
                           - $EXTRA_DREMPEL_PARTNER
                       - $AFBOUWPERCENTAGE
-                  - else: 0
+                  default: 0
               - 0
         legal_basis:
           law: Wet op het kindgebonden budget

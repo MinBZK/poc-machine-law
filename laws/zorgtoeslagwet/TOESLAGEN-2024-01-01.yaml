@@ -11,19 +11,17 @@ uuid: 5be9dbe7-f565-40e2-8931-da82825dcf21
 discoverable: CITIZEN
 articles:
 - number: '1'
-  text: "1 In deze wet en de daarop berustende bepalingen wordt, tenzij anders is geregeld, verstaan onder:\n  a. Onze Minister:\
-    \ Onze Minister van Volksgezondheid, Welzijn en Sport;\n  b. zorgverzekering: de schadeverzekering, bedoeld in artikel\
-    \ 1, onder d, van de Zorgverzekeringswet;\n  c. verzekerde: de persoon, bedoeld in artikel 1, onder f, of in artikel 69\
-    \ van de Zorgverzekeringswet, vanaf de eerste dag van de kalendermaand volgende op de maand waarin hij achttien jaar wordt,\
-    \ met uitzondering van de verzekerde, bedoeld in artikel 24, eerste of tweede lid, van die wet;\n  d. premie: een premie\
-    \ als bedoeld in afdeling 3.3.1 van de Zorgverzekeringswet;\n  e. zorgtoeslag: een tegemoetkoming in een premie dan wel\
-    \ in een bestuursrechtelijke premie als bedoeld in artikel 18d of 18e van de Zorgverzekeringswet en in het verplicht eigen\
-    \ risico, bedoeld in artikel 19 van de Zorgverzekeringswet;\n  f. drempelinkomen: 108% van het twaalfvoud van het voor\
-    \ de maand januari van het berekeningsjaar geldende in artikel 8, eerste lid, onderdeel b, van de Wet minimumloon en minimumvakantiebijslag\
-    \ bedoelde bedrag per maand;\n  g. de standaardpremie: het op grond van artikel 4 vastgestelde bedrag;\n  h. de normpremie:\
-    \ de aan de hand van het drempelinkomen en het toetsingsinkomen van de verzekerde berekende premie voor een zorgverzekering\
-    \ in het berekeningsjaar.\n2 De hoogte van de zorgtoeslag is afhankelijk van de draagkracht op basis van het inkomen en\
-    \ het vermogen."
+  text: |-
+    1 In deze wet en de daarop berustende bepalingen wordt, tenzij anders is geregeld, verstaan onder:
+      a. Onze Minister: Onze Minister van Volksgezondheid, Welzijn en Sport;
+      b. zorgverzekering: de schadeverzekering, bedoeld in artikel 1, onder d, van de Zorgverzekeringswet;
+      c. verzekerde: de persoon, bedoeld in artikel 1, onder f, of in artikel 69 van de Zorgverzekeringswet, vanaf de eerste dag van de kalendermaand volgende op de maand waarin hij achttien jaar wordt, met uitzondering van de verzekerde, bedoeld in artikel 24, eerste of tweede lid, van die wet;
+      d. premie: een premie als bedoeld in afdeling 3.3.1 van de Zorgverzekeringswet;
+      e. zorgtoeslag: een tegemoetkoming in een premie dan wel in een bestuursrechtelijke premie als bedoeld in artikel 18d of 18e van de Zorgverzekeringswet en in het verplicht eigen risico, bedoeld in artikel 19 van de Zorgverzekeringswet;
+      f. drempelinkomen: 108% van het twaalfvoud van het voor de maand januari van het berekeningsjaar geldende in artikel 8, eerste lid, onderdeel b, van de Wet minimumloon en minimumvakantiebijslag bedoelde bedrag per maand;
+      g. de standaardpremie: het op grond van artikel 4 vastgestelde bedrag;
+      h. de normpremie: de aan de hand van het drempelinkomen en het toetsingsinkomen van de verzekerde berekende premie voor een zorgverzekering in het berekeningsjaar.
+    2 De hoogte van de zorgtoeslag is afhankelijk van de draagkracht op basis van het inkomen en het vermogen.
   url: https://wetten.overheid.nl/BWBR0018451/2024-01-01#Artikel1
   machine_readable:
     definitions:
@@ -195,7 +193,7 @@ articles:
             operation: EQUALS
             value: true
         - subject: $LEEFTIJD
-          operation: GREATER_OR_EQUAL
+          operation: GREATER_THAN_OR_EQUAL
           value: $MINIMUM_LEEFTIJD
         - subject: $IS_GEDETINEERD
           operation: EQUALS
@@ -209,60 +207,60 @@ articles:
       - output: hoogte_toeslag
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $HEEFT_PARTNER
               value: false
             then:
               operation: IF
-              conditions:
-              - test:
+              cases:
+              - when:
                   operation: GREATER_THAN
                   subject: $INKOMEN
                   value: $DREMPELINKOMEN_ALLEENSTAANDE
                 then: 0
-              - test:
+              - when:
                   operation: GREATER_THAN
                   subject: $VERMOGEN
                   value: $VERMOGENSGRENS_ALLEENSTAANDE
                 then: 0
-              - else:
-                  operation: SUBTRACT
+              default:
+                operation: SUBTRACT
+                values:
+                - $STANDAARDPREMIE
+                - operation: ADD
                   values:
-                  - $STANDAARDPREMIE
-                  - operation: ADD
+                  - operation: MULTIPLY
                     values:
-                    - operation: MULTIPLY
+                    - $PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND
+                    - operation: MIN
                       values:
-                      - $PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND
-                      - operation: MIN
+                      - $INKOMEN
+                      - $DREMPELINKOMEN_ALLEENSTAANDE
+                  - operation: IF
+                    cases:
+                    - when:
+                        operation: GREATER_THAN
+                        subject: $INKOMEN
+                        value: $DREMPELINKOMEN_ALLEENSTAANDE
+                      then:
+                        operation: MULTIPLY
                         values:
-                        - $INKOMEN
-                        - $DREMPELINKOMEN_ALLEENSTAANDE
-                    - operation: IF
-                      conditions:
-                      - test:
-                          operation: GREATER_THAN
-                          subject: $INKOMEN
-                          value: $DREMPELINKOMEN_ALLEENSTAANDE
-                        then:
-                          operation: MULTIPLY
+                        - operation: SUBTRACT
                           values:
-                          - operation: SUBTRACT
-                            values:
-                            - $INKOMEN
-                            - $DREMPELINKOMEN_ALLEENSTAANDE
-                          - $AFBOUWPERCENTAGE_MINIMUM
-                      - else: 0
-          - test:
+                          - $INKOMEN
+                          - $DREMPELINKOMEN_ALLEENSTAANDE
+                        - $AFBOUWPERCENTAGE_MINIMUM
+                    default: 0
+          - when:
               operation: EQUALS
               subject: $HEEFT_PARTNER
               value: true
             then:
               operation: IF
-              conditions:
-              - test:
+              cases:
+              - when:
                   operation: GREATER_THAN
                   subject:
                     operation: ADD
@@ -271,49 +269,49 @@ articles:
                     - $PARTNER_INKOMEN
                   value: $DREMPELINKOMEN_TOESLAGPARTNER
                 then: 0
-              - test:
+              - when:
                   operation: GREATER_THAN
                   subject: $GEZAMENLIJK_VERMOGEN
                   value: $VERMOGENSGRENS_TOESLAGPARTNER
                 then: 0
-              - else:
-                  operation: SUBTRACT
+              default:
+                operation: SUBTRACT
+                values:
+                - operation: MULTIPLY
+                  values:
+                  - $STANDAARDPREMIE
+                  - 2
+                - operation: ADD
                   values:
                   - operation: MULTIPLY
                     values:
-                    - $STANDAARDPREMIE
-                    - 2
-                  - operation: ADD
-                    values:
-                    - operation: MULTIPLY
+                    - $PERCENTAGE_DREMPELINKOMEN_MET_PARTNER
+                    - operation: MIN
                       values:
-                      - $PERCENTAGE_DREMPELINKOMEN_MET_PARTNER
-                      - operation: MIN
+                      - operation: ADD
                         values:
-                        - operation: ADD
+                        - $INKOMEN
+                        - $PARTNER_INKOMEN
+                      - $DREMPELINKOMEN_TOESLAGPARTNER
+                  - operation: IF
+                    cases:
+                    - when:
+                        operation: GREATER_THAN
+                        subject:
+                          operation: ADD
                           values:
                           - $INKOMEN
                           - $PARTNER_INKOMEN
-                        - $DREMPELINKOMEN_TOESLAGPARTNER
-                    - operation: IF
-                      conditions:
-                      - test:
-                          operation: GREATER_THAN
-                          subject:
-                            operation: ADD
+                        value: $DREMPELINKOMEN_TOESLAGPARTNER
+                      then:
+                        operation: MULTIPLY
+                        values:
+                        - operation: SUBTRACT
+                          values:
+                          - operation: ADD
                             values:
                             - $INKOMEN
                             - $PARTNER_INKOMEN
-                          value: $DREMPELINKOMEN_TOESLAGPARTNER
-                        then:
-                          operation: MULTIPLY
-                          values:
-                          - operation: SUBTRACT
-                            values:
-                            - operation: ADD
-                              values:
-                              - $INKOMEN
-                              - $PARTNER_INKOMEN
-                            - $DREMPELINKOMEN_TOESLAGPARTNER
-                          - $AFBOUWPERCENTAGE_BOVEN_DREMPEL
-                      - else: 0
+                          - $DREMPELINKOMEN_TOESLAGPARTNER
+                        - $AFBOUWPERCENTAGE_BOVEN_DREMPEL
+                    default: 0

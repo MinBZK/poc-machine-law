@@ -11,11 +11,11 @@ uuid: 13dc8a31-91eb-4598-998c-012c9129b9ea
 discoverable: CITIZEN
 articles:
 - number: '7'
-  text: "1 Recht op ouderdomspensioen overeenkomstig de bepalingen van deze wet heeft degene, die\n  a. de pensioengerechtigde\
-    \ leeftijd heeft bereikt, en\n  b. ingevolge deze wet minimaal één kalenderjaar verzekerd is geweest in het tijdvak, aanvangende\
-    \ met de dag waarop de aanvangsleeftijd is bereikt en eindigende met de dag voorafgaande aan de dag waarop de pensioengerechtigde\
-    \ leeftijd is bereikt.\n2 Bij ministeriële regeling worden regels gesteld omtrent de herleiding van gedeelten van kalenderjaren\
-    \ tot gehele kalenderjaren."
+  text: |-
+    1 Recht op ouderdomspensioen overeenkomstig de bepalingen van deze wet heeft degene, die
+      a. de pensioengerechtigde leeftijd heeft bereikt, en
+      b. ingevolge deze wet minimaal één kalenderjaar verzekerd is geweest in het tijdvak, aanvangende met de dag waarop de aanvangsleeftijd is bereikt en eindigende met de dag voorafgaande aan de dag waarop de pensioengerechtigde leeftijd is bereikt.
+    2 Bij ministeriële regeling worden regels gesteld omtrent de herleiding van gedeelten van kalenderjaren tot gehele kalenderjaren.
   url: https://wetten.overheid.nl/BWBR0002221/2024-01-01#Artikel7
   machine_readable:
     definitions:
@@ -222,7 +222,7 @@ articles:
       requirements:
       - all:
         - subject: $LEEFTIJD
-          operation: GREATER_OR_EQUAL
+          operation: GREATER_THAN_OR_EQUAL
           value: $PENSIOENLEEFTIJD
         - operation: GREATER_THAN
           values:
@@ -245,13 +245,13 @@ articles:
       - output: basisbedrag
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $HEEFT_PARTNER
               value: true
             then: $BASISBEDRAG_GEDEELD
-          - else: $BASISBEDRAG_ALLEENSTAAND
+          default: $BASISBEDRAG_ALLEENSTAAND
         legal_basis:
           law: Algemene Ouderdomswet
           bwb_id: BWBR0002221
@@ -287,8 +287,8 @@ articles:
           - $basisbedrag
           - $opbouwpercentage
           - operation: IF
-            conditions:
-            - test:
+            cases:
+            - when:
                 operation: EQUALS
                 subject: $HEEFT_PARTNER
                 value: true
@@ -297,10 +297,10 @@ articles:
                 values:
                 - 1
                 - operation: IF
-                  conditions:
-                  - test:
+                  cases:
+                  - when:
                       operation: AND
-                      values:
+                      conditions:
                       - operation: LESS_THAN
                         subject: $PARTNER_LEEFTIJD
                         value: $PARTNER_PENSIOENLEEFTIJD
@@ -321,8 +321,8 @@ articles:
                           - $INKOMENSGRENS_PARTNER
                           - $PARTNER_INKOMEN
                         - $KORTINGSPERCENTAGE
-                  - else: 0
-            - else: 1
+                  default: 0
+            default: 1
         legal_basis:
           law: Algemene Ouderdomswet
           bwb_id: BWBR0002221

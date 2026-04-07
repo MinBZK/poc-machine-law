@@ -11,20 +11,11 @@ uuid: 0c6a4f3c-8a49-4f76-a109-265c0b7a05dc
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '450'
-  text: '1 Indien een meerderjarige als gevolg van zijn geestelijke of lichamelijke toestand tijdelijk of duurzaam niet in
-    staat is of bemoeilijkt wordt zijn belangen van niet-vermogensrechtelijke aard zelf behoorlijk waar te nemen, kan de kantonrechter
-    te zijnen behoeve een mentorschap instellen.
-
-    2 Indien te verwachten is dat een minderjarige op het tijdstip waarop hij meerderjarig zal worden, in de in het eerste
-    lid bedoelde toestand zal verkeren, kan het mentorschap reeds voor de meerderjarigheid worden ingesteld.
-
-    3 Het mentorschap kan eveneens worden ingesteld, indien te verwachten is dat een meerderjarige binnen afzienbare tijd
-    in de in het eerste lid bedoelde toestand zal verkeren.
-
-    4 De rechter bij wie een verzoek tot het verlenen van een rechterlijke machtiging als bedoeld in de Wet zorg en dwang
-    psychogeriatrische en verstandelijk gehandicapte cliënten dan wel een zorgmachtiging of een machtiging tot voorzetting
-    van de crisismaatregel als bedoeld in de Wet verplichte geestelijke gezondheidszorg aanhangig is, is tevens bevoegd tot
-    kennisneming van een verzoek tot instelling van een mentorschap.'
+  text: |-
+    1 Indien een meerderjarige als gevolg van zijn geestelijke of lichamelijke toestand tijdelijk of duurzaam niet in staat is of bemoeilijkt wordt zijn belangen van niet-vermogensrechtelijke aard zelf behoorlijk waar te nemen, kan de kantonrechter te zijnen behoeve een mentorschap instellen.
+    2 Indien te verwachten is dat een minderjarige op het tijdstip waarop hij meerderjarig zal worden, in de in het eerste lid bedoelde toestand zal verkeren, kan het mentorschap reeds voor de meerderjarigheid worden ingesteld.
+    3 Het mentorschap kan eveneens worden ingesteld, indien te verwachten is dat een meerderjarige binnen afzienbare tijd in de in het eerste lid bedoelde toestand zal verkeren.
+    4 De rechter bij wie een verzoek tot het verlenen van een rechterlijke machtiging als bedoeld in de Wet zorg en dwang psychogeriatrische en verstandelijk gehandicapte cliënten dan wel een zorgmachtiging of een machtiging tot voorzetting van de crisismaatregel als bedoeld in de Wet verplichte geestelijke gezondheidszorg aanhangig is, is tevens bevoegd tot kennisneming van een verzoek tot instelling van een mentorschap.
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel450
   machine_readable:
     definitions:
@@ -75,8 +66,10 @@ articles:
       - name: valid_until_dates
         type: array
       requirements:
-      - operation: EXISTS
-        subject: $MENTORSCHAP_REGISTRATIES
+      - operation: NOT
+        value:
+          operation: IS_NULL
+          subject: $MENTORSCHAP_REGISTRATIES
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -91,12 +84,12 @@ articles:
           subject: $MENTORSCHAP_REGISTRATIES
           where:
             operation: AND
-            values:
+            conditions:
             - operation: EQUALS
               subject: $current.status
               value: ACTIEF
             - operation: OR
-              values:
+              conditions:
               - operation: IS_NULL
                 subject: $current.datum_einde
               - operation: EQUALS
@@ -112,23 +105,22 @@ articles:
           article: '462'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling3_Artikel462
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=462&z=2024-01-01&g=2024-01-01
-          explanation: 'Alleen actieve mentorschap-registraties geven vertegenwoordigingsbevoegdheid. Mentorschap kan worden
-            opgeheven (Art. 1:462 BW).
-
-            '
+          explanation: |
+            Alleen actieve mentorschap-registraties geven vertegenwoordigingsbevoegdheid. Mentorschap kan worden opgeheven (Art. 1:462 BW).
       - output: heeft_delegaties
         value:
-          operation: EXISTS
-          subject: $actief_mentorschap
+          operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $actief_mentorschap
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
           article: '453'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling2_Artikel453
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=453&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 1:453 BW bepaalt dat de mentor de betrokkene kan vertegenwoordigen.
-
-            '
+          explanation: |
+            Art. 1:453 BW bepaalt dat de mentor de betrokkene kan vertegenwoordigen.
       - output: subject_ids
         value: $actief_mentorschap.bsn_betrokkene
         legal_basis:
@@ -183,10 +175,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling2_Artikel453
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=453&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 1:453 lid 1 BW: De mentor vertegenwoordigt de betrokkene in aangelegenheden betreffende verzorging,
-            verpleging, behandeling en begeleiding.
-
-            '
+          explanation: |
+            Art. 1:453 lid 1 BW: De mentor vertegenwoordigt de betrokkene in aangelegenheden betreffende verzorging, verpleging, behandeling en begeleiding.
       - output: valid_from_dates
         value: $actief_mentorschap.datum_ingang
         legal_basis:

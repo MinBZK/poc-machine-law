@@ -10,9 +10,11 @@ service: RvIG
 uuid: 7f3e9a2b-5c4d-4e8f-9b1a-3d6c8f2e4a5b
 articles:
 - number: 28a
-  text: "De analysemethoden, bedoeld in artikel 2.37c, vierde lid, van de wet zien op:\n  a. de analyse van mededelingen als\
-    \ bedoeld in artikel 2.37b, eerste lid, van de wet;\n  b. de analyse aan de hand van profielen;\n  c. een onderzoek naar\
-    \ patronen."
+  text: |-
+    De analysemethoden, bedoeld in artikel 2.37c, vierde lid, van de wet zien op:
+      a. de analyse van mededelingen als bedoeld in artikel 2.37b, eerste lid, van de wet;
+      b. de analyse aan de hand van profielen;
+      c. een onderzoek naar patronen.
   url: https://wetten.overheid.nl/BWBR0034306/2023-05-15#Artikel28a
   machine_readable:
     definitions:
@@ -107,8 +109,10 @@ articles:
           precision: 0
       requirements:
       - all:
-        - subject: $ADRES
-          operation: NOT_NULL
+        - operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $ADRES
           legal_basis:
             law: Besluit basisregistratie personen
             bwb_id: BWBR0034306
@@ -120,7 +124,7 @@ articles:
       - output: genereer_signaal
         value:
           operation: OR
-          values:
+          conditions:
           - operation: EQUALS
             subject: $BELASTINGDIENST_TWIJFEL
             value: true
@@ -131,7 +135,7 @@ articles:
             subject: $CJIB_TWIJFEL
             value: true
           - operation: AND
-            values:
+            conditions:
             - operation: GREATER_THAN
               subject: $AANTAL_BEWONERS
               value: $HOOG_BEWONERS_DREMPEL
@@ -148,10 +152,10 @@ articles:
       - output: signaal_type
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: OR
-              values:
+              conditions:
               - operation: EQUALS
                 subject: $BELASTINGDIENST_TWIJFEL
                 value: true
@@ -162,7 +166,7 @@ articles:
                 subject: $CJIB_TWIJFEL
                 value: true
             then: MELDING
-          - else: PROFIEL
+          default: PROFIEL
         legal_basis:
           law: Besluit basisregistratie personen
           bwb_id: BWBR0034306

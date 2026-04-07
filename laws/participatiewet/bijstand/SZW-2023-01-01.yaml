@@ -10,18 +10,13 @@ service: SZW
 uuid: c00f6a8b-b387-45d0-ab15-6f5aa34b7287
 articles:
 - number: '11'
-  text: "1 Iedere in Nederland woonachtige Nederlander die hier te lande in zodanige omstandigheden verkeert of dreigt te\
-    \ geraken dat hij niet over de middelen beschikt om in de noodzakelijke kosten van bestaan te voorzien, heeft recht op\
-    \ bijstand van overheidswege.\n2 Met de Nederlander, bedoeld in het eerste lid, wordt gelijkgesteld de hier te lande woonachtige\
-    \ vreemdeling die rechtmatig in Nederland verblijf houdt in de zin van artikel 8, onderdelen a tot en met e en l, van\
-    \ de Vreemdelingenwet 2000, met uitzondering van de gevallen, bedoeld in artikel 24, tweede lid, van Richtlijn 2004/38/EG.\n\
-    3 Bij algemene maatregel van bestuur kunnen andere hier te lande woonachtige vreemdelingen dan de in het tweede lid bedoelde\
-    \ voor de toepassing van deze wet met een Nederlander gelijk worden gesteld:\n  a. ter uitvoering van een verdrag dan\
-    \ wel van een besluit van een volkenrechtelijke organisatie, of\n  b. indien zij, na rechtmatig verblijf te hebben gehouden\
-    \ in de zin van artikel 8, onderdelen a tot en met e en l, van de Vreemdelingenwet 2000, rechtmatig in Nederland verblijf\
-    \ hebben als bedoeld in artikel 8, onderdeel g of h, van die wet en zij aan de in die algemene maatregel van bestuur gestelde\
-    \ voorwaarden voldoen.\n4 Het recht op bijstand komt de echtgenoten gezamenlijk toe, tenzij een van de echtgenoten geen\
-    \ recht op bijstand heeft."
+  text: |-
+    1 Iedere in Nederland woonachtige Nederlander die hier te lande in zodanige omstandigheden verkeert of dreigt te geraken dat hij niet over de middelen beschikt om in de noodzakelijke kosten van bestaan te voorzien, heeft recht op bijstand van overheidswege.
+    2 Met de Nederlander, bedoeld in het eerste lid, wordt gelijkgesteld de hier te lande woonachtige vreemdeling die rechtmatig in Nederland verblijf houdt in de zin van artikel 8, onderdelen a tot en met e en l, van de Vreemdelingenwet 2000, met uitzondering van de gevallen, bedoeld in artikel 24, tweede lid, van Richtlijn 2004/38/EG.
+    3 Bij algemene maatregel van bestuur kunnen andere hier te lande woonachtige vreemdelingen dan de in het tweede lid bedoelde voor de toepassing van deze wet met een Nederlander gelijk worden gesteld:
+      a. ter uitvoering van een verdrag dan wel van een besluit van een volkenrechtelijke organisatie, of
+      b. indien zij, na rechtmatig verblijf te hebben gehouden in de zin van artikel 8, onderdelen a tot en met e en l, van de Vreemdelingenwet 2000, rechtmatig in Nederland verblijf hebben als bedoeld in artikel 8, onderdeel g of h, van die wet en zij aan de in die algemene maatregel van bestuur gestelde voorwaarden voldoen.
+    4 Het recht op bijstand komt de echtgenoten gezamenlijk toe, tenzij een van de echtgenoten geen recht op bijstand heeft.
   url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Artikel11
   machine_readable:
     definitions:
@@ -229,7 +224,7 @@ articles:
       requirements:
       - all:
         - subject: $LEEFTIJD
-          operation: GREATER_OR_EQUAL
+          operation: GREATER_THAN_OR_EQUAL
           value: $MINIMUM_LEEFTIJD
           legal_basis:
             law: Participatiewet
@@ -273,8 +268,10 @@ articles:
               url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11
               juriconnect: jci1.3:c:BWBR0015703&artikel=11&lid=2&z=2025-01-01&g=2025-01-01
               explanation: Artikel 11 lid 2 geeft vreemdelingen met rechtmatig verblijf recht op bijstand
-        - subject: $VERBLIJFSADRES
-          operation: NOT_NULL
+        - operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $VERBLIJFSADRES
           legal_basis:
             law: Participatiewet
             bwb_id: BWBR0015703
@@ -328,8 +325,8 @@ articles:
             url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel34
             juriconnect: jci1.3:c:BWBR0015703&artikel=34&z=2025-01-01&g=2025-01-01
             explanation: Artikel 34 bepaalt de vermogenstoets voor het recht op bijstand
-          conditions:
-          - test:
+          cases:
+          - when:
               subject: $HEEFT_PARTNER
               operation: EQUALS
               value: true
@@ -357,19 +354,19 @@ articles:
                 - $BEZITTINGEN
                 - $PARTNER_BEZITTINGEN
               - $VERMOGENSGRENS_PARTNER
-          - else:
-              operation: LESS_THAN
-              legal_basis:
-                law: Participatiewet
-                bwb_id: BWBR0015703
-                article: '34'
-                paragraph: '3'
-                url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel34
-                juriconnect: jci1.3:c:BWBR0015703&artikel=34&lid=3&z=2025-01-01&g=2025-01-01
-                explanation: Artikel 34 lid 3 bepaalt de vermogensgrens voor alleenstaanden
-              values:
-              - $BEZITTINGEN
-              - $VERMOGENSGRENS_ALLEENSTAAND
+          default:
+            operation: LESS_THAN
+            legal_basis:
+              law: Participatiewet
+              bwb_id: BWBR0015703
+              article: '34'
+              paragraph: '3'
+              url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel34
+              juriconnect: jci1.3:c:BWBR0015703&artikel=34&lid=3&z=2025-01-01&g=2025-01-01
+              explanation: Artikel 34 lid 3 bepaalt de vermogensgrens voor alleenstaanden
+            values:
+            - $BEZITTINGEN
+            - $VERMOGENSGRENS_ALLEENSTAAND
         - operation: IF
           legal_basis:
             law: Participatiewet
@@ -377,10 +374,10 @@ articles:
             article: '19'
             url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.1_Artikel19
             juriconnect: jci1.3:c:BWBR0015703&artikel=19&z=2025-01-01&g=2025-01-01
-            explanation: Artikel 19 bepaalt dat bijstand wordt verleend voor zover de belanghebbende niet over voldoende middelen
-              beschikt om in de noodzakelijke kosten van het bestaan te voorzien
-          conditions:
-          - test:
+            explanation: |-
+              Artikel 19 bepaalt dat bijstand wordt verleend voor zover de belanghebbende niet over voldoende middelen beschikt om in de noodzakelijke kosten van het bestaan te voorzien
+          cases:
+          - when:
               subject: $HEEFT_PARTNER
               operation: EQUALS
               value: true
@@ -401,22 +398,22 @@ articles:
                 - $BEDRIJFSINKOMEN
                 - $PARTNER_INKOMEN
               - $BASISBEDRAG_PARTNERS_21_PLUS
-          - else:
-              operation: LESS_THAN
-              legal_basis:
-                law: Participatiewet
-                bwb_id: BWBR0015703
-                article: '31'
-                paragraph: '2'
-                url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel31
-                juriconnect: jci1.3:c:BWBR0015703&artikel=31&lid=2&z=2025-01-01&g=2025-01-01
-                explanation: Artikel 31 lid 2 bepaalt welke inkomsten in aanmerking worden genomen voor de bijstandsberekening
+          default:
+            operation: LESS_THAN
+            legal_basis:
+              law: Participatiewet
+              bwb_id: BWBR0015703
+              article: '31'
+              paragraph: '2'
+              url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel31
+              juriconnect: jci1.3:c:BWBR0015703&artikel=31&lid=2&z=2025-01-01&g=2025-01-01
+              explanation: Artikel 31 lid 2 bepaalt welke inkomsten in aanmerking worden genomen voor de bijstandsberekening
+            values:
+            - operation: ADD
               values:
-              - operation: ADD
-                values:
-                - $INKOMEN
-                - $BEDRIJFSINKOMEN
-              - $BASISBEDRAG_ALLEENSTAAND_21_PLUS
+              - $INKOMEN
+              - $BEDRIJFSINKOMEN
+            - $BASISBEDRAG_ALLEENSTAAND_21_PLUS
       actions:
       - output: is_gerechtigd
         value: true
@@ -426,18 +423,18 @@ articles:
           article: '11'
           url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11
           juriconnect: jci1.3:c:BWBR0015703&artikel=11&z=2025-01-01&g=2025-01-01
-          explanation: Als aan alle voorwaarden is voldaan, is men gerechtigd tot bijstand volgens artikel 11 dat bepaalt
-            wie recht heeft op algemene bijstand
+          explanation: |-
+            Als aan alle voorwaarden is voldaan, is men gerechtigd tot bijstand volgens artikel 11 dat bepaalt wie recht heeft op algemene bijstand
       - output: basisbedrag
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $HEEFT_PARTNER
               value: true
             then: $BASISBEDRAG_PARTNERS_21_PLUS
-          - else: $BASISBEDRAG_ALLEENSTAAND_21_PLUS
+          default: $BASISBEDRAG_ALLEENSTAAND_21_PLUS
         legal_basis:
           law: Participatiewet
           bwb_id: BWBR0015703
@@ -445,13 +442,13 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.1_Artikel20
           juriconnect: jci1.3:c:BWBR0015703&artikel=20&lid=1&z=2025-01-01&g=2025-01-01
-          explanation: Artikel 20 lid 1 bepaalt de hoogte van de bijstandsnorm voor personen van 21 jaar en ouder afhankelijk
-            van de leefsituatie
+          explanation: |-
+            Artikel 20 lid 1 bepaalt de hoogte van de bijstandsnorm voor personen van 21 jaar en ouder afhankelijk van de leefsituatie
       - output: kostendelersnorm
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: IN
               subject: $HUISHOUDLEDEN
               values: $KOSTENDELERSNORM_FACTOREN
@@ -459,7 +456,7 @@ articles:
               operation: GET
               subject: $HUISHOUDLEDEN
               values: $KOSTENDELERSNORM_FACTOREN
-          - else: 0.38
+          default: 0.38
         legal_basis:
           law: Participatiewet
           bwb_id: BWBR0015703
@@ -467,5 +464,5 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.1_Artikel22a
           juriconnect: jci1.3:c:BWBR0015703&artikel=22a&lid=1&z=2025-01-01&g=2025-01-01
-          explanation: Artikel 22a lid 1 bepaalt dat de bijstandsnorm wordt verlaagd wanneer belanghebbende zijn woning deelt
-            met een of meer meerderjarigen (kostendelersnorm)
+          explanation: |-
+            Artikel 22a lid 1 bepaalt dat de bijstandsnorm wordt verlaagd wanneer belanghebbende zijn woning deelt met een of meer meerderjarigen (kostendelersnorm)

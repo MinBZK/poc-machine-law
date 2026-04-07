@@ -11,7 +11,8 @@ uuid: 96d926a0-b45f-4cf3-92af-01b167221a00
 discoverable: CITIZEN
 articles:
 - number: B1
-  text: '1. De leden van de Tweede Kamer der Staten-Generaal worden gekozen door degenen die op de dag van de kandidaatstelling Nederlander zijn en op de dag van de stemming de leeftijd van achttien jaar hebben bereikt, met uitzondering van degenen die op de dag van de kandidaatstelling hun werkelijke woonplaats hebben in Aruba, Curacao of Sint Maarten. 2. Deze uitzondering geldt niet voor: a. de Nederlander die gedurende ten minste tien jaren ingezetene van Nederland is geweest; b. de Nederlander die in Nederlandse openbare dienst in Aruba, Curacao of Sint Maarten werkzaam is, alsmede zijn Nederlandse echtgenoot, geregistreerde partner of levensgezel en kinderen, voor zover dezen met hem een gemeenschappelijke huishouding voeren.'
+  text: |-
+    1. De leden van de Tweede Kamer der Staten-Generaal worden gekozen door degenen die op de dag van de kandidaatstelling Nederlander zijn en op de dag van de stemming de leeftijd van achttien jaar hebben bereikt, met uitzondering van degenen die op de dag van de kandidaatstelling hun werkelijke woonplaats hebben in Aruba, Curacao of Sint Maarten. 2. Deze uitzondering geldt niet voor: a. de Nederlander die gedurende ten minste tien jaren ingezetene van Nederland is geweest; b. de Nederlander die in Nederlandse openbare dienst in Aruba, Curacao of Sint Maarten werkzaam is, alsmede zijn Nederlandse echtgenoot, geregistreerde partner of levensgezel en kinderen, voor zover dezen met hem een gemeenschappelijke huishouding voeren.
   url: https://wetten.overheid.nl/BWBR0004627/2024-01-01#ArtikelB1
   machine_readable:
     definitions:
@@ -85,7 +86,7 @@ articles:
           operation: EQUALS
           value: true
         - subject: $LEEFTIJD
-          operation: GREATER_OR_EQUAL
+          operation: GREATER_THAN_OR_EQUAL
           value: $MINIMUM_LEEFTIJD
         - subject: $GERECHTELIJKE_UITSLUITING
           operation: EQUALS
@@ -94,11 +95,11 @@ articles:
       - output: heeft_stemrecht
         value:
           operation: AND
-          values:
+          conditions:
           - operation: EQUALS
             subject: $NATIONALITEIT
             value: true
-          - operation: GREATER_OR_EQUAL
+          - operation: GREATER_THAN_OR_EQUAL
             subject: $LEEFTIJD
             value: $MINIMUM_LEEFTIJD
           - operation: EQUALS

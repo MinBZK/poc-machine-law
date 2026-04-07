@@ -117,7 +117,7 @@ articles:
       actions:
       - output: is_aow_gerechtigd
         value:
-          operation: GREATER_OR_EQUAL
+          operation: GREATER_THAN_OR_EQUAL
           subject: $LEEFTIJD
           value: $PENSIOENLEEFTIJD
         legal_basis:
@@ -131,13 +131,13 @@ articles:
       - output: bijdrage_type
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $is_aow_gerechtigd
               value: true
             then: LAAG
-          - else: HOOG
+          default: HOOG
         legal_basis:
           law: Zorgverzekeringswet
           bwb_id: BWBR0018450
@@ -171,8 +171,8 @@ articles:
       - output: verschuldigde_bijdrage
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $bijdrage_type
               value: HOOG
@@ -181,11 +181,11 @@ articles:
               values:
               - $bijdrage_inkomen_begrensd
               - $PERCENTAGE_HOOG
-          - else:
-              operation: MULTIPLY
-              values:
-              - $bijdrage_inkomen_begrensd
-              - $PERCENTAGE_LAAG
+          default:
+            operation: MULTIPLY
+            values:
+            - $bijdrage_inkomen_begrensd
+            - $PERCENTAGE_LAAG
         legal_basis:
           law: Zorgverzekeringswet
           bwb_id: BWBR0018450

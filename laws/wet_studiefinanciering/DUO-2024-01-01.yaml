@@ -10,15 +10,18 @@ service: DUO
 uuid: e3bb489c-b7d1-49dd-985c-a3cde1ab0ad3
 articles:
 - number: '3.1'
-  text: "1 Studiefinanciering bestaat voor een opleiding in het beroepsonderwijs uit een basisbeurs, een basislening en een\
-    \ aanvullende beurs of aanvullende lening, en kan geheel of gedeeltelijk worden toegekend in de vorm van:\n  a. een gift;\n\
-    \  b. een prestatiebeurs; of\n  c. een lening.\n2 Studiefinanciering bestaat voor een opleiding in het hoger onderwijs\
-    \ uit een basisbeurs, een basislening, een aanvullende beurs of aanvullende lening en collegegeldkrediet, en kan geheel\
-    \ of gedeeltelijk worden toegekend in de vorm van:\n  a. een gift;\n  b. een prestatiebeurs; of\n  c. een lening.\n3 Indien\
-    \ een student geen aanspraak heeft op studiefinanciering als bedoeld in het eerste of tweede lid bestaat studiefinanciering\
-    \ uit levenlanglerenkrediet.\n4 De hoogte van de studiefinanciering wordt vastgesteld op basis van een budget voor een\
-    \ kalendermaand.\n5 In afwijking van het vierde lid kan de hoogte van de studiefinanciering ook worden vastgesteld op\
-    \ een tegemoetkoming in de kosten van de toegang tot het onderwijs."
+  text: |-
+    1 Studiefinanciering bestaat voor een opleiding in het beroepsonderwijs uit een basisbeurs, een basislening en een aanvullende beurs of aanvullende lening, en kan geheel of gedeeltelijk worden toegekend in de vorm van:
+      a. een gift;
+      b. een prestatiebeurs; of
+      c. een lening.
+    2 Studiefinanciering bestaat voor een opleiding in het hoger onderwijs uit een basisbeurs, een basislening, een aanvullende beurs of aanvullende lening en collegegeldkrediet, en kan geheel of gedeeltelijk worden toegekend in de vorm van:
+      a. een gift;
+      b. een prestatiebeurs; of
+      c. een lening.
+    3 Indien een student geen aanspraak heeft op studiefinanciering als bedoeld in het eerste of tweede lid bestaat studiefinanciering uit levenlanglerenkrediet.
+    4 De hoogte van de studiefinanciering wordt vastgesteld op basis van een budget voor een kalendermaand.
+    5 In afwijking van het vierde lid kan de hoogte van de studiefinanciering ook worden vastgesteld op een tegemoetkoming in de kosten van de toegang tot het onderwijs.
   url: https://wetten.overheid.nl/BWBR0011453/2024-01-01#Artikel3.1
   machine_readable:
     definitions:
@@ -206,49 +209,49 @@ articles:
           operation: ADD
           values:
           - operation: IF
-            conditions:
-            - test:
+            cases:
+            - when:
                 operation: EQUALS
                 subject: $OPLEIDING_TYPE
                 value: WO
               then:
                 operation: IF
-                conditions:
-                - test:
+                cases:
+                - when:
                     operation: EQUALS
                     subject: $WOONSITUATIE
                     value: UIT
                   then: $BASISBEURS_WO_UIT
-                - else: $BASISBEURS_WO_THUIS
-            - test:
+                default: $BASISBEURS_WO_THUIS
+            - when:
                 operation: EQUALS
                 subject: $OPLEIDING_TYPE
                 value: HBO
               then:
                 operation: IF
-                conditions:
-                - test:
+                cases:
+                - when:
                     operation: EQUALS
                     subject: $WOONSITUATIE
                     value: UIT
                   then: $BASISBEURS_HBO_UIT
-                - else: $BASISBEURS_HBO_THUIS
-            - test:
+                default: $BASISBEURS_HBO_THUIS
+            - when:
                 operation: EQUALS
                 subject: $OPLEIDING_TYPE
                 value: MBO
               then:
                 operation: IF
-                conditions:
-                - test:
+                cases:
+                - when:
                     operation: EQUALS
                     subject: $WOONSITUATIE
                     value: UIT
                   then: $BASISBEURS_MBO_UIT
-                - else: $BASISBEURS_MBO_THUIS
+                default: $BASISBEURS_MBO_THUIS
           - operation: IF
-            conditions:
-            - test:
+            cases:
+            - when:
                 operation: LESS_THAN
                 subject:
                   operation: ADD
@@ -260,18 +263,18 @@ articles:
                 operation: MULTIPLY
                 values:
                 - operation: IF
-                  conditions:
-                  - test:
+                  cases:
+                  - when:
                       operation: EQUALS
                       subject: $OPLEIDING_TYPE
                       value: WO
                     then: $MAX_AANVULLENDE_BEURS_WO
-                  - test:
+                  - when:
                       operation: EQUALS
                       subject: $OPLEIDING_TYPE
                       value: HBO
                     then: $MAX_AANVULLENDE_BEURS_HBO
-                  - test:
+                  - when:
                       operation: EQUALS
                       subject: $OPLEIDING_TYPE
                       value: MBO
@@ -296,7 +299,6 @@ articles:
                       values:
                       - $INKOMEN_GRENS_GEEN_BEURS
                       - $INKOMENSDREMPEL_BASIS
-              else: 0
         legal_basis:
           law: Wet studiefinanciering 2000
           bwb_id: BWBR0011453
@@ -309,49 +311,49 @@ articles:
           operation: ADD
           values:
           - operation: IF
-            conditions:
-            - test:
+            cases:
+            - when:
                 operation: EQUALS
                 subject: $PARTNER_OPLEIDING_TYPE
                 value: WO
               then:
                 operation: IF
-                conditions:
-                - test:
+                cases:
+                - when:
                     operation: EQUALS
                     subject: $PARTNER_WOONSITUATIE
                     value: UIT
                   then: $BASISBEURS_WO_UIT
-                - else: $BASISBEURS_WO_THUIS
-            - test:
+                default: $BASISBEURS_WO_THUIS
+            - when:
                 operation: EQUALS
                 subject: $PARTNER_OPLEIDING_TYPE
                 value: HBO
               then:
                 operation: IF
-                conditions:
-                - test:
+                cases:
+                - when:
                     operation: EQUALS
                     subject: $PARTNER_WOONSITUATIE
                     value: UIT
                   then: $BASISBEURS_HBO_UIT
-                - else: $BASISBEURS_HBO_THUIS
-            - test:
+                default: $BASISBEURS_HBO_THUIS
+            - when:
                 operation: EQUALS
                 subject: $PARTNER_OPLEIDING_TYPE
                 value: MBO
               then:
                 operation: IF
-                conditions:
-                - test:
+                cases:
+                - when:
                     operation: EQUALS
                     subject: $PARTNER_WOONSITUATIE
                     value: UIT
                   then: $BASISBEURS_MBO_UIT
-                - else: $BASISBEURS_MBO_THUIS
+                default: $BASISBEURS_MBO_THUIS
           - operation: IF
-            conditions:
-            - test:
+            cases:
+            - when:
                 operation: LESS_THAN
                 subject:
                   operation: ADD
@@ -363,18 +365,18 @@ articles:
                 operation: MULTIPLY
                 values:
                 - operation: IF
-                  conditions:
-                  - test:
+                  cases:
+                  - when:
                       operation: EQUALS
                       subject: $PARTNER_OPLEIDING_TYPE
                       value: WO
                     then: $MAX_AANVULLENDE_BEURS_WO
-                  - test:
+                  - when:
                       operation: EQUALS
                       subject: $PARTNER_OPLEIDING_TYPE
                       value: HBO
                     then: $MAX_AANVULLENDE_BEURS_HBO
-                  - test:
+                  - when:
                       operation: EQUALS
                       subject: $PARTNER_OPLEIDING_TYPE
                       value: MBO
@@ -399,7 +401,6 @@ articles:
                       values:
                       - $INKOMEN_GRENS_GEEN_BEURS
                       - $INKOMENSDREMPEL_BASIS
-              else: 0
         legal_basis:
           law: Wet studiefinanciering 2000
           bwb_id: BWBR0011453
@@ -410,8 +411,10 @@ articles:
             beurs.
       - output: is_student
         value:
-          operation: NOT_NULL
-          subject: $OPLEIDING_TYPE
+          operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $OPLEIDING_TYPE
         legal_basis:
           law: Wet studiefinanciering 2000
           bwb_id: BWBR0011453

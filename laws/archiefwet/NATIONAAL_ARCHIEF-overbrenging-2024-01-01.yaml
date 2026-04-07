@@ -10,7 +10,8 @@ service: NATIONAAL_ARCHIEF
 uuid: 5cebc6f0-caa4-4f2f-908e-37c0fcb7337a
 articles:
 - number: '12'
-  text: '1. De zorgdrager brengt de archiefbescheiden die niet voor vernietiging in aanmerking komen en ouder zijn dan twintig jaar over naar een archiefbewaarplaats. 2. Bij of krachtens algemene maatregel van bestuur worden regels gesteld, die bij de overbrenging van archiefbescheiden in acht dienen te worden genomen.'
+  text: |-
+    1. De zorgdrager brengt de archiefbescheiden die niet voor vernietiging in aanmerking komen en ouder zijn dan twintig jaar over naar een archiefbewaarplaats. 2. Bij of krachtens algemene maatregel van bestuur worden regels gesteld, die bij de overbrenging van archiefbescheiden in acht dienen te worden genomen.
   url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Artikel12
   machine_readable:
     definitions:
@@ -47,26 +48,28 @@ articles:
       - output: moet_overgebracht_worden
         value:
           operation: AND
-          values:
+          conditions:
           - operation: EQUALS
             subject: $VOOR_VERNIETIGING
             value: false
-          - operation: GREATER_OR_EQUAL
+          - operation: GREATER_THAN_OR_EQUAL
             subject:
-              operation: SUBTRACT_DATE
-              unit: years
-              values:
-              - $calculation_date
-              - $AANMAAKDATUM
+              operation: AGE
+              reference_date: $calculation_date
+              date_of_birth: $AANMAAKDATUM
             value: $MINIMALE_LEEFTIJD_JAREN
           - operation: OR
-            values:
-            - operation: NOT_EQUALS
-              subject: $OPSCHORTINGSMACHTIGING
-              value: true
-            - operation: NOT_EQUALS
-              subject: $VEELVULDIG_GEBRUIK
-              value: true
+            conditions:
+            - operation: NOT
+              value:
+                operation: EQUALS
+                subject: $OPSCHORTINGSMACHTIGING
+                value: true
+            - operation: NOT
+              value:
+                operation: EQUALS
+                subject: $VEELVULDIG_GEBRUIK
+                value: true
         legal_basis:
           law: Archiefwet 1995
           bwb_id: BWBR0007376
@@ -78,18 +81,15 @@ articles:
       - output: uiterste_overbrengdatum
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $moet_overgebracht_worden
               value: true
             then:
-              operation: ADD_DATE
-              unit: years
-              values:
-              - $AANMAAKDATUM
-              - $UITERSTE_LEEFTIJD_JAREN
-          - else: null
+              operation: DATE_ADD
+              date: $AANMAAKDATUM
+              years: $UITERSTE_LEEFTIJD_JAREN
         legal_basis:
           law: Archiefbesluit 1995
           bwb_id: BWBR0007748

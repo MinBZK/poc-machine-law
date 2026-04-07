@@ -10,14 +10,8 @@ uuid: 56ec10fc-cf5b-468f-927f-4a4615f4dbfa
 discoverable: BUSINESS
 articles:
 - number: '4:2'
-  text: Artikel 4:2 Aanwijzing collectieve festiviteiten 1. De artikelen 2:17, 2:17a, 2:19, 2:19a en 2:20 van het besluit
-    gelden niet voor ten hoogste zeven door het college per kalenderjaar aan te wijzen collectieve festiviteiten gedurende
-    de door hem aan te wijzen dagen of dagdelen. 2. Artikel 3.148 van het besluit geldt niet voor ten hoogste zeven door het
-    college per kalenderjaar aan te wijzen collectieve festiviteiten gedurende de daarbij aan te wijzen dagen of dagdelen.
-    3. In een aanwijzing krachtens het eerste of tweede lid, kan het college bepalen dat de aanwijzing slechts geldt in één
-    of meer delen van de gemeente. 4. Het college kan wanneer een collectieve festiviteit redelijkerwijs niet te voorzien
-    was, een festiviteit onverwijld als collectieve festiviteit als bedoeld in het eerste lid aanwijzen. <section class="section-chapter
-    js-scrollSection"
+  text: |-
+    Artikel 4:2 Aanwijzing collectieve festiviteiten 1. De artikelen 2:17, 2:17a, 2:19, 2:19a en 2:20 van het besluit gelden niet voor ten hoogste zeven door het college per kalenderjaar aan te wijzen collectieve festiviteiten gedurende de door hem aan te wijzen dagen of dagdelen. 2. Artikel 3.148 van het besluit geldt niet voor ten hoogste zeven door het college per kalenderjaar aan te wijzen collectieve festiviteiten gedurende de daarbij aan te wijzen dagen of dagdelen. 3. In een aanwijzing krachtens het eerste of tweede lid, kan het college bepalen dat de aanwijzing slechts geldt in één of meer delen van de gemeente. 4. Het college kan wanneer een collectieve festiviteit redelijkerwijs niet te voorzien was, een festiviteit onverwijld als collectieve festiviteit als bedoeld in het eerste lid aanwijzen. <section class="section-chapter js-scrollSection"
   url: https://lokaleregelgeving.overheid.nl/CVDR373493#artikel_4:2
   machine_readable:
     definitions:
@@ -127,7 +121,7 @@ articles:
             article: '4:2'
             url: https://lokaleregelgeving.overheid.nl/CVDR373493
             explanation: Er mogen maximaal 12 geluidsontheffingen per kalenderjaar worden verleend
-        - operation: GREATER_OR_EQUAL
+        - operation: GREATER_THAN_OR_EQUAL
           subject:
             operation: SUBTRACT_DATE
             values:
@@ -166,7 +160,7 @@ articles:
           explanation: Het aantal nog beschikbare ontheffingen wordt berekend (12 minus verleend)
       - output: tijdig_aangevraagd
         value:
-          operation: GREATER_OR_EQUAL
+          operation: GREATER_THAN_OR_EQUAL
           subject:
             operation: SUBTRACT_DATE
             values:
@@ -204,17 +198,17 @@ articles:
       - output: maximale_eindtijd
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: IN
               subject:
                 operation: DAY_OF_WEEK
-                subject: $ACTIVITEITSDATUM
+                date: $ACTIVITEITSDATUM
               values:
               - 4
               - 5
             then: 02:00 (volgende ochtend)
-          - else: 00:00 (middernacht)
+          default: 00:00 (middernacht)
         legal_basis:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: '4:2'

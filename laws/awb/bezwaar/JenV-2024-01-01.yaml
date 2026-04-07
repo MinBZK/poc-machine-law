@@ -10,15 +10,16 @@ service: JenV
 uuid: b6679cca-4555-44b4-9b8f-caa6886b74a0
 articles:
 - number: '7:1'
-  text: "1 Degene aan wie het recht is toegekend beroep bij een bestuursrechter in te stellen, dient alvorens beroep in te\
-    \ stellen bezwaar te maken, tenzij:\n  a. het besluit in bezwaar of in administratief beroep is genomen,\n  b. het besluit\
-    \ aan goedkeuring is onderworpen,\n  c. het besluit een goedkeuring of een weigering daarvan inhoudt,\n  d. het besluit\
-    \ is voorbereid met toepassing van afdeling 3.4,\n  e. het besluit is genomen op basis van een uitspraak waarin de bestuursrechter\
-    \ met toepassing van artikel 8:72, vierde lid, onderdeel a, heeft bepaald dat afdeling 3.4 geheel of gedeeltelijk buiten\
-    \ toepassing blijft,\n  f. het beroep zich richt tegen het niet tijdig nemen van een besluit,\n  g. het besluit is genomen\
-    \ op grond van een voorschrift als genoemd in de bij deze wet behorende Regeling rechtstreeks beroep dan wel het besluit\
-    \ anderszins in die regeling is omschreven.\n2 Tegen de beslissing op het bezwaar kan beroep worden ingesteld met toepassing\
-    \ van de voorschriften die gelden voor het instellen van beroep tegen het besluit waartegen bezwaar is gemaakt."
+  text: |-
+    1 Degene aan wie het recht is toegekend beroep bij een bestuursrechter in te stellen, dient alvorens beroep in te stellen bezwaar te maken, tenzij:
+      a. het besluit in bezwaar of in administratief beroep is genomen,
+      b. het besluit aan goedkeuring is onderworpen,
+      c. het besluit een goedkeuring of een weigering daarvan inhoudt,
+      d. het besluit is voorbereid met toepassing van afdeling 3.4,
+      e. het besluit is genomen op basis van een uitspraak waarin de bestuursrechter met toepassing van artikel 8:72, vierde lid, onderdeel a, heeft bepaald dat afdeling 3.4 geheel of gedeeltelijk buiten toepassing blijft,
+      f. het beroep zich richt tegen het niet tijdig nemen van een besluit,
+      g. het besluit is genomen op grond van een voorschrift als genoemd in de bij deze wet behorende Regeling rechtstreeks beroep dan wel het besluit anderszins in die regeling is omschreven.
+    2 Tegen de beslissing op het bezwaar kan beroep worden ingesteld met toepassing van de voorschriften die gelden voor het instellen van beroep tegen het besluit waartegen bezwaar is gemaakt.
   url: https://wetten.overheid.nl/BWBR0005537/2024-01-01#Artikel7:1
   machine_readable:
     definitions:
@@ -101,7 +102,7 @@ articles:
       - output: bezwaar_mogelijk
         value:
           operation: AND
-          values:
+          conditions:
           - operation: NOT_IN
             subject: $WET.decision_type
             values: $EXCLUDED_DECISION_TYPES
@@ -129,30 +130,31 @@ articles:
       - output: reden_niet_mogelijk
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: IN
               subject: $WET.decision_type
               values: $EXCLUDED_DECISION_TYPES
             then: tegen dit type besluit is geen bezwaar mogelijk
-          - test:
+          - when:
               operation: NOT_IN
               subject: $WET.legal_character
               values: $REQUIRED_LEGAL_CHARACTER
             then: dit is geen besluit in de zin van de AWB
-          - test:
-              operation: NOT_EQUALS
-              values:
-              - operation: FOREACH
-                subject: $GEBEURTENISSEN
-                value:
-                - operation: EQUALS
-                  subject: $event_type
-                  value: Objected
-                combine: ADD
-              - 0
+          - when:
+              operation: NOT
+              value:
+                operation: EQUALS
+                values:
+                - operation: FOREACH
+                  subject: $GEBEURTENISSEN
+                  value:
+                  - operation: EQUALS
+                    subject: $event_type
+                    value: Objected
+                  combine: ADD
+                - 0
             then: er is al eerder bezwaar gemaakt tegen dit besluit
-          - else: null
         legal_basis:
           law: Algemene wet bestuursrecht
           bwb_id: BWBR0005537
@@ -163,12 +165,14 @@ articles:
       - output: bezwaartermijn
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_NULL
-              subject: $WET.bezwaartermijn_weken
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $WET.bezwaartermijn_weken
             then: $WET.bezwaartermijn_weken
-          - else: $DEFAULT_TERMIJN_BEZWAAR_WEKEN
+          default: $DEFAULT_TERMIJN_BEZWAAR_WEKEN
         legal_basis:
           law: Algemene wet bestuursrecht
           bwb_id: BWBR0005537
@@ -179,12 +183,14 @@ articles:
       - output: beslistermijn
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_NULL
-              subject: $WET.beslistermijn_weken
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $WET.beslistermijn_weken
             then: $WET.beslistermijn_weken
-          - else: $DEFAULT_TERMIJN_BESLISSING_WEKEN
+          default: $DEFAULT_TERMIJN_BESLISSING_WEKEN
         legal_basis:
           law: Algemene wet bestuursrecht
           bwb_id: BWBR0005537
@@ -196,12 +202,14 @@ articles:
       - output: verdagingstermijn
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_NULL
-              subject: $WET.verdagingstermijn_weken
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $WET.verdagingstermijn_weken
             then: $WET.verdagingstermijn_weken
-          - else: $DEFAULT_TERMIJN_VERDAGING_WEKEN
+          default: $DEFAULT_TERMIJN_VERDAGING_WEKEN
         legal_basis:
           law: Algemene wet bestuursrecht
           bwb_id: BWBR0005537

@@ -11,17 +11,14 @@ uuid: e1199fc0-2fbc-4bc7-aab5-e4f3790a5cc7
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '68'
-  text: "1 De curator is belast met het beheer en de vereffening van de failliete boedel.\n2 De curator:\n  a. beziet bij\
-    \ het beheer en de vereffening van de failliete boedel of er sprake is van onregelmatigheden die het faillissement, althans\
-    \ mede, hebben veroorzaakt, de vereffening van de failliete boedel bemoeilijken of het tekort in het faillissement hebben\
-    \ vergroot;\n  b. informeert hierover de rechter-commissaris vertrouwelijk; en\n  c. doet, zo hij of de rechter-commissaris\
-    \ dit nodig acht, melding of aangifte van onregelmatigheden bij de bevoegde instanties.\n3 Alvorens in rechte op te treden,\
-    \ behalve waar het verificatiegeschillen betreft, alsmede in de gevallen van de artikelen 37, 39, 40, 58, tweede lid,\
-    \ 60, tweede en derde lid, en 60a, eerste lid, behoeft de curator machtiging van de rechter-commissaris.\n4 Ingeval in\
-    \ Nederland geen secundaire insolventieprocedure is geopend, wordt de machtiging tot beëindiging van arbeidsovereenkomsten,\
-    \ bedoeld in artikel 13 van de in artikel 5, derde lid, genoemde verordening op verzoek van de insolventiefunctionaris\
-    \ in de hoofdinsolventieprocedure verleend door de rechter-commissaris van de rechtbank, aangewezen in artikel 2. De rechtbank\
-    \ benoemt de rechter-commissaris binnen vijf werkdagen na ontvangst van dit machtigingsverzoek."
+  text: |-
+    1 De curator is belast met het beheer en de vereffening van de failliete boedel.
+    2 De curator:
+      a. beziet bij het beheer en de vereffening van de failliete boedel of er sprake is van onregelmatigheden die het faillissement, althans mede, hebben veroorzaakt, de vereffening van de failliete boedel bemoeilijken of het tekort in het faillissement hebben vergroot;
+      b. informeert hierover de rechter-commissaris vertrouwelijk; en
+      c. doet, zo hij of de rechter-commissaris dit nodig acht, melding of aangifte van onregelmatigheden bij de bevoegde instanties.
+    3 Alvorens in rechte op te treden, behalve waar het verificatiegeschillen betreft, alsmede in de gevallen van de artikelen 37, 39, 40, 58, tweede lid, 60, tweede en derde lid, en 60a, eerste lid, behoeft de curator machtiging van de rechter-commissaris.
+    4 Ingeval in Nederland geen secundaire insolventieprocedure is geopend, wordt de machtiging tot beëindiging van arbeidsovereenkomsten, bedoeld in artikel 13 van de in artikel 5, derde lid, genoemde verordening op verzoek van de insolventiefunctionaris in de hoofdinsolventieprocedure verleend door de rechter-commissaris van de rechtbank, aangewezen in artikel 2. De rechtbank benoemt de rechter-commissaris binnen vijf werkdagen na ontvangst van dit machtigingsverzoek.
   url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#Artikel68
   machine_readable:
     definitions:
@@ -74,8 +71,10 @@ articles:
       - name: valid_until_dates
         type: array
       requirements:
-      - operation: EXISTS
-        subject: $FAILLISSEMENT_REGISTRATIES
+      - operation: NOT
+        value:
+          operation: IS_NULL
+          subject: $FAILLISSEMENT_REGISTRATIES
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -90,12 +89,12 @@ articles:
           subject: $FAILLISSEMENT_REGISTRATIES
           where:
             operation: AND
-            values:
+            conditions:
             - operation: EQUALS
               subject: $current.status
               value: ACTIEF
             - operation: OR
-              values:
+              conditions:
               - operation: IS_NULL
                 subject: $current.datum_einde
               - operation: EQUALS
@@ -111,23 +110,22 @@ articles:
           article: '193'
           url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelI_Artikel193
           juriconnect: jci1.3:c:BWBR0001860&artikel=193&z=2024-01-01&g=2024-01-01
-          explanation: 'Alleen actieve faillissementen geven curatorbevoegdheid. Art. 193 Fw: faillissement eindigt bij vereffening
-            of opheffing.
-
-            '
+          explanation: |
+            Alleen actieve faillissementen geven curatorbevoegdheid. Art. 193 Fw: faillissement eindigt bij vereffening of opheffing.
       - output: heeft_delegaties
         value:
-          operation: EXISTS
-          subject: $actieve_faillissementen
+          operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $actieve_faillissementen
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
           article: '68'
           url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelI_Artikel68
           juriconnect: jci1.3:c:BWBR0001860&artikel=68&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 68 Fw bepaalt dat de curator de failliete boedel beheert.
-
-            '
+          explanation: |
+            Art. 68 Fw bepaalt dat de curator de failliete boedel beheert.
       - output: subject_ids
         value: $actieve_faillissementen.gefailleerde_id
         legal_basis:
@@ -159,13 +157,13 @@ articles:
           subject: $actieve_faillissementen
           value:
             operation: IF
-            conditions:
-            - test:
+            cases:
+            - when:
                 operation: EQUALS
                 subject: $current.gefailleerde_type
                 value: RECHTSPERSOON
               then: BUSINESS
-            - else: CITIZEN
+            default: CITIZEN
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -197,9 +195,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelI_Artikel68
           juriconnect: jci1.3:c:BWBR0001860&artikel=68&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 68 lid 1 Fw: De curator beheert en vereffent de failliete boedel.
-
-            '
+          explanation: |
+            Art. 68 lid 1 Fw: De curator beheert en vereffent de failliete boedel.
       - output: valid_from_dates
         value: $actieve_faillissementen.datum_uitspraak
         legal_basis:

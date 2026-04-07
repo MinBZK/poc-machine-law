@@ -10,7 +10,8 @@ service: NATIONAAL_ARCHIEF
 uuid: 81c1b431-545b-4a8a-b1e2-eacfc6c3915a
 articles:
 - number: '5'
-  text: '1. De zorgdrager is verplicht tot het ontwerpen van selectielijsten waarin tenminste wordt aangegeven welke archiefbescheiden voor vernietiging in aanmerking komen. 2. De lijsten worden vastgesteld, voor zover het betreft: a. archiefbescheiden van de Eerste en de Tweede Kamer der Staten-Generaal, de andere Hoge Colleges van Staat en het Kabinet van de Koning: bij koninklijk besluit, op voordracht van Onze minister, in overeenstemming met het betrokken overheidsorgaan; b. archiefbescheiden van de ministeries: door Onze minister en Onze minister wie het mede aangaat; c. archiefbescheiden van andere overheidsorganen: door Onze minister. 3. Een besluit tot vaststelling van een selectielijst wordt bekendgemaakt in de Staatscourant.'
+  text: |-
+    1. De zorgdrager is verplicht tot het ontwerpen van selectielijsten waarin tenminste wordt aangegeven welke archiefbescheiden voor vernietiging in aanmerking komen. 2. De lijsten worden vastgesteld, voor zover het betreft: a. archiefbescheiden van de Eerste en de Tweede Kamer der Staten-Generaal, de andere Hoge Colleges van Staat en het Kabinet van de Koning: bij koninklijk besluit, op voordracht van Onze minister, in overeenstemming met het betrokken overheidsorgaan; b. archiefbescheiden van de ministeries: door Onze minister en Onze minister wie het mede aangaat; c. archiefbescheiden van andere overheidsorganen: door Onze minister. 3. Een besluit tot vaststelling van een selectielijst wordt bekendgemaakt in de Staatscourant.
   url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Artikel5
   machine_readable:
     definitions:
@@ -56,7 +57,7 @@ articles:
       - output: mag_vernietigd_worden
         value:
           operation: AND
-          values:
+          conditions:
           - operation: EQUALS
             subject: $OP_SELECTIELIJST_VERNIETIGING
             value: true
@@ -67,20 +68,20 @@ articles:
             subject: $SELECTIELIJST_GEPUBLICEERD
             value: true
           - operation: IF
-            conditions:
-            - test:
-                operation: NOT_NULL
-                subject: $BEWAARTERMIJN_JAREN
+            cases:
+            - when:
+                operation: NOT
+                value:
+                  operation: IS_NULL
+                  subject: $BEWAARTERMIJN_JAREN
               then:
-                operation: GREATER_OR_EQUAL
+                operation: GREATER_THAN_OR_EQUAL
                 subject:
-                  operation: SUBTRACT_DATE
-                  unit: years
-                  values:
-                  - $calculation_date
-                  - $AANMAAKDATUM
+                  operation: AGE
+                  reference_date: $calculation_date
+                  date_of_birth: $AANMAAKDATUM
                 value: $BEWAARTERMIJN_JAREN
-            - else: true
+            default: true
         legal_basis:
           law: Archiefwet 1995
           bwb_id: BWBR0007376
@@ -91,22 +92,21 @@ articles:
       - output: vernietig_vanaf_datum
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: AND
-              values:
+              conditions:
               - operation: EQUALS
                 subject: $OP_SELECTIELIJST_VERNIETIGING
                 value: true
-              - operation: NOT_NULL
-                subject: $BEWAARTERMIJN_JAREN
+              - operation: NOT
+                value:
+                  operation: IS_NULL
+                  subject: $BEWAARTERMIJN_JAREN
             then:
-              operation: ADD_DATE
-              unit: years
-              values:
-              - $AANMAAKDATUM
-              - $BEWAARTERMIJN_JAREN
-          - else: null
+              operation: DATE_ADD
+              date: $AANMAAKDATUM
+              years: $BEWAARTERMIJN_JAREN
         legal_basis:
           law: Archiefwet 1995
           bwb_id: BWBR0007376
@@ -118,45 +118,44 @@ articles:
       - output: reden_niet_vernietigen
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $mag_vernietigd_worden
               value: false
             then:
               operation: IF
-              conditions:
-              - test:
+              cases:
+              - when:
                   operation: EQUALS
                   subject: $OP_SELECTIELIJST_VERNIETIGING
                   value: false
                 then: Archiefstuk komt niet voor op een selectielijst voor vernietiging (mogelijk blijvend te bewaren)
-              - test:
+              - when:
                   operation: EQUALS
                   subject: $SELECTIELIJST_VASTGESTELD
                   value: false
                 then: Selectielijst is niet formeel vastgesteld volgens artikel 5 lid 2 Archiefwet
-              - test:
+              - when:
                   operation: EQUALS
                   subject: $SELECTIELIJST_GEPUBLICEERD
                   value: false
                 then: Selectielijst is niet bekendgemaakt in de Staatscourant volgens artikel 5 lid 3 Archiefwet
-              - test:
+              - when:
                   operation: AND
-                  values:
-                  - operation: NOT_NULL
-                    subject: $BEWAARTERMIJN_JAREN
+                  conditions:
+                  - operation: NOT
+                    value:
+                      operation: IS_NULL
+                      subject: $BEWAARTERMIJN_JAREN
                   - operation: LESS_THAN
                     subject:
-                      operation: SUBTRACT_DATE
-                      unit: years
-                      values:
-                      - $calculation_date
-                      - $AANMAAKDATUM
+                      operation: AGE
+                      reference_date: $calculation_date
+                      date_of_birth: $AANMAAKDATUM
                     value: $BEWAARTERMIJN_JAREN
                 then: Bewaartermijn is nog niet verstreken
-              - else: Onbekende reden
-          - else: null
+              default: Onbekende reden
         legal_basis:
           law: Archiefwet 1995
           bwb_id: BWBR0007376

@@ -11,7 +11,8 @@ uuid: fcf09c18-1584-4565-9223-e8a86fbddc09
 discoverable: BUSINESS
 articles:
 - number: '1.1'
-  text: 'In deze wet en de daarop berustende bepalingen wordt verstaan onder: a. Onze Minister: Onze Minister van Binnenlandse Zaken en Koninkrijksrelaties; b. de basisregistratie: de basisregistratie personen, bedoeld in artikel 1.2; c. de persoonslijst: het geheel van gegevens, bedoeld in artikel 2.7, eerste lid, 2.69, eerste lid, en 2.84, eerste lid, over een persoon in de basisregistratie; d. de inschrijving: de opneming van een persoonslijst in de basisregistratie; e. de ingeschrevene: degene ten aanzien van wie een persoonslijst in de basisregistratie is opgenomen; f. de ingezetene: de ingeschrevene die zijn adres heeft in een gemeente in Nederland en op wiens persoonslijst niet het gegeven van zijn overlijden of van vertrek uit Nederland als actueel gegeven is opgenomen; g. de systematische verstrekking van gegevens of het systematisch verstrekken van gegevens: de verstrekking of het verstrekken van gegevens uit de basisregistratie, bedoeld in artikel 3.1, tweede lid; h. de bijhoudingsgemeente: de gemeente waarvan het college van burgemeester en wethouders op grond van artikel 1.4 verantwoordelijk is voor de bijhouding van de persoonslijst; i. een vreemdeling: degene die de Nederlandse nationaliteit niet bezit en niet op grond van een wettelijke bepaling als Nederlander wordt behandeld; j. de aangifte van verblijf en adres: de aangifte, bedoeld in artikel 2.38; k. een beedigd vertaler: een vertaler als bedoeld in artikel 1, onder d, van de Wet beedigde tolken en vertalers; l. de aangifte van adreswijziging: de aangifte, bedoeld in artikel 2.39; m. de aangifte van vertrek: de aangifte, bedoeld in artikel 2.43; n. een authentiek gegeven: een in de basisregistratie opgenomen gegeven dat op grond van artikel 1.6 als authentiek wordt aangemerkt; o. het woonadres: 1. het adres waar betrokkene woont, waaronder begrepen het adres van een woning die zich in een voertuig of vaartuig bevindt, indien het voertuig of vaartuig een vaste stand- of ligplaats heeft, of, indien betrokkene op meer dan een adres woont, het adres waar hij naar redelijke verwachting gedurende een half jaar de meeste malen zal overnachten; 2. het adres waar, bij het ontbreken van een adres als bedoeld onder 1, betrokkene naar redelijke verwachting gedurende drie maanden ten minste twee derde van de tijd zal overnachten; p. het briefadres: het adres waar voor betrokkene bestemde geschriften in ontvangst worden genomen; q. het adres: het woonadres, dan wel bij het ontbreken hiervan of bij toepassing van artikel 2.40 of 2.41, het briefadres; r. de briefadresgever: de natuurlijke persoon of rechtspersoon, bedoeld in artikel 2.42, die een briefadres ter beschikking stelt; s. het burgerservicenummer: het nummer, bedoeld in artikel 1, onder b, van de Wet algemene bepalingen burgerservicenummer; t. een overheidsorgaan: 1. een orgaan van een rechtspersoon die krachtens publiekrecht is ingesteld, of 2. een ander persoon of college, met enig openbaar gezag bekleed; u. een derde: elke natuurlijke persoon, niet zijnde een overheidsorgaan of de ingeschrevene, en elke rechtspersoon die niet krachtens publiekrecht is ingesteld, noch met enig openbaar gezag is bekleed; v. de openbare lichamen: de openbare lichamen Bonaire, Sint Eustatius en Saba; w. een inschrijfvoorziening: een voorziening als bedoeld in artikel 2.64; x. het Besluit bevolkingsboekhouding: het Besluit bevolkingsboekhouding zoals dat gold op de laatste dag voor de intrekking van de Wet bevolkings- en verblijfsregisters; y. de verordening: Verordening (EU) nr. 2016/679 van het Europees Parlement en de Raad van 27 april 2016 betreffende de bescherming van natuurlijke personen in verband met de verwerking van persoonsgegevens en betreffende het vrije verkeer van die gegevens en tot intrekking van Richtlijn 95/46/EG (Algemene verordening gegevensbescherming) (PbEU 2016, L 119); z. het tijdelijk verblijfsadres: het adres in Nederland, niet zijnde het woonadres of het briefadres, waar betrokkene naar redelijke verwachting gedurende een maand meestentijds en gedurende een half jaar minder dan twee derde van de tijd zal overnachten; aa. contactgegevens: telefoonnummer en e-mailadres van de niet-ingezetene; ab. de ingezetene van een openbaar lichaam: de ingeschrevene die zijn adres heeft in een van de openbare lichamen, en op wiens persoonslijst niet het gegeven van zijn overlijden of van zijn vertrek uit een van de openbare lichamen als actueel gegeven is opgenomen; ac. Nederland: het Europese deel van Nederland.'
+  text: |-
+    In deze wet en de daarop berustende bepalingen wordt verstaan onder: a. Onze Minister: Onze Minister van Binnenlandse Zaken en Koninkrijksrelaties; b. de basisregistratie: de basisregistratie personen, bedoeld in artikel 1.2; c. de persoonslijst: het geheel van gegevens, bedoeld in artikel 2.7, eerste lid, 2.69, eerste lid, en 2.84, eerste lid, over een persoon in de basisregistratie; d. de inschrijving: de opneming van een persoonslijst in de basisregistratie; e. de ingeschrevene: degene ten aanzien van wie een persoonslijst in de basisregistratie is opgenomen; f. de ingezetene: de ingeschrevene die zijn adres heeft in een gemeente in Nederland en op wiens persoonslijst niet het gegeven van zijn overlijden of van vertrek uit Nederland als actueel gegeven is opgenomen; g. de systematische verstrekking van gegevens of het systematisch verstrekken van gegevens: de verstrekking of het verstrekken van gegevens uit de basisregistratie, bedoeld in artikel 3.1, tweede lid; h. de bijhoudingsgemeente: de gemeente waarvan het college van burgemeester en wethouders op grond van artikel 1.4 verantwoordelijk is voor de bijhouding van de persoonslijst; i. een vreemdeling: degene die de Nederlandse nationaliteit niet bezit en niet op grond van een wettelijke bepaling als Nederlander wordt behandeld; j. de aangifte van verblijf en adres: de aangifte, bedoeld in artikel 2.38; k. een beedigd vertaler: een vertaler als bedoeld in artikel 1, onder d, van de Wet beedigde tolken en vertalers; l. de aangifte van adreswijziging: de aangifte, bedoeld in artikel 2.39; m. de aangifte van vertrek: de aangifte, bedoeld in artikel 2.43; n. een authentiek gegeven: een in de basisregistratie opgenomen gegeven dat op grond van artikel 1.6 als authentiek wordt aangemerkt; o. het woonadres: 1. het adres waar betrokkene woont, waaronder begrepen het adres van een woning die zich in een voertuig of vaartuig bevindt, indien het voertuig of vaartuig een vaste stand- of ligplaats heeft, of, indien betrokkene op meer dan een adres woont, het adres waar hij naar redelijke verwachting gedurende een half jaar de meeste malen zal overnachten; 2. het adres waar, bij het ontbreken van een adres als bedoeld onder 1, betrokkene naar redelijke verwachting gedurende drie maanden ten minste twee derde van de tijd zal overnachten; p. het briefadres: het adres waar voor betrokkene bestemde geschriften in ontvangst worden genomen; q. het adres: het woonadres, dan wel bij het ontbreken hiervan of bij toepassing van artikel 2.40 of 2.41, het briefadres; r. de briefadresgever: de natuurlijke persoon of rechtspersoon, bedoeld in artikel 2.42, die een briefadres ter beschikking stelt; s. het burgerservicenummer: het nummer, bedoeld in artikel 1, onder b, van de Wet algemene bepalingen burgerservicenummer; t. een overheidsorgaan: 1. een orgaan van een rechtspersoon die krachtens publiekrecht is ingesteld, of 2. een ander persoon of college, met enig openbaar gezag bekleed; u. een derde: elke natuurlijke persoon, niet zijnde een overheidsorgaan of de ingeschrevene, en elke rechtspersoon die niet krachtens publiekrecht is ingesteld, noch met enig openbaar gezag is bekleed; v. de openbare lichamen: de openbare lichamen Bonaire, Sint Eustatius en Saba; w. een inschrijfvoorziening: een voorziening als bedoeld in artikel 2.64; x. het Besluit bevolkingsboekhouding: het Besluit bevolkingsboekhouding zoals dat gold op de laatste dag voor de intrekking van de Wet bevolkings- en verblijfsregisters; y. de verordening: Verordening (EU) nr. 2016/679 van het Europees Parlement en de Raad van 27 april 2016 betreffende de bescherming van natuurlijke personen in verband met de verwerking van persoonsgegevens en betreffende het vrije verkeer van die gegevens en tot intrekking van Richtlijn 95/46/EG (Algemene verordening gegevensbescherming) (PbEU 2016, L 119); z. het tijdelijk verblijfsadres: het adres in Nederland, niet zijnde het woonadres of het briefadres, waar betrokkene naar redelijke verwachting gedurende een maand meestentijds en gedurende een half jaar minder dan twee derde van de tijd zal overnachten; aa. contactgegevens: telefoonnummer en e-mailadres van de niet-ingezetene; ab. de ingezetene van een openbaar lichaam: de ingeschrevene die zijn adres heeft in een van de openbare lichamen, en op wiens persoonslijst niet het gegeven van zijn overlijden of van zijn vertrek uit een van de openbare lichamen als actueel gegeven is opgenomen; ac. Nederland: het Europese deel van Nederland.
   url: https://wetten.overheid.nl/BWBR0033715/2020-01-01#Artikel1.1
   machine_readable:
     definitions:
@@ -206,8 +207,10 @@ articles:
         type: boolean
       requirements:
       - all:
-        - subject: $GEBOORTEDATUM
-          operation: NOT_NULL
+        - operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $GEBOORTEDATUM
       actions:
       - output: geboortedatum
         value: $GEBOORTEDATUM
@@ -216,20 +219,17 @@ articles:
       - output: partner_bsn
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: IN
               subject: $PARTNERTYPE
               values: $GELDIGE_PARTNERTYPEN
             then: $PARTNER_BSN
-          - else: null
       - output: leeftijd
         value:
-          operation: SUBTRACT_DATE
-          unit: years
-          values:
-          - $calculation_date
-          - $GEBOORTEDATUM
+          operation: AGE
+          reference_date: $calculation_date
+          date_of_birth: $GEBOORTEDATUM
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -264,13 +264,13 @@ articles:
       - output: woonsituatie
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $VERBLIJFSADRES
               value: $OUDER_ADRESSEN
             then: THUIS
-          - else: UIT
+          default: UIT
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -327,10 +327,12 @@ articles:
       - output: verblijfsadres
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_NULL
-              subject: $ADRES
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $ADRES
             then:
               operation: CONCAT
               values:
@@ -341,14 +343,15 @@ articles:
               - $ADRES.postcode
               - ' '
               - $ADRES.woonplaats
-          - else: null
       - output: huishoudgrootte
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_NULL
-              subject: $HUISHOUDEN
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $HUISHOUDEN
             then:
               operation: ADD
               values:
@@ -357,12 +360,12 @@ articles:
                 subject: $HUISHOUDEN
                 value: 1
                 combine: ADD
-          - else: 1
+          default: 1
       - output: postadres
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: IN
               subject: $ADRES.type
               values: $POST_ADRES_TYPEN
@@ -376,7 +379,6 @@ articles:
               - $ADRES.postcode
               - ' '
               - $ADRES.woonplaats
-          - else: null
       - output: woonplaats
         value: $ADRES.woonplaats
         legal_basis:
@@ -389,13 +391,15 @@ articles:
       - output: huishoudleden
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_NULL
-              subject: $HUISHOUDEN
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $HUISHOUDEN
             then: $HUISHOUDEN
-          - else:
-              value: null
+          default:
+            value: null
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -406,13 +410,15 @@ articles:
       - output: kinderen
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_NULL
-              subject: $KINDEREN_GEGEVENS
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $KINDEREN_GEGEVENS
             then: $KINDEREN_GEGEVENS
-          - else:
-              value: null
+          default:
+            value: null
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -423,23 +429,18 @@ articles:
       - output: heeft_kinderen_onder_12
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_NULL
-              subject: $KINDEREN_GEGEVENS
-            then:
-              operation: EXISTS
-              subject: $KINDEREN_GEGEVENS
+          cases:
+          - when:
+              operation: NOT
               value:
-                operation: LESS_THAN
-                subject:
-                  operation: SUBTRACT_DATE
-                  unit: years
-                  values:
-                  - $calculation_date
-                  - $item.geboortedatum
-                value: $KIND_MAX_LEEFTIJD_COMBINATIEKORTING
-          - else: false
+                operation: IS_NULL
+                subject: $KINDEREN_GEGEVENS
+            then:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $KINDEREN_GEGEVENS
+          default: false
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715

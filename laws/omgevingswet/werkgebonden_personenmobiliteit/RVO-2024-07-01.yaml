@@ -11,26 +11,24 @@ uuid: 8a2b6c4e-3f1d-4a5b-9e2c-7f8d1a4b6c9e
 discoverable: BUSINESS
 articles:
 - number: '18.11'
-  text: "1 Als milieubelastende activiteiten als bedoeld in artikel 18.2 worden aangewezen:\n  a. het door een onderneming\
-    \ of rechtspersoon laten reizen van een werknemer tussen de woon- of verblijfplaats van de werknemer en de locatie waar\
-    \ de arbeid pleegt te worden verricht; en\n  b. het door een onderneming of rechtspersoon laten reizen van een werknemer\
-    \ in het kader van de dienstbetrekking, met uitzondering van woon-werkmobiliteit.\n2 Onder de aanwijzing valt niet het\
-    \ laten reizen van een werknemer:\n  a. buiten Nederland, voor zover de reizen van de werknemer niet in Nederland beginnen\
-    \ of eindigen;\n  b. door een onderneming of rechtspersoon die geen financiële vergoeding, fiets, bromfiets, motorvoertuig,\
-    \ vervoersbewijs voor openbaar vervoer of andere mobiliteitsvoorziening beschikbaar stelt voor zakelijke mobiliteit of\
-    \ woon-werkmobiliteit;\n  c. door een in Nederland gevestigde onderneming of rechtspersoon die op 1 januari van het kalenderjaar,\
-    \ bedoeld in artikel 18.15, eerste lid, in totaal minder dan 100 werknemers heeft;\n  d. door een buiten Nederland gevestigde\
-    \ onderneming of rechtspersoon waarvan de nevenvestigingen in Nederland op 1 januari van het kalenderjaar, bedoeld in\
-    \ artikel 18.15, eerste lid, in totaal minder dan 100 werknemers hebben;\n  e. met vliegtuigen, helikopters, vaartuigen\
-    \ of werktuigen;\n  f. met voertuigen die zijn bedoeld voor:\n  1°. het vervoer van goederen of dieren;\n  2°. het gebruik\
-    \ door hulpverleningsdiensten ter vervulling van een dringende taak als bedoeld in artikel 29 van het Reglement verkeersregels\
-    \ en verkeerstekens 1990; of\n  3°. militair gebruik en die zijn voorzien van een militair kenteken;\n  g. met andere\
-    \ voertuigen dan bedoeld onder f, aanhef en onder 2°:\n  1°. voor de uitoefening van een politietaak als bedoeld in hoofdstuk\
-    \ 2 van de Politiewet 2012, of voor het volgen van een politieopleiding als bedoeld in artikel 1 van die wet; of\n  2°.\
-    \ voor de uitoefening van een taak op het gebied van de brandweerzorg, bedoeld in artikel 3, eerste lid, van de Wet veiligheidsregio’s,\
-    \ of de rampenbestrijding, crisisbeheersing en geneeskundige hulpverlening, bedoeld in artikel 1 van die wet, of voor\
-    \ het volgen van een opleiding als bedoeld in artikel 68, eerste lid, van die wet; en\n  h. als bestuurder van een voertuig\
-    \ dat is bedoeld voor het vervoer van personen tegen betaling of als controleur van vervoerbewijzen in dat voertuig."
+  text: |-
+    1 Als milieubelastende activiteiten als bedoeld in artikel 18.2 worden aangewezen:
+      a. het door een onderneming of rechtspersoon laten reizen van een werknemer tussen de woon- of verblijfplaats van de werknemer en de locatie waar de arbeid pleegt te worden verricht; en
+      b. het door een onderneming of rechtspersoon laten reizen van een werknemer in het kader van de dienstbetrekking, met uitzondering van woon-werkmobiliteit.
+    2 Onder de aanwijzing valt niet het laten reizen van een werknemer:
+      a. buiten Nederland, voor zover de reizen van de werknemer niet in Nederland beginnen of eindigen;
+      b. door een onderneming of rechtspersoon die geen financiële vergoeding, fiets, bromfiets, motorvoertuig, vervoersbewijs voor openbaar vervoer of andere mobiliteitsvoorziening beschikbaar stelt voor zakelijke mobiliteit of woon-werkmobiliteit;
+      c. door een in Nederland gevestigde onderneming of rechtspersoon die op 1 januari van het kalenderjaar, bedoeld in artikel 18.15, eerste lid, in totaal minder dan 100 werknemers heeft;
+      d. door een buiten Nederland gevestigde onderneming of rechtspersoon waarvan de nevenvestigingen in Nederland op 1 januari van het kalenderjaar, bedoeld in artikel 18.15, eerste lid, in totaal minder dan 100 werknemers hebben;
+      e. met vliegtuigen, helikopters, vaartuigen of werktuigen;
+      f. met voertuigen die zijn bedoeld voor:
+      1°. het vervoer van goederen of dieren;
+      2°. het gebruik door hulpverleningsdiensten ter vervulling van een dringende taak als bedoeld in artikel 29 van het Reglement verkeersregels en verkeerstekens 1990; of
+      3°. militair gebruik en die zijn voorzien van een militair kenteken;
+      g. met andere voertuigen dan bedoeld onder f, aanhef en onder 2°:
+      1°. voor de uitoefening van een politietaak als bedoeld in hoofdstuk 2 van de Politiewet 2012, of voor het volgen van een politieopleiding als bedoeld in artikel 1 van die wet; of
+      2°. voor de uitoefening van een taak op het gebied van de brandweerzorg, bedoeld in artikel 3, eerste lid, van de Wet veiligheidsregio’s, of de rampenbestrijding, crisisbeheersing en geneeskundige hulpverlening, bedoeld in artikel 1 van die wet, of voor het volgen van een opleiding als bedoeld in artikel 68, eerste lid, van die wet; en
+      h. als bestuurder van een voertuig dat is bedoeld voor het vervoer van personen tegen betaling of als controleur van vervoerbewijzen in dat voertuig.
   url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Artikel18.11
   machine_readable:
     definitions:
@@ -85,7 +83,7 @@ articles:
             url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.11
             juriconnect: jci1.3:c:BWBR0041330&artikel=18.11&lid=2&z=2024-07-01&g=2024-07-01
             explanation: Organisaties moeten mobiliteitsvergoeding verstrekken om onder rapportageverplichting te vallen
-        - operation: GREATER_OR_EQUAL
+        - operation: GREATER_THAN_OR_EQUAL
           subject: $AANTAL_WERKNEMERS
           value: $WERKNEMERS_DREMPEL
           legal_basis:

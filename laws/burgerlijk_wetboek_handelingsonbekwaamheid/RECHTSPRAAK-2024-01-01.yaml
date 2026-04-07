@@ -11,25 +11,13 @@ uuid: 9f2a3b4c-1d5e-4f6a-b7c8-2e3d4f5a6b7c
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '381'
-  text: '1 De curatele werkt met ingang van de dag waarop zij is uitgesproken. In het geval, bedoeld in artikel 378, tweede
-    lid, werkt de curatele met ingang van het tijdstip waarop de onder curatele gestelde meerderjarig wordt.
-
-    2 Van deze tijdstippen is de onder curatele gestelde onbekwaam rechtshandelingen te verrichten voor zover de wet niet
-    anders bepaalt.
-
-    3 Een onder curatele gestelde is bekwaam rechtshandelingen te verrichten met toestemming van zijn curator, voor zover
-    deze bevoegd is die rechtshandelingen voor de onder curatele gestelde te verrichten. De toestemming kan slechts worden
-    verleend voor een bepaalde rechtshandeling of voor een bepaald doel. De toestemming voor een bepaald doel moet schriftelijk
-    worden verleend.
-
-    4 Met betrekking tot aangelegenheden betreffende verzorging, verpleging, behandeling en begeleiding van een onder curatele
-    gestelde zijn de artikelen 453 en 454 van dit boek van overeenkomstige toepassing.
-
-    5 Hij is bekwaam over gelden die zijn curator voor levensonderhoud te zijner beschikking heeft gesteld, overeenkomstig
-    deze bestemming te beschikken.
-
-    6 In zaken van curatele is degene wiens curatele het betreft bekwaam in rechte op te treden en tegen een uitspraak beroep
-    in te stellen.'
+  text: |-
+    1 De curatele werkt met ingang van de dag waarop zij is uitgesproken. In het geval, bedoeld in artikel 378, tweede lid, werkt de curatele met ingang van het tijdstip waarop de onder curatele gestelde meerderjarig wordt.
+    2 Van deze tijdstippen is de onder curatele gestelde onbekwaam rechtshandelingen te verrichten voor zover de wet niet anders bepaalt.
+    3 Een onder curatele gestelde is bekwaam rechtshandelingen te verrichten met toestemming van zijn curator, voor zover deze bevoegd is die rechtshandelingen voor de onder curatele gestelde te verrichten. De toestemming kan slechts worden verleend voor een bepaalde rechtshandeling of voor een bepaald doel. De toestemming voor een bepaald doel moet schriftelijk worden verleend.
+    4 Met betrekking tot aangelegenheden betreffende verzorging, verpleging, behandeling en begeleiding van een onder curatele gestelde zijn de artikelen 453 en 454 van dit boek van overeenkomstige toepassing.
+    5 Hij is bekwaam over gelden die zijn curator voor levensonderhoud te zijner beschikking heeft gesteld, overeenkomstig deze bestemming te beschikken.
+    6 In zaken van curatele is degene wiens curatele het betreft bekwaam in rechte op te treden en tegen een uitspraak beroep in te stellen.
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel381
   machine_readable:
     definitions:
@@ -98,12 +86,12 @@ articles:
           subject: $CURATELE_ALS_CURANDUS
           where:
             operation: AND
-            values:
+            conditions:
             - operation: EQUALS
               subject: $current.status
               value: ACTIEF
             - operation: OR
-              values:
+              conditions:
               - operation: IS_NULL
                 subject: $current.datum_einde
               - operation: EQUALS
@@ -119,14 +107,14 @@ articles:
           article: '389'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling3_Artikel389
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=389&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 1:389 BW: curatele eindigt door opheffing. Alleen actieve curatele zonder einddatum of met toekomstige
-            einddatum is van kracht.
-
-            '
+          explanation: |
+            Art. 1:389 BW: curatele eindigt door opheffing. Alleen actieve curatele zonder einddatum of met toekomstige einddatum is van kracht.
       - output: is_onder_curatele
         value:
-          operation: EXISTS
-          subject: $actieve_curatele
+          operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $actieve_curatele
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -147,10 +135,15 @@ articles:
           explanation: 'Art. 1:381 lid 1 BW: onder curatele gestelden zijn handelingsonbekwaam'
       - output: curator_bsn
         value:
-          operation: COALESCE
-          values:
-          - $actieve_curatele.bsn_curator
-          - null
+          operation: IF
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $actieve_curatele.bsn_curator
+            then: $actieve_curatele.bsn_curator
+          default: null
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -161,10 +154,10 @@ articles:
       - output: base_permissions
         value:
           operation: IF
-          conditions:
-          - test: $is_handelingsonbekwaam
+          cases:
+          - when: $is_handelingsonbekwaam
             then: $HANDELINGSONBEKWAME_RECHTEN
-          - else: $VOLLEDIGE_RECHTEN
+          default: $VOLLEDIGE_RECHTEN
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -172,10 +165,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 1:381 lid 1 BW: handelingsonbekwamen kunnen geen rechtshandelingen zelfstandig verrichten. Zij
-            hebben alleen leesrecht.
-
-            '
+          explanation: |
+            Art. 1:381 lid 1 BW: handelingsonbekwamen kunnen geen rechtshandelingen zelfstandig verrichten. Zij hebben alleen leesrecht.
       - output: heeft_delegaties
         value: true
         legal_basis:

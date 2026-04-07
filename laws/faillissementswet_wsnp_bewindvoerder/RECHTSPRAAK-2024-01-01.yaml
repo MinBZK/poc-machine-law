@@ -11,11 +11,11 @@ uuid: 1a8ce7cd-8c96-41ae-806c-d6387e43c0dd
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '316'
-  text: "1 De bewindvoerder is belast met:\n  a. het toezicht op de naleving door de schuldenaar van diens verplichtingen\
-    \ die uit de schuldsaneringsregeling voortvloeien;\n  b. het beheer en de vereffening van de boedel.\n2 Alvorens in rechte\
-    \ op te treden, behalve waar het verificatiegeschillen betreft, alsmede in de gevallen van de artikelen 37, 40, 58, tweede\
-    \ lid, 59a, zesde lid, 305, 326, eerste lid, en 349, eerste lid, behoeft de bewindvoerder machtiging van de rechter-commissaris.\
-    \ Artikel 72 is van overeenkomstige toepassing."
+  text: |-
+    1 De bewindvoerder is belast met:
+      a. het toezicht op de naleving door de schuldenaar van diens verplichtingen die uit de schuldsaneringsregeling voortvloeien;
+      b. het beheer en de vereffening van de boedel.
+    2 Alvorens in rechte op te treden, behalve waar het verificatiegeschillen betreft, alsmede in de gevallen van de artikelen 37, 40, 58, tweede lid, 59a, zesde lid, 305, 326, eerste lid, en 349, eerste lid, behoeft de bewindvoerder machtiging van de rechter-commissaris. Artikel 72 is van overeenkomstige toepassing.
   url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#Artikel316
   machine_readable:
     definitions:
@@ -67,8 +67,10 @@ articles:
       - name: valid_until_dates
         type: array
       requirements:
-      - operation: EXISTS
-        subject: $WSNP_REGISTRATIES
+      - operation: NOT
+        value:
+          operation: IS_NULL
+          subject: $WSNP_REGISTRATIES
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -83,12 +85,12 @@ articles:
           subject: $WSNP_REGISTRATIES
           where:
             operation: AND
-            values:
+            conditions:
             - operation: EQUALS
               subject: $current.status
               value: ACTIEF
             - operation: OR
-              values:
+              conditions:
               - operation: IS_NULL
                 subject: $current.datum_einde
               - operation: EQUALS
@@ -104,23 +106,22 @@ articles:
           article: '356'
           url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel356
           juriconnect: jci1.3:c:BWBR0001860&artikel=356&z=2024-01-01&g=2024-01-01
-          explanation: 'Alleen actieve WSNP-regelingen geven bewindvoerderbevoegdheid. Art. 356 Fw: schuldsanering eindigt
-            bij schone lei of beeindiging.
-
-            '
+          explanation: |
+            Alleen actieve WSNP-regelingen geven bewindvoerderbevoegdheid. Art. 356 Fw: schuldsanering eindigt bij schone lei of beeindiging.
       - output: heeft_delegaties
         value:
-          operation: EXISTS
-          subject: $actieve_wsnp
+          operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $actieve_wsnp
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
           article: '316'
           url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316
           juriconnect: jci1.3:c:BWBR0001860&artikel=316&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 316 Fw bepaalt dat de bewindvoerder de WSNP-boedel beheert.
-
-            '
+          explanation: |
+            Art. 316 Fw bepaalt dat de bewindvoerder de WSNP-boedel beheert.
       - output: subject_ids
         value: $actieve_wsnp.bsn_saniet
         legal_basis:
@@ -182,9 +183,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316
           juriconnect: jci1.3:c:BWBR0001860&artikel=316&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 316 lid 1 Fw: De bewindvoerder beheert de WSNP-boedel.
-
-            '
+          explanation: |
+            Art. 316 lid 1 Fw: De bewindvoerder beheert de WSNP-boedel.
       - output: valid_from_dates
         value: $actieve_wsnp.datum_uitspraak
         legal_basis:

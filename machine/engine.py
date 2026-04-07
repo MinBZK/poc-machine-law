@@ -359,7 +359,7 @@ class RulesEngine:
         return True
 
     def _evaluate_if_operation(self, operation: dict[str, Any], context: RuleContext) -> Any:
-        """Evaluate an IF operation"""
+        """Evaluate an IF operation (supports both old and new format)"""
         with logger.indent_block("Evaluating IF"):
             if_node = PathNode(
                 type="operation",
@@ -371,29 +371,54 @@ class RulesEngine:
 
             result = 0
             conditions = operation.get("conditions", [])
+            cases = operation.get("cases", [])
+            default = operation.get("default")
 
-            for i, condition in enumerate(conditions):
-                condition_result = {
-                    "condition_index": i,
-                    "type": "test" if "test" in condition else "else",
-                }
-
-                if "test" in condition:
-                    test_result = self._evaluate_operation(condition["test"], context)
-                    condition_result["test_result"] = test_result
-                    if test_result:
-                        result = self._evaluate_value(condition["then"], context)
-                        if_node.details["condition_results"].append(condition_result)
-                        logger.debug(f"THEN condition: {result}")
-                        break
-                elif "else" in condition:
-                    result = self._evaluate_value(condition["else"], context)
-                    condition_result["else_value"] = result
+            if cases:
+                # New format: cases/when/then + default
+                for i, case in enumerate(cases):
+                    condition_result = {
+                        "condition_index": i,
+                        "type": "when" if "when" in case else "default",
+                    }
+                    if "when" in case:
+                        test_result = self._evaluate_operation(case["when"], context)
+                        condition_result["test_result"] = test_result
+                        if test_result:
+                            result = self._evaluate_value(case["then"], context)
+                            if_node.details["condition_results"].append(condition_result)
+                            logger.debug(f"WHEN condition matched: {result}")
+                            break
                     if_node.details["condition_results"].append(condition_result)
-                    logger.debug(f"ELSE condition: {result}")
-                    break
+                else:
+                    # No case matched, use default
+                    if default is not None:
+                        result = self._evaluate_value(default, context)
+                        logger.debug(f"DEFAULT condition: {result}")
+            else:
+                # Old format: conditions/test/then/else
+                for i, condition in enumerate(conditions):
+                    condition_result = {
+                        "condition_index": i,
+                        "type": "test" if "test" in condition else "else",
+                    }
 
-                if_node.details["condition_results"].append(condition_result)
+                    if "test" in condition:
+                        test_result = self._evaluate_operation(condition["test"], context)
+                        condition_result["test_result"] = test_result
+                        if test_result:
+                            result = self._evaluate_value(condition["then"], context)
+                            if_node.details["condition_results"].append(condition_result)
+                            logger.debug(f"THEN condition: {result}")
+                            break
+                    elif "else" in condition:
+                        result = self._evaluate_value(condition["else"], context)
+                        condition_result["else_value"] = result
+                        if_node.details["condition_results"].append(condition_result)
+                        logger.debug(f"ELSE condition: {result}")
+                        break
+
+                    if_node.details["condition_results"].append(condition_result)
 
             if_node.result = result
             context.pop_path()
@@ -408,7 +433,9 @@ class RulesEngine:
         array_data = self._evaluate_value(operation["subject"], context)
         if not array_data:
             logger.warning("No data found to run FOREACH on")
-            return self._evaluate_aggregate_ops(combine, [])
+            if combine:
+                return self._evaluate_aggregate_ops(combine, [])
+            return []
 
         if not isinstance(array_data, list):
             array_data = [array_data]
@@ -461,6 +488,8 @@ class RulesEngine:
         "LESS_THAN": operator.lt,
         "GREATER_OR_EQUAL": operator.ge,
         "LESS_OR_EQUAL": operator.le,
+        "GREATER_THAN_OR_EQUAL": operator.ge,
+        "LESS_THAN_OR_EQUAL": operator.le,
     }
 
     AGGREGATE_OPS = {
@@ -737,7 +766,12 @@ class RulesEngine:
 
         elif op_type == "IS_NULL":
             subject = self._evaluate_value(operation["subject"], context)
-            result = subject is None
+            # Treat None and empty collections as null (matches EXISTS semantics:
+            # an empty list of records is semantically "no data" in the legal domain)
+            if subject is None or (isinstance(subject, (list, tuple, dict)) and len(subject) == 0):
+                result = True
+            else:
+                result = False
             node.details["subject_value"] = subject
             logger.debug(f"IS_NULL result: {result}")
 
@@ -769,7 +803,7 @@ class RulesEngine:
         elif op_type == "AND":
             with logger.indent_block("AND"):
                 values = []
-                for v in operation["values"]:
+                for v in operation.get("conditions", operation.get("values", [])):
                     r = self._evaluate_value(v, context)
                     values.append(r)
                     if not bool(r):
@@ -783,7 +817,7 @@ class RulesEngine:
         elif op_type == "OR":
             with logger.indent_block("OR"):
                 values = []
-                for v in operation["values"]:
+                for v in operation.get("conditions", operation.get("values", [])):
                     r = self._evaluate_value(v, context)
                     values.append(r)
                     if bool(r):
@@ -849,7 +883,7 @@ class RulesEngine:
 
         elif op_type == "DAY_OF_WEEK":
             # Get day of week from a date (0=Monday, 6=Sunday)
-            date_val = self._evaluate_value(operation.get("subject"), context)
+            date_val = self._evaluate_value(operation.get("date", operation.get("subject")), context)
 
             if date_val is None:
                 logger.warning("DAY_OF_WEEK: missing date value")
@@ -925,6 +959,73 @@ class RulesEngine:
             result = values.get(subject)
             node.details.update({"subject_value": subject, "allowed_values": values})
             logger.debug(f"GET {subject} from {values}: {result}")
+
+        elif op_type == "NOT":
+            value = self._evaluate_value(operation["value"], context)
+            result = not bool(value) if value is not None else None
+            node.details["value"] = value
+            logger.debug(f"NOT({value}) = {result}")
+
+        elif op_type == "AGE":
+            dob = self._evaluate_value(operation["date_of_birth"], context)
+            ref = self._evaluate_value(operation["reference_date"], context)
+            if dob is None or ref is None:
+                context.missing_required = True
+                logger.warning(f"AGE: missing date_of_birth ({dob}) or reference_date ({ref})")
+                result = None
+            else:
+                try:
+                    if isinstance(dob, str):
+                        dob = datetime.fromisoformat(dob)
+                    if isinstance(ref, str):
+                        ref = datetime.fromisoformat(ref)
+                    # Calculate complete years between dates
+                    result = ref.year - dob.year - ((ref.month, ref.day) < (dob.month, dob.day))
+                    logger.debug(f"AGE({dob}, {ref}) = {result}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"AGE failed: {e}")
+                    result = None
+            node.details.update({"date_of_birth": dob, "reference_date": ref})
+
+        elif op_type == "DATE_ADD":
+            base_date = self._evaluate_value(operation["date"], context)
+            if base_date is None:
+                context.missing_required = True
+                logger.warning("DATE_ADD: missing base date")
+                result = None
+            else:
+                try:
+                    if isinstance(base_date, str):
+                        base_date = datetime.fromisoformat(base_date)
+                    years = int(self._evaluate_value(operation["years"], context)) if "years" in operation else 0
+                    months = int(self._evaluate_value(operation["months"], context)) if "months" in operation else 0
+                    weeks = int(self._evaluate_value(operation["weeks"], context)) if "weeks" in operation else 0
+                    days = int(self._evaluate_value(operation["days"], context)) if "days" in operation else 0
+                    result_date = base_date + relativedelta(years=years, months=months, weeks=weeks, days=days)
+                    result = result_date.strftime("%Y-%m-%d")
+                    logger.debug(f"DATE_ADD({base_date}, y={years}, m={months}, w={weeks}, d={days}) = {result}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"DATE_ADD failed: {e}")
+                    result = None
+            node.details.update({"date": base_date})
+
+        elif op_type == "DATE":
+            year = self._evaluate_value(operation["year"], context)
+            month = self._evaluate_value(operation["month"], context)
+            day = self._evaluate_value(operation["day"], context)
+            try:
+                result = datetime(int(year), int(month), int(day))
+                logger.debug(f"DATE({year}, {month}, {day}) = {result}")
+            except (ValueError, TypeError) as e:
+                logger.warning(f"DATE failed: {e}")
+                result = None
+            node.details.update({"year": year, "month": month, "day": day})
+
+        elif op_type == "LIST":
+            items = operation.get("items", [])
+            result = [self._evaluate_value(item, context) for item in items]
+            node.details["items"] = result
+            logger.debug(f"LIST({items}) = {result}")
 
         else:
             result = None

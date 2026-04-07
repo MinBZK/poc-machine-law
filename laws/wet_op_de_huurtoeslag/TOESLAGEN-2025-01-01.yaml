@@ -11,24 +11,22 @@ uuid: a611a7ea-98d5-42f5-a05c-475b1be4590e
 discoverable: CITIZEN
 articles:
 - number: '1'
-  text: "In deze wet en de bepalingen die daarop berusten wordt verstaan onder:\n  a. burgemeester en wethouders: burgemeester\
-    \ en wethouders van de gemeente waar de woning is gelegen waarop de huurtoeslag betrekking heeft;\n  b. huurcommissie:\
-    \ de huurcommissie, bedoeld in artikel 3a, eerste lid, van de Uitvoeringswet huurprijzen woonruimte;\n  c. huurder: persoon\
-    \ die zijn hoofdverblijf heeft in een door hem gehuurde woning, daaronder begrepen een woonwagen, tenzij:\n  1°. de overeenkomst\
-    \ van huur en verhuur een gebruik van de woning betreft dat naar zijn aard slechts van korte duur is, of\n  2°. de woning\
-    \ onderdeel uitmaakt van een hotel-, pension-, kamp- of vakantiebestedingsbedrijf, ongeacht de duur van de huurovereenkomst;\n\
-    \  d. huurprijs: de prijs die bij huur en verhuur is verschuldigd voor het enkele gebruik van een woning;\n  e. huurtoeslag:\
-    \ een tegemoetkoming van het Rijk als bedoeld in artikel 2, eerste lid, onderdeel h, van de Algemene wet inkomensafhankelijke\
-    \ regelingen in de kosten van het huren van een woning;\n  f. onderhuurder: persoon als bedoeld in artikel 2, eerste lid,\
-    \ onderdeel e, onder 2°, van de Algemene wet inkomensafhankelijke regelingen;\n  g. Onze Minister: Onze Minister van Volkshuisvesting\
-    \ en Ruimtelijke Ordening;\n  h. rekenhuur: de rekenhuur, bedoeld in artikel 5;\n  i. rekeninkomen: de gezamenlijke toetsingsinkomens,\
-    \ bedoeld in artikel 8 van de Algemene wet inkomensafhankelijke regelingen, die in aanmerking worden genomen voor het\
-    \ bepalen van de draagkracht, bedoeld in artikel 7 van die wet;\n  j. standplaats: kavel, bestemd voor het plaatsen van\
-    \ een woonwagen, waarop voorzieningen aanwezig zijn die op het leidingnet van de openbare nutsbedrijven, andere instellingen\
-    \ of van gemeenten kunnen worden aangesloten;\n  k. woning: een gebouwde onroerende zaak voor zover deze als zelfstandige\
-    \ woonruimte, onvrije etage dan wel andere onzelfstandige woonruimte is verhuurd, alsmede de onroerende aanhorigheden;\n\
-    \  l. woonwagen: voor bewoning bestemd gebouw dat is geplaatst op een standplaats en dat in zijn geheel of in delen kan\
-    \ worden verplaatst."
+  text: |-
+    In deze wet en de bepalingen die daarop berusten wordt verstaan onder:
+      a. burgemeester en wethouders: burgemeester en wethouders van de gemeente waar de woning is gelegen waarop de huurtoeslag betrekking heeft;
+      b. huurcommissie: de huurcommissie, bedoeld in artikel 3a, eerste lid, van de Uitvoeringswet huurprijzen woonruimte;
+      c. huurder: persoon die zijn hoofdverblijf heeft in een door hem gehuurde woning, daaronder begrepen een woonwagen, tenzij:
+      1°. de overeenkomst van huur en verhuur een gebruik van de woning betreft dat naar zijn aard slechts van korte duur is, of
+      2°. de woning onderdeel uitmaakt van een hotel-, pension-, kamp- of vakantiebestedingsbedrijf, ongeacht de duur van de huurovereenkomst;
+      d. huurprijs: de prijs die bij huur en verhuur is verschuldigd voor het enkele gebruik van een woning;
+      e. huurtoeslag: een tegemoetkoming van het Rijk als bedoeld in artikel 2, eerste lid, onderdeel h, van de Algemene wet inkomensafhankelijke regelingen in de kosten van het huren van een woning;
+      f. onderhuurder: persoon als bedoeld in artikel 2, eerste lid, onderdeel e, onder 2°, van de Algemene wet inkomensafhankelijke regelingen;
+      g. Onze Minister: Onze Minister van Volkshuisvesting en Ruimtelijke Ordening;
+      h. rekenhuur: de rekenhuur, bedoeld in artikel 5;
+      i. rekeninkomen: de gezamenlijke toetsingsinkomens, bedoeld in artikel 8 van de Algemene wet inkomensafhankelijke regelingen, die in aanmerking worden genomen voor het bepalen van de draagkracht, bedoeld in artikel 7 van die wet;
+      j. standplaats: kavel, bestemd voor het plaatsen van een woonwagen, waarop voorzieningen aanwezig zijn die op het leidingnet van de openbare nutsbedrijven, andere instellingen of van gemeenten kunnen worden aangesloten;
+      k. woning: een gebouwde onroerende zaak voor zover deze als zelfstandige woonruimte, onvrije etage dan wel andere onzelfstandige woonruimte is verhuurd, alsmede de onroerende aanhorigheden;
+      l. woonwagen: voor bewoning bestemd gebouw dat is geplaatst op een standplaats en dat in zijn geheel of in delen kan worden verplaatst.
   url: https://wetten.overheid.nl/BWBR0008659/2025-01-01#Artikel1
   machine_readable:
     definitions:
@@ -247,7 +245,7 @@ articles:
       requirements:
       - all:
         - subject: $LEEFTIJD
-          operation: GREATER_OR_EQUAL
+          operation: GREATER_THAN_OR_EQUAL
           value: $MINIMUM_LEEFTIJD
           legal_basis:
             law: Wet op de huurtoeslag
@@ -274,25 +272,25 @@ articles:
               combine: ADD
               value:
                 operation: IF
-                conditions:
-                - test:
-                    operation: GREATER_OR_EQUAL
+                cases:
+                - when:
+                    operation: GREATER_THAN_OR_EQUAL
                     values:
                     - $leeftijd
                     - 21
                   then: $inkomen
-                - else:
-                    operation: SUBTRACT
-                    values:
-                    - $inkomen
-                    - $KIND_VRIJSTELLING
+                default:
+                  operation: SUBTRACT
+                  values:
+                  - $inkomen
+                  - $KIND_VRIJSTELLING
             - operation: FOREACH
               subject: $KINDEREN
               combine: ADD
               value:
                 operation: IF
-                conditions:
-                - test:
+                cases:
+                - when:
                     operation: LESS_THAN
                     values:
                     - $leeftijd
@@ -302,15 +300,15 @@ articles:
                     values:
                     - $inkomen
                     - $KIND_VRIJSTELLING
-                - else: $inkomen
+                default: $inkomen
           - operation: IF
-            conditions:
-            - test:
+            cases:
+            - when:
                 subject: $HEEFT_PARTNER
                 operation: EQUALS
                 value: true
               then: $INKOMENSGRENS_PARTNERS
-            - else: $INKOMENSGRENS_ALLEENSTAANDE
+            default: $INKOMENSGRENS_ALLEENSTAANDE
         - operation: IF
           legal_basis:
             law: Algemene wet inkomensafhankelijke regelingen
@@ -320,8 +318,8 @@ articles:
             url: https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.2_Artikel3
             juriconnect: jci1.3:c:BWBR0018472&artikel=3&lid=1&z=2025-01-01&g=2025-01-01
             explanation: Partners moeten op hetzelfde adres wonen volgens artikel 3 lid 1 AWIR
-          conditions:
-          - test:
+          cases:
+          - when:
               subject: $HEEFT_PARTNER
               operation: EQUALS
               value: true
@@ -330,7 +328,7 @@ articles:
               values:
               - $VERBLIJFSADRES
               - $PARTNER_ADRES
-          - else: true
+          default: true
         - operation: IF
           legal_basis:
             law: Algemene wet inkomensafhankelijke regelingen
@@ -339,8 +337,8 @@ articles:
             url: https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.3_Artikel8
             juriconnect: jci1.3:c:BWBR0018472&artikel=8&z=2025-01-01&g=2025-01-01
             explanation: De vermogenstoets wordt bepaald conform artikel 8 AWIR
-          conditions:
-          - test:
+          cases:
+          - when:
               subject: $HEEFT_PARTNER
               operation: EQUALS
               value: true
@@ -349,11 +347,11 @@ articles:
               values:
               - $GEZAMENLIJK_VERMOGEN
               - $VERMOGENSGRENS_PARTNERS
-          - else:
-              operation: LESS_THAN
-              values:
-              - $VERMOGEN
-              - $VERMOGENSGRENS_ALLEENSTAANDE
+          default:
+            operation: LESS_THAN
+            values:
+            - $VERMOGEN
+            - $VERMOGENSGRENS_ALLEENSTAANDE
         - operation: IF
           legal_basis:
             law: Wet op de huurtoeslag
@@ -362,8 +360,8 @@ articles:
             url: https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel14
             juriconnect: jci1.3:c:BWBR0008659&artikel=14&z=2025-01-01&g=2025-01-01
             explanation: De inkomenstoets voor huurtoeslag wordt bepaald conform artikel 14
-          conditions:
-          - test:
+          cases:
+          - when:
               subject: $HEEFT_PARTNER
               operation: EQUALS
               value: true
@@ -375,11 +373,11 @@ articles:
                 - $INKOMEN
                 - $PARTNER_INKOMEN
               - $INKOMENSGRENS_PARTNERS
-          - else:
-              operation: LESS_THAN
-              values:
-              - $INKOMEN
-              - $INKOMENSGRENS_ALLEENSTAANDE
+          default:
+            operation: LESS_THAN
+            values:
+            - $INKOMEN
+            - $INKOMENSGRENS_ALLEENSTAANDE
         - operation: LESS_THAN
           legal_basis:
             law: Wet op de huurtoeslag
@@ -411,13 +409,13 @@ articles:
       - output: basishuur
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: LESS_OR_EQUAL
+          cases:
+          - when:
+              operation: LESS_THAN_OR_EQUAL
               subject:
                 operation: IF
-                conditions:
-                - test:
+                cases:
+                - when:
                     operation: EQUALS
                     subject: $HEEFT_PARTNER
                     value: true
@@ -426,69 +424,69 @@ articles:
                     values:
                     - $INKOMEN
                     - $PARTNER_INKOMEN
-                - else: $INKOMEN
+                default: $INKOMEN
               value:
                 operation: IF
-                conditions:
-                - test:
+                cases:
+                - when:
                     operation: EQUALS
                     subject: $HEEFT_PARTNER
                     value: true
                   then: $MINIMUM_INKOMENSIJKPUNT_PARTNERS
-                - else: $MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE
+                default: $MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE
             then: $NORMHUUR_BIJ_MINIMUM_INKOMEN
-          - else:
-              operation: ADD
+          default:
+            operation: ADD
+            values:
+            - $NORMHUUR_BIJ_MINIMUM_INKOMEN
+            - operation: MULTIPLY
               values:
-              - $NORMHUUR_BIJ_MINIMUM_INKOMEN
-              - operation: MULTIPLY
+              - operation: DIVIDE
                 values:
-                - operation: DIVIDE
-                  values:
-                  - operation: SUBTRACT
-                    values:
-                    - operation: IF
-                      conditions:
-                      - test:
-                          operation: EQUALS
-                          subject: $HEEFT_PARTNER
-                          value: true
-                        then:
-                          operation: ADD
-                          values:
-                          - $INKOMEN
-                          - $PARTNER_INKOMEN
-                      - else: $INKOMEN
-                    - operation: IF
-                      conditions:
-                      - test:
-                          operation: EQUALS
-                          subject: $HEEFT_PARTNER
-                          value: true
-                        then: $MINIMUM_INKOMENSIJKPUNT_PARTNERS
-                      - else: $MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE
-                  - operation: SUBTRACT
-                    values:
-                    - operation: IF
-                      conditions:
-                      - test:
-                          operation: EQUALS
-                          subject: $HEEFT_PARTNER
-                          value: true
-                        then: $REFERENTIE_INKOMENSIJKPUNT_PARTNERS
-                      - else: $REFERENTIE_INKOMENSIJKPUNT_ALLEENSTAANDE
-                    - operation: IF
-                      conditions:
-                      - test:
-                          operation: EQUALS
-                          subject: $HEEFT_PARTNER
-                          value: true
-                        then: $MINIMUM_INKOMENSIJKPUNT_PARTNERS
-                      - else: $MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE
                 - operation: SUBTRACT
                   values:
-                  - $NORMHUUR_BIJ_REFERENTIE_INKOMEN
-                  - $NORMHUUR_BIJ_MINIMUM_INKOMEN
+                  - operation: IF
+                    cases:
+                    - when:
+                        operation: EQUALS
+                        subject: $HEEFT_PARTNER
+                        value: true
+                      then:
+                        operation: ADD
+                        values:
+                        - $INKOMEN
+                        - $PARTNER_INKOMEN
+                    default: $INKOMEN
+                  - operation: IF
+                    cases:
+                    - when:
+                        operation: EQUALS
+                        subject: $HEEFT_PARTNER
+                        value: true
+                      then: $MINIMUM_INKOMENSIJKPUNT_PARTNERS
+                    default: $MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE
+                - operation: SUBTRACT
+                  values:
+                  - operation: IF
+                    cases:
+                    - when:
+                        operation: EQUALS
+                        subject: $HEEFT_PARTNER
+                        value: true
+                      then: $REFERENTIE_INKOMENSIJKPUNT_PARTNERS
+                    default: $REFERENTIE_INKOMENSIJKPUNT_ALLEENSTAANDE
+                  - operation: IF
+                    cases:
+                    - when:
+                        operation: EQUALS
+                        subject: $HEEFT_PARTNER
+                        value: true
+                      then: $MINIMUM_INKOMENSIJKPUNT_PARTNERS
+                    default: $MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE
+              - operation: SUBTRACT
+                values:
+                - $NORMHUUR_BIJ_REFERENTIE_INKOMEN
+                - $NORMHUUR_BIJ_MINIMUM_INKOMEN
         legal_basis:
           law: Wet op de huurtoeslag
           bwb_id: BWBR0008659
@@ -536,13 +534,13 @@ articles:
                 - operation: SUBTRACT
                   values:
                   - operation: IF
-                    conditions:
-                    - test:
-                        operation: LESS_OR_EQUAL
+                    cases:
+                    - when:
+                        operation: LESS_THAN_OR_EQUAL
                         subject: $HUISHOUDGROOTTE
                         value: 2
                       then: $AFTOPPINGSGRENS_1_2
-                    - else: $AFTOPPINGSGRENS_3_PLUS
+                    default: $AFTOPPINGSGRENS_3_PLUS
                   - $KWALITEITSKORTINGSGRENS
             - $SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP
           - operation: MULTIPLY
@@ -557,13 +555,13 @@ articles:
                   - $HUURPRIJS
                   - $SUBSIDIABELE_SERVICEKOSTEN
                 - operation: IF
-                  conditions:
-                  - test:
-                      operation: LESS_OR_EQUAL
+                  cases:
+                  - when:
+                      operation: LESS_THAN_OR_EQUAL
                       subject: $HUISHOUDGROOTTE
                       value: 2
                     then: $AFTOPPINGSGRENS_1_2
-                  - else: $AFTOPPINGSGRENS_3_PLUS
+                  default: $AFTOPPINGSGRENS_3_PLUS
             - $SUBSIDIEPERCENTAGE_BOVEN_AFTOP
         legal_basis:
           law: Wet op de huurtoeslag

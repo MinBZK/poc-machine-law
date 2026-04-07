@@ -11,17 +11,11 @@ uuid: 3f8a2b1c-9d4e-4f5a-b8c7-6e1d2f3a4b5c
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '240'
-  text: '1 Het bestuur vertegenwoordigt de vennootschap, voor zover uit de wet niet anders voortvloeit.
-
-    2 De bevoegdheid tot vertegenwoordiging komt mede aan iedere bestuurder toe. De statuten kunnen echter bepalen dat zij
-    behalve aan het bestuur slechts toekomt aan een of meer bestuurders. Zij kunnen voorts bepalen dat een bestuurder de vennootschap
-    slechts met medewerking van een of meer anderen mag vertegenwoordigen.
-
-    3 Bevoegdheid tot vertegenwoordiging die aan het bestuur of aan een bestuurder toekomt, is onbeperkt en onvoorwaardelijk,
-    voor zover uit de wet niet anders voortvloeit. Een wettelijk toegelaten of voorgeschreven beperking van of voorwaarde
-    voor de bevoegdheid tot vertegenwoordiging kan slechts door de vennootschap worden ingeroepen.
-
-    4 De statuten kunnen ook aan andere personen dan bestuurders bevoegdheid tot vertegenwoordiging toekennen.'
+  text: |-
+    1 Het bestuur vertegenwoordigt de vennootschap, voor zover uit de wet niet anders voortvloeit.
+    2 De bevoegdheid tot vertegenwoordiging komt mede aan iedere bestuurder toe. De statuten kunnen echter bepalen dat zij behalve aan het bestuur slechts toekomt aan een of meer bestuurders. Zij kunnen voorts bepalen dat een bestuurder de vennootschap slechts met medewerking van een of meer anderen mag vertegenwoordigen.
+    3 Bevoegdheid tot vertegenwoordiging die aan het bestuur of aan een bestuurder toekomt, is onbeperkt en onvoorwaardelijk, voor zover uit de wet niet anders voortvloeit. Een wettelijk toegelaten of voorgeschreven beperking van of voorwaarde voor de bevoegdheid tot vertegenwoordiging kan slechts door de vennootschap worden ingeroepen.
+    4 De statuten kunnen ook aan andere personen dan bestuurders bevoegdheid tot vertegenwoordiging toekennen.
   url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Artikel240
   machine_readable:
     definitions:
@@ -109,8 +103,10 @@ articles:
       - name: bevoegdheden
         type: array
       requirements:
-      - operation: EXISTS
-        subject: $FUNCTIONARISSEN
+      - operation: NOT
+        value:
+          operation: IS_NULL
+          subject: $FUNCTIONARISSEN
         legal_basis:
           law: Handelsregisterwet 2007
           bwb_id: BWBR0021777
@@ -135,15 +131,14 @@ articles:
           paragraph: '2'
           url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel5_Afdeling4_Artikel240
           juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=240&lid=2&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 2:240 lid 2 BW: alleen bestuurders hebben vertegenwoordigingsbevoegdheid. Art. 2:240 lid 4 BW:
-            statuten kunnen ook anderen bevoegdheid toekennen (gemachtigden). Commissarissen en andere toezichthouders zijn
-            NIET bevoegd de rechtspersoon te vertegenwoordigen.
-
-            '
+          explanation: |
+            Art. 2:240 lid 2 BW: alleen bestuurders hebben vertegenwoordigingsbevoegdheid. Art. 2:240 lid 4 BW: statuten kunnen ook anderen bevoegdheid toekennen (gemachtigden). Commissarissen en andere toezichthouders zijn NIET bevoegd de rechtspersoon te vertegenwoordigen.
       - output: heeft_delegaties
         value:
-          operation: EXISTS
-          subject: $bevoegde_functionarissen
+          operation: NOT
+          value:
+            operation: IS_NULL
+            subject: $bevoegde_functionarissen
         legal_basis:
           law: Burgerlijk Wetboek Boek 2
           bwb_id: BWBR0003045
@@ -151,10 +146,8 @@ articles:
           paragraph: '2'
           url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel5_Afdeling4_Artikel240
           juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=240&lid=2&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 2:240 lid 2 BW bepaalt dat iedere bestuurder vertegenwoordigingsbevoegd is. Alleen functies met
-            vertegenwoordigingsbevoegdheid worden meegeteld.
-
-            '
+          explanation: |
+            Art. 2:240 lid 2 BW bepaalt dat iedere bestuurder vertegenwoordigingsbevoegd is. Alleen functies met vertegenwoordigingsbevoegdheid worden meegeteld.
       - output: subject_ids
         value: $bevoegde_functionarissen.kvk_nummer
         legal_basis:
@@ -203,23 +196,21 @@ articles:
           paragraph: '3'
           url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel5_Afdeling4_Artikel240
           juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=240&lid=3&z=2024-01-01&g=2024-01-01
-          explanation: 'Art. 2:240 lid 3 BW: de bevoegdheid van het bestuur kan in de statuten worden beperkt. Het Handelsregister
-            registreert dit als VOLLEDIG of BEPERKT.
-
-            '
+          explanation: |
+            Art. 2:240 lid 3 BW: de bevoegdheid van het bestuur kan in de statuten worden beperkt. Het Handelsregister registreert dit als VOLLEDIG of BEPERKT.
       - output: permissions
         value:
           operation: FOREACH
           subject: $bevoegdheden
           value:
             operation: IF
-            conditions:
-            - test:
+            cases:
+            - when:
                 operation: EQUALS
                 subject: $current
                 value: VOLLEDIG
               then: $VOLLEDIGE_BEVOEGDHEID_RECHTEN
-            - else: $BEPERKTE_BEVOEGDHEID_RECHTEN
+            default: $BEPERKTE_BEVOEGDHEID_RECHTEN
         legal_basis:
           law: Burgerlijk Wetboek Boek 2
           bwb_id: BWBR0003045
@@ -227,10 +218,8 @@ articles:
           paragraph: '3'
           url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel5_Afdeling4_Artikel240
           juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=240&lid=3&z=2024-01-01&g=2024-01-01
-          explanation: 'Bepaalt per bedrijf de rechten op basis van de geregistreerde bevoegdheid. VOLLEDIG = alle rechten,
-            BEPERKT = alleen leesrechten.
-
-            '
+          explanation: |
+            Bepaalt per bedrijf de rechten op basis van de geregistreerde bevoegdheid. VOLLEDIG = alle rechten, BEPERKT = alleen leesrechten.
       - output: valid_from_dates
         value: $bevoegde_functionarissen.datum_inschrijving
         legal_basis:

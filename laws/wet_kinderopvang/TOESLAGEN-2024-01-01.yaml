@@ -11,12 +11,12 @@ uuid: f8e7d6c5-4321-4f0f-bbbb-123456789abc
 discoverable: CITIZEN
 articles:
 - number: '1.5'
-  text: "1 Een ouder heeft aanspraak op een kinderopvangtoeslag in de door hem of zijn partner betaalde kosten, indien het\
-    \ betreft:\n  a. kinderopvang in een geregistreerd kindercentrum; of\n  b. gastouderopvang in een geregistreerde voorziening\
-    \ voor gastouderopvang.\n2 Indien het ouderparticipatieopvang in een ouderparticipatiecrèche betreft, heeft de ouder in\
-    \ de aanloopperiode, bedoeld in artikel 1.60b, in afwijking van het eerste lid, geen aanspraak op kinderopvangtoeslag.\n\
-    3 Een ouder en diens partner die tevens ouder is worden voor de toepassing van deze wet geacht gezamenlijk één aanspraak\
-    \ te hebben."
+  text: |-
+    1 Een ouder heeft aanspraak op een kinderopvangtoeslag in de door hem of zijn partner betaalde kosten, indien het betreft:
+      a. kinderopvang in een geregistreerd kindercentrum; of
+      b. gastouderopvang in een geregistreerde voorziening voor gastouderopvang.
+    2 Indien het ouderparticipatieopvang in een ouderparticipatiecrèche betreft, heeft de ouder in de aanloopperiode, bedoeld in artikel 1.60b, in afwijking van het eerste lid, geen aanspraak op kinderopvangtoeslag.
+    3 Een ouder en diens partner die tevens ouder is worden voor de toepassing van deze wet geacht gezamenlijk één aanspraak te hebben.
   url: https://wetten.overheid.nl/BWBR0017017/2024-01-01#Artikel1.5
   machine_readable:
     definitions:
@@ -128,16 +128,16 @@ articles:
       requirements:
       - all:
         - operation: OR
-          values:
+          conditions:
           - subject: $PARTNER_BSN
             operation: IS_NULL
           - operation: OR
-            values:
+            conditions:
             - subject: $PARTNER_GEWERKTE_UREN
-              operation: GREATER_OR_EQUAL
+              operation: GREATER_THAN_OR_EQUAL
               value: $MIN_HOURS_PARTNER
             - subject: $VERWACHTE_PARTNER_UREN
-              operation: GREATER_OR_EQUAL
+              operation: GREATER_THAN_OR_EQUAL
               value: $MIN_HOURS_PER_WEEK
         - subject: $GEWERKTE_UREN
           operation: GREATER_THAN
@@ -155,51 +155,55 @@ articles:
             - operation: MIN
               values:
               - operation: IF
-                conditions:
-                - test:
+                cases:
+                - when:
                     operation: EQUALS
                     subject: $soort_opvang
                     value: DAGOPVANG
                   then: $MAX_UURTARIEF_DAGOPVANG
-                - else: $MAX_UURTARIEF_BSO
+                default: $MAX_UURTARIEF_BSO
               - $uurtarief
             - operation: MIN
               values:
               - $uren_per_jaar
               - $MAX_HOURS_PER_YEAR
             - operation: IF
-              conditions:
-              - test:
+              cases:
+              - when:
                   operation: LESS_THAN
                   subject:
                     operation: ADD
                     values:
                     - $INKOMEN
                     - operation: IF
-                      conditions:
-                      - test:
-                          operation: NOT_NULL
-                          subject: $PARTNER_BSN
+                      cases:
+                      - when:
+                          operation: NOT
+                          value:
+                            operation: IS_NULL
+                            subject: $PARTNER_BSN
                         then: $PARTNER_INKOMEN
-                      - else: 0
+                      default: 0
                   value: $INKOMENSDREMPEL_1
                 then: $PERCENTAGE_1
-              - test:
+              - when:
                   operation: LESS_THAN
                   subject:
                     operation: ADD
                     values:
                     - $INKOMEN
                     - operation: IF
-                      conditions:
-                      - test:
-                          operation: NOT_NULL
-                          subject: $PARTNER_BSN
+                      cases:
+                      - when:
+                          operation: NOT
+                          value:
+                            operation: IS_NULL
+                            subject: $PARTNER_BSN
                         then: $PARTNER_INKOMEN
-                      - else: 0
+                      default: 0
                   value: $INKOMENSDREMPEL_2
                 then: $PERCENTAGE_2
-              - else: $PERCENTAGE_3
+              default: $PERCENTAGE_3
           combine: ADD
         legal_basis:
           law: Wet kinderopvang

@@ -11,20 +11,16 @@ uuid: 7d4e8f2a-3b6c-4a9d-8e1f-5c2d7a9b4e3f
 discoverable: CITIZEN
 articles:
 - number: '2'
-  text: "1 Algemene bijstand kan worden verleend aan:\n  a. de zelfstandige die gedurende een redelijke termijn als zodanig\
-    \ werkzaam is geweest en wiens bedrijf of zelfstandig beroep levensvatbaar is;\n  b. de persoon of de echtgenoot van de\
-    \ persoon die uit hoofde van werkloosheid een uitkering ontvangt en die een bedrijf of zelfstandig beroep begint dat levensvatbaar\
-    \ is;\n  c. de zelfstandige geboren voor 1 januari 1960, wiens bedrijf of zelfstandig beroep niet levensvatbaar is en\
-    \ die het bedrijf of zelfstandig beroep gedurende een aaneengesloten periode van 10 jaar onmiddellijk voorafgaand aan\
-    \ de aanvraag heeft uitgeoefend en hieruit een inkomen geniet dat duurzaam ontoereikend is om in de noodzakelijke kosten\
-    \ van het bestaan te voorzien;\n  d. de zelfstandige wiens bedrijf of zelfstandig beroep niet levensvatbaar is en die\
-    \ zich verplicht de activiteiten in het bedrijf of zelfstandig beroep zo spoedig mogelijk, doch uiterlijk binnen 12 maanden,\
-    \ te beëindigen.\n2 Bijstand ter voorziening in de behoefte aan bedrijfskapitaal kan slechts worden verleend aan de zelfstandige,\
-    \ bedoeld in de onderdelen a, b en c van het eerste lid.\n3 Bijstandsverlening aan een persoon die algemene bijstand ontvangt,\
-    \ die voornemens is een bedrijf of zelfstandig beroep te beginnen en zich in verband hiermee niet beschikbaar stelt voor\
-    \ arbeid in dienstbetrekking kan gedurende een voorbereidingsperiode van ten hoogste 12 maanden worden voortgezet. In\
-    \ een zodanig geval:\n  a. zijn de artikelen 9, met uitzondering van het eerste lid, onderdeel c, en 10 van de wet niet\
-    \ van toepassing;\n  b. is de belanghebbende verplicht mee te werken aan door het college aangewezen begeleiding."
+  text: |-
+    1 Algemene bijstand kan worden verleend aan:
+      a. de zelfstandige die gedurende een redelijke termijn als zodanig werkzaam is geweest en wiens bedrijf of zelfstandig beroep levensvatbaar is;
+      b. de persoon of de echtgenoot van de persoon die uit hoofde van werkloosheid een uitkering ontvangt en die een bedrijf of zelfstandig beroep begint dat levensvatbaar is;
+      c. de zelfstandige geboren voor 1 januari 1960, wiens bedrijf of zelfstandig beroep niet levensvatbaar is en die het bedrijf of zelfstandig beroep gedurende een aaneengesloten periode van 10 jaar onmiddellijk voorafgaand aan de aanvraag heeft uitgeoefend en hieruit een inkomen geniet dat duurzaam ontoereikend is om in de noodzakelijke kosten van het bestaan te voorzien;
+      d. de zelfstandige wiens bedrijf of zelfstandig beroep niet levensvatbaar is en die zich verplicht de activiteiten in het bedrijf of zelfstandig beroep zo spoedig mogelijk, doch uiterlijk binnen 12 maanden, te beëindigen.
+    2 Bijstand ter voorziening in de behoefte aan bedrijfskapitaal kan slechts worden verleend aan de zelfstandige, bedoeld in de onderdelen a, b en c van het eerste lid.
+    3 Bijstandsverlening aan een persoon die algemene bijstand ontvangt, die voornemens is een bedrijf of zelfstandig beroep te beginnen en zich in verband hiermee niet beschikbaar stelt voor arbeid in dienstbetrekking kan gedurende een voorbereidingsperiode van ten hoogste 12 maanden worden voortgezet. In een zodanig geval:
+      a. zijn de artikelen 9, met uitzondering van het eerste lid, onderdeel c, en 10 van de wet niet van toepassing;
+      b. is de belanghebbende verplicht mee te werken aan door het college aangewezen begeleiding.
   url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Artikel2
   machine_readable:
     definitions:
@@ -215,7 +211,7 @@ articles:
             juriconnect: jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01
             explanation: Artikel 1 lid 1 onder b vereist dat de persoon arbeid verricht in eigen bedrijf
         - subject: $LEEFTIJD
-          operation: GREATER_OR_EQUAL
+          operation: GREATER_THAN_OR_EQUAL
           value: $MINIMUM_LEEFTIJD
           legal_basis:
             law: Besluit bijstandverlening zelfstandigen 2004
@@ -238,7 +234,7 @@ articles:
             url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1
             juriconnect: jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01
             explanation: Artikel 1 lid 1 onder b bepaalt maximumleeftijd als pensioengerechtigde leeftijd
-        - operation: GREATER_OR_EQUAL
+        - operation: GREATER_THAN_OR_EQUAL
           legal_basis:
             law: Besluit bijstandverlening zelfstandigen 2004
             bwb_id: BWBR0015711
@@ -256,11 +252,11 @@ articles:
           - $URENCRITERIUM_PER_JAAR
         - or:
           - operation: AND
-            values:
+            conditions:
             - subject: $BBZ_AANVRAAG.type_zelfstandige
               operation: EQUALS
               value: OUDER
-            - operation: LESS_OR_EQUAL
+            - operation: LESS_THAN_OR_EQUAL
               values:
               - $VERMOGEN
               - $VERMOGENSGRENS_OUDER
@@ -272,7 +268,7 @@ articles:
               url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel3
               juriconnect: jci1.3:c:BWBR0015711&artikel=3&lid=2&z=2025-01-01&g=2025-01-01
               explanation: Artikel 3 lid 2 bepaalt vermogensgrens €170.725 voor oudere zelfstandigen
-          - operation: LESS_OR_EQUAL
+          - operation: LESS_THAN_OR_EQUAL
             values:
             - $VERMOGEN
             - $VERMOGENSGRENS_ALGEMEEN
@@ -286,7 +282,7 @@ articles:
               explanation: Artikel 3 lid 1 bepaalt algemene vermogensgrens €243.892
         - or:
           - operation: AND
-            values:
+            conditions:
             - subject: $BBZ_AANVRAAG.type_zelfstandige
               operation: EQUALS
               value: GEVESTIGD
@@ -302,7 +298,7 @@ articles:
               juriconnect: jci1.3:c:BWBR0015711&artikel=18&lid=1&z=2025-01-01&g=2025-01-01
               explanation: Artikel 18 lid 1 vereist levensvatbaar bedrijf voor gevestigde zelfstandigen
           - operation: AND
-            values:
+            conditions:
             - subject: $BBZ_AANVRAAG.type_zelfstandige
               operation: EQUALS
               value: BEGINNEND
@@ -321,7 +317,7 @@ articles:
               juriconnect: jci1.3:c:BWBR0015711&artikel=23&lid=1&z=2025-01-01&g=2025-01-01
               explanation: Artikel 23 lid 1 vereist WW-uitkering en levensvatbaar bedrijf voor beginnende zelfstandigen
           - operation: AND
-            values:
+            conditions:
             - subject: $BBZ_AANVRAAG.type_zelfstandige
               operation: EQUALS
               value: OUDER
@@ -331,7 +327,7 @@ articles:
             - subject: $BBZ_AANVRAAG.bedrijf_levensvatbaar
               operation: EQUALS
               value: false
-            - operation: GREATER_OR_EQUAL
+            - operation: GREATER_THAN_OR_EQUAL
               values:
               - $BBZ_AANVRAAG.jaren_ondernemerschap
               - 10
@@ -345,12 +341,14 @@ articles:
               explanation: 'Artikel 25 lid 1 stelt eisen voor oudere zelfstandigen: geboren voor 1960, niet-levensvatbaar,
                 10 jaar ondernemerschap'
           - operation: AND
-            values:
+            conditions:
             - subject: $BBZ_AANVRAAG.type_zelfstandige
               operation: EQUALS
               value: BEEINDIGEND
-            - operation: NOT_NULL
-              subject: $BBZ_AANVRAAG.beeindigingsdatum
+            - operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $BBZ_AANVRAAG.beeindigingsdatum
             legal_basis:
               law: Besluit bijstandverlening zelfstandigen 2004
               bwb_id: BWBR0015711
@@ -391,23 +389,23 @@ articles:
       - output: max_duur_maanden
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $BBZ_AANVRAAG.type_zelfstandige
               value: GEVESTIGD
             then: $MAX_DUUR_GEVESTIGD
-          - test:
+          - when:
               operation: EQUALS
               subject: $BBZ_AANVRAAG.type_zelfstandige
               value: BEGINNEND
             then: $MAX_DUUR_BEGINNEND
-          - test:
+          - when:
               operation: EQUALS
               subject: $BBZ_AANVRAAG.type_zelfstandige
               value: OUDER
             then: $MAX_DUUR_OUDER
-          - else: $MAX_DUUR_BEEINDIGEND
+          default: $MAX_DUUR_BEEINDIGEND
         legal_basis:
           law: Besluit bijstandverlening zelfstandigen 2004
           bwb_id: BWBR0015711
@@ -418,23 +416,23 @@ articles:
       - output: bedrijfskapitaal_max
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $BBZ_AANVRAAG.type_zelfstandige
               value: GEVESTIGD
             then: $BEDRIJFSKAPITAAL_GEVESTIGD
-          - test:
+          - when:
               operation: EQUALS
               subject: $BBZ_AANVRAAG.type_zelfstandige
               value: BEGINNEND
             then: $BEDRIJFSKAPITAAL_BEGINNEND
-          - test:
+          - when:
               operation: EQUALS
               subject: $BBZ_AANVRAAG.type_zelfstandige
               value: OUDER
             then: $BEDRIJFSKAPITAAL_OUDER
-          - else: 0
+          default: 0
         legal_basis:
           law: Besluit bijstandverlening zelfstandigen 2004
           bwb_id: BWBR0015711
@@ -445,18 +443,18 @@ articles:
       - output: bedrijfskapitaal_type
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $BBZ_AANVRAAG.type_zelfstandige
               value: OUDER
             then: $TYPE_OM_NIET
-          - test:
+          - when:
               operation: EQUALS
               subject: $BBZ_AANVRAAG.type_zelfstandige
               value: BEEINDIGEND
             then: GEEN
-          - else: $TYPE_LENING_RENTE
+          default: $TYPE_LENING_RENTE
         legal_basis:
           law: Besluit bijstandverlening zelfstandigen 2004
           bwb_id: BWBR0015711

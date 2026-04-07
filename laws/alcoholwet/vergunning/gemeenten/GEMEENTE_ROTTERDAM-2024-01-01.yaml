@@ -11,11 +11,9 @@ uuid: 7c2e8f4a-3b9d-4e1f-a5c2-9d8b7e6f4a3c
 discoverable: BUSINESS
 articles:
 - number: '3'
-  text: '1 Het is verboden zonder daartoe strekkende vergunning van de burgemeester het horecabedrijf of slijtersbedrijf uit
-    te oefenen.
-
-    2 Met toepassing van artikel 28, eerste lid, laatste zinsnede, van de Dienstenwet is paragraaf 4.1.3.3. van de Algemene
-    wet bestuursrecht niet van toepassing op de aanvraag van een vergunning als bedoeld in het eerste lid.'
+  text: |-
+    1 Het is verboden zonder daartoe strekkende vergunning van de burgemeester het horecabedrijf of slijtersbedrijf uit te oefenen.
+    2 Met toepassing van artikel 28, eerste lid, laatste zinsnede, van de Dienstenwet is paragraaf 4.1.3.3. van de Algemene wet bestuursrecht niet van toepassing op de aanvraag van een vergunning als bedoeld in het eerste lid.
   url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Artikel3
   machine_readable:
     definitions:
@@ -193,9 +191,11 @@ articles:
         - or:
           - subject: $BIBOB_MATE_VAN_GEVAAR
             operation: IS_NULL
-          - subject: $BIBOB_MATE_VAN_GEVAAR
-            operation: NOT_EQUALS
-            value: $BIBOB_ERNSTIG_GEVAAR
+          - operation: NOT
+            value:
+              operation: EQUALS
+              subject: $BIBOB_MATE_VAN_GEVAAR
+              value: $BIBOB_ERNSTIG_GEVAAR
           legal_basis:
             law: Wet bevordering integriteitsbeoordelingen door het openbaar bestuur
             bwb_id: BWBR0013798
@@ -222,23 +222,25 @@ articles:
       - output: weigeringsgrond
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_EQUALS
-              subject: $BEDRIJF_STATUS
-              value: Actief
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: EQUALS
+                subject: $BEDRIJF_STATUS
+                value: Actief
             then: Onderneming is niet actief in het handelsregister
-          - test:
+          - when:
               operation: EQUALS
               subject: $VOLDOET_AAN_NATIONALE_EISEN
               value: false
             then: $WEIGERINGSGROND_NATIONAAL
-          - test:
+          - when:
               operation: EQUALS
               subject: $BIBOB_MATE_VAN_GEVAAR
               value: $BIBOB_ERNSTIG_GEVAAR
             then: Ernstig gevaar volgens Bibob-advies
-          - else: ''
+          default: ''
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458

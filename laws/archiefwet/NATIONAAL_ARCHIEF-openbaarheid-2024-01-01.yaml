@@ -10,7 +10,8 @@ service: NATIONAAL_ARCHIEF
 uuid: 3fc7f637-fe3e-44c8-a735-98f11584c2c9
 articles:
 - number: '15'
-  text: '1. Bij de overbrenging van de in artikel 1, onder c 1° en 2°, bedoelde archiefbescheiden kan de zorgdrager, na advies van de beheerder van de archiefbewaarplaats, slechts beperkingen aan de openbaarheid stellen voor een bepaalde termijn en met het oog op: a. de eerbiediging van de persoonlijke levenssfeer; b. het belang van de Staat of zijn bondgenoten; c. de onevenredige benadeling van een ander belang dan genoemd in onderdeel a of onderdeel b. Voor zover de beheerder van een archiefbewaarplaats een rijksarchivaris is als bedoeld in artikel 26, tweede lid, wordt het advies, bedoeld in de eerste volzin, gevraagd aan de algemene rijksarchivaris, bedoeld in artikel 25, eerste lid. 2. De zorgdrager ten aanzien van de in de archiefbewaarplaats berustende archiefbescheiden kan, na de in het eerste lid bedoelde overbrenging, niet alsnog beperkingen als bedoeld in het eerste lid stellen, tenzij zich na het tijdstip van overbrenging omstandigheden hebben voorgedaan die, waren zij op dat tijdstip bekend geweest, tot het stellen van beperkingen aan de openbaarheid ingevolge het eerste lid zouden hebben geleid. 3. De zorgdrager ten aanzien van de in de archiefbewaarplaats berustende archiefbescheiden, kan, gehoord degene op wiens last de archiefbescheiden zijn overgebracht, de ingevolge het eerste of het tweede lid aan de openbaarheid gestelde beperkingen opheffen, dan wel ten aanzien van een verzoeker buiten toepassing laten, indien het belang van de gestelde beperking niet opweegt tegen diens belang tot raadpleging of gebruik van de archiefbescheiden. 4. Ingevolge het eerste of het tweede lid aan de openbaarheid gestelde beperkingen hebben geen betrekking op archiefbescheiden die ouder zijn dan vijfenzeventig jaar, tenzij door Onze minister dan wel, indien het archiefbescheiden betreft voor de bewaring waarvan een andere dan een rijksarchiefbewaarplaats of een provinciale archiefbewaarplaats is aangewezen, door gedeputeerde staten anders wordt beslist. 5. Het derde lid is niet van toepassing op archiefbescheiden aan de openbaarheid waarvan beperkingen zijn gesteld met het oog op het belang van de Staat of zijn bondgenoten. 6. In geval van archiefbescheiden die het belang van de Staat of zijn bondgenoten betreffen vindt het vierde lid slechts toepassing voor zover de ministerraad niet anders beslist. 7. Met betrekking tot de in het vijfde lid bedoelde archiefbescheiden zijn van toepassing de regelingen inzake het recht op informatie die zouden gelden indien de archiefbescheiden niet naar een archiefbewaarplaats waren overgebracht.'
+  text: |-
+    1. Bij de overbrenging van de in artikel 1, onder c 1° en 2°, bedoelde archiefbescheiden kan de zorgdrager, na advies van de beheerder van de archiefbewaarplaats, slechts beperkingen aan de openbaarheid stellen voor een bepaalde termijn en met het oog op: a. de eerbiediging van de persoonlijke levenssfeer; b. het belang van de Staat of zijn bondgenoten; c. de onevenredige benadeling van een ander belang dan genoemd in onderdeel a of onderdeel b. Voor zover de beheerder van een archiefbewaarplaats een rijksarchivaris is als bedoeld in artikel 26, tweede lid, wordt het advies, bedoeld in de eerste volzin, gevraagd aan de algemene rijksarchivaris, bedoeld in artikel 25, eerste lid. 2. De zorgdrager ten aanzien van de in de archiefbewaarplaats berustende archiefbescheiden kan, na de in het eerste lid bedoelde overbrenging, niet alsnog beperkingen als bedoeld in het eerste lid stellen, tenzij zich na het tijdstip van overbrenging omstandigheden hebben voorgedaan die, waren zij op dat tijdstip bekend geweest, tot het stellen van beperkingen aan de openbaarheid ingevolge het eerste lid zouden hebben geleid. 3. De zorgdrager ten aanzien van de in de archiefbewaarplaats berustende archiefbescheiden, kan, gehoord degene op wiens last de archiefbescheiden zijn overgebracht, de ingevolge het eerste of het tweede lid aan de openbaarheid gestelde beperkingen opheffen, dan wel ten aanzien van een verzoeker buiten toepassing laten, indien het belang van de gestelde beperking niet opweegt tegen diens belang tot raadpleging of gebruik van de archiefbescheiden. 4. Ingevolge het eerste of het tweede lid aan de openbaarheid gestelde beperkingen hebben geen betrekking op archiefbescheiden die ouder zijn dan vijfenzeventig jaar, tenzij door Onze minister dan wel, indien het archiefbescheiden betreft voor de bewaring waarvan een andere dan een rijksarchiefbewaarplaats of een provinciale archiefbewaarplaats is aangewezen, door gedeputeerde staten anders wordt beslist. 5. Het derde lid is niet van toepassing op archiefbescheiden aan de openbaarheid waarvan beperkingen zijn gesteld met het oog op het belang van de Staat of zijn bondgenoten. 6. In geval van archiefbescheiden die het belang van de Staat of zijn bondgenoten betreffen vindt het vierde lid slechts toepassing voor zover de ministerraad niet anders beslist. 7. Met betrekking tot de in het vijfde lid bedoelde archiefbescheiden zijn van toepassing de regelingen inzake het recht op informatie die zouden gelden indien de archiefbescheiden niet naar een archiefbewaarplaats waren overgebracht.
   url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Artikel15
   machine_readable:
     definitions:
@@ -57,30 +58,32 @@ articles:
       - output: is_openbaar
         value:
           operation: OR
-          values:
+          conditions:
           - operation: AND
-            values:
+            conditions:
             - operation: IS_NULL
               subject: $BEPERKING_TYPE
-            - operation: NOT_NULL
-              subject: $OVERBRENGDATUM
+            - operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $OVERBRENGDATUM
           - operation: AND
-            values:
-            - operation: GREATER_OR_EQUAL
+            conditions:
+            - operation: GREATER_THAN_OR_EQUAL
               subject:
-                operation: SUBTRACT_DATE
-                unit: years
-                values:
-                - $calculation_date
-                - $AANMAAKDATUM
+                operation: AGE
+                reference_date: $calculation_date
+                date_of_birth: $AANMAAKDATUM
               value: $MAXIMALE_BEPERKING_JAREN
             - operation: OR
-              values:
-              - operation: NOT_EQUALS
-                subject: $BEPERKING_TYPE
-                value: $BEPERKING_STAATSBELANG
+              conditions:
+              - operation: NOT
+                value:
+                  operation: EQUALS
+                  subject: $BEPERKING_TYPE
+                  value: $BEPERKING_STAATSBELANG
               - operation: AND
-                values:
+                conditions:
                 - operation: EQUALS
                   subject: $BEPERKING_TYPE
                   value: $BEPERKING_STAATSBELANG
@@ -88,18 +91,20 @@ articles:
                   subject: $MINISTERRAAD_BESLUIT_STAATSBELANG
                   value: false
           - operation: AND
-            values:
-            - operation: NOT_NULL
-              subject: $BEPERKING_TERMIJN_JAREN
-            - operation: NOT_NULL
-              subject: $OVERBRENGDATUM
-            - operation: GREATER_OR_EQUAL
+            conditions:
+            - operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $BEPERKING_TERMIJN_JAREN
+            - operation: NOT
+              value:
+                operation: IS_NULL
+                subject: $OVERBRENGDATUM
+            - operation: GREATER_THAN_OR_EQUAL
               subject:
-                operation: SUBTRACT_DATE
-                unit: years
-                values:
-                - $calculation_date
-                - $OVERBRENGDATUM
+                operation: AGE
+                reference_date: $calculation_date
+                date_of_birth: $OVERBRENGDATUM
               value: $BEPERKING_TERMIJN_JAREN
         legal_basis:
           law: Archiefwet 1995
@@ -111,31 +116,30 @@ articles:
       - output: beperking_reden
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $is_openbaar
               value: false
             then:
               operation: IF
-              conditions:
-              - test:
+              cases:
+              - when:
                   operation: EQUALS
                   subject: $BEPERKING_TYPE
                   value: $BEPERKING_PRIVACY
                 then: Beperkt vanwege eerbiediging van de persoonlijke levenssfeer
-              - test:
+              - when:
                   operation: EQUALS
                   subject: $BEPERKING_TYPE
                   value: $BEPERKING_STAATSBELANG
                 then: Beperkt vanwege het belang van de Staat of zijn bondgenoten
-              - test:
+              - when:
                   operation: EQUALS
                   subject: $BEPERKING_TYPE
                   value: $BEPERKING_ONEVENREDIGE_GEVOLGEN
                 then: Beperkt om onevenredige bevoordeling of benadeling te voorkomen
-              - else: Beperkt, reden onbekend
-          - else: null
+              default: Beperkt, reden onbekend
         legal_basis:
           law: Archiefwet 1995
           bwb_id: BWBR0007376
@@ -147,17 +151,17 @@ articles:
       - output: openbaar_vanaf_datum
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $is_openbaar
               value: false
             then:
               operation: IF
-              conditions:
-              - test:
+              cases:
+              - when:
                   operation: AND
-                  values:
+                  conditions:
                   - operation: EQUALS
                     subject: $BEPERKING_TYPE
                     value: $BEPERKING_STAATSBELANG
@@ -165,13 +169,10 @@ articles:
                     subject: $MINISTERRAAD_BESLUIT_STAATSBELANG
                     value: true
                 then: null
-              - else:
-                  operation: ADD_DATE
-                  unit: years
-                  values:
-                  - $AANMAAKDATUM
-                  - $MAXIMALE_BEPERKING_JAREN
-          - else: null
+              default:
+                operation: DATE_ADD
+                date: $AANMAAKDATUM
+                years: $MAXIMALE_BEPERKING_JAREN
         legal_basis:
           law: Archiefwet 1995
           bwb_id: BWBR0007376

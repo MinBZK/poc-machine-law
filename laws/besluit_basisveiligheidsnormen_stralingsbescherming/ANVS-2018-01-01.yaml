@@ -11,23 +11,20 @@ uuid: 7b4d8f3e-2c9a-4e1d-9f7b-5a3e6c8d1f4a
 discoverable: BUSINESS
 articles:
 - number: '3.7'
-  text: "Een vergunning wordt geweigerd indien:\n  a. ten aanzien van de handeling waarop de aanvraag betrekking heeft, niet\
-    \ wordt voldaan aan het bepaalde in:\n  1°. hoofdstuk 2, 7 of 8, met betrekking tot rechtvaardiging, optimalisatie en\
-    \ dosislimitering, of\n  2°. hoofdstuk 5, met betrekking tot deskundigheid;\n  b. voor een lid van de bevolking dat zich\
-    \ op enig punt buiten de locatie bevindt, als gevolg van de handeling waarop de aanvraag betrekking heeft en ten gevolge\
-    \ van alle toegestane handelingen die onder verantwoordelijkheid van de ondernemer worden verricht, een effectieve dosis\
-    \ van 0,1 millisievert in een kalenderjaar wordt overschreden of kan worden overschreden;\n  c. voor een lid van de bevolking\
-    \ dat zich buiten de locatie bevindt, ten gevolge van de handeling waarop de aanvraag betrekking heeft en ten gevolge\
-    \ van andere handelingen binnen en buiten deze locatie, een van de volgende doses wordt overschreden of kan worden overschreden:\n\
-    \  1°. een effectieve dosis van 1 millisievert in een kalenderjaar en, met inachtneming daarvan:\n  2°. een equivalente\
-    \ dosis van 50 millisievert in een kalenderjaar voor de huid, gemiddeld over enig huidoppervlak van 1 cm2;\n  d. de handeling\
-    \ waarop de aanvraag betrekking heeft behoort tot een soort of categorie die op grond van paragraaf 2.2 generiek is gerechtvaardigd,\
-    \ maar het specifieke karakter van die handeling op grond van het bepaalde in die paragraaf niet gerechtvaardigd is;\n\
-    \  e. niet is aangetoond dat een krachtens dit besluit vereiste financiële zekerheid is gesteld;\n  f. geen, of een ontoereikend,\
-    \ beveiligingsplan als bedoeld in artikel 4.7, bedrijfsnoodplan als bedoeld in artikel 6.7 of beëindigingsplan als bedoeld\
-    \ in artikel 10.8 bij de aanvraag is gevoegd, voor zover vereist krachtens artikel 3.6, derde lid, aanhef en onder e;\n\
-    \  g. niet wordt voldaan aan bij of krachtens de wet met het oog op stralingsbescherming gestelde regels of voorschriften;\
-    \ of\n  h. internationale verplichtingen tot het weigeren van de vergunning noodzaken."
+  text: |-
+    Een vergunning wordt geweigerd indien:
+      a. ten aanzien van de handeling waarop de aanvraag betrekking heeft, niet wordt voldaan aan het bepaalde in:
+      1°. hoofdstuk 2, 7 of 8, met betrekking tot rechtvaardiging, optimalisatie en dosislimitering, of
+      2°. hoofdstuk 5, met betrekking tot deskundigheid;
+      b. voor een lid van de bevolking dat zich op enig punt buiten de locatie bevindt, als gevolg van de handeling waarop de aanvraag betrekking heeft en ten gevolge van alle toegestane handelingen die onder verantwoordelijkheid van de ondernemer worden verricht, een effectieve dosis van 0,1 millisievert in een kalenderjaar wordt overschreden of kan worden overschreden;
+      c. voor een lid van de bevolking dat zich buiten de locatie bevindt, ten gevolge van de handeling waarop de aanvraag betrekking heeft en ten gevolge van andere handelingen binnen en buiten deze locatie, een van de volgende doses wordt overschreden of kan worden overschreden:
+      1°. een effectieve dosis van 1 millisievert in een kalenderjaar en, met inachtneming daarvan:
+      2°. een equivalente dosis van 50 millisievert in een kalenderjaar voor de huid, gemiddeld over enig huidoppervlak van 1 cm2;
+      d. de handeling waarop de aanvraag betrekking heeft behoort tot een soort of categorie die op grond van paragraaf 2.2 generiek is gerechtvaardigd, maar het specifieke karakter van die handeling op grond van het bepaalde in die paragraaf niet gerechtvaardigd is;
+      e. niet is aangetoond dat een krachtens dit besluit vereiste financiële zekerheid is gesteld;
+      f. geen, of een ontoereikend, beveiligingsplan als bedoeld in artikel 4.7, bedrijfsnoodplan als bedoeld in artikel 6.7 of beëindigingsplan als bedoeld in artikel 10.8 bij de aanvraag is gevoegd, voor zover vereist krachtens artikel 3.6, derde lid, aanhef en onder e;
+      g. niet wordt voldaan aan bij of krachtens de wet met het oog op stralingsbescherming gestelde regels of voorschriften; of
+      h. internationale verplichtingen tot het weigeren van de vergunning noodzaken.
   url: https://wetten.overheid.nl/BWBR0040179/2018-01-01#Artikel3.7
   machine_readable:
     definitions:
@@ -78,7 +75,7 @@ articles:
         type: array
       requirements:
       - subject: $verwachte_dosis_jaar
-        operation: GREATER_OR_EQUAL
+        operation: GREATER_THAN_OR_EQUAL
         value: 0
       actions:
       - output: verwachte_dosis_bevolking
@@ -93,34 +90,38 @@ articles:
       - output: overschreden_limieten
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: GREATER_THAN
               subject: $verwachte_dosis_jaar
               value: $DOSIS_LIMIET_BEVOLKING_ALGEMEEN
             then:
             - effectieve_dosis_algemeen
-          - test:
+          - when:
               operation: AND
-              values:
-              - operation: NOT_NULL
-                subject: $dosis_buiten_locatie
+              conditions:
+              - operation: NOT
+                value:
+                  operation: IS_NULL
+                  subject: $dosis_buiten_locatie
               - operation: GREATER_THAN
                 subject: $dosis_buiten_locatie
                 value: $DOSIS_LIMIET_BEVOLKING_BUITEN_LOCATIE
             then:
             - effectieve_dosis_buiten_locatie
-          - test:
+          - when:
               operation: AND
-              values:
-              - operation: NOT_NULL
-                subject: $verwachte_dosis_huid
+              conditions:
+              - operation: NOT
+                value:
+                  operation: IS_NULL
+                  subject: $verwachte_dosis_huid
               - operation: GREATER_THAN
                 subject: $verwachte_dosis_huid
                 value: $DOSIS_LIMIET_HUID
             then:
             - equivalente_dosis_huid
-          - else: []
+          default: []
         legal_basis:
           law: Besluit basisveiligheidsnormen stralingsbescherming
           bwb_id: BWBR0040179
@@ -132,13 +133,15 @@ articles:
       - output: dosislimiet_overschreden
         value:
           operation: IF
-          conditions:
-          - test:
-              operation: NOT_EQUALS
-              subject: $overschreden_limieten
-              value: []
+          cases:
+          - when:
+              operation: NOT
+              value:
+                operation: EQUALS
+                subject: $overschreden_limieten
+                value: []
             then: true
-          - else: false
+          default: false
         legal_basis:
           law: Besluit basisveiligheidsnormen stralingsbescherming
           bwb_id: BWBR0040179
@@ -149,13 +152,13 @@ articles:
       - output: vergunning_toegestaan_straling
         value:
           operation: IF
-          conditions:
-          - test:
+          cases:
+          - when:
               operation: EQUALS
               subject: $dosislimiet_overschreden
               value: false
             then: true
-          - else: false
+          default: false
         legal_basis:
           law: Besluit basisveiligheidsnormen stralingsbescherming
           bwb_id: BWBR0040179
