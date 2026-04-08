@@ -91,6 +91,7 @@ articles:
                 subject: $current.datum_einde
                 value: $referencedate
           body: $current
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 3
           bwb_id: BWBR0005291
@@ -160,6 +161,7 @@ articles:
                 value: ALGEMENE_VOLMACHT
               then: GEVOLMACHTIGDE_ALGEMEEN
             default: GEVOLMACHTIGDE_BIJZONDER
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 3
           bwb_id: BWBR0005291
@@ -180,6 +182,7 @@ articles:
                 value: ALGEMENE_VOLMACHT
               then: $algemene_volmacht_rechten
             default: $bijzondere_volmacht_rechten
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 3
           bwb_id: BWBR0005291

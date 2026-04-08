@@ -85,6 +85,7 @@ articles:
                 subject: $current.datum_einde
                 value: $referencedate
           body: $current
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 4
           bwb_id: BWBR0002761
@@ -128,6 +129,7 @@ articles:
             values:
             - 'Nalatenschap '
             - $current.naam_erflater
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 4
           bwb_id: BWBR0002761

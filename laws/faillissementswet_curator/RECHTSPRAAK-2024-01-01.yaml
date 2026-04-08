@@ -93,6 +93,7 @@ articles:
                 subject: $current.datum_einde
                 value: $referencedate
           body: $current
+          as: current
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -136,6 +137,7 @@ articles:
             values:
             - 'Boedel '
             - $current.gefailleerde_naam
+          as: current
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -157,6 +159,7 @@ articles:
                 value: RECHTSPERSOON
               then: BUSINESS
             default: CITIZEN
+          as: current
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860

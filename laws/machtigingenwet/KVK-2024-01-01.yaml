@@ -109,6 +109,7 @@ articles:
             subject: $current.functie
             value: $bevoegde_functies
           body: $current
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 2
           bwb_id: BWBR0003045
@@ -207,6 +208,7 @@ articles:
                 value: VOLLEDIG
               then: $volledige_bevoegdheid_rechten
             default: $beperkte_bevoegdheid_rechten
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 2
           bwb_id: BWBR0003045

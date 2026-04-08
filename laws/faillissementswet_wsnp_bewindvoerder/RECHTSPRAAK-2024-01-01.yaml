@@ -84,6 +84,7 @@ articles:
                 subject: $current.datum_einde
                 value: $referencedate
           body: $current
+          as: current
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860
@@ -127,6 +128,7 @@ articles:
             values:
             - 'WSNP Boedel '
             - $current.naam_saniet
+          as: current
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860

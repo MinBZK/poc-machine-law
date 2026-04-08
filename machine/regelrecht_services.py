@@ -118,20 +118,30 @@ class RegelrechtServices:
             return
 
         key_field = _pick_key_field_for_table(table, df)
+        param_key = _get_param_key_for_table(table, key_field)
         object_inputs = _OBJECT_FIELD_MAPPING.get(table, {})
 
         records = []
         for _, row in df.iterrows():
             record = _to_native({col: row[col] for col in df.columns})
+            # If the DataFrame key differs from the parameter key, add an alias
+            # so the engine can look up by parameter name (e.g., bsn → bsn_curator)
+            if param_key != key_field and param_key not in record and key_field in record:
+                record[param_key] = record[key_field]
             # Inject synthetic object fields for multi-field inputs.
+            # DON'T inject if the input name matches the table name - that means
+            # it's an array-type input that should come from _register_array_data_source.
             for input_name, field_list in object_inputs.items():
+                if input_name == table:
+                    continue
                 obj = {f: record[f] for f in field_list if f in record}
                 if obj:
                     record[input_name] = obj
             records.append(record)
 
         try:
-            self._engine.register_data_source(table, key_field, records)
+            # Register with the parameter-side key so engine criteria match
+            self._engine.register_data_source(table, param_key, records)
         except Exception as e:
             logger.debug("Could not register data source %s: %s", table, e)
 
@@ -277,7 +287,7 @@ def _pick_key_field_for_table(table: str, df: pd.DataFrame) -> str:
 
 
 def _build_table_key_fields() -> dict[str, list[str]]:
-    """Build mapping of table → preferred key fields from source_ref_mapping.json."""
+    """Build mapping of table → ALL possible key fields from source_ref_mapping.json."""
     result: dict[str, list[str]] = {}
     if not _SOURCE_REF_MAPPING_PATH.exists():
         return result
@@ -287,9 +297,12 @@ def _build_table_key_fields() -> dict[str, list[str]]:
         table = entry.get("table", "")
         select_on = entry.get("select_on", [])
         if table and isinstance(select_on, list):
-            keys = [s.get("name") for s in select_on if s.get("name")]
-            if keys:
-                result[table] = keys
+            existing = result.get(table, [])
+            for s in select_on:
+                name = s.get("name")
+                if name and name not in existing:
+                    existing.append(name)
+            result[table] = existing
     return result
 
 

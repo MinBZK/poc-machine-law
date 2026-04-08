@@ -109,6 +109,7 @@ articles:
                 subject: $current.datum_einde
                 value: $referencedate
           body: $current
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -189,6 +190,7 @@ articles:
                 value: true
               then: $beperkte_gezag_rechten
             default: $gezag_rechten
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

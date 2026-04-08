@@ -99,6 +99,7 @@ articles:
                 subject: $current.datum_einde
                 value: $referencedate
           body: $current
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

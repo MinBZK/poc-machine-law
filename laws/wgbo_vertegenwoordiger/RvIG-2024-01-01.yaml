@@ -114,6 +114,7 @@ articles:
               subject: $current.relatie_type
               value: $wgbo_relatie_hierarchie
           body: $current
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 7
           bwb_id: BWBR0005290
@@ -196,6 +197,7 @@ articles:
                 value: KIND
               then: WGBO_VERTEGENWOORDIGER_KIND
             default: WGBO_VERTEGENWOORDIGER_SIBLING
+          as: current
         legal_basis:
           law: Burgerlijk Wetboek Boek 7
           bwb_id: BWBR0005290
