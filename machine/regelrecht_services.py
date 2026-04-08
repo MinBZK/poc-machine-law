@@ -5,6 +5,7 @@ as data sources. Source blocks are stripped to source: {} at load time so
 all inputs resolve from either parameters or the DataSourceRegistry.
 """
 
+import json
 import logging
 from pathlib import Path
 from typing import Any
@@ -18,6 +19,39 @@ from machine.service import RuleResult, Services
 
 logger = logging.getLogger(__name__)
 LAWS_DIR = Path("laws")
+_SOURCE_REF_MAPPING_PATH = Path(__file__).parent / "source_ref_mapping.json"
+
+
+def _build_object_field_mapping() -> dict[str, dict[str, list[str]]]:
+    """Build mapping: {table_name: {input_name: [field1, field2, ...]}} for multi-field inputs.
+
+    Reads source_ref_mapping.json and identifies entries with a ``fields`` list
+    (i.e. object-typed inputs that combine several DataFrame columns into a single dict).
+    """
+    if not _SOURCE_REF_MAPPING_PATH.exists():
+        return {}
+    with open(_SOURCE_REF_MAPPING_PATH) as f:
+        mapping = json.load(f)
+    result: dict[str, dict[str, list[str]]] = {}
+    for key, entry in mapping.items():
+        if "fields" not in entry:
+            continue
+        # key format: "law_path:input_name"
+        input_name = key.rsplit(":", 1)[-1]
+        table = entry["table"]
+        fields = entry["fields"]
+        if table not in result:
+            result[table] = {}
+        # Multiple laws may map the same table+input with different field lists;
+        # merge them to keep the superset of columns.
+        existing = result[table].get(input_name, [])
+        merged = list(dict.fromkeys(existing + fields))  # preserves order, deduplicates
+        result[table][input_name] = merged
+    return result
+
+
+# Module-level cache so we parse the JSON once.
+_OBJECT_FIELD_MAPPING: dict[str, dict[str, list[str]]] = _build_object_field_mapping()
 
 
 class RegelrechtServices:
@@ -73,12 +107,28 @@ class RegelrechtServices:
     # -- Data sources ----------------------------------------------------------
 
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
-        """Register DataFrame in both Services and the Rust engine."""
+        """Register DataFrame in both Services and the Rust engine.
+
+        For each row the individual columns are registered as flat fields.
+        Additionally, for tables that have multi-field object inputs (as defined
+        in source_ref_mapping.json), a synthetic object field is injected whose
+        value is a dict of the relevant columns.  This allows the engine to
+        resolve e.g. ``werkgegevens`` as ``{gemiddeld_uren_per_week: 40, ...}``.
+        """
         self._services.set_source_dataframe(service, table, df)
         if df.empty:
             return
         key_field = _pick_key_field(df)
-        records = [_to_native({col: row[col] for col in df.columns}) for _, row in df.iterrows()]
+        object_inputs = _OBJECT_FIELD_MAPPING.get(table, {})
+        records = []
+        for _, row in df.iterrows():
+            record = _to_native({col: row[col] for col in df.columns})
+            # Inject synthetic object fields for multi-field inputs.
+            for input_name, field_list in object_inputs.items():
+                obj = {f: record[f] for f in field_list if f in record}
+                if obj:
+                    record[input_name] = obj
+            records.append(record)
         try:
             self._engine.register_data_source(table, key_field, records)
         except Exception as e:
