@@ -435,6 +435,11 @@ class RegelrechtServices:
         # Pre-resolve data source inputs that the engine can't resolve itself
         self._pre_resolve_data_sources(law_id, params, data)
 
+        # Fill defaults for any remaining unresolved source: {} inputs.
+        # This prevents TypeMismatch errors when the engine encounters null
+        # in numeric operations (e.g., ADD(1500000, Null) → TypeMismatch).
+        _fill_input_defaults(data, params)
+
         try:
             result = self._engine.evaluate(law_id, output_names, params, reference_date)
         except Exception as e:
@@ -684,6 +689,33 @@ def _get_param_key_for_table(table: str, df_key_field: str) -> str:
             if col == df_key_field and isinstance(ref, str) and ref.startswith("$"):
                 return ref[1:]  # Strip $ prefix → parameter name
     return df_key_field
+
+
+def _fill_input_defaults(data: dict, params: dict) -> None:
+    """Fill default values for unresolved source: {} inputs.
+
+    Prevents TypeMismatch errors when the engine encounters null values
+    in arithmetic operations. Uses type-appropriate defaults:
+    number/amount → 0, boolean → False, string → "", array → [], object → {}.
+    """
+    _TYPE_DEFAULTS = {
+        "number": 0,
+        "amount": 0,
+        "boolean": False,
+        "string": "",
+        "date": "2000-01-01",
+        "array": [],
+        "object": {},
+    }
+    for art in data.get("articles", []):
+        for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+            name = inp.get("name", "")
+            source = inp.get("source")
+            if name and name not in params and source == {}:
+                # Fill defaults ONLY for source: {} inputs (data source resolution).
+                # Cross-law inputs (source.regulation) should be resolved by the engine.
+                input_type = inp.get("type", "string")
+                params[name] = _TYPE_DEFAULTS.get(input_type, "")
 
 
 def _to_native(obj: Any) -> Any:

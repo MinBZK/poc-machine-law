@@ -128,7 +128,7 @@ articles:
           precision: 0
           min: 0
         source:
-          regulation: wet_inkomstenbelasting/toetsingsinkomen
+          regulation: wet_inkomstenbelasting
           output: inkomen
           service: UWV
           parameters:
@@ -174,7 +174,7 @@ articles:
           precision: 0
           min: 0
         source:
-          regulation: wet_inkomstenbelasting/toetsingsinkomen
+          regulation: wet_inkomstenbelasting
           output: partner_inkomen
           service: UWV
           parameters:
