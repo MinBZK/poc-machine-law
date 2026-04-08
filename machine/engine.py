@@ -773,7 +773,7 @@ class RulesEngine:
         elif op_type in ["IN", "NOT_IN"]:
             with logger.indent_block(op_type):
                 subject = self._evaluate_value(operation["subject"], context)
-                allowed_values = self._evaluate_value(operation.get("values", []), context)
+                allowed_values = self._evaluate_value(operation.get("values", operation.get("value", [])), context)
 
                 # Ensure allowed_values is a list/set for membership testing
                 allowed_set = allowed_values if isinstance(allowed_values, list | dict | set) else [allowed_values]

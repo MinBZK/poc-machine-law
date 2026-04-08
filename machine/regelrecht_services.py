@@ -1,8 +1,11 @@
-"""Services using regelrecht Rust engine via PyO3.
+"""Services wrapping the regelrecht Rust engine (PyO3) and the Python engine.
 
-All law evaluations go through the Rust engine. DataFrames are registered
-as data sources. Source blocks are stripped to source: {} at load time so
-all inputs resolve from either parameters or the DataSourceRegistry.
+Law evaluation delegates to the Python engine which handles all law
+features correctly (FOREACH, cross-law references, source_ref_mapping
+field resolution, dot-notation projection on arrays).
+
+DataFrames are registered in both engines so the Rust engine stays
+primed for future use as its feature set catches up.
 """
 
 import json
@@ -12,7 +15,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-import yaml
 from regelrecht_engine import RegelrechtEngine
 
 from machine.service import RuleResult, Services
@@ -190,82 +192,23 @@ class RegelrechtServices:
         approved: bool = False,
         **kwargs,
     ) -> RuleResult:
-        reference_date = reference_date or self.root_reference_date
-        rule = self.resolver.find_rule(law, reference_date, service)
-        if not rule:
-            raise ValueError(f"No rule found for {law}")
+        """Evaluate a law using the Python engine.
 
-        params = _to_native(dict(parameters))
-        if overwrite_input:
-            for sv in overwrite_input.values():
-                if isinstance(sv, dict):
-                    params.update(_to_native(sv))
-
-        data = yaml.safe_load(Path(rule.path).read_text())
-        law_id = data.get("$id", law)
-        output_names = _get_output_names(data)
-        if requested_output:
-            output_names = [requested_output]
-        if not output_names:
-            return RuleResult(
-                output={},
-                requirements_met=False,
-                input=params,
-                rulespec_uuid=rule.uuid,
-                path=None,
-                missing_required=True,
-            )
-
-        try:
-            result = self._engine.evaluate(law_id, output_names, params, reference_date)
-        except Exception as e:
-            logger.warning("Engine error for %s: %s", law, e)
-            return RuleResult(
-                output={},
-                requirements_met=False,
-                input=params,
-                rulespec_uuid=rule.uuid,
-                path=None,
-                missing_required=True,
-            )
-
-        outputs = dict(result.get("outputs", {}))
-        resolved = dict(result.get("resolved_inputs", {}))
-
-        voldoet = outputs.pop("voldoet_aan_voorwaarden", None)
-        req_met = bool(voldoet) if voldoet is not None else bool(outputs)
-
-        return RuleResult(
-            output=outputs,
-            requirements_met=req_met,
-            input=resolved,
-            rulespec_uuid=rule.uuid,
-            path=None,
-            missing_required=not req_met and not outputs,
+        The Rust engine is loaded with all laws and data sources for future
+        use, but evaluation currently delegates to the Python engine which
+        handles all law features correctly (FOREACH, cross-law references,
+        source_ref_mapping field resolution, dot-notation projection).
+        """
+        return self._services.evaluate(
+            service,
+            law=law,
+            parameters=parameters,
+            reference_date=reference_date,
+            overwrite_input=overwrite_input,
+            overwrite_definitions=overwrite_definitions,
+            requested_output=requested_output,
+            approved=approved,
         )
-
-
-def _strip_to_datasource(yaml_content: str) -> str:
-    """Strip all source blocks to source: {} for DataSourceRegistry resolution."""
-    data = yaml.safe_load(yaml_content)
-    for art in data.get("articles", []):
-        mr = art.get("machine_readable", {})
-        for inp in mr.get("execution", {}).get("input", []):
-            if "source" in inp or "source_reference" in inp:
-                inp.pop("source", None)
-                inp.pop("source_reference", None)
-                inp["source"] = {}
-    return yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
-
-
-def _get_output_names(data: dict) -> list[str]:
-    names = []
-    for art in data.get("articles", []):
-        for o in art.get("machine_readable", {}).get("execution", {}).get("output", []):
-            name = o.get("name")
-            if name and name not in names:
-                names.append(name)
-    return names
 
 
 def _pick_key_field(df: pd.DataFrame) -> str:
