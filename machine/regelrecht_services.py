@@ -327,7 +327,7 @@ class RegelrechtServices:
 
             # Array-type inputs: collect ALL matching rows as a list of objects
             # so the engine can iterate with FOREACH.
-            is_array_input = input_name == table or input_types.get(input_name) == "array"
+            is_array_input = input_types.get(input_name) == "array"
             if fields and is_array_input:
                 rows = []
                 for _, row in matched.iterrows():
@@ -468,7 +468,7 @@ class RegelrechtServices:
                 if matched.empty:
                     continue
 
-                is_array_input = input_name == table or input_types.get(input_name) == "array"
+                is_array_input = input_types.get(input_name) == "array"
                 if fields and is_array_input:
                     rows = []
                     for _, row in matched.iterrows():
