@@ -65,11 +65,12 @@ class RegelrechtServices:
         self._load_all_laws()
 
     def _load_all_laws(self) -> None:
-        """Load all laws with sources stripped to source: {} for DataSourceRegistry resolution."""
+        """Load all laws into the engine as-is. Cross-law sources (source.regulation)
+        are resolved by the engine. Data source inputs (source: {}) are resolved
+        from registered DataFrames."""
         for path in sorted(LAWS_DIR.rglob("*.yaml")):
             try:
-                stripped = _strip_to_datasource(path.read_text())
-                self._engine.load_law(stripped)
+                self._engine.load_law(path.read_text())
             except Exception as e:
                 logger.debug("Could not load %s: %s", path, e)
         logger.info("Loaded %d laws into engine", self._engine.law_count())
@@ -109,17 +110,16 @@ class RegelrechtServices:
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         """Register DataFrame in both Services and the Rust engine.
 
-        For each row the individual columns are registered as flat fields.
-        Additionally, for tables that have multi-field object inputs (as defined
-        in source_ref_mapping.json), a synthetic object field is injected whose
-        value is a dict of the relevant columns.  This allows the engine to
-        resolve e.g. ``werkgegevens`` as ``{gemiddeld_uren_per_week: 40, ...}``.
+        Uses source_ref_mapping.json to determine the correct key field per table
+        and to create synthetic object/array fields for multi-field inputs.
         """
         self._services.set_source_dataframe(service, table, df)
         if df.empty:
             return
-        key_field = _pick_key_field(df)
+
+        key_field = _pick_key_field_for_table(table, df)
         object_inputs = _OBJECT_FIELD_MAPPING.get(table, {})
+
         records = []
         for _, row in df.iterrows():
             record = _to_native({col: row[col] for col in df.columns})
@@ -129,10 +129,42 @@ class RegelrechtServices:
                 if obj:
                     record[input_name] = obj
             records.append(record)
+
         try:
             self._engine.register_data_source(table, key_field, records)
         except Exception as e:
             logger.debug("Could not register data source %s: %s", table, e)
+
+        # For tables that have array-type inputs (e.g., curatele_registraties),
+        # also register a grouped version where all rows for the same key are
+        # collected into an array under the table name as field.
+        if table in _ARRAY_INPUT_TABLES:
+            self._register_array_data_source(table, key_field, records)
+
+    def _register_array_data_source(self, table: str, key_field: str, records: list) -> None:
+        """Group records by key and register as array-valued data source.
+
+        The key_field in the data source must match the parameter name that the
+        law uses (e.g., 'bsn'), not the DataFrame column name (e.g., 'bsn_curator').
+        We use source_ref_mapping.json to find the parameter name from the select_on
+        value reference (e.g., '$bsn' → 'bsn').
+        """
+        # Determine the parameter-side key name from the mapping
+        param_key = _get_param_key_for_table(table, key_field)
+
+        grouped: dict[str, list] = {}
+        for record in records:
+            key = str(record.get(key_field, ""))
+            grouped.setdefault(key, []).append(record)
+
+        array_records = []
+        for key, rows in grouped.items():
+            array_records.append({param_key: key, table: rows})
+
+        try:
+            self._engine.register_data_source(f"{table}_array", param_key, array_records)
+        except Exception as e:
+            logger.debug("Could not register array data source %s: %s", table, e)
 
     # -- Evaluation ------------------------------------------------------------
 
@@ -231,6 +263,74 @@ def _pick_key_field(df: pd.DataFrame) -> str:
         if c in df.columns:
             return c
     return df.columns[0]
+
+
+def _pick_key_field_for_table(table: str, df: pd.DataFrame) -> str:
+    """Pick the best key field using source_ref_mapping.json knowledge."""
+    # Check mapping for this table's select_on fields
+    table_keys = _TABLE_KEY_FIELDS.get(table)
+    if table_keys:
+        for key in table_keys:
+            if key in df.columns:
+                return key
+    return _pick_key_field(df)
+
+
+def _build_table_key_fields() -> dict[str, list[str]]:
+    """Build mapping of table → preferred key fields from source_ref_mapping.json."""
+    result: dict[str, list[str]] = {}
+    if not _SOURCE_REF_MAPPING_PATH.exists():
+        return result
+    with open(_SOURCE_REF_MAPPING_PATH) as f:
+        mapping = json.load(f)
+    for entry in mapping.values():
+        table = entry.get("table", "")
+        select_on = entry.get("select_on", [])
+        if table and isinstance(select_on, list):
+            keys = [s.get("name") for s in select_on if s.get("name")]
+            if keys:
+                result[table] = keys
+    return result
+
+
+def _build_array_input_tables() -> set[str]:
+    """Find tables that serve array-type inputs."""
+    result = set()
+    if not _SOURCE_REF_MAPPING_PATH.exists():
+        return result
+    with open(_SOURCE_REF_MAPPING_PATH) as f:
+        mapping = json.load(f)
+    for entry in mapping.values():
+        table = entry.get("table", "")
+        if table and "fields" in entry:
+            result.add(table)
+    return result
+
+
+_TABLE_KEY_FIELDS: dict[str, list[str]] = _build_table_key_fields()
+_ARRAY_INPUT_TABLES: set[str] = _build_array_input_tables()
+
+
+def _get_param_key_for_table(table: str, df_key_field: str) -> str:
+    """Get the parameter-side key name for a table's select_on.
+
+    E.g., curatele_registraties has select_on: [{name: bsn_curator, value: $bsn}]
+    The DataFrame key is 'bsn_curator' but the parameter key is 'bsn'.
+    """
+    if not _SOURCE_REF_MAPPING_PATH.exists():
+        return df_key_field
+    with open(_SOURCE_REF_MAPPING_PATH) as f:
+        mapping = json.load(f)
+    for entry in mapping.values():
+        if entry.get("table") != table:
+            continue
+        select_on = entry.get("select_on", [])
+        for criterion in select_on:
+            col = criterion.get("name", "")
+            ref = criterion.get("value", "")
+            if col == df_key_field and isinstance(ref, str) and ref.startswith("$"):
+                return ref[1:]  # Strip $ prefix → parameter name
+    return df_key_field
 
 
 def _to_native(obj: Any) -> Any:
