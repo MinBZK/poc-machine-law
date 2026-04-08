@@ -351,7 +351,12 @@ class RegelrechtServices:
                 # Don't skip just because it's in the mapping - Phase 1
                 # might not have resolved it (e.g. object input without fields)
 
-                for tbl_name, df in all_sources.items():
+                # Sort tables: prefer name matching input_name first
+                sorted_tables = sorted(
+                    all_sources.items(),
+                    key=lambda item: (0 if input_name in item[0] or item[0] in input_name else 1, item[0]),
+                )
+                for tbl_name, df in sorted_tables:
                     if df.empty:
                         continue
                     # Use params to filter rows
@@ -364,7 +369,6 @@ class RegelrechtServices:
                         matched = df  # Try without filtering
 
                     if input_type == "object":
-                        # Compose an object from the matched row
                         if not matched.empty:
                             row = matched.iloc[0]
                             obj = _to_native({col: row[col] for col in df.columns})
