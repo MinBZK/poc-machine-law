@@ -192,22 +192,66 @@ class RegelrechtServices:
         approved: bool = False,
         **kwargs,
     ) -> RuleResult:
-        """Evaluate a law using the Python engine.
+        """Evaluate a law using the Rust engine."""
+        reference_date = reference_date or self.root_reference_date
+        rule = self.resolver.find_rule(law, reference_date, service)
+        if not rule:
+            raise ValueError(f"No rule found for {law}")
 
-        The Rust engine is loaded with all laws and data sources for future
-        use, but evaluation currently delegates to the Python engine which
-        handles all law features correctly (FOREACH, cross-law references,
-        source_ref_mapping field resolution, dot-notation projection).
-        """
-        return self._services.evaluate(
-            service,
-            law=law,
-            parameters=parameters,
-            reference_date=reference_date,
-            overwrite_input=overwrite_input,
-            overwrite_definitions=overwrite_definitions,
-            requested_output=requested_output,
-            approved=approved,
+        params = _to_native(dict(parameters))
+        if overwrite_input:
+            for sv in overwrite_input.values():
+                if isinstance(sv, dict):
+                    params.update(_to_native(sv))
+
+        import yaml as yaml_mod
+
+        data = yaml_mod.safe_load(Path(rule.path).read_text())
+        law_id = data.get("$id", law)
+        output_names = []
+        for art in data.get("articles", []):
+            for o in art.get("machine_readable", {}).get("execution", {}).get("output", []):
+                name = o.get("name")
+                if name and name not in output_names:
+                    output_names.append(name)
+        if requested_output:
+            output_names = [requested_output]
+        if not output_names:
+            return RuleResult(
+                output={},
+                requirements_met=False,
+                input=params,
+                rulespec_uuid=rule.uuid,
+                path=None,
+                missing_required=True,
+            )
+
+        try:
+            result = self._engine.evaluate(law_id, output_names, params, reference_date)
+        except Exception as e:
+            logger.warning("Engine error for %s: %s", law, e)
+            return RuleResult(
+                output={},
+                requirements_met=False,
+                input=params,
+                rulespec_uuid=rule.uuid,
+                path=None,
+                missing_required=True,
+            )
+
+        outputs = dict(result.get("outputs", {}))
+        resolved = dict(result.get("resolved_inputs", {}))
+
+        voldoet = outputs.pop("voldoet_aan_voorwaarden", None)
+        req_met = bool(voldoet) if voldoet is not None else bool(outputs)
+
+        return RuleResult(
+            output=outputs,
+            requirements_met=req_met,
+            input=resolved,
+            rulespec_uuid=rule.uuid,
+            path=None,
+            missing_required=not req_met and not outputs,
         )
 
 
