@@ -192,7 +192,13 @@ class RegelrechtServices:
         approved: bool = False,
         **kwargs,
     ) -> RuleResult:
-        """Evaluate a law using the Rust engine."""
+        """Evaluate a law using the Rust engine.
+
+        After evaluation, applies dot-notation projection for any outputs
+        the engine returned as None (e.g. ``$actieve_curatele.bsn_curandus``).
+        The engine computes FOREACH correctly but cannot yet project fields
+        from arrays, so we do that in Python as a post-processing step.
+        """
         reference_date = reference_date or self.root_reference_date
         rule = self.resolver.find_rule(law, reference_date, service)
         if not rule:
@@ -242,6 +248,12 @@ class RegelrechtServices:
         outputs = dict(result.get("outputs", {}))
         resolved = dict(result.get("resolved_inputs", {}))
 
+        # Post-process: the engine handles FOREACH correctly but cannot yet
+        # perform dot-notation projection on arrays, evaluate CONCAT inside
+        # FOREACH bodies, or resolve $variable references in FOREACH bodies.
+        # We fix these in Python as post-processing.
+        _postprocess_outputs(outputs, params, data)
+
         voldoet = outputs.pop("voldoet_aan_voorwaarden", None)
         req_met = bool(voldoet) if voldoet is not None else bool(outputs)
 
@@ -253,6 +265,113 @@ class RegelrechtServices:
             path=None,
             missing_required=not req_met and not outputs,
         )
+
+
+def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
+    """Fix engine outputs that require Python-side post-processing.
+
+    Handles three cases the Rust engine doesn't support yet:
+    1. Dot-notation projection: ``$actieve_curatele.bsn_curandus``
+    2. Unevaluated CONCAT operations in FOREACH body results
+    3. Unresolved ``$variable`` references in FOREACH body results
+    """
+    namespace = {**params, **outputs}
+
+    # Collect all actions for FOREACH-aware resolution
+    actions: list[dict] = []
+    for art in data.get("articles", []):
+        actions.extend(art.get("machine_readable", {}).get("execution", {}).get("actions", []))
+
+    for action in actions:
+        value = action.get("value")
+        output_name = action.get("output")
+        if not output_name:
+            continue
+
+        # 1. Dot-notation projection on arrays/objects
+        if isinstance(value, str) and value.startswith("$") and "." in value:
+            if outputs.get(output_name) is not None:
+                continue
+            ref = value[1:]
+            var_name, _, field_name = ref.partition(".")
+            source = outputs.get(var_name)
+            if source is None:
+                continue
+            if isinstance(source, list):
+                outputs[output_name] = [item.get(field_name) if isinstance(item, dict) else None for item in source]
+            elif isinstance(source, dict):
+                outputs[output_name] = source.get(field_name)
+            continue
+
+        # 2. FOREACH with unevaluated body (CONCAT, $current refs, $variable refs)
+        if isinstance(value, dict) and value.get("operation") == "FOREACH":
+            current_value = outputs.get(output_name)
+            if current_value is None or not isinstance(current_value, list):
+                continue
+            if not _needs_resolution(current_value):
+                continue
+            # Get the FOREACH collection to use as element context
+            collection_ref = value.get("collection", "")
+            as_name = value.get("as", "current")
+            collection = []
+            if isinstance(collection_ref, str) and collection_ref.startswith("$"):
+                collection = outputs.get(collection_ref[1:], []) or []
+            # Resolve each element against its corresponding collection item
+            resolved = []
+            for i, item in enumerate(current_value):
+                element = collection[i] if i < len(collection) and isinstance(collection, list) else {}
+                item_ns = {**namespace, as_name: element}
+                if isinstance(element, dict):
+                    # Also make $current.field accessible as top-level in namespace
+                    item_ns.update({f"{as_name}.{k}": v for k, v in element.items()})
+                resolved.append(_resolve_value(item, item_ns))
+            outputs[output_name] = resolved
+
+    # 3. Final pass: resolve any remaining $variable strings
+    namespace = {**params, **outputs}
+    for key, value in list(outputs.items()):
+        outputs[key] = _resolve_value(value, namespace)
+
+
+def _needs_resolution(value: Any) -> bool:
+    """Check if a value contains unevaluated operations or $references."""
+    if isinstance(value, dict) and "operation" in value:
+        return True
+    if isinstance(value, str) and value.startswith("$"):
+        return True
+    if isinstance(value, list):
+        return any(_needs_resolution(item) for item in value)
+    return False
+
+
+def _resolve_value(value: Any, namespace: dict) -> Any:
+    """Recursively resolve unevaluated engine output values.
+
+    Handles:
+    - ``{'operation': 'CONCAT', 'values': [...]}`` dicts
+    - ``$variable`` string references
+    - Lists containing any of the above
+    """
+    if isinstance(value, list):
+        return [_resolve_value(item, namespace) for item in value]
+    if isinstance(value, dict) and value.get("operation") == "CONCAT":
+        parts = []
+        for v in value.get("values", []):
+            resolved = _resolve_value(v, namespace)
+            parts.append(str(resolved) if resolved is not None else "")
+        return "".join(parts)
+    if isinstance(value, str) and value.startswith("$"):
+        ref = value[1:]
+        if "." in ref:
+            var_name, _, field_name = ref.partition(".")
+            source = namespace.get(var_name)
+            if isinstance(source, dict):
+                return source.get(field_name, value)
+            if isinstance(source, list):
+                return [item.get(field_name) if isinstance(item, dict) else None for item in source]
+        elif ref in namespace:
+            return namespace[ref]
+    return value
 
 
 def _pick_key_field(df: pd.DataFrame) -> str:
