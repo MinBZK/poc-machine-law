@@ -10,45 +10,34 @@ service: DUO
 uuid: e3bb489c-b7d1-49dd-985c-a3cde1ab0ad3
 articles:
 - number: '3.1'
-  text: |-
-    1 Studiefinanciering bestaat voor een opleiding in het beroepsonderwijs uit een basisbeurs, een basislening en een aanvullende beurs of aanvullende lening, en kan geheel of gedeeltelijk worden toegekend in de vorm van:
-      a. een gift;
-      b. een prestatiebeurs; of
-      c. een lening.
-    2 Studiefinanciering bestaat voor een opleiding in het hoger onderwijs uit een basisbeurs, een basislening, een aanvullende beurs of aanvullende lening en collegegeldkrediet, en kan geheel of gedeeltelijk worden toegekend in de vorm van:
-      a. een gift;
-      b. een prestatiebeurs; of
-      c. een lening.
-    3 Indien een student geen aanspraak heeft op studiefinanciering als bedoeld in het eerste of tweede lid bestaat studiefinanciering uit levenlanglerenkrediet.
-    4 De hoogte van de studiefinanciering wordt vastgesteld op basis van een budget voor een kalendermaand.
-    5 In afwijking van het vierde lid kan de hoogte van de studiefinanciering ook worden vastgesteld op een tegemoetkoming in de kosten van de toegang tot het onderwijs.
+  text: "1 Studiefinanciering bestaat voor een opleiding in het beroepsonderwijs uit\
+    \ een basisbeurs, een basislening en een aanvullende beurs of aanvullende lening,\
+    \ en kan geheel of gedeeltelijk worden toegekend in de vorm van:\n  a. een gift;\n\
+    \  b. een prestatiebeurs; of\n  c. een lening.\n2 Studiefinanciering bestaat voor\
+    \ een opleiding in het hoger onderwijs uit een basisbeurs, een basislening, een\
+    \ aanvullende beurs of aanvullende lening en collegegeldkrediet, en kan geheel\
+    \ of gedeeltelijk worden toegekend in de vorm van:\n  a. een gift;\n  b. een prestatiebeurs;\
+    \ of\n  c. een lening.\n3 Indien een student geen aanspraak heeft op studiefinanciering\
+    \ als bedoeld in het eerste of tweede lid bestaat studiefinanciering uit levenlanglerenkrediet.\n\
+    4 De hoogte van de studiefinanciering wordt vastgesteld op basis van een budget\
+    \ voor een kalendermaand.\n5 In afwijking van het vierde lid kan de hoogte van\
+    \ de studiefinanciering ook worden vastgesteld op een tegemoetkoming in de kosten\
+    \ van de toegang tot het onderwijs."
   url: https://wetten.overheid.nl/BWBR0011453/2024-01-01#Artikel3.1
   machine_readable:
     definitions:
-      basisbeurs_wo_uit:
-        value: 28800
-      basisbeurs_wo_thuis:
-        value: 10300
-      basisbeurs_hbo_uit:
-        value: 28800
-      basisbeurs_hbo_thuis:
-        value: 10300
-      basisbeurs_mbo_uit:
-        value: 28800
-      basisbeurs_mbo_thuis:
-        value: 10300
-      max_aanvullende_beurs_wo:
-        value: 41900
-      max_aanvullende_beurs_hbo:
-        value: 41900
-      max_aanvullende_beurs_mbo:
-        value: 41900
-      inkomen_grens_geen_beurs:
-        value: 7000000
-      inkomensdrempel_basis:
-        value: 3400000
-      verhoging_drempel_per_kind:
-        value: 350000
+      basisbeurs_wo_uit: 28800
+      basisbeurs_wo_thuis: 10300
+      basisbeurs_hbo_uit: 28800
+      basisbeurs_hbo_thuis: 10300
+      basisbeurs_mbo_uit: 28800
+      basisbeurs_mbo_thuis: 10300
+      max_aanvullende_beurs_wo: 41900
+      max_aanvullende_beurs_hbo: 41900
+      max_aanvullende_beurs_mbo: 41900
+      inkomen_grens_geen_beurs: 7000000
+      inkomensdrempel_basis: 3400000
+      verhoging_drempel_per_kind: 350000
     execution:
       parameters:
       - name: bsn
@@ -150,44 +139,16 @@ articles:
           period_type: year
       - name: opleiding_type
         type: string
-        source_reference:
-          table: inschrijvingen
-          field: onderwijstype
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: studerend_gezin
         type: number
-        source_reference:
-          table: studiefinanciering
-          field: aantal_studerend_gezin
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: partner_opleiding_type
         type: string
-        source_reference:
-          table: inschrijvingen
-          field: onderwijstype
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_studerend_gezin
         type: number
-        source_reference:
-          table: studiefinanciering
-          field: aantal_studerend_gezin
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van partner
-            type: string
-            value: $partner_bsn
+        source: {}
       output:
       - name: studiefinanciering
         type: amount
@@ -307,7 +268,8 @@ articles:
           article: '3.1'
           url: https://wetten.overheid.nl/BWBR0011453/2024-01-01#Hoofdstuk3_Paragraaf3.1_Artikel3.1
           juriconnect: jci1.3:c:BWBR0011453&artikel=3.1&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 3.1 bepaalt dat studiefinanciering bestaat uit de som van basisbeurs en aanvullende beurs.
+          explanation: Artikel 3.1 bepaalt dat studiefinanciering bestaat uit de som
+            van basisbeurs en aanvullende beurs.
       - output: partner_studiefinanciering
         value:
           operation: ADD
@@ -409,8 +371,8 @@ articles:
           article: '3.1'
           url: https://wetten.overheid.nl/BWBR0011453/2024-01-01#Hoofdstuk3_Paragraaf3.1_Artikel3.1
           juriconnect: jci1.3:c:BWBR0011453&artikel=3.1&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 3.1 bepaalt dat studiefinanciering voor partners bestaat uit de som van basisbeurs en aanvullende
-            beurs.
+          explanation: Artikel 3.1 bepaalt dat studiefinanciering voor partners bestaat
+            uit de som van basisbeurs en aanvullende beurs.
       - output: is_student
         value:
           operation: NOT
@@ -423,7 +385,8 @@ articles:
           article: '2.1'
           url: https://wetten.overheid.nl/BWBR0011453/2024-01-01#Hoofdstuk2_Artikel2.1
           juriconnect: jci1.3:c:BWBR0011453&artikel=2.1&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 2.1 vereist dat de studerende is ingeschreven voor een opleiding om recht te hebben op studiefinanciering.
+          explanation: Artikel 2.1 vereist dat de studerende is ingeschreven voor
+            een opleiding om recht te hebben op studiefinanciering.
       - output: ontvangt_studiefinanciering
         value:
           operation: GREATER_THAN
@@ -435,5 +398,5 @@ articles:
           article: '2.2'
           url: https://wetten.overheid.nl/BWBR0011453/2024-01-01#Hoofdstuk2_Artikel2.2
           juriconnect: jci1.3:c:BWBR0011453&artikel=2.2&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 2.2 bepaalt dat een studerende recht heeft op studiefinanciering als het berekende bedrag groter
-            is dan nul.
+          explanation: Artikel 2.2 bepaalt dat een studerende recht heeft op studiefinanciering
+            als het berekende bedrag groter is dan nul.

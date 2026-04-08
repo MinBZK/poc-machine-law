@@ -10,8 +10,19 @@ service: DJI
 uuid: 292c11ff-8318-4b7a-bb11-3ea545b04c8e
 articles:
 - number: '2'
-  text: |-
-    1. De tenuitvoerlegging van een vrijheidsstraf of vrijheidsbenemende maatregel vindt, voor zover niet bij of krachtens de wet anders is bepaald, plaats door onderbrenging van de persoon aan wie deze is opgelegd in een penitentiaire inrichting dan wel door diens deelname aan een penitentiair programma. 2. Met handhaving van het karakter van de vrijheidsstraf of de vrijheidsbenemende maatregel wordt de tenuitvoerlegging hiervan zoveel mogelijk en afhankelijk van het gedrag van de betrokkene dienstbaar gemaakt aan de voorbereiding van de terugkeer in de maatschappij. Bij het verlenen van vrijheden aan gedetineerden wordt rekening gehouden met de veiligheid van de samenleving en de belangen van slachtoffers en nabestaanden. 3. Personen ten aanzien van wie de tenuitvoerlegging plaatsvindt van een vrijheidsstraf of vrijheidsbenemende maatregel worden aan geen andere beperkingen onderworpen dan die welke voor het doel van de vrijheidsbeneming, het belang van de handhaving van de orde of veiligheid noodzakelijk zijn.
+  text: 1. De tenuitvoerlegging van een vrijheidsstraf of vrijheidsbenemende maatregel
+    vindt, voor zover niet bij of krachtens de wet anders is bepaald, plaats door
+    onderbrenging van de persoon aan wie deze is opgelegd in een penitentiaire inrichting
+    dan wel door diens deelname aan een penitentiair programma. 2. Met handhaving
+    van het karakter van de vrijheidsstraf of de vrijheidsbenemende maatregel wordt
+    de tenuitvoerlegging hiervan zoveel mogelijk en afhankelijk van het gedrag van
+    de betrokkene dienstbaar gemaakt aan de voorbereiding van de terugkeer in de maatschappij.
+    Bij het verlenen van vrijheden aan gedetineerden wordt rekening gehouden met de
+    veiligheid van de samenleving en de belangen van slachtoffers en nabestaanden.
+    3. Personen ten aanzien van wie de tenuitvoerlegging plaatsvindt van een vrijheidsstraf
+    of vrijheidsbenemende maatregel worden aan geen andere beperkingen onderworpen
+    dan die welke voor het doel van de vrijheidsbeneming, het belang van de handhaving
+    van de orde of veiligheid noodzakelijk zijn.
   url: https://wetten.overheid.nl/BWBR0009709/2022-01-01#Artikel2
   machine_readable:
     execution:
@@ -25,24 +36,10 @@ articles:
       input:
       - name: detentiestatus
         type: string
-        source_reference:
-          table: detenties
-          field: status
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: inrichting_type
         type: string
-        source_reference:
-          table: detenties
-          field: inrichting_type
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: is_gedetineerd
         type: boolean
@@ -67,4 +64,5 @@ articles:
           article: '2'
           url: https://wetten.overheid.nl/BWBR0009709/2024-01-01#HoofdstukI_Artikel2
           juriconnect: jci1.3:c:BWBR0009709&artikel=2&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 2 en 3 Pbw definiëren wanneer iemand als gedetineerde wordt aangemerkt
+          explanation: Artikel 2 en 3 Pbw definiëren wanneer iemand als gedetineerde
+            wordt aangemerkt

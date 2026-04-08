@@ -10,13 +10,19 @@ service: NATIONAAL_ARCHIEF
 uuid: 81c1b431-545b-4a8a-b1e2-eacfc6c3915a
 articles:
 - number: '5'
-  text: |-
-    1. De zorgdrager is verplicht tot het ontwerpen van selectielijsten waarin tenminste wordt aangegeven welke archiefbescheiden voor vernietiging in aanmerking komen. 2. De lijsten worden vastgesteld, voor zover het betreft: a. archiefbescheiden van de Eerste en de Tweede Kamer der Staten-Generaal, de andere Hoge Colleges van Staat en het Kabinet van de Koning: bij koninklijk besluit, op voordracht van Onze minister, in overeenstemming met het betrokken overheidsorgaan; b. archiefbescheiden van de ministeries: door Onze minister en Onze minister wie het mede aangaat; c. archiefbescheiden van andere overheidsorganen: door Onze minister. 3. Een besluit tot vaststelling van een selectielijst wordt bekendgemaakt in de Staatscourant.
+  text: '1. De zorgdrager is verplicht tot het ontwerpen van selectielijsten waarin
+    tenminste wordt aangegeven welke archiefbescheiden voor vernietiging in aanmerking
+    komen. 2. De lijsten worden vastgesteld, voor zover het betreft: a. archiefbescheiden
+    van de Eerste en de Tweede Kamer der Staten-Generaal, de andere Hoge Colleges
+    van Staat en het Kabinet van de Koning: bij koninklijk besluit, op voordracht
+    van Onze minister, in overeenstemming met het betrokken overheidsorgaan; b. archiefbescheiden
+    van de ministeries: door Onze minister en Onze minister wie het mede aangaat;
+    c. archiefbescheiden van andere overheidsorganen: door Onze minister. 3. Een besluit
+    tot vaststelling van een selectielijst wordt bekendgemaakt in de Staatscourant.'
   url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Artikel5
   machine_readable:
     definitions:
-      minimale_bewaartermijn_jaren:
-        value: 0
+      minimale_bewaartermijn_jaren: 0
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -88,7 +94,8 @@ articles:
           article: '3'
           url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel3
           juriconnect: jci1.3:c:BWBR0007376&artikel=3&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 3 bepaalt de zorgplicht voor vernietiging van daarvoor in aanmerking komende archiefbescheiden
+          explanation: Artikel 3 bepaalt de zorgplicht voor vernietiging van daarvoor
+            in aanmerking komende archiefbescheiden
       - output: vernietig_vanaf_datum
         value:
           operation: IF
@@ -114,7 +121,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5
           juriconnect: jci1.3:c:BWBR0007376&artikel=5&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: De selectielijst bepaalt de termijn na welke vernietiging plaats mag vinden
+          explanation: De selectielijst bepaalt de termijn na welke vernietiging plaats
+            mag vinden
       - output: reden_niet_vernietigen
         value:
           operation: IF
@@ -130,17 +138,20 @@ articles:
                   operation: EQUALS
                   subject: $op_selectielijst_vernietiging
                   value: false
-                then: Archiefstuk komt niet voor op een selectielijst voor vernietiging (mogelijk blijvend te bewaren)
+                then: Archiefstuk komt niet voor op een selectielijst voor vernietiging
+                  (mogelijk blijvend te bewaren)
               - when:
                   operation: EQUALS
                   subject: $selectielijst_vastgesteld
                   value: false
-                then: Selectielijst is niet formeel vastgesteld volgens artikel 5 lid 2 Archiefwet
+                then: Selectielijst is niet formeel vastgesteld volgens artikel 5
+                  lid 2 Archiefwet
               - when:
                   operation: EQUALS
                   subject: $selectielijst_gepubliceerd
                   value: false
-                then: Selectielijst is niet bekendgemaakt in de Staatscourant volgens artikel 5 lid 3 Archiefwet
+                then: Selectielijst is niet bekendgemaakt in de Staatscourant volgens
+                  artikel 5 lid 3 Archiefwet
               - when:
                   operation: AND
                   conditions:

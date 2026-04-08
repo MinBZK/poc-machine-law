@@ -10,73 +10,63 @@ service: SVB
 uuid: 47fa262a-b8f7-43bf-a5dd-5f9b2d2c1228
 articles:
 - number: 7a
-  text: |-
-    1 De pensioengerechtigde leeftijd en de aanvangsleeftijd zijn:
-      a. vóór 1 januari 2013: 65, respectievelijk 15 jaar;
-      b. in 2013: 65 jaar en één maand, respectievelijk 15 jaar en één maand;
-      c. in 2014: 65 jaar en twee maanden, respectievelijk 15 jaar en twee maanden;
-      d. in 2015: 65 jaar en drie maanden, respectievelijk 15 jaar en drie maanden;
-      e. in 2016: 65 jaar en zes maanden, respectievelijk 15 jaar en zes maanden;
-      f. in 2017: 65 jaar en negen maanden, respectievelijk 15 jaar en negen maanden;
-      g. in 2018: 66 jaar, respectievelijk 16 jaar;
-      h. in 2019: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;
-      i. in 2020: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;
-      j. in 2021: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;
-      k. in 2022: 66 jaar en zeven maanden, respectievelijk 16 jaar en zeven maanden;
-      l. in 2023: 66 jaar en tien maanden, respectievelijk 16 jaar en tien maanden;
-      m. in 2024: 67 jaar, respectievelijk 17 jaar;
-      n. in 2025: 67 jaar, respectievelijk 17 jaar;
-      o. in 2026 en de kalenderjaren daarna: de pensioengerechtigde leeftijd en de aanvangsleeftijd, die jaarlijks op basis van de verhoging van de pensioengerechtigde leeftijd en de aanvangsleeftijd op grond van het tweede lid worden vastgesteld.
-    Op pensioengerechtigden die in een bepaald kalenderjaar de pensioengerechtigde leeftijd hebben bereikt zijn de pensioengerechtigde leeftijd en de aanvangsleeftijd in de kalenderjaren daarna niet van toepassing.
-    2 De verhoging van de pensioengerechtigde leeftijd en de aanvangsleeftijd in 2026 en de kalenderjaren daarna wordt jaarlijks, voor de eerste maal uiterlijk op 1 januari 2021 voor het jaar 2026, vastgesteld volgens de formule:
-    V = 2/3 * (L – 20,64) – (P – 67)
-    waarbij:
-    V staat voor de periode waarmee de pensioengerechtigde leeftijd respectievelijk aanvangsleeftijd wordt verhoogd, uitgedrukt in perioden van een jaar;
-    L staat voor de geraamde macro gemiddelde resterende levensverwachting op 65-jarige leeftijd in het kalenderjaar van verhoging;
-    P staat voor de pensioengerechtigde leeftijd in het kalenderjaar voorafgaande aan het kalenderjaar van verhoging.
-    Indien V negatief is of minder dan 0,25 bedraagt, wordt deze gesteld op 0. Indien V 0,25 of meer bedraagt, wordt deze gesteld op drie maanden.
-    De volgens de formule vastgestelde verdere verhoging van de pensioengerechtigde leeftijd en de aanvangsleeftijd wordt door of namens Onze Minister medegedeeld in de Staatscourant.
-    3 De verhoging, bedoeld in het tweede lid, treedt telkens in werking vijf jaar na de uiterste datum van vaststelling, bedoeld in het tweede lid, voor de eerste maal met ingang van 1 januari 2026.
-    4 De ramingen van de macro gemiddelde resterende levensverwachting, bedoeld in het tweede lid, worden uitgevoerd en bekendgemaakt door het CBS.
+  text: "1 De pensioengerechtigde leeftijd en de aanvangsleeftijd zijn:\n  a. vóór\
+    \ 1 januari 2013: 65, respectievelijk 15 jaar;\n  b. in 2013: 65 jaar en één maand,\
+    \ respectievelijk 15 jaar en één maand;\n  c. in 2014: 65 jaar en twee maanden,\
+    \ respectievelijk 15 jaar en twee maanden;\n  d. in 2015: 65 jaar en drie maanden,\
+    \ respectievelijk 15 jaar en drie maanden;\n  e. in 2016: 65 jaar en zes maanden,\
+    \ respectievelijk 15 jaar en zes maanden;\n  f. in 2017: 65 jaar en negen maanden,\
+    \ respectievelijk 15 jaar en negen maanden;\n  g. in 2018: 66 jaar, respectievelijk\
+    \ 16 jaar;\n  h. in 2019: 66 jaar en vier maanden, respectievelijk 16 jaar en\
+    \ vier maanden;\n  i. in 2020: 66 jaar en vier maanden, respectievelijk 16 jaar\
+    \ en vier maanden;\n  j. in 2021: 66 jaar en vier maanden, respectievelijk 16\
+    \ jaar en vier maanden;\n  k. in 2022: 66 jaar en zeven maanden, respectievelijk\
+    \ 16 jaar en zeven maanden;\n  l. in 2023: 66 jaar en tien maanden, respectievelijk\
+    \ 16 jaar en tien maanden;\n  m. in 2024: 67 jaar, respectievelijk 17 jaar;\n\
+    \  n. in 2025: 67 jaar, respectievelijk 17 jaar;\n  o. in 2026 en de kalenderjaren\
+    \ daarna: de pensioengerechtigde leeftijd en de aanvangsleeftijd, die jaarlijks\
+    \ op basis van de verhoging van de pensioengerechtigde leeftijd en de aanvangsleeftijd\
+    \ op grond van het tweede lid worden vastgesteld.\nOp pensioengerechtigden die\
+    \ in een bepaald kalenderjaar de pensioengerechtigde leeftijd hebben bereikt zijn\
+    \ de pensioengerechtigde leeftijd en de aanvangsleeftijd in de kalenderjaren daarna\
+    \ niet van toepassing.\n2 De verhoging van de pensioengerechtigde leeftijd en\
+    \ de aanvangsleeftijd in 2026 en de kalenderjaren daarna wordt jaarlijks, voor\
+    \ de eerste maal uiterlijk op 1 januari 2021 voor het jaar 2026, vastgesteld volgens\
+    \ de formule:\nV = 2/3 * (L – 20,64) – (P – 67)\nwaarbij:\nV staat voor de periode\
+    \ waarmee de pensioengerechtigde leeftijd respectievelijk aanvangsleeftijd wordt\
+    \ verhoogd, uitgedrukt in perioden van een jaar;\nL staat voor de geraamde macro\
+    \ gemiddelde resterende levensverwachting op 65-jarige leeftijd in het kalenderjaar\
+    \ van verhoging;\nP staat voor de pensioengerechtigde leeftijd in het kalenderjaar\
+    \ voorafgaande aan het kalenderjaar van verhoging.\nIndien V negatief is of minder\
+    \ dan 0,25 bedraagt, wordt deze gesteld op 0. Indien V 0,25 of meer bedraagt,\
+    \ wordt deze gesteld op drie maanden.\nDe volgens de formule vastgestelde verdere\
+    \ verhoging van de pensioengerechtigde leeftijd en de aanvangsleeftijd wordt door\
+    \ of namens Onze Minister medegedeeld in de Staatscourant.\n3 De verhoging, bedoeld\
+    \ in het tweede lid, treedt telkens in werking vijf jaar na de uiterste datum\
+    \ van vaststelling, bedoeld in het tweede lid, voor de eerste maal met ingang\
+    \ van 1 januari 2026.\n4 De ramingen van de macro gemiddelde resterende levensverwachting,\
+    \ bedoeld in het tweede lid, worden uitgevoerd en bekendgemaakt door het CBS."
   url: https://wetten.overheid.nl/BWBR0002221/2024-01-01#Artikel7a
   machine_readable:
     definitions:
-      basis_pensioenleeftijd:
-        value: 65
-      verhoging_2013:
-        value: 1
-      verhoging_2014:
-        value: 2
-      verhoging_2015:
-        value: 3
-      verhoging_2016:
-        value: 6
-      verhoging_2017:
-        value: 9
-      verhoging_2018:
-        value: 12
-      verhoging_2019:
-        value: 16
-      verhoging_2020:
-        value: 16
-      verhoging_2021:
-        value: 18
-      verhoging_2022:
-        value: 21
-      verhoging_2023:
-        value: 24
-      verhoging_2024:
-        value: 24
-      verhoging_2025:
-        value: 24
-      referentie_leeftijd:
-        value: 65
-      referentie_levensverwachting:
-        value: 20.0
-      maanden_verhoging_per_jaar:
-        value: 3
-      aankondigingsperiode_jaren:
-        value: 5
+      basis_pensioenleeftijd: 65
+      verhoging_2013: 1
+      verhoging_2014: 2
+      verhoging_2015: 3
+      verhoging_2016: 6
+      verhoging_2017: 9
+      verhoging_2018: 12
+      verhoging_2019: 16
+      verhoging_2020: 16
+      verhoging_2021: 18
+      verhoging_2022: 21
+      verhoging_2023: 24
+      verhoging_2024: 24
+      verhoging_2025: 24
+      referentie_leeftijd: 65
+      referentie_levensverwachting: 20.0
+      maanden_verhoging_per_jaar: 3
+      aankondigingsperiode_jaren: 5
     execution:
       produces:
         legal_character: BESCHIKKING

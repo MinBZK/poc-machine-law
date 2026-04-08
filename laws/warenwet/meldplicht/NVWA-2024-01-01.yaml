@@ -11,20 +11,29 @@ uuid: a4c7e9f1-2b5d-4e8a-93f6-5a1c9b7e2d40
 discoverable: BUSINESS
 articles:
 - number: '21'
-  text: '1 Indien waren naar het oordeel van Onze Minister gevaar opleveren voor de veiligheid of de gezondheid van de mens, of indien het technische voortbrengselen betreft, tevens gevaar opleveren voor de veiligheid van zaken, kan hij met het oog op de bescherming van die belangen degene die de waar of het voortbrengsel verhandelt of heeft verhandeld, gelasten om de houders dan wel de vermoedelijke houders van die waar onverwijld en op doeltreffende wijze op de hoogte te stellen van het gevaar. Degene tot wie de last is gericht, geeft daaraan onverwijld gevolg.
+  text: '1 Indien waren naar het oordeel van Onze Minister gevaar opleveren voor de
+    veiligheid of de gezondheid van de mens, of indien het technische voortbrengselen
+    betreft, tevens gevaar opleveren voor de veiligheid van zaken, kan hij met het
+    oog op de bescherming van die belangen degene die de waar of het voortbrengsel
+    verhandelt of heeft verhandeld, gelasten om de houders dan wel de vermoedelijke
+    houders van die waar onverwijld en op doeltreffende wijze op de hoogte te stellen
+    van het gevaar. Degene tot wie de last is gericht, geeft daaraan onverwijld gevolg.
 
-    2 Indien waren, niet zijnde eet- of drinkwaren, naar het oordeel van Onze Minister gevaar opleveren voor de veiligheid of de gezondheid van de mens, of gevaar opleveren voor de veiligheid van zaken, kan hij met het oog op de bescherming van die belangen degene die de waar verhandelt of heeft verhandeld, gelasten de verhandeling daarvan te staken dan wel al de noodzakelijke maatregelen te treffen om die waar terug te nemen. Degene tot wie de last is gericht, geeft daaraan onverwijld gevolg.
+    2 Indien waren, niet zijnde eet- of drinkwaren, naar het oordeel van Onze Minister
+    gevaar opleveren voor de veiligheid of de gezondheid van de mens, of gevaar opleveren
+    voor de veiligheid van zaken, kan hij met het oog op de bescherming van die belangen
+    degene die de waar verhandelt of heeft verhandeld, gelasten de verhandeling daarvan
+    te staken dan wel al de noodzakelijke maatregelen te treffen om die waar terug
+    te nemen. Degene tot wie de last is gericht, geeft daaraan onverwijld gevolg.
 
-    3 Het niet uitvoeren van een door Onze Minister gegeven last als bedoeld in het tweede lid is een misdrijf.'
+    3 Het niet uitvoeren van een door Onze Minister gegeven last als bedoeld in het
+    tweede lid is een misdrijf.'
   url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#Artikel21
   machine_readable:
     definitions:
-      melding_deadline_uren:
-        value: 4
-      rapportage_methode:
-        value: NVWA meldformulier (nvwa.nl/melden)
-      toezichthouder:
-        value: NVWA
+      melding_deadline_uren: 4
+      rapportage_methode: NVWA meldformulier (nvwa.nl/melden)
+      toezichthouder: NVWA
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -36,26 +45,10 @@ articles:
       input:
       - name: is_levensmiddelenbedrijf
         type: boolean
-        source_reference:
-          source_type: NVWA
-          table: nvwa_registratie
-          field: is_levensmiddelenbedrijf
-          select_on:
-          - name: kvk_nummer
-            description: KvK-nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: heeft_actief_incident
         type: boolean
-        source_reference:
-          source_type: NVWA
-          table: nvwa_meldplicht
-          field: heeft_actief_incident
-          select_on:
-          - name: kvk_nummer
-            description: KvK-nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -87,7 +80,8 @@ articles:
           article: '21'
           url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21
           juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
-          explanation: Het bedrijf is een levensmiddelenbedrijf; de meldplicht is van toepassing
+          explanation: Het bedrijf is een levensmiddelenbedrijf; de meldplicht is
+            van toepassing
       - output: heeft_actief_incident
         value: $heeft_actief_incident
         legal_basis:
@@ -123,7 +117,8 @@ articles:
           article: '21'
           url: https://wetten.overheid.nl/BWBR0001969/2024-01-01#HoofdstukVII_Artikel21
           juriconnect: jci1.3:c:BWBR0001969&artikel=21&z=2024-01-01&g=2024-01-01
-          explanation: De meldplicht is event-driven en treedt alleen in werking bij een daadwerkelijk incident
+          explanation: De meldplicht is event-driven en treedt alleen in werking bij
+            een daadwerkelijk incident
       - output: toezichthouder
         value: $toezichthouder
         legal_basis:

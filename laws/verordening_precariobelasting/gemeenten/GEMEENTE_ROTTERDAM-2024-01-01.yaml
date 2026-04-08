@@ -12,16 +12,17 @@ uuid: b5d8e2f4-3a6c-4b9e-a7d1-9c4f2e8b1a53
 discoverable: BUSINESS
 articles:
 - number: '2'
-  text: '1. Onder de naam ''precariobelasting'' wordt een directe belasting geheven ter zake van het hebben van voorwerpen onder, op of boven voor de openbare dienst bestemde gemeentegrond, bedoeld of genoemd in deze verordening. 2. Onder de naam ''reclamebelasting'' wordt een directe belasting geheven voor een openbare aankondiging die zichtbaar is vanaf de openbare weg.'
+  text: 1. Onder de naam 'precariobelasting' wordt een directe belasting geheven ter
+    zake van het hebben van voorwerpen onder, op of boven voor de openbare dienst
+    bestemde gemeentegrond, bedoeld of genoemd in deze verordening. 2. Onder de naam
+    'reclamebelasting' wordt een directe belasting geheven voor een openbare aankondiging
+    die zichtbaar is vanaf de openbare weg.
   url: https://lokaleregelgeving.overheid.nl/CVDR719500/1#artikel_2
   machine_readable:
     definitions:
-      belastingjaar:
-        value: 2024
-      precario_tarief_per_m2:
-        value: 3610
-      vrijstellingsdrempel_m2:
-        value: 50
+      belastingjaar: 2024
+      precario_tarief_per_m2: 3610
+      vrijstellingsdrempel_m2: 50
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -66,25 +67,10 @@ articles:
           reference: $referencedate
       - name: heeft_terras
         type: boolean
-        source_reference:
-          table: vestigingen
-          field: heeft_terras
-          select_on:
-          - name: kvk_nummer
-            description: KvK-nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: locatie_op_openbare_weg
         type: boolean
-        source_reference:
-          source_type: GEMEENTE_ROTTERDAM
-          table: bgt_terraslocaties
-          field: is_openbare_weg
-          select_on:
-          - name: adres
-            description: Adres van de horecalocatie
-            type: string
-            value: $vestigingsadres
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -116,7 +102,8 @@ articles:
           law: Verordening precariobelasting Rotterdam 2024
           article: '2'
           url: https://lokaleregelgeving.overheid.nl/CVDR719500/1
-          explanation: Het bedrijf heeft een terras op openbare gemeentegrond; precariobelasting is verschuldigd
+          explanation: Het bedrijf heeft een terras op openbare gemeentegrond; precariobelasting
+            is verschuldigd
       - output: tarief_per_m2
         value: $precario_tarief_per_m2
         legal_basis:
@@ -124,7 +111,8 @@ articles:
           article: '5'
           paragraph: b
           url: https://lokaleregelgeving.overheid.nl/CVDR704478/1
-          explanation: Het tarief van € 36,10 per m² per jaar is vastgelegd in artikel 5 lid b van de verordening
+          explanation: Het tarief van € 36,10 per m² per jaar is vastgelegd in artikel
+            5 lid b van de verordening
       - output: heffingsmaatstaf_m2
         value:
           operation: MAX
@@ -139,7 +127,8 @@ articles:
           article: '5'
           paragraph: a
           url: https://lokaleregelgeving.overheid.nl/CVDR704478/1
-          explanation: De eerste 50 m² van een terras is vrijgesteld; de heffingsmaatstaf is de oppervlakte boven deze drempel
+          explanation: De eerste 50 m² van een terras is vrijgesteld; de heffingsmaatstaf
+            is de oppervlakte boven deze drempel
       - output: belasting_per_jaar
         value:
           operation: MULTIPLY
@@ -151,4 +140,5 @@ articles:
           article: '5'
           paragraph: b
           url: https://lokaleregelgeving.overheid.nl/CVDR704478/1
-          explanation: Precariobelasting = € 36,10 per jaar voor elke m² die de oppervlakte van het terras van 50 m² te boven gaat
+          explanation: Precariobelasting = € 36,10 per jaar voor elke m² die de oppervlakte
+            van het terras van 50 m² te boven gaat

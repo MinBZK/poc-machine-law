@@ -11,69 +11,57 @@ uuid: a611a7ea-98d5-42f5-a05c-475b1be4590e
 discoverable: CITIZEN
 articles:
 - number: '1'
-  text: |-
-    In deze wet en de bepalingen die daarop berusten wordt verstaan onder:
-      a. burgemeester en wethouders: burgemeester en wethouders van de gemeente waar de woning is gelegen waarop de huurtoeslag betrekking heeft;
-      b. huurcommissie: de huurcommissie, bedoeld in artikel 3a, eerste lid, van de Uitvoeringswet huurprijzen woonruimte;
-      c. huurder: persoon die zijn hoofdverblijf heeft in een door hem gehuurde woning, daaronder begrepen een woonwagen, tenzij:
-      1°. de overeenkomst van huur en verhuur een gebruik van de woning betreft dat naar zijn aard slechts van korte duur is, of
-      2°. de woning onderdeel uitmaakt van een hotel-, pension-, kamp- of vakantiebestedingsbedrijf, ongeacht de duur van de huurovereenkomst;
-      d. huurprijs: de prijs die bij huur en verhuur is verschuldigd voor het enkele gebruik van een woning;
-      e. huurtoeslag: een tegemoetkoming van het Rijk als bedoeld in artikel 2, eerste lid, onderdeel h, van de Algemene wet inkomensafhankelijke regelingen in de kosten van het huren van een woning;
-      f. onderhuurder: persoon als bedoeld in artikel 2, eerste lid, onderdeel e, onder 2°, van de Algemene wet inkomensafhankelijke regelingen;
-      g. Onze Minister: Onze Minister van Volkshuisvesting en Ruimtelijke Ordening;
-      h. rekenhuur: de rekenhuur, bedoeld in artikel 5;
-      i. rekeninkomen: de gezamenlijke toetsingsinkomens, bedoeld in artikel 8 van de Algemene wet inkomensafhankelijke regelingen, die in aanmerking worden genomen voor het bepalen van de draagkracht, bedoeld in artikel 7 van die wet;
-      j. standplaats: kavel, bestemd voor het plaatsen van een woonwagen, waarop voorzieningen aanwezig zijn die op het leidingnet van de openbare nutsbedrijven, andere instellingen of van gemeenten kunnen worden aangesloten;
-      k. woning: een gebouwde onroerende zaak voor zover deze als zelfstandige woonruimte, onvrije etage dan wel andere onzelfstandige woonruimte is verhuurd, alsmede de onroerende aanhorigheden;
-      l. woonwagen: voor bewoning bestemd gebouw dat is geplaatst op een standplaats en dat in zijn geheel of in delen kan worden verplaatst.
+  text: "In deze wet en de bepalingen die daarop berusten wordt verstaan onder:\n\
+    \  a. burgemeester en wethouders: burgemeester en wethouders van de gemeente waar\
+    \ de woning is gelegen waarop de huurtoeslag betrekking heeft;\n  b. huurcommissie:\
+    \ de huurcommissie, bedoeld in artikel 3a, eerste lid, van de Uitvoeringswet huurprijzen\
+    \ woonruimte;\n  c. huurder: persoon die zijn hoofdverblijf heeft in een door\
+    \ hem gehuurde woning, daaronder begrepen een woonwagen, tenzij:\n  1°. de overeenkomst\
+    \ van huur en verhuur een gebruik van de woning betreft dat naar zijn aard slechts\
+    \ van korte duur is, of\n  2°. de woning onderdeel uitmaakt van een hotel-, pension-,\
+    \ kamp- of vakantiebestedingsbedrijf, ongeacht de duur van de huurovereenkomst;\n\
+    \  d. huurprijs: de prijs die bij huur en verhuur is verschuldigd voor het enkele\
+    \ gebruik van een woning;\n  e. huurtoeslag: een tegemoetkoming van het Rijk als\
+    \ bedoeld in artikel 2, eerste lid, onderdeel h, van de Algemene wet inkomensafhankelijke\
+    \ regelingen in de kosten van het huren van een woning;\n  f. onderhuurder: persoon\
+    \ als bedoeld in artikel 2, eerste lid, onderdeel e, onder 2°, van de Algemene\
+    \ wet inkomensafhankelijke regelingen;\n  g. Onze Minister: Onze Minister van\
+    \ Volkshuisvesting en Ruimtelijke Ordening;\n  h. rekenhuur: de rekenhuur, bedoeld\
+    \ in artikel 5;\n  i. rekeninkomen: de gezamenlijke toetsingsinkomens, bedoeld\
+    \ in artikel 8 van de Algemene wet inkomensafhankelijke regelingen, die in aanmerking\
+    \ worden genomen voor het bepalen van de draagkracht, bedoeld in artikel 7 van\
+    \ die wet;\n  j. standplaats: kavel, bestemd voor het plaatsen van een woonwagen,\
+    \ waarop voorzieningen aanwezig zijn die op het leidingnet van de openbare nutsbedrijven,\
+    \ andere instellingen of van gemeenten kunnen worden aangesloten;\n  k. woning:\
+    \ een gebouwde onroerende zaak voor zover deze als zelfstandige woonruimte, onvrije\
+    \ etage dan wel andere onzelfstandige woonruimte is verhuurd, alsmede de onroerende\
+    \ aanhorigheden;\n  l. woonwagen: voor bewoning bestemd gebouw dat is geplaatst\
+    \ op een standplaats en dat in zijn geheel of in delen kan worden verplaatst."
   url: https://wetten.overheid.nl/BWBR0008659/2025-01-01#Artikel1
   machine_readable:
     definitions:
-      minimum_leeftijd:
-        value: 18
-      kwaliteitskortingsgrens:
-        value: 47720
-      aftoppingsgrens_1_2:
-        value: 68296
-      aftoppingsgrens_3_plus:
-        value: 73193
-      maximale_huurgrens:
-        value: 90007
-      vermogensgrens_alleenstaande:
-        value: 3695200
-      vermogensgrens_partners:
-        value: 7390400
-      inkomensgrens_alleenstaande:
-        value: 4400000
-      inkomensgrens_partners:
-        value: 5400000
-      subsidiepercentage_onder_kwaliteitskortingsgrens:
-        value: 1.0
-      subsidiepercentage_tussen_kwaliteit_aftop:
-        value: 0.65
-      subsidiepercentage_boven_aftop:
-        value: 0.4
-      minimum_basishuur_percentage:
-        value: 0.0486
-      maximale_servicekosten:
-        value: 4800
-      kind_vrijstelling:
-        value: 543200
-      leeftijdsgrens_kind_inkomen:
-        value: 23
-      minimum_inkomensijkpunt_alleenstaande:
-        value: 1800000
-      minimum_inkomensijkpunt_partners:
-        value: 2400000
-      referentie_inkomensijkpunt_alleenstaande:
-        value: 3262500
-      referentie_inkomensijkpunt_partners:
-        value: 4247500
-      normhuur_bij_minimum_inkomen:
-        value: 23801
-      normhuur_bij_referentie_inkomen:
-        value: 48378
+      minimum_leeftijd: 18
+      kwaliteitskortingsgrens: 47720
+      aftoppingsgrens_1_2: 68296
+      aftoppingsgrens_3_plus: 73193
+      maximale_huurgrens: 90007
+      vermogensgrens_alleenstaande: 3695200
+      vermogensgrens_partners: 7390400
+      inkomensgrens_alleenstaande: 4400000
+      inkomensgrens_partners: 5400000
+      subsidiepercentage_onder_kwaliteitskortingsgrens: 1.0
+      subsidiepercentage_tussen_kwaliteit_aftop: 0.65
+      subsidiepercentage_boven_aftop: 0.4
+      minimum_basishuur_percentage: 0.0486
+      maximale_servicekosten: 4800
+      kind_vrijstelling: 543200
+      leeftijdsgrens_kind_inkomen: 23
+      minimum_inkomensijkpunt_alleenstaande: 1800000
+      minimum_inkomensijkpunt_partners: 2400000
+      referentie_inkomensijkpunt_alleenstaande: 3262500
+      referentie_inkomensijkpunt_partners: 4247500
+      normhuur_bij_minimum_inkomen: 23801
+      normhuur_bij_referentie_inkomen: 48378
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -234,21 +222,15 @@ articles:
       - name: huurprijs
         type: amount
         required: true
-        source_reference:
-          source_type: claim
-          wallet_attribute: rent
+        source: {}
       - name: servicekosten
         type: amount
         required: true
-        source_reference:
-          source_type: claim
-          wallet_attribute: service_charges
+        source: {}
       - name: subsidiabele_servicekosten
         type: amount
         required: true
-        source_reference:
-          source_type: claim
-          wallet_attribute: eligible_service_charges
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -382,7 +364,8 @@ articles:
           article: '7'
           url: https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel7
           juriconnect: jci1.3:c:BWBR0008659&artikel=7&z=2025-01-01&g=2025-01-01
-          explanation: Het recht op huurtoeslag wordt toegekend als aan alle voorwaarden wordt voldaan conform artikel 7
+          explanation: Het recht op huurtoeslag wordt toegekend als aan alle voorwaarden
+            wordt voldaan conform artikel 7
       - output: basishuur
         value:
           operation: IF
@@ -470,7 +453,8 @@ articles:
           article: '19'
           url: https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf3_Artikel19
           juriconnect: jci1.3:c:BWBR0008659&artikel=19&z=2025-01-01&g=2025-01-01
-          explanation: De basishuur is gelijk aan de normhuur berekend op basis van inkomen conform artikel 19
+          explanation: De basishuur is gelijk aan de normhuur berekend op basis van
+            inkomen conform artikel 19
       - output: subsidiebedrag
         value:
           operation: ADD
@@ -546,10 +530,12 @@ articles:
           article: '21'
           url: https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf3_Artikel21
           juriconnect: jci1.3:c:BWBR0008659&artikel=21&z=2025-01-01&g=2025-01-01
-          explanation: De hoogte van de huurtoeslag wordt berekend volgens de formule in artikel 21
+          explanation: De hoogte van de huurtoeslag wordt berekend volgens de formule
+            in artikel 21
     untranslatables:
     - construct: iteratie over variabel aantal huishoudleden en kinderen voor inkomenstoets
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal huishoudleden en kinderen is dynamisch en kan niet
-        vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal huishoudleden tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal huishoudleden
+        en kinderen is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal huishoudleden
+        tot een vast maximum
       accepted: true

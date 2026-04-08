@@ -11,23 +11,26 @@ uuid: 848e8af1-5b25-454d-9813-8d295a93fd44
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '234'
-  text: |-
-    1 Een minderjarige is, mits hij met toestemming van zijn wettelijke vertegenwoordiger handelt, bekwaam rechtshandelingen te verrichten, voor zover de wet niet anders bepaalt.
-    2 De toestemming kan slechts worden verleend voor een bepaalde rechtshandeling of voor een bepaald doel.
-    3 De toestemming wordt aan de minderjarige verondersteld te zijn verleend, indien het een rechtshandeling betreft ten aanzien waarvan in het maatschappelijk verkeer gebruikelijk is dat minderjarigen van zijn leeftijd deze zelfstandig verrichten.
+  text: '1 Een minderjarige is, mits hij met toestemming van zijn wettelijke vertegenwoordiger
+    handelt, bekwaam rechtshandelingen te verrichten, voor zover de wet niet anders
+    bepaalt.
+
+    2 De toestemming kan slechts worden verleend voor een bepaalde rechtshandeling
+    of voor een bepaald doel.
+
+    3 De toestemming wordt aan de minderjarige verondersteld te zijn verleend, indien
+    het een rechtshandeling betreft ten aanzien waarvan in het maatschappelijk verkeer
+    gebruikelijk is dat minderjarigen van zijn leeftijd deze zelfstandig verrichten.'
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel234
   machine_readable:
     definitions:
-      meerderjarigheid_leeftijd:
-        value: 18
+      meerderjarigheid_leeftijd: 18
       minderjarige_rechten:
-        value:
-        - LEZEN
+      - LEZEN
       volledige_rechten:
-        value:
-        - LEZEN
-        - CLAIMS_INDIENEN
-        - BESLUITEN_ONTVANGEN
+      - LEZEN
+      - CLAIMS_INDIENEN
+      - BESLUITEN_ONTVANGEN
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -39,17 +42,7 @@ articles:
       input:
       - name: persoonsgegevens
         type: object
-        source_reference:
-          table: personen
-          fields:
-          - geboortedatum
-          - heeft_handlichting
-          - handlichting_gebieden
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -166,8 +159,11 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel13_Artikel234
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=234&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 1:234 lid 1 BW: minderjarigen hebben beperkte handelingsbekwaamheid zonder toestemming wettelijk vertegenwoordiger. Bij handlichting hebben zij voor bepaalde gebieden wel volledige rechten (Art. 1:235 BW).
+          explanation: 'Art. 1:234 lid 1 BW: minderjarigen hebben beperkte handelingsbekwaamheid
+            zonder toestemming wettelijk vertegenwoordiger. Bij handlichting hebben
+            zij voor bepaalde gebieden wel volledige rechten (Art. 1:235 BW).
+
+            '
       - output: heeft_delegaties
         value: true
         legal_basis:
@@ -230,7 +226,7 @@ articles:
           explanation: Rechten afhankelijk van minderjarigheid
       - output: valid_from_dates
         value:
-        -
+        - null
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -240,7 +236,7 @@ articles:
           explanation: SELF delegatie heeft geen ingangsdatum
       - output: valid_until_dates
         value:
-        -
+        - null
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

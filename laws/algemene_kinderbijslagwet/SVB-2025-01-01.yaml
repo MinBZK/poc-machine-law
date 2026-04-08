@@ -10,16 +10,20 @@ service: SVB
 uuid: 2e4f7a9b-5c8d-4e1a-9f3b-6d2e8a4c7f1b
 articles:
 - number: '6'
-  text: "1 Verzekerd overeenkomstig de bepalingen van deze wet is degene, die\n  a. ingezetene is;\n  b. geen ingezetene is,\
-    \ doch ter zake van in Nederland of op het continentaal plat in dienstbetrekking verrichte arbeid aan de loonbelasting\
-    \ is onderworpen.\n2 Niet verzekerd is de vreemdeling die niet rechtmatig in Nederland verblijf houdt in de zin van artikel\
-    \ 8, onder a tot en met e en l, van de Vreemdelingenwet 2000.\n3 Bij of krachtens algemene maatregel van bestuur kan,\
-    \ in afwijking van het eerste en tweede lid, uitbreiding dan wel beperking worden gegeven aan de kring der verzekerden.\n\
-    4 Bij een maatregel, als bedoeld in het derde lid, kan worden bepaald dat bij een niet rechtmatig verblijf in Nederland\
-    \ in de zin van artikel 8, onder a tot en met e en l, verzekerd zijn:\n  a. vreemdelingen die rechtmatig in Nederland\
-    \ arbeid verrichten, dan wel hebben verricht;\n  b. vreemdelingen die, na rechtmatig verblijf te hebben gehouden in de\
-    \ zin van artikel 8, onder a tot en met e en l, van de Vreemdelingenwet 2000, rechtmatig in Nederland verblijf hebben\
-    \ als bedoeld in artikel 8, onder g of h, van de Vreemdelingenwet 2000."
+  text: "1 Verzekerd overeenkomstig de bepalingen van deze wet is degene, die\n  a.\
+    \ ingezetene is;\n  b. geen ingezetene is, doch ter zake van in Nederland of op\
+    \ het continentaal plat in dienstbetrekking verrichte arbeid aan de loonbelasting\
+    \ is onderworpen.\n2 Niet verzekerd is de vreemdeling die niet rechtmatig in Nederland\
+    \ verblijf houdt in de zin van artikel 8, onder a tot en met e en l, van de Vreemdelingenwet\
+    \ 2000.\n3 Bij of krachtens algemene maatregel van bestuur kan, in afwijking van\
+    \ het eerste en tweede lid, uitbreiding dan wel beperking worden gegeven aan de\
+    \ kring der verzekerden.\n4 Bij een maatregel, als bedoeld in het derde lid, kan\
+    \ worden bepaald dat bij een niet rechtmatig verblijf in Nederland in de zin van\
+    \ artikel 8, onder a tot en met e en l, verzekerd zijn:\n  a. vreemdelingen die\
+    \ rechtmatig in Nederland arbeid verrichten, dan wel hebben verricht;\n  b. vreemdelingen\
+    \ die, na rechtmatig verblijf te hebben gehouden in de zin van artikel 8, onder\
+    \ a tot en met e en l, van de Vreemdelingenwet 2000, rechtmatig in Nederland verblijf\
+    \ hebben als bedoeld in artikel 8, onder g of h, van de Vreemdelingenwet 2000."
   url: https://wetten.overheid.nl/BWBR0002368/2020-01-01#Artikel6
   machine_readable:
     execution:
@@ -33,17 +37,7 @@ articles:
       input:
       - name: kinderen_data
         type: object
-        source_reference:
-          table: algemene_kinderbijslagwet
-          fields:
-          - aantal_kinderen
-          - kinderen_leeftijden
-          - ontvangt_kinderbijslag
-          select_on:
-          - name: ouder_bsn
-            description: BSN van de ouder
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: ontvangt_kinderbijslag
         type: boolean

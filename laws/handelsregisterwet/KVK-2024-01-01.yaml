@@ -10,31 +10,32 @@ service: KVK
 uuid: 8b59ef92-03f8-4294-bce9-4eaac01ba0ed
 articles:
 - number: '2'
-  text: |-
-    Er is een handelsregister van ondernemingen en rechtspersonen:
-      a. ter bevordering van de rechtszekerheid in het economisch verkeer;
-      b. voor de verstrekking van gegevens van algemene, feitelijke aard omtrent de samenstelling van ondernemingen en rechtspersonen ter bevordering van de economische belangen van handel, industrie, ambacht en dienstverlening;
-      c. voor het registreren van alle ondernemingen en rechtspersonen als onderdeel van de gegevenshuishouding die bijdraagt aan het efficiënt functioneren van en de rechtshandhaving door de overheid;
-      d. voor het registreren van uiteindelijk belanghebbenden ter voorkoming van het gebruik van het financiële stelsel voor het witwassen van geld en terrorismefinanciering.
+  text: "Er is een handelsregister van ondernemingen en rechtspersonen:\n  a. ter\
+    \ bevordering van de rechtszekerheid in het economisch verkeer;\n  b. voor de\
+    \ verstrekking van gegevens van algemene, feitelijke aard omtrent de samenstelling\
+    \ van ondernemingen en rechtspersonen ter bevordering van de economische belangen\
+    \ van handel, industrie, ambacht en dienstverlening;\n  c. voor het registreren\
+    \ van alle ondernemingen en rechtspersonen als onderdeel van de gegevenshuishouding\
+    \ die bijdraagt aan het efficiënt functioneren van en de rechtshandhaving door\
+    \ de overheid;\n  d. voor het registreren van uiteindelijk belanghebbenden ter\
+    \ voorkoming van het gebruik van het financiële stelsel voor het witwassen van\
+    \ geld en terrorismefinanciering."
   url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Artikel2
   machine_readable:
     definitions:
       actieve_statussen:
-        value:
-        - ACTIEF
-        - TIJDELIJK_GESTAAKT
+      - ACTIEF
+      - TIJDELIJK_GESTAAKT
       ondernemersvormen:
-        value:
-        - EENMANSZAAK
-        - VOF
-        - MAATSCHAP
-        - COMMANDITAIRE_VENNOOTSCHAP
+      - EENMANSZAAK
+      - VOF
+      - MAATSCHAP
+      - COMMANDITAIRE_VENNOOTSCHAP
       ondernemers_posities:
-        value:
-        - EIGENAAR
-        - VENNOOT
-        - MAAT
-        - BEHEREND_VENNOOT
+      - EIGENAAR
+      - VENNOOT
+      - MAAT
+      - BEHEREND_VENNOOT
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -46,31 +47,10 @@ articles:
       input:
       - name: inschrijvingen
         type: array
-        source_reference:
-          table: inschrijvingen
-          fields:
-          - kvk_nummer
-          - rechtsvorm
-          - status
-          - activiteit
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: posities
         type: array
-        source_reference:
-          table: functionarissen
-          fields:
-          - kvk_nummer
-          - functie
-          - status
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: is_actieve_ondernemer
         type: boolean
@@ -103,7 +83,8 @@ articles:
           article: '7'
           url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk2_Artikel7
           juriconnect: jci1.3:c:BWBR0021777&artikel=7&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 7 Handelsregisterwet bepaalt wanneer sprake is van actief ondernemerschap
+          explanation: Artikel 7 Handelsregisterwet bepaalt wanneer sprake is van
+            actief ondernemerschap
       - output: kvk_nummer
         value: $inschrijvingen.kvk_nummer
         legal_basis:

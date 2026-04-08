@@ -11,13 +11,36 @@ uuid: 7b2c4d8e-3f91-4a6b-9c5e-8d7f6a5b4c3d
 discoverable: BUSINESS
 articles:
 - number: '1'
-  text: |-
-    1. Onder bestuursorgaan wordt verstaan: a. een orgaan van een rechtspersoon die krachtens publiekrecht is ingesteld, of b. een ander persoon of college, met enig openbaar gezag bekleed. 2. De volgende organen, personen en colleges worden niet als bestuursorgaan aangemerkt: a. de wetgevende macht; b. de kamers en de verenigde vergadering der Staten-Generaal; c. onafhankelijke, bij de wet ingestelde organen die met rechtspraak zijn belast, alsmede de Raad voor de rechtspraak en het College van afgevaardigden; d. de Raad van State en zijn afdelingen; e. de Algemene Rekenkamer; f. de Nationale ombudsman en de substituut-ombudsmannen als bedoeld in artikel 9, eerste lid, van de Wet Nationale ombudsman, en ombudsmannen en ombudscommissies als bedoeld in artikel 9:17, onderdeel b; g. de voorzitters, leden, griffiers en secretarissen van de in de onderdelen b tot en met f bedoelde organen, de procureur-generaal, de plaatsvervangend procureur-generaal en de advocaten-generaal bij de Hoge Raad, de besturen van de in onderdeel c bedoelde organen alsmede de voorzitters van die besturen, alsmede de commissies uit het midden van de in de onderdelen b tot en met f bedoelde organen; h. de commissie van toezicht op de inlichtingen- en veiligheidsdiensten en haar afdelingen, bedoeld in artikel 97 van de Wet op de inlichtingen- en veiligheidsdiensten 2017; i. de toetsingscommissie inzet bevoegdheden, bedoeld in artikel 32 van de Wet op de inlichtingen- en veiligheidsdiensten 2017. 3. Een ingevolge het tweede lid uitgezonderd orgaan, persoon of college wordt wel als bestuursorgaan aangemerkt voor zover het orgaan, de persoon of het college besluiten neemt of handelingen verricht ten aanzien van een persoon met betrekking tot diens in artikel 3 van de Ambtenarenwet 2017 bedoelde hoedanigheid, zijn nagelaten betrekkingen of zijn rechtverkrijgenden, met uitzondering van een voor het leven benoemde ambtenaar werkzaam bij de Raad van State en zijn afdelingen en de Algemene Rekenkamer. 4. De vermogensrechtelijke gevolgen van een handeling van een bestuursorgaan treffen de rechtspersoon waartoe het bestuursorgaan behoort.
+  text: '1. Onder bestuursorgaan wordt verstaan: a. een orgaan van een rechtspersoon
+    die krachtens publiekrecht is ingesteld, of b. een ander persoon of college, met
+    enig openbaar gezag bekleed. 2. De volgende organen, personen en colleges worden
+    niet als bestuursorgaan aangemerkt: a. de wetgevende macht; b. de kamers en de
+    verenigde vergadering der Staten-Generaal; c. onafhankelijke, bij de wet ingestelde
+    organen die met rechtspraak zijn belast, alsmede de Raad voor de rechtspraak en
+    het College van afgevaardigden; d. de Raad van State en zijn afdelingen; e. de
+    Algemene Rekenkamer; f. de Nationale ombudsman en de substituut-ombudsmannen als
+    bedoeld in artikel 9, eerste lid, van de Wet Nationale ombudsman, en ombudsmannen
+    en ombudscommissies als bedoeld in artikel 9:17, onderdeel b; g. de voorzitters,
+    leden, griffiers en secretarissen van de in de onderdelen b tot en met f bedoelde
+    organen, de procureur-generaal, de plaatsvervangend procureur-generaal en de advocaten-generaal
+    bij de Hoge Raad, de besturen van de in onderdeel c bedoelde organen alsmede de
+    voorzitters van die besturen, alsmede de commissies uit het midden van de in de
+    onderdelen b tot en met f bedoelde organen; h. de commissie van toezicht op de
+    inlichtingen- en veiligheidsdiensten en haar afdelingen, bedoeld in artikel 97
+    van de Wet op de inlichtingen- en veiligheidsdiensten 2017; i. de toetsingscommissie
+    inzet bevoegdheden, bedoeld in artikel 32 van de Wet op de inlichtingen- en veiligheidsdiensten
+    2017. 3. Een ingevolge het tweede lid uitgezonderd orgaan, persoon of college
+    wordt wel als bestuursorgaan aangemerkt voor zover het orgaan, de persoon of het
+    college besluiten neemt of handelingen verricht ten aanzien van een persoon met
+    betrekking tot diens in artikel 3 van de Ambtenarenwet 2017 bedoelde hoedanigheid,
+    zijn nagelaten betrekkingen of zijn rechtverkrijgenden, met uitzondering van een
+    voor het leven benoemde ambtenaar werkzaam bij de Raad van State en zijn afdelingen
+    en de Algemene Rekenkamer. 4. De vermogensrechtelijke gevolgen van een handeling
+    van een bestuursorgaan treffen de rechtspersoon waartoe het bestuursorgaan behoort.'
   url: https://wetten.overheid.nl/BWBR0005537/1994-01-01#Artikel1
   machine_readable:
     definitions:
-      twee_derde_drempel:
-        value: 66.67
+      twee_derde_drempel: 66.67
     execution:
       parameters:
       - name: organisatie_id
@@ -26,125 +49,37 @@ articles:
       input:
       - name: is_orgaan_van_rechtspersoon
         type: boolean
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: is_orgaan_van_rechtspersoon
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       - name: publiekrechtelijke_rechtspersoon_type
         type: string
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: publiekrechtelijke_rechtspersoon_type
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       - name: heeft_publiekrechtelijke_bevoegdheid
         type: boolean
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: heeft_publiekrechtelijke_bevoegdheid
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       - name: bevoegdheid_bij_of_krachtens_wet
         type: boolean
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: bevoegdheid_bij_of_krachtens_wet
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       - name: overheidsfinanciering_percentage
         type: number
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: overheidsfinanciering_percentage
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       - name: criteria_door_overheid_bepaald
         type: boolean
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: criteria_door_overheid_bepaald
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       - name: is_uitsluitend_financiele_uitkering
         type: boolean
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: is_uitsluitend_financiele_uitkering
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       - name: is_volksvertegenwoordigend_orgaan
         type: boolean
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: is_volksvertegenwoordigend_orgaan
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       - name: is_rechterlijk_orgaan
         type: boolean
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: is_rechterlijk_orgaan
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       - name: is_ombudsman
         type: boolean
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: is_ombudsman
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       - name: is_algemene_rekenkamer
         type: boolean
-        source_reference:
-          source_type: AWB
-          table: organisaties
-          field: is_algemene_rekenkamer
-          select_on:
-          - name: organisatie_id
-            description: Identifier van de organisatie
-            type: string
-            value: $organisatie_id
+        source: {}
       output:
       - name: is_bestuursorgaan
         type: boolean

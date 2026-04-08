@@ -10,52 +10,68 @@ service: RVZ
 uuid: aba2b8fa-4b34-420f-883a-e78da326a8f4
 articles:
 - number: '1'
-  text: |-
-    In deze wet en de daarop berustende bepalingen wordt verstaan onder:
-      a. verzekeraar: een verzekeringsonderneming als bedoeld in de richtlijn solvabiliteit II;
-      b. zorgverzekeraar: een verzekeraar, voor zover deze zorgverzekeringen aanbiedt of uitvoert;
-      c. verzekeringnemer: een persoon die met een zorgverzekeraar een zorgverzekering heeft gesloten;
-      d. zorgverzekering: een tussen een zorgverzekeraar en een verzekeringnemer ten behoeve van een verzekeringsplichtige gesloten schadeverzekering, die voldoet aan hetgeen daarover bij of krachtens deze wet is geregeld, en waarvan de verzekerde prestaties het bij of krachtens deze wet geregelde niet te boven gaan;
-      e. verzekeringsplichtige: degene die op grond van artikel 2 verplicht is zich krachtens een zorgverzekering te verzekeren of te laten verzekeren;
-      f. verzekerde: degene wiens risico van behoefte aan zorg of overige diensten, als bedoeld in artikel 10, door een zorgverzekering wordt gedekt;
-      g. verplicht eigen risico: een bedrag aan kosten van zorg of overige diensten als bedoeld bij of krachtens artikel 11, dat voor rekening van de verzekerde blijft;
-      h. vrijwillig eigen risico: een door de verzekeringnemer met de zorgverzekeraar als onderdeel van de zorgverzekering overeengekomen bedrag aan kosten van zorg of overige diensten als bedoeld bij of krachtens artikel 11, dat de verzekerde voor zijn rekening zal nemen;
-      i. zorgpolis: de akte waarin de tussen een verzekeringnemer en een zorgverzekeraar gesloten zorgverzekering is vastgelegd;
-      j. modelovereenkomst: model van een zorgverzekering, waarin een overzicht wordt gegeven van de rechten en plichten die de verzekeringnemer, de verzekerde en de zorgverzekeraar jegens elkaar zullen hebben indien een overeenkomst volgens het desbetreffende model wordt gesloten;
-      k. Zvw-pgb: een gemaximeerde vergoeding voor de kosten die de verzekerde maakt voor het betrekken van zorg of een andere dienst;
-      l. inhoudingsplichtige: de inhoudingsplichtige in de zin van de Wet op de loonbelasting 1964 dan wel de werkgever in de zin van de Wet financiering sociale verzekeringen;
-      m. instelling:
-      1°. een organisatorisch verband dat zorg of een andere dienst verleent waarop aanspraak bestaat ingevolge een zorgverzekering of ingevolge artikel 3.1.1 van de Wet langdurige zorg;
-      2°. een organisatorisch verband dat gevestigd is buiten het grondgebied van het Europese deel van Nederland en overeenkomstig de daar geldende wetgeving rechtmatig gezondheidszorg verstrekt als bedoeld bij en krachtens artikel 11;
-      n. Onze Minister: Onze Minister voor Medische Zorg;
-      o. zorgautoriteit: de Nederlandse Zorgautoriteit, bedoeld in de Wet marktordening gezondheidszorg;
-      p. Zorginstituut: het Zorginstituut Nederland, genoemd in artikel 58, eerste lid;
-      q. Zorgverzekeringsfonds: het fonds, genoemd in artikel 39;
-      r. richtlijn solvabiliteit II: richtlijn 2009/138/EG van het Europees Parlement en de Raad van 25 november 2009 betreffende de toegang tot en uitoefening van het verzekerings- en het herverzekeringsbedrijf (Solvabiliteit II) (PbEU 2009, L 335);
-      s. Wlz-uitvoerder: de rechtspersoon, bedoeld in artikel 1.1.1 van de Wet langdurige zorg;
-      t. loontijdvak: het loontijdvak, bedoeld in artikel 25, eerste en vierde lid, van de Wet op de loonbelasting 1964;
-      u. inspecteur: de functionaris van de rijksbelastingdienst die als zodanig bij regeling van Onze Minister van Financiën is aangewezen;
-      v. burgerservicenummer: het nummer, bedoeld in artikel 1, onderdeel b, van de Wet algemene bepalingen burgerservicenummer;
-      w. premie: de premie, bedoeld in afdeling 3.3.1;
-      x. bestuursrechtelijke premie: de premie, bedoeld in de artikelen 18d en 18e;
-      y. Sociale verzekeringsbank: Sociale verzekeringsbank, bedoeld in artikel 1, eerste lid, onderdeel d, van de Wet structuur uitvoeringsorganisatie werk en inkomen;
-      z. vervallen;
-      aa. vervallen;
-      bb. het CAK: het CAK, genoemd in artikel 6.1.1, eerste lid, van de Wet langdurige zorg.
+  text: "In deze wet en de daarop berustende bepalingen wordt verstaan onder:\n  a.\
+    \ verzekeraar: een verzekeringsonderneming als bedoeld in de richtlijn solvabiliteit\
+    \ II;\n  b. zorgverzekeraar: een verzekeraar, voor zover deze zorgverzekeringen\
+    \ aanbiedt of uitvoert;\n  c. verzekeringnemer: een persoon die met een zorgverzekeraar\
+    \ een zorgverzekering heeft gesloten;\n  d. zorgverzekering: een tussen een zorgverzekeraar\
+    \ en een verzekeringnemer ten behoeve van een verzekeringsplichtige gesloten schadeverzekering,\
+    \ die voldoet aan hetgeen daarover bij of krachtens deze wet is geregeld, en waarvan\
+    \ de verzekerde prestaties het bij of krachtens deze wet geregelde niet te boven\
+    \ gaan;\n  e. verzekeringsplichtige: degene die op grond van artikel 2 verplicht\
+    \ is zich krachtens een zorgverzekering te verzekeren of te laten verzekeren;\n\
+    \  f. verzekerde: degene wiens risico van behoefte aan zorg of overige diensten,\
+    \ als bedoeld in artikel 10, door een zorgverzekering wordt gedekt;\n  g. verplicht\
+    \ eigen risico: een bedrag aan kosten van zorg of overige diensten als bedoeld\
+    \ bij of krachtens artikel 11, dat voor rekening van de verzekerde blijft;\n \
+    \ h. vrijwillig eigen risico: een door de verzekeringnemer met de zorgverzekeraar\
+    \ als onderdeel van de zorgverzekering overeengekomen bedrag aan kosten van zorg\
+    \ of overige diensten als bedoeld bij of krachtens artikel 11, dat de verzekerde\
+    \ voor zijn rekening zal nemen;\n  i. zorgpolis: de akte waarin de tussen een\
+    \ verzekeringnemer en een zorgverzekeraar gesloten zorgverzekering is vastgelegd;\n\
+    \  j. modelovereenkomst: model van een zorgverzekering, waarin een overzicht wordt\
+    \ gegeven van de rechten en plichten die de verzekeringnemer, de verzekerde en\
+    \ de zorgverzekeraar jegens elkaar zullen hebben indien een overeenkomst volgens\
+    \ het desbetreffende model wordt gesloten;\n  k. Zvw-pgb: een gemaximeerde vergoeding\
+    \ voor de kosten die de verzekerde maakt voor het betrekken van zorg of een andere\
+    \ dienst;\n  l. inhoudingsplichtige: de inhoudingsplichtige in de zin van de Wet\
+    \ op de loonbelasting 1964 dan wel de werkgever in de zin van de Wet financiering\
+    \ sociale verzekeringen;\n  m. instelling:\n  1°. een organisatorisch verband\
+    \ dat zorg of een andere dienst verleent waarop aanspraak bestaat ingevolge een\
+    \ zorgverzekering of ingevolge artikel 3.1.1 van de Wet langdurige zorg;\n  2°.\
+    \ een organisatorisch verband dat gevestigd is buiten het grondgebied van het\
+    \ Europese deel van Nederland en overeenkomstig de daar geldende wetgeving rechtmatig\
+    \ gezondheidszorg verstrekt als bedoeld bij en krachtens artikel 11;\n  n. Onze\
+    \ Minister: Onze Minister voor Medische Zorg;\n  o. zorgautoriteit: de Nederlandse\
+    \ Zorgautoriteit, bedoeld in de Wet marktordening gezondheidszorg;\n  p. Zorginstituut:\
+    \ het Zorginstituut Nederland, genoemd in artikel 58, eerste lid;\n  q. Zorgverzekeringsfonds:\
+    \ het fonds, genoemd in artikel 39;\n  r. richtlijn solvabiliteit II: richtlijn\
+    \ 2009/138/EG van het Europees Parlement en de Raad van 25 november 2009 betreffende\
+    \ de toegang tot en uitoefening van het verzekerings- en het herverzekeringsbedrijf\
+    \ (Solvabiliteit II) (PbEU 2009, L 335);\n  s. Wlz-uitvoerder: de rechtspersoon,\
+    \ bedoeld in artikel 1.1.1 van de Wet langdurige zorg;\n  t. loontijdvak: het\
+    \ loontijdvak, bedoeld in artikel 25, eerste en vierde lid, van de Wet op de loonbelasting\
+    \ 1964;\n  u. inspecteur: de functionaris van de rijksbelastingdienst die als\
+    \ zodanig bij regeling van Onze Minister van Financiën is aangewezen;\n  v. burgerservicenummer:\
+    \ het nummer, bedoeld in artikel 1, onderdeel b, van de Wet algemene bepalingen\
+    \ burgerservicenummer;\n  w. premie: de premie, bedoeld in afdeling 3.3.1;\n \
+    \ x. bestuursrechtelijke premie: de premie, bedoeld in de artikelen 18d en 18e;\n\
+    \  y. Sociale verzekeringsbank: Sociale verzekeringsbank, bedoeld in artikel 1,\
+    \ eerste lid, onderdeel d, van de Wet structuur uitvoeringsorganisatie werk en\
+    \ inkomen;\n  z. vervallen;\n  aa. vervallen;\n  bb. het CAK: het CAK, genoemd\
+    \ in artikel 6.1.1, eerste lid, van de Wet langdurige zorg."
   url: https://wetten.overheid.nl/BWBR0018450/2024-01-01#Artikel1
   machine_readable:
     definitions:
       actieve_polis_statussen:
-        value:
-        - ACTIEF
-        - GESCHORST_MET_TERUGWERKENDE_KRACHT
+      - ACTIEF
+      - GESCHORST_MET_TERUGWERKENDE_KRACHT
       geldige_verdragslanden:
-        value:
-        - BELGIE
-        - DUITSLAND
-        - FRANKRIJK
-        - VERENIGD_KONINKRIJK
-        - ZWITSERLAND
+      - BELGIE
+      - DUITSLAND
+      - FRANKRIJK
+      - VERENIGD_KONINKRIJK
+      - ZWITSERLAND
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -89,24 +105,10 @@ articles:
           reference: $prev_january_first
       - name: verzekeringspolis
         type: object
-        source_reference:
-          table: verzekeringen
-          field: polis_status
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: verdragsinschrijving
         type: object
-        source_reference:
-          table: verdragsverzekeringen
-          field: registratie
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: heeft_verzekering
         type: boolean

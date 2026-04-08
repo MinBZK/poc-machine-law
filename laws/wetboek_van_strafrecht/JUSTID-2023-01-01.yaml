@@ -39,20 +39,7 @@ articles:
       input:
       - name: stemrecht_uitsluitingen
         type: array
-        source_reference:
-          table: ontzettingen
-          fields:
-          - startdatum
-          - einddatum
-          select_on:
-          - name: bsn
-            description: BSN van de persoon
-            type: string
-            value: $bsn
-          - name: type
-            description: Type ontzetting
-            type: string
-            value: KIESRECHT
+        source: {}
       output:
       - name: heeft_stemrecht_uitsluiting
         type: boolean

@@ -11,16 +11,17 @@ uuid: 7c2e8f4a-3b9d-4e1f-a5c2-9d8b7e6f4a3c
 discoverable: BUSINESS
 articles:
 - number: '3'
-  text: |-
-    1 Het is verboden zonder daartoe strekkende vergunning van de burgemeester het horecabedrijf of slijtersbedrijf uit te oefenen.
-    2 Met toepassing van artikel 28, eerste lid, laatste zinsnede, van de Dienstenwet is paragraaf 4.1.3.3. van de Algemene wet bestuursrecht niet van toepassing op de aanvraag van een vergunning als bedoeld in het eerste lid.
+  text: '1 Het is verboden zonder daartoe strekkende vergunning van de burgemeester
+    het horecabedrijf of slijtersbedrijf uit te oefenen.
+
+    2 Met toepassing van artikel 28, eerste lid, laatste zinsnede, van de Dienstenwet
+    is paragraaf 4.1.3.3. van de Algemene wet bestuursrecht niet van toepassing op
+    de aanvraag van een vergunning als bedoeld in het eerste lid.'
   url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Artikel3
   machine_readable:
     definitions:
-      bibob_ernstig_gevaar:
-        value: ernstig_gevaar
-      bibob_beschikking_type:
-        value: vergunning
+      bibob_ernstig_gevaar: ernstig_gevaar
+      bibob_beschikking_type: vergunning
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -112,44 +113,16 @@ articles:
           reference: $referencedate
       - name: bsn_leidinggevende
         type: string
-        source_reference:
-          table: leidinggevenden
-          field: bsn
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: vloeroppervlakte_horecalokaliteit
         type: number
-        source_reference:
-          table: inrichtingen
-          field: vloeroppervlakte_horecalokaliteit
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: type_bedrijf
         type: string
-        source_reference:
-          table: inrichtingen
-          field: type_bedrijf
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: heeft_actieve_alcoholwetvergunning
         type: boolean
-        source_reference:
-          table: vergunningen
-          field: heeft_alcoholvergunning
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -189,7 +162,8 @@ articles:
           bwb_id: BWBR0002458
           article: '27'
           url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27
-          explanation: Geen weigeringsgrond is van toepassing, dus de vergunning wordt verleend
+          explanation: Geen weigeringsgrond is van toepassing, dus de vergunning wordt
+            verleend
       - output: heeft_actieve_vergunning
         value: $heeft_actieve_alcoholwetvergunning
         legal_basis:

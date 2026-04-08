@@ -10,17 +10,16 @@ service: NATIONAAL_ARCHIEF
 uuid: 5cebc6f0-caa4-4f2f-908e-37c0fcb7337a
 articles:
 - number: '12'
-  text: |-
-    1. De zorgdrager brengt de archiefbescheiden die niet voor vernietiging in aanmerking komen en ouder zijn dan twintig jaar over naar een archiefbewaarplaats. 2. Bij of krachtens algemene maatregel van bestuur worden regels gesteld, die bij de overbrenging van archiefbescheiden in acht dienen te worden genomen.
+  text: 1. De zorgdrager brengt de archiefbescheiden die niet voor vernietiging in
+    aanmerking komen en ouder zijn dan twintig jaar over naar een archiefbewaarplaats.
+    2. Bij of krachtens algemene maatregel van bestuur worden regels gesteld, die
+    bij de overbrenging van archiefbescheiden in acht dienen te worden genomen.
   url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Artikel12
   machine_readable:
     definitions:
-      minimale_leeftijd_jaren:
-        value: 20
-      maximale_termijn_overbrengen_jaren:
-        value: 10
-      uiterste_leeftijd_jaren:
-        value: 30
+      minimale_leeftijd_jaren: 20
+      maximale_termijn_overbrengen_jaren: 10
+      uiterste_leeftijd_jaren: 30
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -77,7 +76,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel12
           juriconnect: jci1.3:c:BWBR0007376&artikel=12&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 12 lid 1 bepaalt wanneer archiefbescheiden overgebracht moeten worden
+          explanation: Artikel 12 lid 1 bepaalt wanneer archiefbescheiden overgebracht
+            moeten worden
       - output: uiterste_overbrengdatum
         value:
           operation: IF
@@ -96,4 +96,5 @@ articles:
           article: '11'
           url: https://wetten.overheid.nl/BWBR0007748/2020-01-01#Artikel11
           juriconnect: jci1.3:c:BWBR0007748&artikel=11&z=2020-01-01&g=2020-01-01
-          explanation: Artikel 11 Archiefbesluit bepaalt de uiterste termijn voor overbrenging
+          explanation: Artikel 11 Archiefbesluit bepaalt de uiterste termijn voor
+            overbrenging

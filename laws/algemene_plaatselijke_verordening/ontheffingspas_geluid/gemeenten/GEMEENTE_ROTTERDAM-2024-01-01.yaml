@@ -12,15 +12,22 @@ uuid: 56ec10fc-cf5b-468f-927f-4a4615f4dbfa
 discoverable: BUSINESS
 articles:
 - number: '4:2'
-  text: |-
-    Artikel 4:2 Aanwijzing collectieve festiviteiten 1. De artikelen 2:17, 2:17a, 2:19, 2:19a en 2:20 van het besluit gelden niet voor ten hoogste zeven door het college per kalenderjaar aan te wijzen collectieve festiviteiten gedurende de door hem aan te wijzen dagen of dagdelen. 2. Artikel 3.148 van het besluit geldt niet voor ten hoogste zeven door het college per kalenderjaar aan te wijzen collectieve festiviteiten gedurende de daarbij aan te wijzen dagen of dagdelen. 3. In een aanwijzing krachtens het eerste of tweede lid, kan het college bepalen dat de aanwijzing slechts geldt in één of meer delen van de gemeente. 4. Het college kan wanneer een collectieve festiviteit redelijkerwijs niet te voorzien was, een festiviteit onverwijld als collectieve festiviteit als bedoeld in het eerste lid aanwijzen. <section class="section-chapter js-scrollSection"
+  text: Artikel 4:2 Aanwijzing collectieve festiviteiten 1. De artikelen 2:17, 2:17a,
+    2:19, 2:19a en 2:20 van het besluit gelden niet voor ten hoogste zeven door het
+    college per kalenderjaar aan te wijzen collectieve festiviteiten gedurende de
+    door hem aan te wijzen dagen of dagdelen. 2. Artikel 3.148 van het besluit geldt
+    niet voor ten hoogste zeven door het college per kalenderjaar aan te wijzen collectieve
+    festiviteiten gedurende de daarbij aan te wijzen dagen of dagdelen. 3. In een
+    aanwijzing krachtens het eerste of tweede lid, kan het college bepalen dat de
+    aanwijzing slechts geldt in één of meer delen van de gemeente. 4. Het college
+    kan wanneer een collectieve festiviteit redelijkerwijs niet te voorzien was, een
+    festiviteit onverwijld als collectieve festiviteit als bedoeld in het eerste lid
+    aanwijzen. <section class="section-chapter js-scrollSection"
   url: https://lokaleregelgeving.overheid.nl/CVDR373493#artikel_4:2
   machine_readable:
     definitions:
-      max_ontheffingen_per_jaar:
-        value: 12
-      min_aanvraagtermijn_uren:
-        value: 48
+      max_ontheffingen_per_jaar: 12
+      min_aanvraagtermijn_uren: 48
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -33,7 +40,7 @@ articles:
         type: date
         required: true
       - name: activiteitsstarttijd
-        type: time
+        type: string
         required: true
       input:
       - name: kvk_status
@@ -46,40 +53,10 @@ articles:
             kvk_nummer: $kvk_nummer
       - name: verleende_ontheffingen_dit_jaar
         type: array
-        source_reference:
-          source_type: cases
-          select_on:
-          - name: law
-            description: Filter op geluidsontheffing wet
-            type: string
-            value: algemene_plaatselijke_verordening/ontheffingspas_geluid
-          - name: status
-            description: Alleen besliste zaken
-            type: string
-            value: DECIDED
-          - name: approved
-            description: Alleen goedgekeurde zaken
-            type: boolean
-            value: true
-          - name: kvk_nummer
-            description: KVK nummer van het horecabedrijf
-            type: string
-            value: $kvk_nummer
-          - name: year
-            description: Kalenderjaar
-            type: number
-            value: $year
+        source: {}
       - name: heeft_geluidsklachten
         type: boolean
-        source_reference:
-          source_type: GEMEENTE_ROTTERDAM
-          table: geluidsklachten
-          field: heeft_actieve_klachten
-          select_on:
-          - name: kvk_nummer
-            description: KVK nummer van het horecabedrijf
-            type: string
-            value: $kvk_nummer
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -143,7 +120,8 @@ articles:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: '4:2'
           url: https://lokaleregelgeving.overheid.nl/CVDR373493
-          explanation: Het aantal nog beschikbare ontheffingen wordt berekend (12 minus verleend)
+          explanation: Het aantal nog beschikbare ontheffingen wordt berekend (12
+            minus verleend)
       - output: tijdig_aangevraagd
         value:
           operation: GREATER_THAN_OR_EQUAL
@@ -160,7 +138,8 @@ articles:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: '4:2'
           url: https://lokaleregelgeving.overheid.nl/CVDR373493
-          explanation: Controle of de aanvraag minimaal 48 uur voor het begin van de activiteit is ingediend
+          explanation: Controle of de aanvraag minimaal 48 uur voor het begin van
+            de activiteit is ingediend
       - output: geen_geluidsklachten
         value:
           operation: EQUALS
@@ -199,7 +178,8 @@ articles:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: '4:2'
           url: https://lokaleregelgeving.overheid.nl/CVDR373493
-          explanation: Vrijdag en zaterdag (dag 4 en 5) geldig tot 02:00, overige dagen tot 00:00 middernacht
+          explanation: Vrijdag en zaterdag (dag 4 en 5) geldig tot 02:00, overige
+            dagen tot 00:00 middernacht
       - output: komt_in_aanmerking_voor_geluidsontheffing
         value: true
         legal_basis:

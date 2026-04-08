@@ -11,32 +11,45 @@ uuid: 2d6430cb-dd3c-47fa-9741-2202386619a8
 discoverable: HIDDEN
 articles:
 - number: '9'
-  text: |-
-    1 Het Bureau heeft tot taak aan bestuursorganen, voorzover deze bij of krachtens de wet de bevoegdheid hebben gekregen het Bureau daartoe te verzoeken, op verzoek advies uit te brengen over de mate van gevaar, bedoeld in artikel 3, eerste lid, of over de feiten en omstandigheden, bedoeld in artikel 3, zesde lid.
-    2 Voor zover het gaat om een overheidsopdracht, heeft het Bureau voorts tot taak rechtspersonen met een overheidstaak desgevraagd advies uit te brengen over:
-      a. feiten en omstandigheden die grond kunnen opleveren voor de toepassing ten aanzien van een betrokkene van artikelen 2.86 tot en met 2.89 van de Aanbestedingswet 2012;
-      b. feiten en omstandigheden die grond kunnen opleveren voor de toepassing ten aanzien van een betrokkene van artikel 3.65 van de Aanbestedingswet 2012 in samenhang gelezen met de in onderdeel a genoemde bepalingen, indien het gaat om een speciale-sectoropdracht als bedoeld in artikel 1.1 van de Aanbestedingswet 2012;
-      c. de mogelijkheid dat een betrokkene wordt gefinancierd met uit gepleegde strafbare feiten verkregen of te verkrijgen, op geld waardeerbare voordelen;
-      d. de mate van gevaar dat een betrokkene, indien de overheidsopdracht aan hem zou worden gegund, bij de uitvoering van die opdracht strafbare feiten zal plegen.
-    3 Voor zover het gaat om een vastgoedtransactie, heeft het Bureau tot taak rechtspersonen met een overheidstaak op verzoek advies uit te brengen over:
-      a. de mate van gevaar dat de vastgoedtransactie mede zal worden gebruikt om uit gepleegde strafbare feiten verkregen of te verkrijgen, op geld waardeerbare voordelen te benutten,
-      b. de mate van gevaar dat in of met de onroerende zaak waar de vastgoedtransactie betrekking op heeft, mede strafbare feiten zullen worden gepleegd, of
-      c. de feiten en omstandigheden die er op wijzen of redelijkerwijs doen vermoeden dat ter verkrijging of behoud van een vastgoedtransactie een strafbaar feit is gepleegd.
-    4 Artikel 3, tweede tot en met vijfde lid, is van overeenkomstige toepassing.
-    5 Het Bureau kan afzien van het uitbrengen van een advies indien:
-      a. het bestuursorgaan of de rechtspersoon met een overheidstaak niet de in artikel 7a, vierde lid, bedoelde informatie heeft toegezonden aan het Bureau; of
-      b. uit de in artikel 7a, vierde lid, bedoelde informatie naar het oordeel van het Bureau blijkt dat het bestuursorgaan of de rechtspersoon met een overheidstaak onvoldoende gebruik heeft gemaakt van de mogelijkheden tot het verrichten van eigen onderzoek.
+  text: "1 Het Bureau heeft tot taak aan bestuursorganen, voorzover deze bij of krachtens\
+    \ de wet de bevoegdheid hebben gekregen het Bureau daartoe te verzoeken, op verzoek\
+    \ advies uit te brengen over de mate van gevaar, bedoeld in artikel 3, eerste\
+    \ lid, of over de feiten en omstandigheden, bedoeld in artikel 3, zesde lid.\n\
+    2 Voor zover het gaat om een overheidsopdracht, heeft het Bureau voorts tot taak\
+    \ rechtspersonen met een overheidstaak desgevraagd advies uit te brengen over:\n\
+    \  a. feiten en omstandigheden die grond kunnen opleveren voor de toepassing ten\
+    \ aanzien van een betrokkene van artikelen 2.86 tot en met 2.89 van de Aanbestedingswet\
+    \ 2012;\n  b. feiten en omstandigheden die grond kunnen opleveren voor de toepassing\
+    \ ten aanzien van een betrokkene van artikel 3.65 van de Aanbestedingswet 2012\
+    \ in samenhang gelezen met de in onderdeel a genoemde bepalingen, indien het gaat\
+    \ om een speciale-sectoropdracht als bedoeld in artikel 1.1 van de Aanbestedingswet\
+    \ 2012;\n  c. de mogelijkheid dat een betrokkene wordt gefinancierd met uit gepleegde\
+    \ strafbare feiten verkregen of te verkrijgen, op geld waardeerbare voordelen;\n\
+    \  d. de mate van gevaar dat een betrokkene, indien de overheidsopdracht aan hem\
+    \ zou worden gegund, bij de uitvoering van die opdracht strafbare feiten zal plegen.\n\
+    3 Voor zover het gaat om een vastgoedtransactie, heeft het Bureau tot taak rechtspersonen\
+    \ met een overheidstaak op verzoek advies uit te brengen over:\n  a. de mate van\
+    \ gevaar dat de vastgoedtransactie mede zal worden gebruikt om uit gepleegde strafbare\
+    \ feiten verkregen of te verkrijgen, op geld waardeerbare voordelen te benutten,\n\
+    \  b. de mate van gevaar dat in of met de onroerende zaak waar de vastgoedtransactie\
+    \ betrekking op heeft, mede strafbare feiten zullen worden gepleegd, of\n  c.\
+    \ de feiten en omstandigheden die er op wijzen of redelijkerwijs doen vermoeden\
+    \ dat ter verkrijging of behoud van een vastgoedtransactie een strafbaar feit\
+    \ is gepleegd.\n4 Artikel 3, tweede tot en met vijfde lid, is van overeenkomstige\
+    \ toepassing.\n5 Het Bureau kan afzien van het uitbrengen van een advies indien:\n\
+    \  a. het bestuursorgaan of de rechtspersoon met een overheidstaak niet de in\
+    \ artikel 7a, vierde lid, bedoelde informatie heeft toegezonden aan het Bureau;\
+    \ of\n  b. uit de in artikel 7a, vierde lid, bedoelde informatie naar het oordeel\
+    \ van het Bureau blijkt dat het bestuursorgaan of de rechtspersoon met een overheidstaak\
+    \ onvoldoende gebruik heeft gemaakt van de mogelijkheden tot het verrichten van\
+    \ eigen onderzoek."
   url: https://wetten.overheid.nl/BWBR0013798/2024-01-01#Artikel9
   machine_readable:
     definitions:
-      mate_geen_gevaar:
-        value: geen_gevaar
-      mate_mindere_mate:
-        value: mindere_mate
-      mate_ernstig_gevaar:
-        value: ernstig_gevaar
-      adviestermijn_weken:
-        value: 8
+      mate_geen_gevaar: geen_gevaar
+      mate_mindere_mate: mindere_mate
+      mate_ernstig_gevaar: ernstig_gevaar
+      adviestermijn_weken: 8
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -47,7 +60,7 @@ articles:
       - name: bsn
         type: string
       - name: beschikking_type
-        type: enum
+        type: string
         required: true
         type_spec:
           enum:
@@ -63,64 +76,22 @@ articles:
       input:
       - name: advies_uitgebracht
         type: boolean
-        source_reference:
-          table: bibob_adviezen
-          field: advies_uitgebracht
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: advies_mate_van_gevaar
-        type: enum
-        source_reference:
-          table: bibob_adviezen
-          field: mate_van_gevaar
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        type: string
+        source: {}
       - name: advies_datum
         type: date
-        source_reference:
-          table: bibob_adviezen
-          field: advies_datum
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: relatie_tot_strafbare_feiten
         type: boolean
-        source_reference:
-          table: bibob_adviezen
-          field: relatie_strafbare_feiten
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: financieringsrisico
         type: boolean
-        source_reference:
-          table: bibob_adviezen
-          field: financieringsrisico
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: voorschriften_geadviseerd
         type: boolean
-        source_reference:
-          table: bibob_adviezen
-          field: voorschriften_geadviseerd
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        source: {}
       output:
       - name: advies_uitgebracht
         type: boolean
@@ -159,7 +130,8 @@ articles:
           bwb_id: BWBR0013798
           article: '3'
           url: https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3
-          explanation: De mate van gevaar wordt alleen bepaald als er een advies is uitgebracht
+          explanation: De mate van gevaar wordt alleen bepaald als er een advies is
+            uitgebracht
       - output: weigering_mogelijk
         value:
           operation: AND
@@ -203,8 +175,8 @@ articles:
           article: '3'
           paragraph: '7'
           url: https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3
-          explanation: Voorschriften zijn mogelijk bij mindere mate van gevaar of bij ernstig gevaar waar weigering niet proportioneel
-            is
+          explanation: Voorschriften zijn mogelijk bij mindere mate van gevaar of
+            bij ernstig gevaar waar weigering niet proportioneel is
       - output: verlening_geadviseerd
         value:
           operation: OR
@@ -220,7 +192,8 @@ articles:
           bwb_id: BWBR0013798
           article: '3'
           url: https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3
-          explanation: Verlening wordt geadviseerd als er geen advies is of als er geen gevaar is gebleken
+          explanation: Verlening wordt geadviseerd als er geen advies is of als er
+            geen gevaar is gebleken
       - output: financieringsrisico
         value: $financieringsrisico
         legal_basis:

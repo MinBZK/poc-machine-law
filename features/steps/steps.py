@@ -5,7 +5,6 @@ from unittest import TestCase
 import pandas as pd
 from behave import given, then, when
 
-from machine.service import Services
 
 assertions = TestCase()
 
@@ -173,12 +172,9 @@ def step_impl(context, date):
             del context.services
     except Exception:
         pass
-    if getattr(context, "engine_type", "python") == "regelrecht":
-        from machine.regelrecht_services import RegelrechtServices
+    from machine.regelrecht_services import RegelrechtServices
 
-        context.services = RegelrechtServices(date)
-    else:
-        context.services = Services(date)
+    context.services = RegelrechtServices(date)
 
 
 @given('een persoon met BSN "{bsn}"')

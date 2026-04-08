@@ -72,16 +72,13 @@ articles:
   machine_readable:
     definitions:
       geldige_uitkering_typen:
-        value:
-        - WW
-        - WIA
-        - WAO
-        - ZW
-        - WAZO
-      dagen_per_jaar:
-        value: 365.25
-      uren_per_dag:
-        value: 8
+      - WW
+      - WIA
+      - WAO
+      - ZW
+      - WAZO
+      dagen_per_jaar: 365.25
+      uren_per_dag: 8
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -93,34 +90,10 @@ articles:
       input:
       - name: dienstverbandperiodes
         type: array
-        source_reference:
-          table: dienstverbanden
-          fields:
-          - start_date
-          - end_date
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: uitkeringsperiodes
         type: array
-        source_reference:
-          table: uitkeringen
-          fields:
-          - start_date
-          - end_date
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
-          - name: type
-            description: Uitkerkingen die meetellen
-            type: string
-            value:
-              operation: IN
-              values: $geldige_uitkering_typen
+        source: {}
       output:
       - name: verzekerde_jaren
         type: number

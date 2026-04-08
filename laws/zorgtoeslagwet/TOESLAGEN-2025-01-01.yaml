@@ -11,35 +11,51 @@ uuid: 60e71675-38bc-4297-87ac-0c145613e481
 discoverable: CITIZEN
 articles:
 - number: '2'
-  text: |-
-    1 Indien de normpremie voor een verzekerde in het berekeningsjaar minder bedraagt dan de standaardpremie in dat jaar, heeft de verzekerde aanspraak op een zorgtoeslag ter grootte van dat verschil. Voor een verzekerde met een partner wordt daarbij tweemaal de standaardpremie in aanmerking genomen; in dat geval worden de verzekerde en zijn partner voor de toepassing van deze wet geacht gezamenlijk één aanspraak te hebben.
-    2 De normpremie bedraagt een percentage van het drempelinkomen in het berekeningsjaar, vermeerderd met een percentage van het toetsingsinkomen van de verzekerde in dat jaar voorzover dat toetsingsinkomen het drempelinkomen te boven gaat. Voor een verzekerde met een partner wordt daarbij het gezamenlijke toetsingsinkomen in aanmerking genomen.
-    3 De percentages worden voor verzekerden met een partner vastgesteld op 4,273% van het drempelinkomen, vermeerderd met 13,700% van het toetsingsinkomen voor zover dat boven het drempelinkomen uitgaat en voor een verzekerde zonder partner op 1,896% van het drempelinkomen, vermeerderd met 13,700% van het toetsingsinkomen voor zover dat boven het drempelinkomen uitgaat. Deze percentages kunnen bij algemene maatregel van bestuur worden gewijzigd.
-    4 In afwijking van het eerste lid bedraagt de aanspraak op een zorgtoeslag voor een verzekerde met een partner die geen verzekerde is, vijftig procent van het op grond van het eerste lid berekende bedrag.
-    5 De aanspraak op een zorgtoeslag wordt voor iedere kalendermaand afzonderlijk bepaald.
-    6 Bij regeling van Onze Minister kunnen omtrent het bepaalde in het vijfde lid nadere regels worden gesteld.
-    7 De voordracht voor een krachtens het derde lid vast te stellen algemene maatregel van bestuur wordt niet eerder gedaan dan twee weken nadat het ontwerp aan beide kamers der Staten-Generaal is overgelegd.
+  text: '1 Indien de normpremie voor een verzekerde in het berekeningsjaar minder
+    bedraagt dan de standaardpremie in dat jaar, heeft de verzekerde aanspraak op
+    een zorgtoeslag ter grootte van dat verschil. Voor een verzekerde met een partner
+    wordt daarbij tweemaal de standaardpremie in aanmerking genomen; in dat geval
+    worden de verzekerde en zijn partner voor de toepassing van deze wet geacht gezamenlijk
+    één aanspraak te hebben.
+
+    2 De normpremie bedraagt een percentage van het drempelinkomen in het berekeningsjaar,
+    vermeerderd met een percentage van het toetsingsinkomen van de verzekerde in dat
+    jaar voorzover dat toetsingsinkomen het drempelinkomen te boven gaat. Voor een
+    verzekerde met een partner wordt daarbij het gezamenlijke toetsingsinkomen in
+    aanmerking genomen.
+
+    3 De percentages worden voor verzekerden met een partner vastgesteld op 4,273%
+    van het drempelinkomen, vermeerderd met 13,700% van het toetsingsinkomen voor
+    zover dat boven het drempelinkomen uitgaat en voor een verzekerde zonder partner
+    op 1,896% van het drempelinkomen, vermeerderd met 13,700% van het toetsingsinkomen
+    voor zover dat boven het drempelinkomen uitgaat. Deze percentages kunnen bij algemene
+    maatregel van bestuur worden gewijzigd.
+
+    4 In afwijking van het eerste lid bedraagt de aanspraak op een zorgtoeslag voor
+    een verzekerde met een partner die geen verzekerde is, vijftig procent van het
+    op grond van het eerste lid berekende bedrag.
+
+    5 De aanspraak op een zorgtoeslag wordt voor iedere kalendermaand afzonderlijk
+    bepaald.
+
+    6 Bij regeling van Onze Minister kunnen omtrent het bepaalde in het vijfde lid
+    nadere regels worden gesteld.
+
+    7 De voordracht voor een krachtens het derde lid vast te stellen algemene maatregel
+    van bestuur wordt niet eerder gedaan dan twee weken nadat het ontwerp aan beide
+    kamers der Staten-Generaal is overgelegd.'
   url: https://wetten.overheid.nl/BWBR0018451/2025-01-01#Artikel2
   machine_readable:
     definitions:
-      minimum_leeftijd:
-        value: 18
-      percentage_drempelinkomen_met_partner:
-        value: 0.04273
-      percentage_drempelinkomen_alleenstaand:
-        value: 0.01896
-      afbouwpercentage_minimum:
-        value: 0.137
-      afbouwpercentage_boven_drempel:
-        value: 0.137
-      drempelinkomen_alleenstaande:
-        value: 3971900
-      drempelinkomen_toeslagpartner:
-        value: 5020600
-      vermogensgrens_alleenstaande:
-        value: 14189600
-      vermogensgrens_toeslagpartner:
-        value: 17942900
+      minimum_leeftijd: 18
+      percentage_drempelinkomen_met_partner: 0.04273
+      percentage_drempelinkomen_alleenstaand: 0.01896
+      afbouwpercentage_minimum: 0.137
+      afbouwpercentage_boven_drempel: 0.137
+      drempelinkomen_alleenstaande: 3971900
+      drempelinkomen_toeslagpartner: 5020600
+      vermogensgrens_alleenstaande: 14189600
+      vermogensgrens_toeslagpartner: 17942900
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -300,11 +316,12 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0018451/2025-01-01/0/Artikel2
           juriconnect: jci1.3:c:BWBR0018451&artikel=2&lid=1&z=2025-01-01&g=2025-01-01
-          explanation: |-
-            Artikel 2 lid 1 bepaalt dat hoogte zorgtoeslag afhangt van verschil tussen standaardpremie en normpremie, waarbij onderscheid wordt gemaakt tussen alleenstaanden en partners
+          explanation: Artikel 2 lid 1 bepaalt dat hoogte zorgtoeslag afhangt van
+            verschil tussen standaardpremie en normpremie, waarbij onderscheid wordt
+            gemaakt tussen alleenstaanden en partners
 - number: '4'
-  text: |-
-    Onze Minister stelt jaarlijks, uiterlijk 22 dagen voorafgaande aan het berekeningsjaar, bij regeling de standaardpremie voor dat berekeningsjaar vast.
+  text: Onze Minister stelt jaarlijks, uiterlijk 22 dagen voorafgaande aan het berekeningsjaar,
+    bij regeling de standaardpremie voor dat berekeningsjaar vast.
   url: https://wetten.overheid.nl/BWBR0018451/2025-01-01#Artikel4
   machine_readable:
     open_terms:

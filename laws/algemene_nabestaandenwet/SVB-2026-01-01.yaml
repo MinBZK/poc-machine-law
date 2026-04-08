@@ -11,27 +11,34 @@ uuid: 3c5d7e9f-2b4a-4f6c-9d8e-0a1b2c3d4e5f
 discoverable: CITIZEN
 articles:
 - number: '14'
-  text: |-
-    1 Recht op nabestaandenuitkering heeft de nabestaande die:
-      a. een ongehuwd kind heeft, dat jonger is dan 18 jaar en niet tot het huishouden van een ander behoort; of
-      b. arbeidsongeschikt is
-      1°. op en sedert de dag van overlijden van de verzekerde, of
-      2°. op en sedert de laatste dag van de maand waarin hij niet meer voldoet aan de voorwaarde bedoeld in onderdeel a, en wiens arbeidsongeschiktheid na de onderscheidenlijk onder 1° en 2° bedoelde dag ten minste drie maanden voortduurt, dan wel ten aanzien van wie aannemelijk is dat de arbeidsongeschiktheid ten minste drie maanden na de vorenbedoelde dag zal voortduren.
-    2 Het recht op nabestaandenuitkering gaat in op de eerste dag van de maand van overlijden van de verzekerde.
-    3 Voor de nabestaande die op de dag van overlijden van de verzekerde niet voldoet aan de voorwaarde, genoemd in het eerste lid, onderdeel a, omdat het kind op het moment van overlijden tot het huishouden van een ander behoort, gaat het recht op nabestaandenuitkering in op de eerste dag van de maand waarin hij als gevolg van het overlijden wel aan die voorwaarde voldoet.
-    4 Voor de nabestaande die geen recht heeft op een nabestaandenuitkering op grond van artikel 15, eerste lid, onderdeel d, gaat het recht op een nabestaandenuitkering in op de eerste dag van de maand dat hij, uiterlijk binnen zes maanden na het overlijden van de verzekerde, deze gezamenlijke huishouding niet meer voert.
-    5 De Sociale verzekeringsbank kan, in afwijking van het vierde lid, een langere termijn vaststellen indien de toepassing wat de termijn van zes maanden betreft, zal leiden tot een onbillijkheid van overwegende aard.
+  text: "1 Recht op nabestaandenuitkering heeft de nabestaande die:\n  a. een ongehuwd\
+    \ kind heeft, dat jonger is dan 18 jaar en niet tot het huishouden van een ander\
+    \ behoort; of\n  b. arbeidsongeschikt is\n  1°. op en sedert de dag van overlijden\
+    \ van de verzekerde, of\n  2°. op en sedert de laatste dag van de maand waarin\
+    \ hij niet meer voldoet aan de voorwaarde bedoeld in onderdeel a, en wiens arbeidsongeschiktheid\
+    \ na de onderscheidenlijk onder 1° en 2° bedoelde dag ten minste drie maanden\
+    \ voortduurt, dan wel ten aanzien van wie aannemelijk is dat de arbeidsongeschiktheid\
+    \ ten minste drie maanden na de vorenbedoelde dag zal voortduren.\n2 Het recht\
+    \ op nabestaandenuitkering gaat in op de eerste dag van de maand van overlijden\
+    \ van de verzekerde.\n3 Voor de nabestaande die op de dag van overlijden van de\
+    \ verzekerde niet voldoet aan de voorwaarde, genoemd in het eerste lid, onderdeel\
+    \ a, omdat het kind op het moment van overlijden tot het huishouden van een ander\
+    \ behoort, gaat het recht op nabestaandenuitkering in op de eerste dag van de\
+    \ maand waarin hij als gevolg van het overlijden wel aan die voorwaarde voldoet.\n\
+    4 Voor de nabestaande die geen recht heeft op een nabestaandenuitkering op grond\
+    \ van artikel 15, eerste lid, onderdeel d, gaat het recht op een nabestaandenuitkering\
+    \ in op de eerste dag van de maand dat hij, uiterlijk binnen zes maanden na het\
+    \ overlijden van de verzekerde, deze gezamenlijke huishouding niet meer voert.\n\
+    5 De Sociale verzekeringsbank kan, in afwijking van het vierde lid, een langere\
+    \ termijn vaststellen indien de toepassing wat de termijn van zes maanden betreft,\
+    \ zal leiden tot een onbillijkheid van overwegende aard."
   url: https://wetten.overheid.nl/BWBR0007795/2026-01-01#Artikel14
   machine_readable:
     definitions:
-      bruto_uitkering:
-        value: 146500
-      vrijlating_maandelijks:
-        value: 77000
-      ao_drempel:
-        value: 45
-      maanden_per_jaar:
-        value: 12
+      bruto_uitkering: 146500
+      vrijlating_maandelijks: 77000
+      ao_drempel: 45
+      maanden_per_jaar: 12
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -99,44 +106,16 @@ articles:
           period_type: year
       - name: was_partner_verzekerd
         type: boolean
-        source_reference:
-          table: anw_dossiers
-          field: partner_verzekerd
-          select_on:
-          - name: bsn
-            description: BSN van de nabestaande
-            type: string
-            value: $bsn
+        source: {}
       - name: overlijdensdatum_partner
         type: date
-        source_reference:
-          table: anw_dossiers
-          field: overlijdensdatum_partner
-          select_on:
-          - name: bsn
-            description: BSN van de nabestaande
-            type: string
-            value: $bsn
+        source: {}
       - name: arbeidsongeschiktheidspercentage
         type: number
-        source_reference:
-          table: anw_dossiers
-          field: ao_percentage
-          select_on:
-          - name: bsn
-            description: BSN van de nabestaande
-            type: string
-            value: $bsn
+        source: {}
       - name: heeft_kinderen_onder_18
         type: boolean
-        source_reference:
-          table: anw_dossiers
-          field: heeft_kinderen_onder_18
-          select_on:
-          - name: bsn
-            description: BSN van de nabestaande
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -200,7 +179,8 @@ articles:
           article: '17'
           url: https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel17
           juriconnect: jci1.3:c:BWBR0007795&artikel=17&z=2024-01-01&g=2024-01-01
-          explanation: 'Artikel 17 Anw: hoogte nabestaandenuitkering is 70% netto minimumloon'
+          explanation: 'Artikel 17 Anw: hoogte nabestaandenuitkering is 70% netto
+            minimumloon'
       - output: inkomenskorting
         value:
           operation: MAX

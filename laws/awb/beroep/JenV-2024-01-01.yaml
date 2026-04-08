@@ -15,21 +15,16 @@ articles:
   machine_readable:
     definitions:
       excluded_decision_types:
-        value:
-        - ALGEMEEN_VERBINDEND_VOORSCHRIFT
-        - BELEIDSREGEL
-        - VOORBEREIDINGSBESLUIT
-        - ANDERE_HANDELING
+      - ALGEMEEN_VERBINDEND_VOORSCHRIFT
+      - BELEIDSREGEL
+      - VOORBEREIDINGSBESLUIT
+      - ANDERE_HANDELING
       required_legal_character:
-        value:
-        - BESCHIKKING
-        - BESLUIT_VAN_ALGEMENE_STREKKING
-      default_termijn_beroep_weken:
-        value: 6
-      default_court_type:
-        value: RECHTBANK
-      default_court:
-        value: RECHTBANK_DEN_HAAG
+      - BESCHIKKING
+      - BESLUIT_VAN_ALGEMENE_STREKKING
+      default_termijn_beroep_weken: 6
+      default_court_type: RECHTBANK
+      default_court: RECHTBANK_DEN_HAAG
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -37,52 +32,15 @@ articles:
       input:
       - name: wet
         type: object
-        source_reference:
-          source_type: laws
-          table: laws
-          fields:
-          - decision_type
-          - name
-          - valid_from
-          - legal_character
-          - voorbereidingsprocedure
-          - beroepstermijn_weken
-          - competent_court
-          select_on:
-          - name: uuid
-            description: UUID van de wet
-            type: string
-            value: $zaak.rulespec_uuid
+        source: {}
       - name: adres
         type: object
       - name: jurisdictie
         type: object
-        source_reference:
-          source_type: reference_data
-          table: jurisdicties
-          fields:
-          - gemeente
-          - arrondissement
-          - rechtbank
-          select_on:
-          - name: gemeente
-            description: Gemeente waar persoon woont
-            type: string
-            value: $adres
+        source: {}
       - name: gebeurtenissen
         type: object
-        source_reference:
-          source_type: events
-          table: events
-          fields:
-          - case_id
-          - event_type
-          - approved
-          select_on:
-          - name: case_id
-            description: Zaak identifier
-            type: string
-            value: $zaak.id
+        source: {}
       output:
       - name: beroep_mogelijk
         type: boolean

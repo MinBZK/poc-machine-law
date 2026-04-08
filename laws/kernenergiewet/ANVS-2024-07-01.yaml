@@ -11,46 +11,37 @@ uuid: 3f8a5c2d-9e7b-4f1c-8d6a-1b9e4c7a2f5d
 discoverable: BUSINESS
 articles:
 - number: '15'
-  text: |-
-    Het is verboden zonder vergunning van de Autoriteit:
-      a. splijtstoffen of ertsen te vervoeren, voorhanden te hebben, binnen of buiten Nederlands grondgebied te brengen of te doen brengen, dan wel zich daarvan te ontdoen;
-      b. een inrichting, waarin kernenergie kan worden vrijgemaakt, splijtstoffen kunnen worden vervaardigd, bewerkt of verwerkt, dan wel splijtstoffen worden opgeslagen, op te richten, inwerking te brengen, in werking te houden, buiten gebruik te stellen of te wijzigen of een inrichting, waarin kernenergie kon worden vrijgemaakt, splijtstoffen konden worden vervaardigd, bewerkt of verwerkt, dan wel splijtstoffen werden opgeslagen, te ontmantelen;
-      c. een uitrusting, geschikt om een vaartuig of ander vervoermiddel door middel van kernenergie voort te bewegen, daarin aan te brengen of aangebracht te houden, dan wel zodanige daarin aangebrachte uitrusting in werking te brengen, in werking te houden of te wijzigen.
+  text: "Het is verboden zonder vergunning van de Autoriteit:\n  a. splijtstoffen\
+    \ of ertsen te vervoeren, voorhanden te hebben, binnen of buiten Nederlands grondgebied\
+    \ te brengen of te doen brengen, dan wel zich daarvan te ontdoen;\n  b. een inrichting,\
+    \ waarin kernenergie kan worden vrijgemaakt, splijtstoffen kunnen worden vervaardigd,\
+    \ bewerkt of verwerkt, dan wel splijtstoffen worden opgeslagen, op te richten,\
+    \ inwerking te brengen, in werking te houden, buiten gebruik te stellen of te\
+    \ wijzigen of een inrichting, waarin kernenergie kon worden vrijgemaakt, splijtstoffen\
+    \ konden worden vervaardigd, bewerkt of verwerkt, dan wel splijtstoffen werden\
+    \ opgeslagen, te ontmantelen;\n  c. een uitrusting, geschikt om een vaartuig of\
+    \ ander vervoermiddel door middel van kernenergie voort te bewegen, daarin aan\
+    \ te brengen of aangebracht te houden, dan wel zodanige daarin aangebrachte uitrusting\
+    \ in werking te brengen, in werking te houden of te wijzigen."
   url: https://wetten.overheid.nl/BWBR0002402/2024-07-01#Artikel15
   machine_readable:
     definitions:
-      activiteit_transport:
-        value: transport
-      activiteit_bezit:
-        value: bezit
-      activiteit_invoer:
-        value: invoer
-      activiteit_uitvoer:
-        value: uitvoer
-      activiteit_inrichting_oprichten:
-        value: inrichting_oprichten
-      activiteit_inrichting_exploiteren:
-        value: inrichting_exploiteren
-      activiteit_kernvoortstuwing:
-        value: kernvoortstuwing
-      materiaal_splijtstof:
-        value: splijtstof
-      materiaal_erts:
-        value: erts
-      weigeringsgrond_veiligheid:
-        value: bescherming_mensen_dieren_planten_goederen
-      weigeringsgrond_staatsveiligheid:
-        value: staatsveiligheid
-      weigeringsgrond_beveiliging:
-        value: behoud_beveiliging_splijtstoffen
-      weigeringsgrond_schadevergoeding:
-        value: zekerheid_betaling_schadevergoeding
-      weigeringsgrond_internationale_verplichtingen:
-        value: internationale_verplichtingen
-      weigeringsgrond_technologie_verouderd:
-        value: technologie_verouderd
-      dosis_limiet_bevolking:
-        value: 1.0
+      activiteit_transport: transport
+      activiteit_bezit: bezit
+      activiteit_invoer: invoer
+      activiteit_uitvoer: uitvoer
+      activiteit_inrichting_oprichten: inrichting_oprichten
+      activiteit_inrichting_exploiteren: inrichting_exploiteren
+      activiteit_kernvoortstuwing: kernvoortstuwing
+      materiaal_splijtstof: splijtstof
+      materiaal_erts: erts
+      weigeringsgrond_veiligheid: bescherming_mensen_dieren_planten_goederen
+      weigeringsgrond_staatsveiligheid: staatsveiligheid
+      weigeringsgrond_beveiliging: behoud_beveiliging_splijtstoffen
+      weigeringsgrond_schadevergoeding: zekerheid_betaling_schadevergoeding
+      weigeringsgrond_internationale_verplichtingen: internationale_verplichtingen
+      weigeringsgrond_technologie_verouderd: technologie_verouderd
+      dosis_limiet_bevolking: 1.0
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -135,7 +126,8 @@ articles:
           article: '15'
           url: https://wetten.overheid.nl/BWBR0002402/2024-07-01#Hoofdstuk3_Artikel15
           juriconnect: jci1.3:c:BWBR0002402&artikel=15&z=2024-07-01&g=2024-07-01
-          explanation: Artikel 15 bepaalt dat voor alle genoemde activiteiten een vergunning vereist is
+          explanation: Artikel 15 bepaalt dat voor alle genoemde activiteiten een
+            vergunning vereist is
       - output: weigeringsgronden
         value:
           operation: IF

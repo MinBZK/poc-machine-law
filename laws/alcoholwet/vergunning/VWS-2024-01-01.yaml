@@ -11,28 +11,30 @@ uuid: 8a3f9b5c-4d2e-4f0a-b6c3-1e9d8f7a5b4c
 discoverable: HIDDEN
 articles:
 - number: '8'
-  text: |-
-    1 Leidinggevenden van het horecabedrijf en het slijtersbedrijf voldoen aan de volgende eisen:
-      a. zij hebben de leeftijd van eenentwintig jaar bereikt;
-      b. zij zijn niet in enig opzicht van slecht levensgedrag;
-      c. zij mogen niet onder curatele staan.
-    2 Bij of krachtens algemene maatregel van bestuur worden naast de in het eerste lid gestelde eisen andere eisen ten aanzien van het zedelijk gedrag van leidinggevenden gesteld en kan de in dat lid, onder b, gestelde eis nader worden omschreven.
-    3 Leidinggevenden beschikken tevens over voldoende kennis en inzicht met betrekking tot sociale hygiëne en zijn ingeschreven in het Register sociale hygiëne, genoemd in artikel 11c.
-    4 De in het derde lid gestelde eis geldt niet voor leidinggevenden voor wier rekening en risico het horecabedrijf of het slijtersbedrijf wordt uitgeoefend, indien die leidinggevenden geen bemoeienis hebben met de bedrijfsvoering of de exploitatie van het horecabedrijf of het slijtersbedrijf waarvoor vergunning wordt gevraagd of is verkregen en de vergunninghouder dit in een schriftelijke verklaring bevestigt.
-    5 Indien een paracommerciële rechtspersoon het horecabedrijf uitoefent, voldoen ten minste twee leidinggevenden aan de bij of krachtens dit artikel gestelde eisen.
+  text: "1 Leidinggevenden van het horecabedrijf en het slijtersbedrijf voldoen aan\
+    \ de volgende eisen:\n  a. zij hebben de leeftijd van eenentwintig jaar bereikt;\n\
+    \  b. zij zijn niet in enig opzicht van slecht levensgedrag;\n  c. zij mogen niet\
+    \ onder curatele staan.\n2 Bij of krachtens algemene maatregel van bestuur worden\
+    \ naast de in het eerste lid gestelde eisen andere eisen ten aanzien van het zedelijk\
+    \ gedrag van leidinggevenden gesteld en kan de in dat lid, onder b, gestelde eis\
+    \ nader worden omschreven.\n3 Leidinggevenden beschikken tevens over voldoende\
+    \ kennis en inzicht met betrekking tot sociale hygiëne en zijn ingeschreven in\
+    \ het Register sociale hygiëne, genoemd in artikel 11c.\n4 De in het derde lid\
+    \ gestelde eis geldt niet voor leidinggevenden voor wier rekening en risico het\
+    \ horecabedrijf of het slijtersbedrijf wordt uitgeoefend, indien die leidinggevenden\
+    \ geen bemoeienis hebben met de bedrijfsvoering of de exploitatie van het horecabedrijf\
+    \ of het slijtersbedrijf waarvoor vergunning wordt gevraagd of is verkregen en\
+    \ de vergunninghouder dit in een schriftelijke verklaring bevestigt.\n5 Indien\
+    \ een paracommerciële rechtspersoon het horecabedrijf uitoefent, voldoen ten minste\
+    \ twee leidinggevenden aan de bij of krachtens dit artikel gestelde eisen."
   url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Artikel8
   machine_readable:
     definitions:
-      minimale_leeftijd:
-        value: 21
-      minimale_vloeroppervlakte_horeca:
-        value: 35
-      minimale_vloeroppervlakte_slijterij:
-        value: 15
-      type_horecabedrijf:
-        value: horecabedrijf
-      type_slijtersbedrijf:
-        value: slijtersbedrijf
+      minimale_leeftijd: 21
+      minimale_vloeroppervlakte_horeca: 35
+      minimale_vloeroppervlakte_slijterij: 15
+      type_horecabedrijf: horecabedrijf
+      type_slijtersbedrijf: slijtersbedrijf
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -250,7 +252,8 @@ articles:
               operation: LESS_THAN
               subject: $leeftijd_leidinggevende
               value: $minimale_leeftijd
-            then: Leidinggevende heeft de leeftijd van 21 jaar niet bereikt (artikel 8 lid 1 onder a)
+            then: Leidinggevende heeft de leeftijd van 21 jaar niet bereikt (artikel
+              8 lid 1 onder a)
           - when:
               operation: EQUALS
               subject: $is_onder_curatele
@@ -265,7 +268,8 @@ articles:
               - operation: LESS_THAN
                 subject: $vloeroppervlakte
                 value: $minimale_vloeroppervlakte_horeca
-            then: Horecalokaliteit heeft minder dan 35 m² vloeroppervlakte (artikel 10 lid 2)
+            then: Horecalokaliteit heeft minder dan 35 m² vloeroppervlakte (artikel
+              10 lid 2)
           - when:
               operation: AND
               conditions:
@@ -275,7 +279,8 @@ articles:
               - operation: LESS_THAN
                 subject: $vloeroppervlakte
                 value: $minimale_vloeroppervlakte_slijterij
-            then: Slijtlokaliteit heeft minder dan 15 m² vloeroppervlakte (artikel 10 lid 2)
+            then: Slijtlokaliteit heeft minder dan 15 m² vloeroppervlakte (artikel
+              10 lid 2)
           default: ''
         legal_basis:
           law: Alcoholwet
@@ -283,4 +288,5 @@ articles:
           article: '27'
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27
-          explanation: Weigeringsgrond op basis van niet voldoen aan artikel 8 of 10
+          explanation: Weigeringsgrond op basis van niet voldoen aan artikel 8 of
+            10

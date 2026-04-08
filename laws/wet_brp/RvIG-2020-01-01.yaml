@@ -11,28 +11,76 @@ uuid: fcf09c18-1584-4565-9223-e8a86fbddc09
 discoverable: BUSINESS
 articles:
 - number: '1.1'
-  text: |-
-    In deze wet en de daarop berustende bepalingen wordt verstaan onder: a. Onze Minister: Onze Minister van Binnenlandse Zaken en Koninkrijksrelaties; b. de basisregistratie: de basisregistratie personen, bedoeld in artikel 1.2; c. de persoonslijst: het geheel van gegevens, bedoeld in artikel 2.7, eerste lid, 2.69, eerste lid, en 2.84, eerste lid, over een persoon in de basisregistratie; d. de inschrijving: de opneming van een persoonslijst in de basisregistratie; e. de ingeschrevene: degene ten aanzien van wie een persoonslijst in de basisregistratie is opgenomen; f. de ingezetene: de ingeschrevene die zijn adres heeft in een gemeente in Nederland en op wiens persoonslijst niet het gegeven van zijn overlijden of van vertrek uit Nederland als actueel gegeven is opgenomen; g. de systematische verstrekking van gegevens of het systematisch verstrekken van gegevens: de verstrekking of het verstrekken van gegevens uit de basisregistratie, bedoeld in artikel 3.1, tweede lid; h. de bijhoudingsgemeente: de gemeente waarvan het college van burgemeester en wethouders op grond van artikel 1.4 verantwoordelijk is voor de bijhouding van de persoonslijst; i. een vreemdeling: degene die de Nederlandse nationaliteit niet bezit en niet op grond van een wettelijke bepaling als Nederlander wordt behandeld; j. de aangifte van verblijf en adres: de aangifte, bedoeld in artikel 2.38; k. een beedigd vertaler: een vertaler als bedoeld in artikel 1, onder d, van de Wet beedigde tolken en vertalers; l. de aangifte van adreswijziging: de aangifte, bedoeld in artikel 2.39; m. de aangifte van vertrek: de aangifte, bedoeld in artikel 2.43; n. een authentiek gegeven: een in de basisregistratie opgenomen gegeven dat op grond van artikel 1.6 als authentiek wordt aangemerkt; o. het woonadres: 1. het adres waar betrokkene woont, waaronder begrepen het adres van een woning die zich in een voertuig of vaartuig bevindt, indien het voertuig of vaartuig een vaste stand- of ligplaats heeft, of, indien betrokkene op meer dan een adres woont, het adres waar hij naar redelijke verwachting gedurende een half jaar de meeste malen zal overnachten; 2. het adres waar, bij het ontbreken van een adres als bedoeld onder 1, betrokkene naar redelijke verwachting gedurende drie maanden ten minste twee derde van de tijd zal overnachten; p. het briefadres: het adres waar voor betrokkene bestemde geschriften in ontvangst worden genomen; q. het adres: het woonadres, dan wel bij het ontbreken hiervan of bij toepassing van artikel 2.40 of 2.41, het briefadres; r. de briefadresgever: de natuurlijke persoon of rechtspersoon, bedoeld in artikel 2.42, die een briefadres ter beschikking stelt; s. het burgerservicenummer: het nummer, bedoeld in artikel 1, onder b, van de Wet algemene bepalingen burgerservicenummer; t. een overheidsorgaan: 1. een orgaan van een rechtspersoon die krachtens publiekrecht is ingesteld, of 2. een ander persoon of college, met enig openbaar gezag bekleed; u. een derde: elke natuurlijke persoon, niet zijnde een overheidsorgaan of de ingeschrevene, en elke rechtspersoon die niet krachtens publiekrecht is ingesteld, noch met enig openbaar gezag is bekleed; v. de openbare lichamen: de openbare lichamen Bonaire, Sint Eustatius en Saba; w. een inschrijfvoorziening: een voorziening als bedoeld in artikel 2.64; x. het Besluit bevolkingsboekhouding: het Besluit bevolkingsboekhouding zoals dat gold op de laatste dag voor de intrekking van de Wet bevolkings- en verblijfsregisters; y. de verordening: Verordening (EU) nr. 2016/679 van het Europees Parlement en de Raad van 27 april 2016 betreffende de bescherming van natuurlijke personen in verband met de verwerking van persoonsgegevens en betreffende het vrije verkeer van die gegevens en tot intrekking van Richtlijn 95/46/EG (Algemene verordening gegevensbescherming) (PbEU 2016, L 119); z. het tijdelijk verblijfsadres: het adres in Nederland, niet zijnde het woonadres of het briefadres, waar betrokkene naar redelijke verwachting gedurende een maand meestentijds en gedurende een half jaar minder dan twee derde van de tijd zal overnachten; aa. contactgegevens: telefoonnummer en e-mailadres van de niet-ingezetene; ab. de ingezetene van een openbaar lichaam: de ingeschrevene die zijn adres heeft in een van de openbare lichamen, en op wiens persoonslijst niet het gegeven van zijn overlijden of van zijn vertrek uit een van de openbare lichamen als actueel gegeven is opgenomen; ac. Nederland: het Europese deel van Nederland.
+  text: 'In deze wet en de daarop berustende bepalingen wordt verstaan onder: a. Onze
+    Minister: Onze Minister van Binnenlandse Zaken en Koninkrijksrelaties; b. de basisregistratie:
+    de basisregistratie personen, bedoeld in artikel 1.2; c. de persoonslijst: het
+    geheel van gegevens, bedoeld in artikel 2.7, eerste lid, 2.69, eerste lid, en
+    2.84, eerste lid, over een persoon in de basisregistratie; d. de inschrijving:
+    de opneming van een persoonslijst in de basisregistratie; e. de ingeschrevene:
+    degene ten aanzien van wie een persoonslijst in de basisregistratie is opgenomen;
+    f. de ingezetene: de ingeschrevene die zijn adres heeft in een gemeente in Nederland
+    en op wiens persoonslijst niet het gegeven van zijn overlijden of van vertrek
+    uit Nederland als actueel gegeven is opgenomen; g. de systematische verstrekking
+    van gegevens of het systematisch verstrekken van gegevens: de verstrekking of
+    het verstrekken van gegevens uit de basisregistratie, bedoeld in artikel 3.1,
+    tweede lid; h. de bijhoudingsgemeente: de gemeente waarvan het college van burgemeester
+    en wethouders op grond van artikel 1.4 verantwoordelijk is voor de bijhouding
+    van de persoonslijst; i. een vreemdeling: degene die de Nederlandse nationaliteit
+    niet bezit en niet op grond van een wettelijke bepaling als Nederlander wordt
+    behandeld; j. de aangifte van verblijf en adres: de aangifte, bedoeld in artikel
+    2.38; k. een beedigd vertaler: een vertaler als bedoeld in artikel 1, onder d,
+    van de Wet beedigde tolken en vertalers; l. de aangifte van adreswijziging: de
+    aangifte, bedoeld in artikel 2.39; m. de aangifte van vertrek: de aangifte, bedoeld
+    in artikel 2.43; n. een authentiek gegeven: een in de basisregistratie opgenomen
+    gegeven dat op grond van artikel 1.6 als authentiek wordt aangemerkt; o. het woonadres:
+    1. het adres waar betrokkene woont, waaronder begrepen het adres van een woning
+    die zich in een voertuig of vaartuig bevindt, indien het voertuig of vaartuig
+    een vaste stand- of ligplaats heeft, of, indien betrokkene op meer dan een adres
+    woont, het adres waar hij naar redelijke verwachting gedurende een half jaar de
+    meeste malen zal overnachten; 2. het adres waar, bij het ontbreken van een adres
+    als bedoeld onder 1, betrokkene naar redelijke verwachting gedurende drie maanden
+    ten minste twee derde van de tijd zal overnachten; p. het briefadres: het adres
+    waar voor betrokkene bestemde geschriften in ontvangst worden genomen; q. het
+    adres: het woonadres, dan wel bij het ontbreken hiervan of bij toepassing van
+    artikel 2.40 of 2.41, het briefadres; r. de briefadresgever: de natuurlijke persoon
+    of rechtspersoon, bedoeld in artikel 2.42, die een briefadres ter beschikking
+    stelt; s. het burgerservicenummer: het nummer, bedoeld in artikel 1, onder b,
+    van de Wet algemene bepalingen burgerservicenummer; t. een overheidsorgaan: 1.
+    een orgaan van een rechtspersoon die krachtens publiekrecht is ingesteld, of 2.
+    een ander persoon of college, met enig openbaar gezag bekleed; u. een derde: elke
+    natuurlijke persoon, niet zijnde een overheidsorgaan of de ingeschrevene, en elke
+    rechtspersoon die niet krachtens publiekrecht is ingesteld, noch met enig openbaar
+    gezag is bekleed; v. de openbare lichamen: de openbare lichamen Bonaire, Sint
+    Eustatius en Saba; w. een inschrijfvoorziening: een voorziening als bedoeld in
+    artikel 2.64; x. het Besluit bevolkingsboekhouding: het Besluit bevolkingsboekhouding
+    zoals dat gold op de laatste dag voor de intrekking van de Wet bevolkings- en
+    verblijfsregisters; y. de verordening: Verordening (EU) nr. 2016/679 van het Europees
+    Parlement en de Raad van 27 april 2016 betreffende de bescherming van natuurlijke
+    personen in verband met de verwerking van persoonsgegevens en betreffende het
+    vrije verkeer van die gegevens en tot intrekking van Richtlijn 95/46/EG (Algemene
+    verordening gegevensbescherming) (PbEU 2016, L 119); z. het tijdelijk verblijfsadres:
+    het adres in Nederland, niet zijnde het woonadres of het briefadres, waar betrokkene
+    naar redelijke verwachting gedurende een maand meestentijds en gedurende een half
+    jaar minder dan twee derde van de tijd zal overnachten; aa. contactgegevens: telefoonnummer
+    en e-mailadres van de niet-ingezetene; ab. de ingezetene van een openbaar lichaam:
+    de ingeschrevene die zijn adres heeft in een van de openbare lichamen, en op wiens
+    persoonslijst niet het gegeven van zijn overlijden of van zijn vertrek uit een
+    van de openbare lichamen als actueel gegeven is opgenomen; ac. Nederland: het
+    Europese deel van Nederland.'
   url: https://wetten.overheid.nl/BWBR0033715/2020-01-01#Artikel1.1
   machine_readable:
     definitions:
       nederlandse_nationaliteiten:
-        value:
-        - NEDERLANDS
-      address_match_distance_m:
-        value: 100
+      - NEDERLANDS
+      address_match_distance_m: 100
       geldige_partnertypen:
-        value:
-        - HUWELIJK
-        - GEREGISTREERD_PARTNERSCHAP
+      - HUWELIJK
+      - GEREGISTREERD_PARTNERSCHAP
       vaste_adres_typen:
-        value:
-        - WOONADRES
+      - WOONADRES
       post_adres_typen:
-        value:
-        - BRIEFADRES
-      kind_max_leeftijd_combinatiekorting:
-        value: 12
+      - BRIEFADRES
+      kind_max_leeftijd_combinatiekorting: 12
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -44,123 +92,37 @@ articles:
       input:
       - name: geboortedatum
         type: date
-        source_reference:
-          table: personen
-          field: geboortedatum
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: partner_geboortedatum
         type: date
-        source_reference:
-          table: personen
-          field: geboortedatum
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partnertype
         type: object
-        source_reference:
-          table: relaties
-          field: partnerschap_type
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: partner_bsn
         type: string
-        source_reference:
-          table: relaties
-          field: partner_bsn
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: kinderen_gegevens
         type: array
-        source_reference:
-          table: relaties
-          field: kinderen
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: verblijfsadres
         type: object
-        source_reference:
-          table: personen
-          field: verblijfsadres
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: ouder_adressen
         type: array
-        source_reference:
-          table: relaties
-          field: ouder_adressen
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: land_van_verblijf
         type: string
-        source_reference:
-          table: personen
-          field: land_verblijf
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: nationaliteit
         type: string
-        source_reference:
-          table: personen
-          field: nationaliteit
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: adres
         type: object
-        source_reference:
-          table: verblijfplaats
-          fields:
-          - straat
-          - huisnummer
-          - postcode
-          - woonplaats
-          - type
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: huishouden
         type: array
-        source_reference:
-          table: bewoners
-          field: medebewoners
-          select_on:
-          - name: postcode
-            value: $adres.postcode
-            description: Postcode van het adres van de persoon
-            type: string
-          - name: huisnummer
-            value: $adres.huisnummer
-            description: Huisnummer van het adres van de persoon
-            type: string
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -240,7 +202,8 @@ articles:
           article: '1.6'
           url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.6
           juriconnect: jci1.3:c:BWBR0033715&artikel=1.6&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 1.6 Wet BRP bepaalt verplicht gebruik van basisregistratie voor persoonsgegevens
+          explanation: Artikel 1.6 Wet BRP bepaalt verplicht gebruik van basisregistratie
+            voor persoonsgegevens
       - output: kinderen_bsns
         value:
           operation: FOREACH
@@ -264,7 +227,8 @@ articles:
           article: '1.7'
           url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.7
           juriconnect: jci1.3:c:BWBR0033715&artikel=1.7&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 1.7 Wet BRP verplicht gebruik authentieke gegevens over huwelijk en partnerschap
+          explanation: Artikel 1.7 Wet BRP verplicht gebruik authentieke gegevens
+            over huwelijk en partnerschap
       - output: woonsituatie
         value:
           operation: IF
@@ -281,7 +245,8 @@ articles:
           article: '2.4'
           url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.1_Artikel2.4
           juriconnect: jci1.3:c:BWBR0033715&artikel=2.4&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 2.4 Wet BRP bepaalt meldingsplicht bij adreswijziging en woonsituatie
+          explanation: Artikel 2.4 Wet BRP bepaalt meldingsplicht bij adreswijziging
+            en woonsituatie
       - output: land_van_verblijf
         value: $land_van_verblijf
         legal_basis:
@@ -290,7 +255,8 @@ articles:
           article: '2.7'
           url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7
           juriconnect: jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 2.7 Wet BRP bepaalt registratie van algemene gegevens zoals nationaliteit
+          explanation: Artikel 2.7 Wet BRP bepaalt registratie van algemene gegevens
+            zoals nationaliteit
       - output: heeft_nederlandse_nationaliteit
         value:
           operation: IN
@@ -303,7 +269,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7
           juriconnect: jci1.3:c:BWBR0033715&artikel=2.7&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 2.7 lid 1 Wet BRP bepaalt dat nationaliteit als algemeen gegeven wordt geregistreerd
+          explanation: Artikel 2.7 lid 1 Wet BRP bepaalt dat nationaliteit als algemeen
+            gegeven wordt geregistreerd
       - output: woont_in_nederland
         value:
           operation: EQUALS
@@ -315,7 +282,8 @@ articles:
           article: '2.10'
           url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10
           juriconnect: jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 2.10 Wet BRP bepaalt dat verblijfplaats in Nederland wordt geregistreerd
+          explanation: Artikel 2.10 Wet BRP bepaalt dat verblijfplaats in Nederland
+            wordt geregistreerd
       - output: heeft_vast_adres
         value:
           operation: IN
@@ -391,7 +359,8 @@ articles:
           article: '2.10'
           url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10
           juriconnect: jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 2.10 Wet BRP bepaalt registratie van woonplaats als onderdeel van verblijfplaatsgegevens
+          explanation: Artikel 2.10 Wet BRP bepaalt registratie van woonplaats als
+            onderdeel van verblijfplaatsgegevens
       - output: huishoudleden
         value:
           operation: IF
@@ -403,14 +372,15 @@ articles:
                 subject: $huishouden
             then: $huishouden
           default:
-            value:
+            value: null
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
           article: '2.4'
           url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.1_Artikel2.4
           juriconnect: jci1.3:c:BWBR0033715&artikel=2.4&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 2.4 Wet BRP bepaalt meldingsplicht bij adreswijziging en woonsituatie
+          explanation: Artikel 2.4 Wet BRP bepaalt meldingsplicht bij adreswijziging
+            en woonsituatie
       - output: kinderen
         value:
           operation: IF
@@ -422,14 +392,15 @@ articles:
                 subject: $kinderen_gegevens
             then: $kinderen_gegevens
           default:
-            value:
+            value: null
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
           article: '1.6'
           url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.6
           juriconnect: jci1.3:c:BWBR0033715&artikel=1.6&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 1.6 Wet BRP bepaalt verplicht gebruik van basisregistratie voor persoonsgegevens
+          explanation: Artikel 1.6 Wet BRP bepaalt verplicht gebruik van basisregistratie
+            voor persoonsgegevens
       - output: heeft_kinderen_onder_12
         value:
           operation: IF
@@ -451,10 +422,12 @@ articles:
           article: '1.6'
           url: https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.6
           juriconnect: jci1.3:c:BWBR0033715&artikel=1.6&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 1.6 Wet BRP bepaalt verplicht gebruik van basisregistratie voor persoonsgegevens
+          explanation: Artikel 1.6 Wet BRP bepaalt verplicht gebruik van basisregistratie
+            voor persoonsgegevens
     untranslatables:
     - construct: iteratie over variabel aantal kinderen en huishoudleden
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal kinderen en huishoudleden is dynamisch en kan niet
-        vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal personen tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal kinderen en huishoudleden
+        is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal personen tot
+        een vast maximum
       accepted: true

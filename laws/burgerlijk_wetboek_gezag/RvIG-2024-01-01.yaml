@@ -11,31 +11,36 @@ uuid: a87bbb48-0bde-487a-af4d-3dc7f4a7c220
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '245'
-  text: |-
-    1 Minderjarigen staan onder gezag.
+  text: '1 Minderjarigen staan onder gezag.
+
     2 Onder gezag wordt verstaan ouderlijk gezag dan wel voogdij.
-    3 Ouderlijk gezag wordt door de ouders gezamenlijk of door één ouder uitgeoefend. Voogdij wordt door een ander dan een ouder uitgeoefend.
-    4 Het gezag heeft betrekking op de persoon van de minderjarige, het bewind over zijn vermogen en zijn vertegenwoordiging in burgerlijke handelingen, zowel in als buiten rechte.
-    5 Het gezag van de ouder die dit krachtens artikel 253sa of krachtens een rechterlijke beslissing overeenkomstig artikel 253t samen met een ander dan een ouder uitoefent, wordt aangemerkt als ouderlijk gezag dat door ouders gezamenlijk wordt uitgeoefend, tenzij uit een wettelijke bepaling het tegendeel voortvloeit.
+
+    3 Ouderlijk gezag wordt door de ouders gezamenlijk of door één ouder uitgeoefend.
+    Voogdij wordt door een ander dan een ouder uitgeoefend.
+
+    4 Het gezag heeft betrekking op de persoon van de minderjarige, het bewind over
+    zijn vermogen en zijn vertegenwoordiging in burgerlijke handelingen, zowel in
+    als buiten rechte.
+
+    5 Het gezag van de ouder die dit krachtens artikel 253sa of krachtens een rechterlijke
+    beslissing overeenkomstig artikel 253t samen met een ander dan een ouder uitoefent,
+    wordt aangemerkt als ouderlijk gezag dat door ouders gezamenlijk wordt uitgeoefend,
+    tenzij uit een wettelijke bepaling het tegendeel voortvloeit.'
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel245
   machine_readable:
     definitions:
       bevoegde_gezag_typen:
-        value:
-        - OUDERLIJK_GEZAG
-        - GEZAMENLIJK_GEZAG
-        - VOOGDIJ
-        - VOOGDIJ_INSTELLING
-      meerderjarigheid_leeftijd:
-        value: 18
+      - OUDERLIJK_GEZAG
+      - GEZAMENLIJK_GEZAG
+      - VOOGDIJ
+      - VOOGDIJ_INSTELLING
+      meerderjarigheid_leeftijd: 18
       gezag_rechten:
-        value:
-        - LEZEN
-        - CLAIMS_INDIENEN
-        - BESLUITEN_ONTVANGEN
+      - LEZEN
+      - CLAIMS_INDIENEN
+      - BESLUITEN_ONTVANGEN
       beperkte_gezag_rechten:
-        value:
-        - LEZEN
+      - LEZEN
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -47,22 +52,7 @@ articles:
       input:
       - name: gezag_relaties
         type: array
-        source_reference:
-          table: gezag_relaties
-          fields:
-          - bsn_kind
-          - naam_kind
-          - geboortedatum_kind
-          - type_gezag
-          - datum_ingang
-          - datum_einde
-          - status
-          - heeft_handlichting
-          select_on:
-          - name: bsn_gezagdrager
-            description: BSN nummer van de gezagsdrager
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -126,8 +116,11 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel14_Artikel245
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=245&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 1:245 lid 1 BW: alleen geldig gezag (ouderlijk gezag of voogdij) over minderjarigen geeft vertegenwoordigingsbevoegdheid. Art. 1:233 BW: minderjarigen zijn personen onder 18 jaar.
+          explanation: 'Art. 1:245 lid 1 BW: alleen geldig gezag (ouderlijk gezag
+            of voogdij) over minderjarigen geeft vertegenwoordigingsbevoegdheid. Art.
+            1:233 BW: minderjarigen zijn personen onder 18 jaar.
+
+            '
       - output: heeft_delegaties
         value:
           operation: NOT
@@ -140,8 +133,10 @@ articles:
           article: '245'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel14_Artikel245
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=245&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 1:245 BW bepaalt dat ouders/voogden met gezag de minderjarige vertegenwoordigen.
+          explanation: 'Art. 1:245 BW bepaalt dat ouders/voogden met gezag de minderjarige
+            vertegenwoordigen.
+
+            '
       - output: subject_ids
         value: $bevoegde_gezag_relaties.bsn_kind
         legal_basis:
@@ -200,8 +195,11 @@ articles:
           article: '235'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel13_Afdeling2_Artikel235
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=235&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 1:235 BW: bij handlichting heeft de minderjarige zelf bepaalde handelingsbevoegdheden. De ouder/voogd heeft dan beperkte rechten voor die gebieden waar het kind zelf bevoegd is.
+          explanation: 'Art. 1:235 BW: bij handlichting heeft de minderjarige zelf
+            bepaalde handelingsbevoegdheden. De ouder/voogd heeft dan beperkte rechten
+            voor die gebieden waar het kind zelf bevoegd is.
+
+            '
       - output: valid_from_dates
         value: $bevoegde_gezag_relaties.datum_ingang
         legal_basis:
@@ -219,10 +217,12 @@ articles:
           article: '233'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel13_Artikel233
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=233&z=2024-01-01&g=2024-01-01
-          explanation: Einddatum gezag, of null als nog actief (leeftijdscheck al in filter)
+          explanation: Einddatum gezag, of null als nog actief (leeftijdscheck al
+            in filter)
     untranslatables:
     - construct: iteratie over variabel aantal gezagsrelaties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal gezagsrelaties per persoon is dynamisch en kan niet
-        vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal gezagsrelaties tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal gezagsrelaties
+        per persoon is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal gezagsrelaties
+        tot een vast maximum
       accepted: true

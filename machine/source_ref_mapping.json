@@ -1,0 +1,2057 @@
+{
+  "alcoholwet/register_sociale_hygiene:registratie": {
+    "table": "registraties",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "alcoholwet/vergunning/rotterdam:bsn_leidinggevende": {
+    "table": "leidinggevenden",
+    "field": "bsn",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "alcoholwet/vergunning/rotterdam:vloeroppervlakte_horecalokaliteit": {
+    "table": "inrichtingen",
+    "field": "vloeroppervlakte_horecalokaliteit",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "alcoholwet/vergunning/rotterdam:type_bedrijf": {
+    "table": "inrichtingen",
+    "field": "type_bedrijf",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "alcoholwet/vergunning/rotterdam:heeft_actieve_alcoholwetvergunning": {
+    "table": "vergunningen",
+    "field": "heeft_alcoholvergunning",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "algemene_kinderbijslagwet:kinderen_data": {
+    "table": "algemene_kinderbijslagwet",
+    "select_on": [
+      {
+        "name": "ouder_bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "aantal_kinderen",
+      "kinderen_leeftijden",
+      "ontvangt_kinderbijslag"
+    ]
+  },
+  "algemene_nabestaandenwet:was_partner_verzekerd": {
+    "table": "anw_dossiers",
+    "field": "partner_verzekerd",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "algemene_nabestaandenwet:overlijdensdatum_partner": {
+    "table": "anw_dossiers",
+    "field": "overlijdensdatum_partner",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "algemene_nabestaandenwet:arbeidsongeschiktheidspercentage": {
+    "table": "anw_dossiers",
+    "field": "ao_percentage",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "algemene_nabestaandenwet:heeft_kinderen_onder_18": {
+    "table": "anw_dossiers",
+    "field": "heeft_kinderen_onder_18",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "algemene_ouderdomswet:woonachtige_verzekerde_jaren": {
+    "table": "verzekerde_tijdvakken",
+    "field": "woonperiodes",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "algemene_ouderdomswet_gegevens:pensioengegevens": {
+    "table": "algemene_ouderdomswet_gegevens",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "pensioenleeftijd"
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:bsn_exploitant": {
+    "table": "exploitatie_inschrijvingen",
+    "field": "bsn_eigenaar",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:heeft_geldige_vog_exploitant": {
+    "table": "personen_vog",
+    "field": "heeft_geldige_vog",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn_exploitant"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:verstrekt_alcohol": {
+    "table": "vestigingen",
+    "field": "schenkt_alcohol",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:horecagebiedsplan": {
+    "table": "horecagebiedsplannen",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$adres"
+      }
+    ],
+    "fields": [
+      "gebied",
+      "toegestane_categorieen",
+      "maximaal_aantal",
+      "ontwikkelruimte"
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:categorie_toegestaan_in_gebied": {
+    "table": "horecagebiedsplannen",
+    "field": "categorie_toegestaan",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$adres"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:vergunning_geschiedenis": {
+    "table": "vergunningen_historie",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$adres"
+      }
+    ],
+    "fields": [
+      "vergunning_type",
+      "afgiftedatum",
+      "intrekkingsdatum",
+      "intrekkingsreden",
+      "handhavingsacties"
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:eerder_ingetrokken_wegens_slecht_levensgedrag": {
+    "table": "vergunningen_historie",
+    "field": "ingetrokken_slecht_levensgedrag",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn_exploitant"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:beheerders": {
+    "table": "beheerders",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "fields": [
+      "bsn",
+      "heeft_vog",
+      "leeftijd",
+      "is_onder_curatele",
+      "heeft_svh_diploma"
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:alle_beheerders_hebben_vog": {
+    "table": "beheerders",
+    "field": "alle_hebben_vog",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:alle_beheerders_voldoen_leeftijdseis": {
+    "table": "beheerders",
+    "field": "alle_voldoen_leeftijd",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      },
+      {
+        "name": "schenkt_alcohol",
+        "value": "$verstrekt_alcohol"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:geen_beheerder_onder_curatele": {
+    "table": "beheerders",
+    "field": "geen_onder_curatele",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:leidinggevende_heeft_svh_diploma": {
+    "table": "beheerders",
+    "field": "heeft_svh_diploma",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:heeft_goedgekeurde_vergunning": {
+    "table": "vergunningen",
+    "field": "heeft_exploitatievergunning",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:vergunde_categorie": {
+    "table": "vergunningen",
+    "field": "categorie",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/exploitatievergunning:omgevingsplan_horeca_toegestaan": {
+    "table": "omgevingsplan_toetsingen",
+    "field": "horeca_toegestaan",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$adres"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/ontheffingspas_geluid:verleende_ontheffingen_dit_jaar": {
+    "select_on": [
+      {
+        "name": "law",
+        "value": "algemene_plaatselijke_verordening/ontheffingspas_geluid"
+      },
+      {
+        "name": "status",
+        "value": "DECIDED"
+      },
+      {
+        "name": "approved",
+        "value": true
+      },
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      },
+      {
+        "name": "year",
+        "value": "$year"
+      }
+    ],
+    "source_type": "cases"
+  },
+  "algemene_plaatselijke_verordening/ontheffingspas_geluid:heeft_geluidsklachten": {
+    "table": "geluidsklachten",
+    "field": "heeft_actieve_klachten",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "GEMEENTE_ROTTERDAM"
+  },
+  "algemene_plaatselijke_verordening/terrassen:heeft_alcoholvergunning": {
+    "table": "vergunningen",
+    "field": "heeft_alcoholvergunning",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/terrassen:bgt_oppervlakte_beschikbaar": {
+    "table": "bgt_terraslocaties",
+    "field": "beschikbare_oppervlakte",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$vestigingsadres"
+      },
+      {
+        "name": "locatie",
+        "value": "$terras_locatie"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/terrassen:bgt_functie_oppervlak": {
+    "table": "bgt_terraslocaties",
+    "field": "functie_oppervlak",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$vestigingsadres"
+      },
+      {
+        "name": "locatie",
+        "value": "$terras_locatie"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/terrassen:locatie_op_openbare_weg": {
+    "table": "bgt_terraslocaties",
+    "field": "is_openbare_weg",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$vestigingsadres"
+      },
+      {
+        "name": "locatie",
+        "value": "$terras_locatie"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/terrassen:terrassenbeleid_gebied": {
+    "table": "terrassenbeleid",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$vestigingsadres"
+      }
+    ],
+    "fields": [
+      "gebied",
+      "max_oppervlakte",
+      "max_sluitingstijd",
+      "seizoensregels",
+      "toegestane_locaties"
+    ]
+  },
+  "algemene_plaatselijke_verordening/terrassen:maximale_sluitingstijd_doordeweeks": {
+    "table": "terrassenbeleid",
+    "field": "max_sluitingstijd_doordeweeks",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$vestigingsadres"
+      },
+      {
+        "name": "seizoen",
+        "value": "$seizoen"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/terrassen:maximale_sluitingstijd_weekend": {
+    "table": "terrassenbeleid",
+    "field": "max_sluitingstijd_weekend",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$vestigingsadres"
+      },
+      {
+        "name": "seizoen",
+        "value": "$seizoen"
+      }
+    ]
+  },
+  "algemene_plaatselijke_verordening/terrassen:precario_tarief_per_m2": {
+    "table": "precario_tarieven",
+    "field": "tarief_per_m2",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$vestigingsadres"
+      },
+      {
+        "name": "gebruik",
+        "value": "terras"
+      }
+    ]
+  },
+  "algemene_wet_bestuursrecht:is_orgaan_van_rechtspersoon": {
+    "table": "organisaties",
+    "field": "is_orgaan_van_rechtspersoon",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "algemene_wet_bestuursrecht:publiekrechtelijke_rechtspersoon_type": {
+    "table": "organisaties",
+    "field": "publiekrechtelijke_rechtspersoon_type",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "algemene_wet_bestuursrecht:heeft_publiekrechtelijke_bevoegdheid": {
+    "table": "organisaties",
+    "field": "heeft_publiekrechtelijke_bevoegdheid",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "algemene_wet_bestuursrecht:bevoegdheid_bij_of_krachtens_wet": {
+    "table": "organisaties",
+    "field": "bevoegdheid_bij_of_krachtens_wet",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "algemene_wet_bestuursrecht:overheidsfinanciering_percentage": {
+    "table": "organisaties",
+    "field": "overheidsfinanciering_percentage",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "algemene_wet_bestuursrecht:criteria_door_overheid_bepaald": {
+    "table": "organisaties",
+    "field": "criteria_door_overheid_bepaald",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "algemene_wet_bestuursrecht:is_uitsluitend_financiele_uitkering": {
+    "table": "organisaties",
+    "field": "is_uitsluitend_financiele_uitkering",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "algemene_wet_bestuursrecht:is_volksvertegenwoordigend_orgaan": {
+    "table": "organisaties",
+    "field": "is_volksvertegenwoordigend_orgaan",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "algemene_wet_bestuursrecht:is_rechterlijk_orgaan": {
+    "table": "organisaties",
+    "field": "is_rechterlijk_orgaan",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "algemene_wet_bestuursrecht:is_ombudsman": {
+    "table": "organisaties",
+    "field": "is_ombudsman",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "algemene_wet_bestuursrecht:is_algemene_rekenkamer": {
+    "table": "organisaties",
+    "field": "is_algemene_rekenkamer",
+    "select_on": [
+      {
+        "name": "organisatie_id",
+        "value": "$organisatie_id"
+      }
+    ],
+    "source_type": "AWB"
+  },
+  "awb/beroep:wet": {
+    "table": "laws",
+    "select_on": [
+      {
+        "name": "uuid",
+        "value": "$zaak.rulespec_uuid"
+      }
+    ],
+    "fields": [
+      "decision_type",
+      "name",
+      "valid_from",
+      "legal_character",
+      "voorbereidingsprocedure",
+      "beroepstermijn_weken",
+      "competent_court"
+    ],
+    "source_type": "laws"
+  },
+  "awb/beroep:jurisdictie": {
+    "table": "jurisdicties",
+    "select_on": [
+      {
+        "name": "gemeente",
+        "value": "$adres"
+      }
+    ],
+    "fields": [
+      "gemeente",
+      "arrondissement",
+      "rechtbank"
+    ],
+    "source_type": "reference_data"
+  },
+  "awb/beroep:gebeurtenissen": {
+    "table": "events",
+    "select_on": [
+      {
+        "name": "case_id",
+        "value": "$zaak.id"
+      }
+    ],
+    "fields": [
+      "case_id",
+      "event_type",
+      "approved"
+    ],
+    "source_type": "events"
+  },
+  "awb/bezwaar:wet": {
+    "table": "laws",
+    "select_on": [
+      {
+        "name": "uuid",
+        "value": "$zaak.rulespec_uuid"
+      }
+    ],
+    "fields": [
+      "decision_type",
+      "name",
+      "valid_from",
+      "legal_character",
+      "bezwaartermijn_weken",
+      "beslistermijn_weken",
+      "verdagingstermijn_weken"
+    ],
+    "source_type": "laws"
+  },
+  "awb/bezwaar:gebeurtenissen": {
+    "table": "events",
+    "select_on": [
+      {
+        "name": "case_id",
+        "value": "$zaak.id"
+      }
+    ],
+    "fields": [
+      "case_id",
+      "event_type"
+    ],
+    "source_type": "events"
+  },
+  "belastingdienst_vermogen:vermogensgegevens": {
+    "table": "belastingdienst_vermogen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "vermogen"
+    ]
+  },
+  "besluit_bijstandverlening_zelfstandigen:bbz_aanvraag": {
+    "table": "bbz_aanvraag",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "type_zelfstandige",
+      "bedrijf_levensvatbaar",
+      "jaren_ondernemerschap",
+      "uren_per_week",
+      "beeindigingsdatum"
+    ]
+  },
+  "burgerlijk_wetboek_beschermingsbewind:bewind_registraties": {
+    "table": "bewind_registraties",
+    "select_on": [
+      {
+        "name": "bsn_bewindvoerder",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "bsn_rechthebbende",
+      "naam_rechthebbende",
+      "bewind_type",
+      "datum_ingang",
+      "datum_einde",
+      "status"
+    ]
+  },
+  "burgerlijk_wetboek_curatele:curatele_registraties": {
+    "table": "curatele_registraties",
+    "select_on": [
+      {
+        "name": "bsn_curator",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "bsn_curandus",
+      "naam_curandus",
+      "datum_ingang",
+      "datum_einde",
+      "status"
+    ]
+  },
+  "burgerlijk_wetboek_executeur:executeur_registraties": {
+    "table": "executeur_registraties",
+    "select_on": [
+      {
+        "name": "bsn_executeur",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "bsn_erflater",
+      "naam_erflater",
+      "nalatenschap_id",
+      "datum_overlijden",
+      "datum_aanvaarding",
+      "datum_einde",
+      "status"
+    ]
+  },
+  "burgerlijk_wetboek_gezag:gezag_relaties": {
+    "table": "gezag_relaties",
+    "select_on": [
+      {
+        "name": "bsn_gezagdrager",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "bsn_kind",
+      "naam_kind",
+      "geboortedatum_kind",
+      "type_gezag",
+      "datum_ingang",
+      "datum_einde",
+      "status",
+      "heeft_handlichting"
+    ]
+  },
+  "burgerlijk_wetboek_handelingsonbekwaamheid:curatele_als_curandus": {
+    "table": "curatele_registraties",
+    "select_on": [
+      {
+        "name": "bsn_curandus",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "bsn_curator",
+      "bsn_curandus",
+      "naam_curandus",
+      "datum_ingang",
+      "datum_einde",
+      "status"
+    ]
+  },
+  "burgerlijk_wetboek_mentorschap:mentorschap_registraties": {
+    "table": "mentorschap_registraties",
+    "select_on": [
+      {
+        "name": "bsn_mentor",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "bsn_betrokkene",
+      "naam_betrokkene",
+      "datum_ingang",
+      "datum_einde",
+      "status"
+    ]
+  },
+  "burgerlijk_wetboek_minderjarigheid:persoonsgegevens": {
+    "table": "personen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "geboortedatum",
+      "heeft_handlichting",
+      "handlichting_gebieden"
+    ]
+  },
+  "burgerlijk_wetboek_volmacht:volmacht_registraties": {
+    "table": "volmacht_registraties",
+    "select_on": [
+      {
+        "name": "bsn_gevolmachtigde",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "bsn_volmachtgever",
+      "naam_volmachtgever",
+      "volmacht_type",
+      "datum_ingang",
+      "datum_einde",
+      "status",
+      "is_herroepen"
+    ]
+  },
+  "faillissementswet_curator:faillissement_registraties": {
+    "table": "faillissement_registraties",
+    "select_on": [
+      {
+        "name": "bsn_curator",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "gefailleerde_id",
+      "gefailleerde_naam",
+      "gefailleerde_type",
+      "insolventie_nummer",
+      "datum_uitspraak",
+      "datum_einde",
+      "status"
+    ]
+  },
+  "faillissementswet_wsnp_bewindvoerder:wsnp_registraties": {
+    "table": "wsnp_registraties",
+    "select_on": [
+      {
+        "name": "bsn_bewindvoerder",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "bsn_saniet",
+      "naam_saniet",
+      "insolventie_nummer",
+      "datum_uitspraak",
+      "datum_einde",
+      "status"
+    ]
+  },
+  "handelsregisterwet:inschrijvingen": {
+    "table": "inschrijvingen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "kvk_nummer",
+      "rechtsvorm",
+      "status",
+      "activiteit"
+    ]
+  },
+  "handelsregisterwet:posities": {
+    "table": "functionarissen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "kvk_nummer",
+      "functie",
+      "status"
+    ]
+  },
+  "handelsregisterwet/bedrijfsgegevens:organisatie_gegevens": {
+    "table": "organisaties",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "fields": [
+      "kvk_nummer",
+      "rechtsvorm",
+      "status",
+      "aantal_werknemers",
+      "datum_telling",
+      "datum_aanvang",
+      "vestigingsadres"
+    ]
+  },
+  "handelsregisterwet/jaarrekening:rechtsvorm": {
+    "table": "organisaties",
+    "field": "rechtsvorm",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "KVK"
+  },
+  "handelsregisterwet/jaarrekening:laatste_boekjaar_einde": {
+    "table": "jaarrekeningen",
+    "field": "laatste_boekjaar_einde",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "KVK"
+  },
+  "kieswet:verkiezingsdatum": {
+    "table": "verkiezingen",
+    "field": "verkiezingsdatum",
+    "select_on": [
+      {
+        "name": "type",
+        "value": "TWEEDE_KAMER"
+      }
+    ]
+  },
+  "machtigingenwet:functionarissen": {
+    "table": "functionarissen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "kvk_nummer",
+      "functie",
+      "bevoegdheid",
+      "handelsnaam",
+      "rechtsvorm",
+      "status",
+      "datum_inschrijving",
+      "datum_uitschrijving"
+    ]
+  },
+  "omgevingswet/energiebesparing/informatieplicht:jaarlijks_elektriciteitsverbruik_kwh": {
+    "table": "rvo_energiegegevens",
+    "field": "elektriciteit_kwh",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "RVO"
+  },
+  "omgevingswet/energiebesparing/informatieplicht:jaarlijks_gasverbruik_m3": {
+    "table": "rvo_energiegegevens",
+    "field": "gasverbruik_m3",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "RVO"
+  },
+  "omgevingswet/energiebesparing/informatieplicht:is_woonfunctie": {
+    "table": "rvo_energiegegevens",
+    "field": "is_woonfunctie",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "RVO"
+  },
+  "omgevingswet/werkgebonden_personenmobiliteit:aantal_werknemers": {
+    "table": "wpm_gegevens",
+    "field": "aantal_werknemers",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "RVO"
+  },
+  "omgevingswet/werkgebonden_personenmobiliteit:verstrekt_mobiliteitsvergoeding": {
+    "table": "wpm_gegevens",
+    "field": "verstrekt_mobiliteitsvergoeding",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "RVO"
+  },
+  "omgevingswet/werkgebonden_personenmobiliteit/gegevens:woon_werk_auto_benzine": {
+    "table": "wpm_reisgegevens",
+    "field": "woon_werk_auto_benzine",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "RVO"
+  },
+  "omgevingswet/werkgebonden_personenmobiliteit/gegevens:woon_werk_auto_diesel": {
+    "table": "wpm_reisgegevens",
+    "field": "woon_werk_auto_diesel",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "RVO"
+  },
+  "omgevingswet/werkgebonden_personenmobiliteit/gegevens:zakelijk_auto_benzine": {
+    "table": "wpm_reisgegevens",
+    "field": "zakelijk_auto_benzine",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "RVO"
+  },
+  "omgevingswet/werkgebonden_personenmobiliteit/gegevens:zakelijk_auto_diesel": {
+    "table": "wpm_reisgegevens",
+    "field": "zakelijk_auto_diesel",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "RVO"
+  },
+  "omgevingswet/werkgebonden_personenmobiliteit/gegevens:woon_werk_openbaar_vervoer": {
+    "table": "wpm_reisgegevens",
+    "field": "woon_werk_openbaar_vervoer",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "RVO"
+  },
+  "participatiewet/bijstand/amsterdam:arbeidsvermogen": {
+    "table": "werk_en_re_integratie",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "arbeidsvermogen",
+      "ontheffing_reden",
+      "ontheffing_einddatum",
+      "re_integratie_traject"
+    ]
+  },
+  "penitentiaire_beginselenwet:detentiestatus": {
+    "table": "detenties",
+    "field": "status",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "penitentiaire_beginselenwet:inrichting_type": {
+    "table": "detenties",
+    "field": "inrichting_type",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "pensioenwet:pensioenkapitaal": {
+    "table": "pensioen_deelnemers",
+    "field": "pensioenkapitaal",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "pensioenwet:pensioenjaren": {
+    "table": "pensioen_deelnemers",
+    "field": "pensioenjaren",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "pensioenwet:type_regeling": {
+    "table": "pensioen_deelnemers",
+    "field": "type_regeling",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "pensioenwet:franchise": {
+    "table": "pensioen_deelnemers",
+    "field": "franchise",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "pensioenwet:pensioengevend_loon": {
+    "table": "pensioen_deelnemers",
+    "field": "pensioengevend_loon",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "pensioenwet:pensioen_leeftijd_fonds": {
+    "table": "pensioen_deelnemers",
+    "field": "pensioenleeftijd",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "uwv_toetsingsinkomen:inkomensgegevens": {
+    "table": "uwv_toetsingsinkomen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "toetsingsinkomen"
+    ]
+  },
+  "uwv_werkgegevens:werkgegevens": {
+    "table": "uwv_werkgegevens",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "gemiddeld_uren_per_week",
+      "huidige_uren_per_week",
+      "gewerkte_weken_36",
+      "arbeidsverleden_jaren",
+      "jaarloon"
+    ]
+  },
+  "verordening_precariobelasting:heeft_terras": {
+    "table": "vestigingen",
+    "field": "heeft_terras",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "verordening_precariobelasting:locatie_op_openbare_weg": {
+    "table": "bgt_terraslocaties",
+    "field": "is_openbare_weg",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$vestigingsadres"
+      }
+    ],
+    "source_type": "GEMEENTE_ROTTERDAM"
+  },
+  "vreemdelingenwet:vergunning_gegevens": {
+    "table": "verblijfsvergunningen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "type",
+      "status",
+      "ingangsdatum",
+      "einddatum"
+    ]
+  },
+  "vreemdelingenwet:eu_inschrijving": {
+    "table": "eu_registraties",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "type",
+      "ingangsdatum"
+    ]
+  },
+  "warenwet/haccp:sbi_code": {
+    "table": "organisaties",
+    "field": "sbi_code",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "KVK"
+  },
+  "warenwet/haccp:is_geregistreerd_nvwa": {
+    "table": "nvwa_registratie",
+    "field": "is_geregistreerd_nvwa",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "NVWA"
+  },
+  "warenwet/haccp:heeft_haccp_systeem": {
+    "table": "nvwa_registratie",
+    "field": "heeft_haccp_systeem",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "NVWA"
+  },
+  "warenwet/haccp:type_haccp_systeem": {
+    "table": "nvwa_registratie",
+    "field": "type_haccp_systeem",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "NVWA"
+  },
+  "warenwet/meldplicht:is_levensmiddelenbedrijf": {
+    "table": "nvwa_registratie",
+    "field": "is_levensmiddelenbedrijf",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "NVWA"
+  },
+  "warenwet/meldplicht:heeft_actief_incident": {
+    "table": "nvwa_meldplicht",
+    "field": "heeft_actief_incident",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ],
+    "source_type": "NVWA"
+  },
+  "wet_adviescollege_ict_toetsing:project_kosten": {
+    "table": "ict_projecten",
+    "field": "totale_kosten",
+    "select_on": [
+      {
+        "name": "project_id",
+        "value": "$project_id"
+      }
+    ],
+    "source_type": "ACICT"
+  },
+  "wet_adviescollege_ict_toetsing:organisatie_type": {
+    "table": "ict_projecten",
+    "field": "organisatie_type",
+    "select_on": [
+      {
+        "name": "project_id",
+        "value": "$project_id"
+      }
+    ],
+    "source_type": "ACICT"
+  },
+  "wet_adviescollege_ict_toetsing:project_type": {
+    "table": "ict_projecten",
+    "field": "project_type",
+    "select_on": [
+      {
+        "name": "project_id",
+        "value": "$project_id"
+      }
+    ],
+    "source_type": "ACICT"
+  },
+  "wet_bag:verblijfsobject": {
+    "table": "bag_verblijfsobjecten",
+    "select_on": [
+      {
+        "name": "adres",
+        "value": "$adres"
+      }
+    ],
+    "fields": [
+      "gebruiksdoel",
+      "oppervlakte",
+      "status",
+      "bouwjaar"
+    ]
+  },
+  "wet_bibob:advies_uitgebracht": {
+    "table": "bibob_adviezen",
+    "field": "advies_uitgebracht",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "wet_bibob:advies_mate_van_gevaar": {
+    "table": "bibob_adviezen",
+    "field": "mate_van_gevaar",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "wet_bibob:advies_datum": {
+    "table": "bibob_adviezen",
+    "field": "advies_datum",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "wet_bibob:relatie_tot_strafbare_feiten": {
+    "table": "bibob_adviezen",
+    "field": "relatie_strafbare_feiten",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "wet_bibob:financieringsrisico": {
+    "table": "bibob_adviezen",
+    "field": "financieringsrisico",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "wet_bibob:voorschriften_geadviseerd": {
+    "table": "bibob_adviezen",
+    "field": "voorschriften_geadviseerd",
+    "select_on": [
+      {
+        "name": "kvk_nummer",
+        "value": "$kvk_nummer"
+      }
+    ]
+  },
+  "wet_brp:geboortedatum": {
+    "table": "personen",
+    "field": "geboortedatum",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp:partner_geboortedatum": {
+    "table": "personen",
+    "field": "geboortedatum",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_brp:partnertype": {
+    "table": "relaties",
+    "field": "partnerschap_type",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp:partner_bsn": {
+    "table": "relaties",
+    "field": "partner_bsn",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp:kinderen_gegevens": {
+    "table": "relaties",
+    "field": "kinderen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp:verblijfsadres": {
+    "table": "personen",
+    "field": "verblijfsadres",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp:ouder_adressen": {
+    "table": "relaties",
+    "field": "ouder_adressen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp:land_van_verblijf": {
+    "table": "personen",
+    "field": "land_verblijf",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp:nationaliteit": {
+    "table": "personen",
+    "field": "nationaliteit",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp:adres": {
+    "table": "verblijfplaats",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "straat",
+      "huisnummer",
+      "postcode",
+      "woonplaats",
+      "type"
+    ]
+  },
+  "wet_brp:huishouden": {
+    "table": "bewoners",
+    "field": "medebewoners",
+    "select_on": [
+      {
+        "name": "postcode",
+        "value": "$adres.postcode"
+      },
+      {
+        "name": "huisnummer",
+        "value": "$adres.huisnummer"
+      }
+    ]
+  },
+  "wet_brp/laa:aantal_bewoners": {
+    "table": "brp_adressen",
+    "field": "aantal_bewoners",
+    "select_on": [
+      {
+        "name": "postcode",
+        "value": "$adres.postcode"
+      },
+      {
+        "name": "huisnummer",
+        "value": "$adres.huisnummer"
+      }
+    ]
+  },
+  "wet_brp/terugmelding/belastingdienst:belasting_adres": {
+    "table": "belasting_adressen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "postcode",
+      "huisnummer",
+      "straat",
+      "woonplaats"
+    ]
+  },
+  "wet_brp/terugmelding/belastingdienst:langdurig_buitenland": {
+    "table": "belasting_verblijf",
+    "field": "langdurig_afwezig",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp/terugmelding/cjib:post_onbestelbaar": {
+    "table": "cjib_post",
+    "field": "onbestelbaar_retour",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp/terugmelding/cjib:aantal_onbestelbaar": {
+    "table": "cjib_post",
+    "field": "aantal_onbestelbaar",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_brp/terugmelding/toeslagen:toeslag_adres": {
+    "table": "toeslagen_adressen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "postcode",
+      "huisnummer",
+      "straat",
+      "woonplaats"
+    ]
+  },
+  "wet_brp/terugmelding/toeslagen:toeslagen_onderzoek": {
+    "table": "toeslagen_adresonderzoek",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "onderzoek_datum",
+      "onderzoek_uitkomst",
+      "adres_geverifieerd"
+    ]
+  },
+  "wet_forensische_zorg:zorgtype": {
+    "table": "forensische_zorg",
+    "field": "zorgtype",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_forensische_zorg:juridische_grondslag": {
+    "table": "forensische_zorg",
+    "field": "juridische_titel",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box1_dienstbetrekking": {
+    "table": "box1",
+    "field": "loon_uit_dienstbetrekking",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box1_uitkeringen": {
+    "table": "box1",
+    "field": "uitkeringen_en_pensioenen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box1_onderneming": {
+    "table": "box1",
+    "field": "winst_uit_onderneming",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box1_overige_werkzaamheden": {
+    "table": "box1",
+    "field": "resultaat_overige_werkzaamheden",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box1_eigen_woning": {
+    "table": "box1",
+    "field": "eigen_woning",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box2_dividend": {
+    "table": "box2",
+    "field": "reguliere_voordelen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box2_aandelen": {
+    "table": "box2",
+    "field": "vervreemdingsvoordelen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box3_sparen": {
+    "table": "box3",
+    "field": "spaargeld",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box3_beleggen": {
+    "table": "box3",
+    "field": "beleggingen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box3_onroerend_goed": {
+    "table": "box3",
+    "field": "onroerend_goed",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:box3_schulden": {
+    "table": "box3",
+    "field": "schulden",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:persoonsgebonden_aftrek": {
+    "table": "aftrekposten",
+    "field": "persoonsgebonden_aftrek",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box1_dienstbetrekking": {
+    "table": "box1",
+    "field": "loon_uit_dienstbetrekking",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box1_uitkeringen": {
+    "table": "box1",
+    "field": "uitkeringen_en_pensioenen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box1_onderneming": {
+    "table": "box1",
+    "field": "winst_uit_onderneming",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box1_overige_werkzaamheden": {
+    "table": "box1",
+    "field": "resultaat_overige_werkzaamheden",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box1_eigen_woning": {
+    "table": "box1",
+    "field": "eigen_woning",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box2_dividend": {
+    "table": "box2",
+    "field": "reguliere_voordelen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box2_aandelen": {
+    "table": "box2",
+    "field": "vervreemdingsvoordelen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box3_sparen": {
+    "table": "box3",
+    "field": "spaargeld",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box3_beleggen": {
+    "table": "box3",
+    "field": "beleggingen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box3_onroerend_goed": {
+    "table": "box3",
+    "field": "onroerend_goed",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_box3_schulden": {
+    "table": "box3",
+    "field": "schulden",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:partner_buitenlands_inkomen": {
+    "table": "buitenlands",
+    "field": "inkomen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_inkomstenbelasting:buitenlands_inkomen": {
+    "table": "buitenlands",
+    "field": "inkomen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_kinderopvang:kinderopvang_kvk": {
+    "source_type": "claim"
+  },
+  "wet_kinderopvang:aangegeven_uren": {
+    "source_type": "claim"
+  },
+  "wet_kinderopvang:verwachte_partner_uren": {
+    "source_type": "claim"
+  },
+  "wet_op_de_huurtoeslag:huurprijs": {
+    "source_type": "claim"
+  },
+  "wet_op_de_huurtoeslag:servicekosten": {
+    "source_type": "claim"
+  },
+  "wet_op_de_huurtoeslag:subsidiabele_servicekosten": {
+    "source_type": "claim"
+  },
+  "wet_op_het_centraal_bureau_voor_de_statistiek:levensverwachting_gegevens": {
+    "table": "levensverwachting",
+    "field": "verwachting_65",
+    "select_on": [
+      {
+        "name": "jaar",
+        "value": "$year"
+      }
+    ]
+  },
+  "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen:dienstverbandperiodes": {
+    "table": "dienstverbanden",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "start_date",
+      "end_date"
+    ]
+  },
+  "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen:uitkeringsperiodes": {
+    "table": "uitkeringen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      },
+      {
+        "name": "type",
+        "value": {
+          "operation": "IN",
+          "values": "$geldige_uitkering_typen"
+        }
+      }
+    ],
+    "fields": [
+      "start_date",
+      "end_date"
+    ]
+  },
+  "wet_studiefinanciering:opleiding_type": {
+    "table": "inschrijvingen",
+    "field": "onderwijstype",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_studiefinanciering:studerend_gezin": {
+    "table": "studiefinanciering",
+    "field": "aantal_studerend_gezin",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "wet_studiefinanciering:partner_opleiding_type": {
+    "table": "inschrijvingen",
+    "field": "onderwijstype",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_studiefinanciering:partner_studerend_gezin": {
+    "table": "studiefinanciering",
+    "field": "aantal_studerend_gezin",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$partner_bsn"
+      }
+    ]
+  },
+  "wet_werk_en_inkomen_naar_arbeidsvermogen:wia_uitkering_status": {
+    "table": "wia_uitkeringen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "status",
+      "start_datum",
+      "eind_datum"
+    ]
+  },
+  "wetboek_van_strafrecht:stemrecht_uitsluitingen": {
+    "table": "ontzettingen",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      },
+      {
+        "name": "type",
+        "value": "KIESRECHT"
+      }
+    ],
+    "fields": [
+      "startdatum",
+      "einddatum"
+    ]
+  },
+  "wgbo_vertegenwoordiger:familie_relaties": {
+    "table": "wgbo_familie_relaties",
+    "select_on": [
+      {
+        "name": "bsn_familielid",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "bsn_patient",
+      "naam_patient",
+      "relatie_type",
+      "is_wilsonbekwaam",
+      "datum_wilsonbekwaamheid"
+    ]
+  },
+  "ziektewet:zw_uitkering": {
+    "table": "ziektewet",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ],
+    "fields": [
+      "heeft_ziektewet_uitkering"
+    ]
+  },
+  "zvw:verzekeringspolis": {
+    "table": "verzekeringen",
+    "field": "polis_status",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  },
+  "zvw:verdragsinschrijving": {
+    "table": "verdragsverzekeringen",
+    "field": "registratie",
+    "select_on": [
+      {
+        "name": "bsn",
+        "value": "$bsn"
+      }
+    ]
+  }
+}

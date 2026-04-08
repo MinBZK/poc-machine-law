@@ -11,24 +11,37 @@ uuid: 9f2a3b4c-1d5e-4f6a-b7c8-2e3d4f5a6b7c
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '381'
-  text: |-
-    1 De curatele werkt met ingang van de dag waarop zij is uitgesproken. In het geval, bedoeld in artikel 378, tweede lid, werkt de curatele met ingang van het tijdstip waarop de onder curatele gestelde meerderjarig wordt.
-    2 Van deze tijdstippen is de onder curatele gestelde onbekwaam rechtshandelingen te verrichten voor zover de wet niet anders bepaalt.
-    3 Een onder curatele gestelde is bekwaam rechtshandelingen te verrichten met toestemming van zijn curator, voor zover deze bevoegd is die rechtshandelingen voor de onder curatele gestelde te verrichten. De toestemming kan slechts worden verleend voor een bepaalde rechtshandeling of voor een bepaald doel. De toestemming voor een bepaald doel moet schriftelijk worden verleend.
-    4 Met betrekking tot aangelegenheden betreffende verzorging, verpleging, behandeling en begeleiding van een onder curatele gestelde zijn de artikelen 453 en 454 van dit boek van overeenkomstige toepassing.
-    5 Hij is bekwaam over gelden die zijn curator voor levensonderhoud te zijner beschikking heeft gesteld, overeenkomstig deze bestemming te beschikken.
-    6 In zaken van curatele is degene wiens curatele het betreft bekwaam in rechte op te treden en tegen een uitspraak beroep in te stellen.
+  text: '1 De curatele werkt met ingang van de dag waarop zij is uitgesproken. In
+    het geval, bedoeld in artikel 378, tweede lid, werkt de curatele met ingang van
+    het tijdstip waarop de onder curatele gestelde meerderjarig wordt.
+
+    2 Van deze tijdstippen is de onder curatele gestelde onbekwaam rechtshandelingen
+    te verrichten voor zover de wet niet anders bepaalt.
+
+    3 Een onder curatele gestelde is bekwaam rechtshandelingen te verrichten met toestemming
+    van zijn curator, voor zover deze bevoegd is die rechtshandelingen voor de onder
+    curatele gestelde te verrichten. De toestemming kan slechts worden verleend voor
+    een bepaalde rechtshandeling of voor een bepaald doel. De toestemming voor een
+    bepaald doel moet schriftelijk worden verleend.
+
+    4 Met betrekking tot aangelegenheden betreffende verzorging, verpleging, behandeling
+    en begeleiding van een onder curatele gestelde zijn de artikelen 453 en 454 van
+    dit boek van overeenkomstige toepassing.
+
+    5 Hij is bekwaam over gelden die zijn curator voor levensonderhoud te zijner beschikking
+    heeft gesteld, overeenkomstig deze bestemming te beschikken.
+
+    6 In zaken van curatele is degene wiens curatele het betreft bekwaam in rechte
+    op te treden en tegen een uitspraak beroep in te stellen.'
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel381
   machine_readable:
     definitions:
       handelingsonbekwame_rechten:
-        value:
-        - LEZEN
+      - LEZEN
       volledige_rechten:
-        value:
-        - LEZEN
-        - CLAIMS_INDIENEN
-        - BESLUITEN_ONTVANGEN
+      - LEZEN
+      - CLAIMS_INDIENEN
+      - BESLUITEN_ONTVANGEN
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -40,20 +53,7 @@ articles:
       input:
       - name: curatele_als_curandus
         type: array
-        source_reference:
-          table: curatele_registraties
-          fields:
-          - bsn_curator
-          - bsn_curandus
-          - naam_curandus
-          - datum_ingang
-          - datum_einde
-          - status
-          select_on:
-          - name: bsn_curandus
-            description: BSN van de persoon als curandus
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: is_onder_curatele
         type: boolean
@@ -107,8 +107,10 @@ articles:
           article: '389'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling3_Artikel389
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=389&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 1:389 BW: curatele eindigt door opheffing. Alleen actieve curatele zonder einddatum of met toekomstige einddatum is van kracht.
+          explanation: 'Art. 1:389 BW: curatele eindigt door opheffing. Alleen actieve
+            curatele zonder einddatum of met toekomstige einddatum is van kracht.
+
+            '
       - output: is_onder_curatele
         value:
           operation: NOT
@@ -143,7 +145,7 @@ articles:
                 operation: IS_NULL
                 subject: $actieve_curatele.bsn_curator
             then: $actieve_curatele.bsn_curator
-          default:
+          default: null
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -165,8 +167,10 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 1:381 lid 1 BW: handelingsonbekwamen kunnen geen rechtshandelingen zelfstandig verrichten. Zij hebben alleen leesrecht.
+          explanation: 'Art. 1:381 lid 1 BW: handelingsonbekwamen kunnen geen rechtshandelingen
+            zelfstandig verrichten. Zij hebben alleen leesrecht.
+
+            '
       - output: heeft_delegaties
         value: true
         legal_basis:
@@ -229,7 +233,7 @@ articles:
           explanation: Rechten afhankelijk van handelingsbekwaamheid
       - output: valid_from_dates
         value:
-        -
+        - null
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -239,7 +243,7 @@ articles:
           explanation: SELF delegatie heeft geen ingangsdatum
       - output: valid_until_dates
         value:
-        -
+        - null
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -249,7 +253,8 @@ articles:
           explanation: SELF delegatie heeft geen einddatum
     untranslatables:
     - construct: iteratie over variabel aantal curatele-registraties (als curandus)
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal curatele-registraties is dynamisch en kan niet
-        vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal curatele-registraties
+        is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties
+        tot een vast maximum
       accepted: true

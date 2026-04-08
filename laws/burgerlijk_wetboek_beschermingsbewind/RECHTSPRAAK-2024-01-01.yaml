@@ -11,22 +11,35 @@ uuid: 970f63e4-eed1-4884-a1ee-9050733eb2e1
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '431'
-  text: |-
-    1 De kantonrechter kan een bewind instellen over één of meer van de goederen die een meerderjarige als rechthebbende toebehoren of zullen toebehoren
-      a. voor een bepaalde of onbepaalde tijdsduur indien de meerderjarige tijdelijk of duurzaam niet in staat is ten volle zijn vermogensrechtelijke belangen behoorlijk waar te nemen als gevolg van zijn lichamelijke of geestelijke toestand, dan wel
-      b. voor een bepaalde tijdsduur indien de meerderjarige tijdelijk niet in staat is ten volle zijn vermogensrechtelijke belangen behoorlijk waar te nemen als gevolg van verkwisting of het hebben van problematische schulden.
-    2 Indien te verwachten is dat een minderjarige op het tijdstip waarop hij meerderjarig zal worden, in de in het vorige lid bedoelde toestand zal verkeren, kan het bewind reeds voor de meerderjarigheid worden ingesteld.
-    3 Het bewind kan eveneens worden ingesteld indien te verwachten is dat de rechthebbende binnen afzienbare tijd in de in het eerste lid bedoelde toestand zal verkeren.
-    4 De rechter bij wie een verzoek tot het verlenen van een rechterlijke machtiging als bedoeld in de Wet zorg en dwang psychogeriatrische en verstandelijk gehandicapte cliënten dan wel een zorgmachtiging of een machtiging tot voorzetting van de crisismaatregel als bedoeld in de Wet verplichte geestelijke gezondheidszorg aanhangig is, is tevens bevoegd tot de kennisneming van een verzoek tot instelling van het bewind.
-    5 Onder aan de meerderjarige toebehorende goederen zijn in deze titel begrepen goederen die behoren tot zijn huwelijksgemeenschap of gemeenschap van geregistreerd partnerschap en die niet uitsluitend onder het bestuur van zijn echtgenoot dan wel geregistreerd partner staan.
+  text: "1 De kantonrechter kan een bewind instellen over één of meer van de goederen\
+    \ die een meerderjarige als rechthebbende toebehoren of zullen toebehoren\n  a.\
+    \ voor een bepaalde of onbepaalde tijdsduur indien de meerderjarige tijdelijk\
+    \ of duurzaam niet in staat is ten volle zijn vermogensrechtelijke belangen behoorlijk\
+    \ waar te nemen als gevolg van zijn lichamelijke of geestelijke toestand, dan\
+    \ wel\n  b. voor een bepaalde tijdsduur indien de meerderjarige tijdelijk niet\
+    \ in staat is ten volle zijn vermogensrechtelijke belangen behoorlijk waar te\
+    \ nemen als gevolg van verkwisting of het hebben van problematische schulden.\n\
+    2 Indien te verwachten is dat een minderjarige op het tijdstip waarop hij meerderjarig\
+    \ zal worden, in de in het vorige lid bedoelde toestand zal verkeren, kan het\
+    \ bewind reeds voor de meerderjarigheid worden ingesteld.\n3 Het bewind kan eveneens\
+    \ worden ingesteld indien te verwachten is dat de rechthebbende binnen afzienbare\
+    \ tijd in de in het eerste lid bedoelde toestand zal verkeren.\n4 De rechter bij\
+    \ wie een verzoek tot het verlenen van een rechterlijke machtiging als bedoeld\
+    \ in de Wet zorg en dwang psychogeriatrische en verstandelijk gehandicapte cliënten\
+    \ dan wel een zorgmachtiging of een machtiging tot voorzetting van de crisismaatregel\
+    \ als bedoeld in de Wet verplichte geestelijke gezondheidszorg aanhangig is, is\
+    \ tevens bevoegd tot de kennisneming van een verzoek tot instelling van het bewind.\n\
+    5 Onder aan de meerderjarige toebehorende goederen zijn in deze titel begrepen\
+    \ goederen die behoren tot zijn huwelijksgemeenschap of gemeenschap van geregistreerd\
+    \ partnerschap en die niet uitsluitend onder het bestuur van zijn echtgenoot dan\
+    \ wel geregistreerd partner staan."
   url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Artikel431
   machine_readable:
     definitions:
       bewindvoerder_rechten:
-        value:
-        - LEZEN
-        - CLAIMS_INDIENEN
-        - BESLUITEN_ONTVANGEN
+      - LEZEN
+      - CLAIMS_INDIENEN
+      - BESLUITEN_ONTVANGEN
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -38,20 +51,7 @@ articles:
       input:
       - name: bewind_registraties
         type: array
-        source_reference:
-          table: bewind_registraties
-          fields:
-          - bsn_rechthebbende
-          - naam_rechthebbende
-          - bewind_type
-          - datum_ingang
-          - datum_einde
-          - status
-          select_on:
-          - name: bsn_bewindvoerder
-            description: BSN nummer van de bewindvoerder
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -105,8 +105,10 @@ articles:
           article: '449'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel449
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=449&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Alleen actieve bewind-registraties geven vertegenwoordigingsbevoegdheid. Bewind kan worden opgeheven (Art. 1:449 BW).
+          explanation: 'Alleen actieve bewind-registraties geven vertegenwoordigingsbevoegdheid.
+            Bewind kan worden opgeheven (Art. 1:449 BW).
+
+            '
       - output: heeft_delegaties
         value:
           operation: NOT
@@ -119,8 +121,10 @@ articles:
           article: '441'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel441
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=441&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 1:441 BW bepaalt dat de bewindvoerder de rechthebbende vertegenwoordigt.
+          explanation: 'Art. 1:441 BW bepaalt dat de bewindvoerder de rechthebbende
+            vertegenwoordigt.
+
+            '
       - output: subject_ids
         value: $actief_bewind.bsn_rechthebbende
         legal_basis:
@@ -175,8 +179,11 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel441
           juriconnect: jci1.3:c:BWBR0002656&boek=1&artikel=441&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 1:441 lid 1 BW: De bewindvoerder vertegenwoordigt bij beheer van onder bewind staande goederen. Volledige rechten voor financiele zaken.
+          explanation: 'Art. 1:441 lid 1 BW: De bewindvoerder vertegenwoordigt bij
+            beheer van onder bewind staande goederen. Volledige rechten voor financiele
+            zaken.
+
+            '
       - output: valid_from_dates
         value: $actief_bewind.datum_ingang
         legal_basis:
@@ -197,7 +204,8 @@ articles:
           explanation: Einddatum bewind, null indien nog actief
     untranslatables:
     - construct: iteratie over variabel aantal bewind-registraties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve beschermingsbewind-registraties is dynamisch
-        en kan niet vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve beschermingsbewind-registraties
+        is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties
+        tot een vast maximum
       accepted: true

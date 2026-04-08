@@ -11,51 +11,55 @@ uuid: 3f8a2b1c-9d4e-4f5a-b8c7-6e1d2f3a4b5c
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '240'
-  text: |-
-    1 Het bestuur vertegenwoordigt de vennootschap, voor zover uit de wet niet anders voortvloeit.
-    2 De bevoegdheid tot vertegenwoordiging komt mede aan iedere bestuurder toe. De statuten kunnen echter bepalen dat zij behalve aan het bestuur slechts toekomt aan een of meer bestuurders. Zij kunnen voorts bepalen dat een bestuurder de vennootschap slechts met medewerking van een of meer anderen mag vertegenwoordigen.
-    3 Bevoegdheid tot vertegenwoordiging die aan het bestuur of aan een bestuurder toekomt, is onbeperkt en onvoorwaardelijk, voor zover uit de wet niet anders voortvloeit. Een wettelijk toegelaten of voorgeschreven beperking van of voorwaarde voor de bevoegdheid tot vertegenwoordiging kan slechts door de vennootschap worden ingeroepen.
-    4 De statuten kunnen ook aan andere personen dan bestuurders bevoegdheid tot vertegenwoordiging toekennen.
+  text: '1 Het bestuur vertegenwoordigt de vennootschap, voor zover uit de wet niet
+    anders voortvloeit.
+
+    2 De bevoegdheid tot vertegenwoordiging komt mede aan iedere bestuurder toe. De
+    statuten kunnen echter bepalen dat zij behalve aan het bestuur slechts toekomt
+    aan een of meer bestuurders. Zij kunnen voorts bepalen dat een bestuurder de vennootschap
+    slechts met medewerking van een of meer anderen mag vertegenwoordigen.
+
+    3 Bevoegdheid tot vertegenwoordiging die aan het bestuur of aan een bestuurder
+    toekomt, is onbeperkt en onvoorwaardelijk, voor zover uit de wet niet anders voortvloeit.
+    Een wettelijk toegelaten of voorgeschreven beperking van of voorwaarde voor de
+    bevoegdheid tot vertegenwoordiging kan slechts door de vennootschap worden ingeroepen.
+
+    4 De statuten kunnen ook aan andere personen dan bestuurders bevoegdheid tot vertegenwoordiging
+    toekennen.'
   url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Artikel240
   machine_readable:
     definitions:
       bestuurder_functies:
-        value:
-        - BESTUURDER
-        - DIRECTEUR
-        - ALGEMEEN_DIRECTEUR
+      - BESTUURDER
+      - DIRECTEUR
+      - ALGEMEEN_DIRECTEUR
       eigenaar_functies:
-        value:
-        - EIGENAAR
-        - VENNOOT
-        - BEHEREND_VENNOOT
-        - MAAT
+      - EIGENAAR
+      - VENNOOT
+      - BEHEREND_VENNOOT
+      - MAAT
       gemachtigde_functies:
-        value:
-        - GEMACHTIGDE
-        - PROCURATIEHOUDER
-        - GEVOLMACHTIGDE
+      - GEMACHTIGDE
+      - PROCURATIEHOUDER
+      - GEVOLMACHTIGDE
       bevoegde_functies:
-        value:
-        - BESTUURDER
-        - DIRECTEUR
-        - ALGEMEEN_DIRECTEUR
-        - EIGENAAR
-        - VENNOOT
-        - BEHEREND_VENNOOT
-        - MAAT
-        - VOORZITTER
-        - GEMACHTIGDE
-        - PROCURATIEHOUDER
-        - GEVOLMACHTIGDE
+      - BESTUURDER
+      - DIRECTEUR
+      - ALGEMEEN_DIRECTEUR
+      - EIGENAAR
+      - VENNOOT
+      - BEHEREND_VENNOOT
+      - MAAT
+      - VOORZITTER
+      - GEMACHTIGDE
+      - PROCURATIEHOUDER
+      - GEVOLMACHTIGDE
       volledige_bevoegdheid_rechten:
-        value:
-        - LEZEN
-        - CLAIMS_INDIENEN
-        - BESLUITEN_ONTVANGEN
+      - LEZEN
+      - CLAIMS_INDIENEN
+      - BESLUITEN_ONTVANGEN
       beperkte_bevoegdheid_rechten:
-        value:
-        - LEZEN
+      - LEZEN
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -67,22 +71,7 @@ articles:
       input:
       - name: functionarissen
         type: array
-        source_reference:
-          table: functionarissen
-          fields:
-          - kvk_nummer
-          - functie
-          - bevoegdheid
-          - handelsnaam
-          - rechtsvorm
-          - status
-          - datum_inschrijving
-          - datum_uitschrijving
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -127,8 +116,12 @@ articles:
           paragraph: '2'
           url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel5_Afdeling4_Artikel240
           juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=240&lid=2&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 2:240 lid 2 BW: alleen bestuurders hebben vertegenwoordigingsbevoegdheid. Art. 2:240 lid 4 BW: statuten kunnen ook anderen bevoegdheid toekennen (gemachtigden). Commissarissen en andere toezichthouders zijn NIET bevoegd de rechtspersoon te vertegenwoordigen.
+          explanation: 'Art. 2:240 lid 2 BW: alleen bestuurders hebben vertegenwoordigingsbevoegdheid.
+            Art. 2:240 lid 4 BW: statuten kunnen ook anderen bevoegdheid toekennen
+            (gemachtigden). Commissarissen en andere toezichthouders zijn NIET bevoegd
+            de rechtspersoon te vertegenwoordigen.
+
+            '
       - output: heeft_delegaties
         value:
           operation: NOT
@@ -142,8 +135,10 @@ articles:
           paragraph: '2'
           url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel5_Afdeling4_Artikel240
           juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=240&lid=2&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 2:240 lid 2 BW bepaalt dat iedere bestuurder vertegenwoordigingsbevoegd is. Alleen functies met vertegenwoordigingsbevoegdheid worden meegeteld.
+          explanation: 'Art. 2:240 lid 2 BW bepaalt dat iedere bestuurder vertegenwoordigingsbevoegd
+            is. Alleen functies met vertegenwoordigingsbevoegdheid worden meegeteld.
+
+            '
       - output: subject_ids
         value: $bevoegde_functionarissen.kvk_nummer
         legal_basis:
@@ -152,7 +147,8 @@ articles:
           article: '18'
           url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel18
           juriconnect: jci1.3:c:BWBR0021777&artikel=18&z=2024-01-01&g=2024-01-01
-          explanation: KVK nummers van bedrijven waarvoor bevoegde vertegenwoordiging is geregistreerd
+          explanation: KVK nummers van bedrijven waarvoor bevoegde vertegenwoordiging
+            is geregistreerd
       - output: subject_names
         value: $bevoegde_functionarissen.handelsnaam
         legal_basis:
@@ -173,7 +169,8 @@ articles:
           article: '9'
           url: https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel9
           juriconnect: jci1.3:c:BWBR0021777&artikel=9&z=2024-01-01&g=2024-01-01
-          explanation: Deze wet behandelt alleen rechtspersonen (BUSINESS), geen natuurlijke personen
+          explanation: Deze wet behandelt alleen rechtspersonen (BUSINESS), geen natuurlijke
+            personen
       - output: delegation_types
         value: $bevoegde_functionarissen.functie
         legal_basis:
@@ -192,8 +189,11 @@ articles:
           paragraph: '3'
           url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel5_Afdeling4_Artikel240
           juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=240&lid=3&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 2:240 lid 3 BW: de bevoegdheid van het bestuur kan in de statuten worden beperkt. Het Handelsregister registreert dit als VOLLEDIG of BEPERKT.
+          explanation: 'Art. 2:240 lid 3 BW: de bevoegdheid van het bestuur kan in
+            de statuten worden beperkt. Het Handelsregister registreert dit als VOLLEDIG
+            of BEPERKT.
+
+            '
       - output: permissions
         value:
           operation: FOREACH
@@ -214,8 +214,10 @@ articles:
           paragraph: '3'
           url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel5_Afdeling4_Artikel240
           juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=240&lid=3&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Bepaalt per bedrijf de rechten op basis van de geregistreerde bevoegdheid. VOLLEDIG = alle rechten, BEPERKT = alleen leesrechten.
+          explanation: 'Bepaalt per bedrijf de rechten op basis van de geregistreerde
+            bevoegdheid. VOLLEDIG = alle rechten, BEPERKT = alleen leesrechten.
+
+            '
       - output: valid_from_dates
         value: $bevoegde_functionarissen.datum_inschrijving
         legal_basis:
@@ -236,7 +238,8 @@ articles:
           explanation: Uitschrijvingsdatum uit Handelsregister, null indien nog actief
     untranslatables:
     - construct: iteratie over variabel aantal functionarissen en bevoegdheden
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal functionarissen en bevoegdheden per rechtspersoon is
-        dynamisch en kan niet vooraf worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal functionarissen tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal functionarissen
+        en bevoegdheden per rechtspersoon is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal functionarissen
+        tot een vast maximum
       accepted: true

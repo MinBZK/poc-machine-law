@@ -12,31 +12,43 @@ uuid: 3e7f9b2a-5d8c-4a1e-9f6b-8c2d4e7a3b1f
 discoverable: BUSINESS
 articles:
 - number: 2:30b
-  text: |-
-    Artikel 2:30b Terrassen 1. Ingeval van een exploitatievergunningaanvraag die tevens van toepassing is voor een of meer bij de openbare inrichting behorende terrassen, beslist de burgemeester – gelet op de openbare orde en veiligheid ter plaatse hetgeen mede omvat de kwaliteit en het uiterlijk aanzien van de terrassen – tevens omtrent de ingebruikneming van de openbare weg. 2. Onverminderd het bepaalde in de artikelen 1:6, 1:8 en 2:28, kan de burgemeester de in het eerste lid bedoelde ingebruikneming van de openbare weg weigeren of verbieden indien het de verwachting is dat het gebruik: a. schade toebrengt aan de weg dan wel gevaar kan veroorzaken voor de bruikbaarheid van de weg of voor het doelmatig en veilig gebruik daarvan; b. een belemmering vormt voor het doelmatig beheer en onderhoud van de weg; c. afbreuk doet aan andere publieke functies van de openbare ruimte, inclusief de bescherming van het uiterlijk aanzien daarvan. 3. Als voor het uitvoeren van openbare werken of om enigerlei andere reden verwijdering van het terras noodzakelijk is, is de exploitant van de openbare inrichting verplicht dit binnen de door het bevoegde bestuursorgaan gestelde termijn, te verwijderen. 4. Het is verboden dranken of eetwaren voor gebruik ter plaatse te verstrekken buiten dat deel van de weg waarvan het gebruik ingevolge het eerste lid is toegestaan. 5. De exploitant of de beheerder is verplicht te zorgen dat dagelijks, uiterlijk een uur na sluiting van de openbare inrichting, doch in ieder geval onverwijld op eerste aanzegging van een ambtenaar, belast met het toezicht op de naleving van het bepaalde in dit artikel, in de nabijheid van het terras op de weg achtergebleven stoffen of voorwerpen, voor zover kennelijk uit of van dat terras afkomstig, worden verwijderd. <section class="section-chapter js-scrollSection"
+  text: 'Artikel 2:30b Terrassen 1. Ingeval van een exploitatievergunningaanvraag
+    die tevens van toepassing is voor een of meer bij de openbare inrichting behorende
+    terrassen, beslist de burgemeester – gelet op de openbare orde en veiligheid ter
+    plaatse hetgeen mede omvat de kwaliteit en het uiterlijk aanzien van de terrassen
+    – tevens omtrent de ingebruikneming van de openbare weg. 2. Onverminderd het bepaalde
+    in de artikelen 1:6, 1:8 en 2:28, kan de burgemeester de in het eerste lid bedoelde
+    ingebruikneming van de openbare weg weigeren of verbieden indien het de verwachting
+    is dat het gebruik: a. schade toebrengt aan de weg dan wel gevaar kan veroorzaken
+    voor de bruikbaarheid van de weg of voor het doelmatig en veilig gebruik daarvan;
+    b. een belemmering vormt voor het doelmatig beheer en onderhoud van de weg; c.
+    afbreuk doet aan andere publieke functies van de openbare ruimte, inclusief de
+    bescherming van het uiterlijk aanzien daarvan. 3. Als voor het uitvoeren van openbare
+    werken of om enigerlei andere reden verwijdering van het terras noodzakelijk is,
+    is de exploitant van de openbare inrichting verplicht dit binnen de door het bevoegde
+    bestuursorgaan gestelde termijn, te verwijderen. 4. Het is verboden dranken of
+    eetwaren voor gebruik ter plaatse te verstrekken buiten dat deel van de weg waarvan
+    het gebruik ingevolge het eerste lid is toegestaan. 5. De exploitant of de beheerder
+    is verplicht te zorgen dat dagelijks, uiterlijk een uur na sluiting van de openbare
+    inrichting, doch in ieder geval onverwijld op eerste aanzegging van een ambtenaar,
+    belast met het toezicht op de naleving van het bepaalde in dit artikel, in de
+    nabijheid van het terras op de weg achtergebleven stoffen of voorwerpen, voor
+    zover kennelijk uit of van dat terras afkomstig, worden verwijderd. <section class="section-chapter
+    js-scrollSection"'
   url: https://lokaleregelgeving.overheid.nl/CVDR373493/11#artikel_2:30b
   machine_readable:
     definitions:
-      minimale_obstakelvrije_ruimte:
-        value: 1.8
-        legal_basis:
-          law: Algemene plaatselijke verordening Rotterdam 2012
-          article: 2:30b
-          paragraph: '3'
-          url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
-          explanation: Er moet minimaal 1,8 meter obstakelvrije ruimte blijven voor voetgangers en hulpdiensten
+      minimale_obstakelvrije_ruimte: 1.8
       toegestane_gebruiksdoelen:
-        value:
-        - bijeenkomstfunctie
-        - celfunctie
-        - winkelfunctie
-        - overige gebruiksfunctie
+      - bijeenkomstfunctie
+      - celfunctie
+      - winkelfunctie
+      - overige gebruiksfunctie
       toegestane_bgt_functies:
-        value:
-        - voetpad
-        - voetgangersgebied
-        - woonerf
-        - inrit
+      - voetpad
+      - voetgangersgebied
+      - woonerf
+      - inrit
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -46,7 +58,7 @@ articles:
         type: string
         required: true
       - name: terras_locatie
-        type: enum
+        type: string
         required: true
         type_spec:
           enum:
@@ -70,7 +82,7 @@ articles:
           precision: 2
           min: 0
       - name: seizoen
-        type: enum
+        type: string
         required: true
         type_spec:
           enum:
@@ -82,7 +94,7 @@ articles:
             zomer: Zomerseizoen (1 maart - 1 november)
             winter: Winterseizoen (1 november - 1 maart)
       - name: gewenste_openingstijd
-        type: enum
+        type: string
         required: true
         type_spec:
           enum:
@@ -114,7 +126,7 @@ articles:
             17: '17:00'
             18: '18:00'
       - name: gewenste_sluitingstijd_doordeweeks
-        type: enum
+        type: string
         required: true
         type_spec:
           enum:
@@ -146,7 +158,7 @@ articles:
             24: 00:00
             1: 01:00 (maximum)
       - name: gewenste_sluitingstijd_weekend
-        type: enum
+        type: string
         required: true
         type_spec:
           enum:
@@ -226,113 +238,28 @@ articles:
           reference: $referencedate
       - name: heeft_alcoholvergunning
         type: boolean
-        source_reference:
-          table: vergunningen
-          field: heeft_alcoholvergunning
-          select_on:
-          - name: kvk_nummer
-            description: KVK-nummer van de onderneming
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: bgt_oppervlakte_beschikbaar
         type: number
-        source_reference:
-          table: bgt_terraslocaties
-          field: beschikbare_oppervlakte
-          select_on:
-          - name: adres
-            description: Adres van de horecalocatie
-            type: string
-            value: $vestigingsadres
-          - name: locatie
-            description: Terraslocatie (voor/zij/achter)
-            type: string
-            value: $terras_locatie
+        source: {}
       - name: bgt_functie_oppervlak
         type: string
-        source_reference:
-          table: bgt_terraslocaties
-          field: functie_oppervlak
-          select_on:
-          - name: adres
-            description: Adres van de horecalocatie
-            type: string
-            value: $vestigingsadres
-          - name: locatie
-            description: Terraslocatie (voor/zij/achter)
-            type: string
-            value: $terras_locatie
+        source: {}
       - name: locatie_op_openbare_weg
         type: boolean
-        source_reference:
-          table: bgt_terraslocaties
-          field: is_openbare_weg
-          select_on:
-          - name: adres
-            description: Adres van de horecalocatie
-            type: string
-            value: $vestigingsadres
-          - name: locatie
-            description: Terraslocatie (voor/zij/achter)
-            type: string
-            value: $terras_locatie
+        source: {}
       - name: terrassenbeleid_gebied
         type: object
-        source_reference:
-          table: terrassenbeleid
-          fields:
-          - gebied
-          - max_oppervlakte
-          - max_sluitingstijd
-          - seizoensregels
-          - toegestane_locaties
-          select_on:
-          - name: adres
-            description: Adres van de horecalocatie
-            type: string
-            value: $vestigingsadres
+        source: {}
       - name: maximale_sluitingstijd_doordeweeks
         type: number
-        source_reference:
-          table: terrassenbeleid
-          field: max_sluitingstijd_doordeweeks
-          select_on:
-          - name: adres
-            description: Adres van de horecalocatie
-            type: string
-            value: $vestigingsadres
-          - name: seizoen
-            description: Seizoen
-            type: string
-            value: $seizoen
+        source: {}
       - name: maximale_sluitingstijd_weekend
         type: number
-        source_reference:
-          table: terrassenbeleid
-          field: max_sluitingstijd_weekend
-          select_on:
-          - name: adres
-            description: Adres van de horecalocatie
-            type: string
-            value: $vestigingsadres
-          - name: seizoen
-            description: Seizoen
-            type: string
-            value: $seizoen
+        source: {}
       - name: precario_tarief_per_m2
         type: number
-        source_reference:
-          table: precario_tarieven
-          field: tarief_per_m2
-          select_on:
-          - name: adres
-            description: Adres van de locatie
-            type: string
-            value: $vestigingsadres
-          - name: gebruik
-            description: Type gebruik
-            type: string
-            value: terras
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -430,7 +357,8 @@ articles:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: 2:30b
           url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
-          explanation: Een actieve vergunning wordt verleend wanneer aan alle voorwaarden is voldaan
+          explanation: Een actieve vergunning wordt verleend wanneer aan alle voorwaarden
+            is voldaan
       - output: weigeringsgrond
         value:
           operation: IF
@@ -464,12 +392,14 @@ articles:
               operation: GREATER_THAN
               subject: $gewenste_sluitingstijd_doordeweeks
               value: $maximale_sluitingstijd_doordeweeks
-            then: Gevraagde sluitingstijd doordeweeks (zo-do) later dan toegestaan in dit gebied
+            then: Gevraagde sluitingstijd doordeweeks (zo-do) later dan toegestaan
+              in dit gebied
           - when:
               operation: GREATER_THAN
               subject: $gewenste_sluitingstijd_weekend
               value: $maximale_sluitingstijd_weekend
-            then: Gevraagde sluitingstijd weekend (vr-za) later dan toegestaan in dit gebied
+            then: Gevraagde sluitingstijd weekend (vr-za) later dan toegestaan in
+              dit gebied
           - when:
               operation: AND
               conditions:
@@ -485,7 +415,8 @@ articles:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: 2:30b
           url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
-          explanation: De burgemeester weigert de vergunning indien niet aan de voorwaarden wordt voldaan
+          explanation: De burgemeester weigert de vergunning indien niet aan de voorwaarden
+            wordt voldaan
       - output: vergunde_oppervlakte
         value:
           operation: MIN
@@ -496,7 +427,8 @@ articles:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: 2:30b
           url: https://lokaleregelgeving.overheid.nl/CVDR373493/11
-          explanation: De vergunde oppervlakte is het minimum van de aangevraagde en beschikbare oppervlakte
+          explanation: De vergunde oppervlakte is het minimum van de aangevraagde
+            en beschikbare oppervlakte
       - output: vergunde_sluitingstijd_doordeweeks
         value:
           operation: MIN
@@ -507,7 +439,8 @@ articles:
           law: Terrassenbeleid Rotterdam 2023
           article: '5'
           url: https://lokaleregelgeving.overheid.nl/CVDR717301/1
-          explanation: De vergunde sluitingstijd doordeweeks (zo-do) is het minimum van de aangevraagde en maximaal toegestane tijd
+          explanation: De vergunde sluitingstijd doordeweeks (zo-do) is het minimum
+            van de aangevraagde en maximaal toegestane tijd
       - output: vergunde_sluitingstijd_weekend
         value:
           operation: MIN
@@ -518,14 +451,16 @@ articles:
           law: Terrassenbeleid Rotterdam 2023
           article: '5'
           url: https://lokaleregelgeving.overheid.nl/CVDR717301/1
-          explanation: De vergunde sluitingstijd weekend (vr-za) is het minimum van de aangevraagde en maximaal toegestane tijd
+          explanation: De vergunde sluitingstijd weekend (vr-za) is het minimum van
+            de aangevraagde en maximaal toegestane tijd
       - output: precariobelasting_verschuldigd
         value: $locatie_op_openbare_weg
         legal_basis:
           law: Verordening precariobelasting Rotterdam 2024
           article: '2'
           url: https://lokaleregelgeving.overheid.nl/CVDR719500/1
-          explanation: Precariobelasting is verschuldigd indien het terras op openbare gemeentegrond staat
+          explanation: Precariobelasting is verschuldigd indien het terras op openbare
+            gemeentegrond staat
       - output: precariobelasting_per_jaar
         value:
           operation: IF
@@ -553,4 +488,5 @@ articles:
           law: Verordening precario- en reclamebelasting Rotterdam 2024
           article: '5'
           url: https://lokaleregelgeving.overheid.nl/CVDR704478/1
-          explanation: De eerste 50 m² van een terras is vrijgesteld; voor elke m² daarboven geldt het tarief per m² per jaar
+          explanation: De eerste 50 m² van een terras is vrijgesteld; voor elke m²
+            daarboven geldt het tarief per m² per jaar

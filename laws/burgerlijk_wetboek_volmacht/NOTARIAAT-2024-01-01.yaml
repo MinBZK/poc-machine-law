@@ -11,23 +11,22 @@ uuid: 5a437c98-30bb-4044-af1a-11701a9bf7ea
 discoverable: DELEGATION_PROVIDER
 articles:
 - number: '60'
-  text: |-
-    1. Volmacht is de bevoegdheid die een volmachtgever verleent aan een ander, de gevolmachtigde, om in zijn naam rechtshandelingen te verrichten. 2. Waar in deze titel van rechtshandeling wordt gesproken, is daaronder het in ontvangst nemen van een verklaring begrepen.
+  text: 1. Volmacht is de bevoegdheid die een volmachtgever verleent aan een ander,
+    de gevolmachtigde, om in zijn naam rechtshandelingen te verrichten. 2. Waar in
+    deze titel van rechtshandeling wordt gesproken, is daaronder het in ontvangst
+    nemen van een verklaring begrepen.
   url: https://wetten.overheid.nl/BWBR0005291/2024-01-01#Artikel60
   machine_readable:
     definitions:
       algemene_volmacht_rechten:
-        value:
-        - LEZEN
-        - CLAIMS_INDIENEN
-        - BESLUITEN_ONTVANGEN
+      - LEZEN
+      - CLAIMS_INDIENEN
+      - BESLUITEN_ONTVANGEN
       bijzondere_volmacht_rechten:
-        value:
-        - LEZEN
+      - LEZEN
       volmacht_typen:
-        value:
-          algemene_volmacht: GEVOLMACHTIGDE_ALGEMEEN
-          bijzondere_volmacht: GEVOLMACHTIGDE_BIJZONDER
+        algemene_volmacht: GEVOLMACHTIGDE_ALGEMEEN
+        bijzondere_volmacht: GEVOLMACHTIGDE_BIJZONDER
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -39,21 +38,7 @@ articles:
       input:
       - name: volmacht_registraties
         type: array
-        source_reference:
-          table: volmacht_registraties
-          fields:
-          - bsn_volmachtgever
-          - naam_volmachtgever
-          - volmacht_type
-          - datum_ingang
-          - datum_einde
-          - status
-          - is_herroepen
-          select_on:
-          - name: bsn_gevolmachtigde
-            description: BSN nummer van de gevolmachtigde
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -112,8 +97,10 @@ articles:
           article: '72'
           url: https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel72
           juriconnect: jci1.3:c:BWBR0005291&boek=3&artikel=72&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 3:72 BW: volmacht eindigt door herroeping, dood volmachtgever, faillissement, etc. Alleen actieve volmachten geven bevoegdheid.
+          explanation: 'Art. 3:72 BW: volmacht eindigt door herroeping, dood volmachtgever,
+            faillissement, etc. Alleen actieve volmachten geven bevoegdheid.
+
+            '
       - output: heeft_delegaties
         value:
           operation: NOT
@@ -126,8 +113,10 @@ articles:
           article: '60'
           url: https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60
           juriconnect: jci1.3:c:BWBR0005291&boek=3&artikel=60&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 3:60 BW bepaalt dat volmacht vertegenwoordigingsbevoegdheid geeft.
+          explanation: 'Art. 3:60 BW bepaalt dat volmacht vertegenwoordigingsbevoegdheid
+            geeft.
+
+            '
       - output: subject_ids
         value: $actieve_volmachten.bsn_volmachtgever
         legal_basis:
@@ -197,8 +186,10 @@ articles:
           article: '62'
           url: https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel62
           juriconnect: jci1.3:c:BWBR0005291&boek=3&artikel=62&z=2024-01-01&g=2024-01-01
-          explanation: |
-            Art. 3:62 BW: Algemene volmacht strekt tot alle rechtshandelingen (volledige rechten), bijzondere tot specifieke handelingen (beperkt).
+          explanation: 'Art. 3:62 BW: Algemene volmacht strekt tot alle rechtshandelingen
+            (volledige rechten), bijzondere tot specifieke handelingen (beperkt).
+
+            '
       - output: valid_from_dates
         value: $actieve_volmachten.datum_ingang
         legal_basis:
@@ -219,7 +210,8 @@ articles:
           explanation: Einddatum volmacht, null indien onbepaalde tijd
     untranslatables:
     - construct: iteratie over variabel aantal volmacht-registraties
-      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve volmachten is dynamisch en kan niet vooraf
-        worden uitgerold
-      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties tot een vast maximum
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal actieve volmachten
+        is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties
+        tot een vast maximum
       accepted: true

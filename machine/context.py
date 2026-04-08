@@ -411,6 +411,30 @@ class RuleContext:
                             if table in self.sources:
                                 df = self.sources[table]
 
+                        # Fallback: source: {} with no table/source_type.
+                        # Search all service DataFrames for a column matching the field name.
+                        if df is None and self.service_provider and hasattr(self.service_provider, "services"):
+                            field_name = source_ref.get("field", path)
+                            for svc_name, svc in self.service_provider.services.items():
+                                for tbl_name, tbl_df in svc.source_dataframes.items():
+                                    if field_name in tbl_df.columns:
+                                        df = tbl_df
+                                        table = tbl_name
+                                        if "table" not in source_ref:
+                                            source_ref["table"] = tbl_name
+                                        # Auto-add select_on for key columns (bsn, kvk_nummer)
+                                        if "select_on" not in source_ref:
+                                            for key_col in ("bsn", "kvk_nummer"):
+                                                if key_col in tbl_df.columns and key_col in self.parameters:
+                                                    source_ref["select_on"] = [
+                                                        {"name": key_col, "value": f"${key_col}"}
+                                                    ]
+                                                    break
+                                        logger.debug(f"Auto-resolved source for {path} from {svc_name}.{tbl_name}")
+                                        break
+                                if df is not None:
+                                    break
+
                         if df is not None:
                             expected_type = spec.get("type")
                             result = self._resolve_from_source(source_ref, table, df, expected_type)

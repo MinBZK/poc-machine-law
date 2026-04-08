@@ -11,13 +11,19 @@ uuid: 96d926a0-b45f-4cf3-92af-01b167221a00
 discoverable: CITIZEN
 articles:
 - number: B1
-  text: |-
-    1. De leden van de Tweede Kamer der Staten-Generaal worden gekozen door degenen die op de dag van de kandidaatstelling Nederlander zijn en op de dag van de stemming de leeftijd van achttien jaar hebben bereikt, met uitzondering van degenen die op de dag van de kandidaatstelling hun werkelijke woonplaats hebben in Aruba, Curacao of Sint Maarten. 2. Deze uitzondering geldt niet voor: a. de Nederlander die gedurende ten minste tien jaren ingezetene van Nederland is geweest; b. de Nederlander die in Nederlandse openbare dienst in Aruba, Curacao of Sint Maarten werkzaam is, alsmede zijn Nederlandse echtgenoot, geregistreerde partner of levensgezel en kinderen, voor zover dezen met hem een gemeenschappelijke huishouding voeren.
+  text: '1. De leden van de Tweede Kamer der Staten-Generaal worden gekozen door degenen
+    die op de dag van de kandidaatstelling Nederlander zijn en op de dag van de stemming
+    de leeftijd van achttien jaar hebben bereikt, met uitzondering van degenen die
+    op de dag van de kandidaatstelling hun werkelijke woonplaats hebben in Aruba,
+    Curacao of Sint Maarten. 2. Deze uitzondering geldt niet voor: a. de Nederlander
+    die gedurende ten minste tien jaren ingezetene van Nederland is geweest; b. de
+    Nederlander die in Nederlandse openbare dienst in Aruba, Curacao of Sint Maarten
+    werkzaam is, alsmede zijn Nederlandse echtgenoot, geregistreerde partner of levensgezel
+    en kinderen, voor zover dezen met hem een gemeenschappelijke huishouding voeren.'
   url: https://wetten.overheid.nl/BWBR0004627/2024-01-01#ArtikelB1
   machine_readable:
     definitions:
-      minimum_leeftijd:
-        value: 18
+      minimum_leeftijd: 18
     execution:
       parameters:
       - name: bsn
@@ -62,14 +68,7 @@ articles:
           reference: $verkiezingsdatum
       - name: verkiezingsdatum
         type: date
-        source_reference:
-          table: verkiezingen
-          field: verkiezingsdatum
-          select_on:
-          - name: type
-            value: TWEEDE_KAMER
-            description: Type verkiezing
-            type: string
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -108,4 +107,5 @@ articles:
           article: B1
           url: https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1
           juriconnect: jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12
-          explanation: De bepaling van stemrecht gebeurt volgens de cumulatieve voorwaarden uit artikel B1 en B3 van de Kieswet
+          explanation: De bepaling van stemrecht gebeurt volgens de cumulatieve voorwaarden
+            uit artikel B1 en B3 van de Kieswet

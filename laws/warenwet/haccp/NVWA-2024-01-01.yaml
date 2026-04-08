@@ -11,63 +11,74 @@ uuid: a7f3b2c1-8d4e-4f6a-9c5b-3e1d7a2f8b04
 discoverable: BUSINESS
 articles:
 - number: '2'
-  text: |-
-    1 Het is verboden te handelen in strijd met de artikelen 3, 4, eerste, tweede en derde lid, 5, eerste lid, tweede lid, laatste alinea, en vierde lid, en 6, tweede lid en derde lid, onderdelen a en b, van verordening (EG) 852/2004 en de krachtens de artikelen 4, vierde lid, en 6, derde lid, onderdeel c, van verordening (EG) 852/2004 vastgestelde bepalingen.
-    2 Het is verboden te handelen in strijd met de artikelen 3, 4, eerste tot en met vierde lid, 5, 6, eerste, derde, en vierde lid, 7, eerste lid, en 8, eerste lid, van verordening (EG) 853/2004 en de krachtens artikel 11 van verordening (EG) 853/2004 vastgestelde bepalingen.
-    3 Het is verboden te handelen in strijd met de artikelen 3, 4, 5, eerste, tweede en vierde lid, 6, eerste lid, 7, en 9, van verordening (EG) 2073/2005.
+  text: '1 Het is verboden te handelen in strijd met de artikelen 3, 4, eerste, tweede
+    en derde lid, 5, eerste lid, tweede lid, laatste alinea, en vierde lid, en 6,
+    tweede lid en derde lid, onderdelen a en b, van verordening (EG) 852/2004 en de
+    krachtens de artikelen 4, vierde lid, en 6, derde lid, onderdeel c, van verordening
+    (EG) 852/2004 vastgestelde bepalingen.
+
+    2 Het is verboden te handelen in strijd met de artikelen 3, 4, eerste tot en met
+    vierde lid, 5, 6, eerste, derde, en vierde lid, 7, eerste lid, en 8, eerste lid,
+    van verordening (EG) 853/2004 en de krachtens artikel 11 van verordening (EG)
+    853/2004 vastgestelde bepalingen.
+
+    3 Het is verboden te handelen in strijd met de artikelen 3, 4, 5, eerste, tweede
+    en vierde lid, 6, eerste lid, 7, en 9, van verordening (EG) 2073/2005.
+
     4 Het is verboden te handelen in strijd met artikel 7, eerste lid.
-    5 Het is verboden rauwe melk en rauwe room, bestemd voor rechtstreekse menselijke consumptie, te verhandelen, anders dan met inachtneming van de artikelen 8 en 8a.
+
+    5 Het is verboden rauwe melk en rauwe room, bestemd voor rechtstreekse menselijke
+    consumptie, te verhandelen, anders dan met inachtneming van de artikelen 8 en
+    8a.'
   url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
   machine_readable:
     definitions:
       sbi_levensmiddelen:
-        value:
-        - '1011'
-        - '1012'
-        - '1013'
-        - '1020'
-        - '1031'
-        - '1032'
-        - '1039'
-        - '1041'
-        - '1042'
-        - '1051'
-        - '1052'
-        - '1061'
-        - '1062'
-        - '1071'
-        - '1072'
-        - '1073'
-        - '1081'
-        - '1082'
-        - '1083'
-        - '1084'
-        - '1085'
-        - '1086'
-        - '1089'
-        - '1101'
-        - '1102'
-        - '1103'
-        - '1104'
-        - '1105'
-        - '1106'
-        - '1107'
-        - '4711'
-        - '4721'
-        - '4722'
-        - '4723'
-        - '4724'
-        - '4725'
-        - '4726'
-        - '4729'
-        - '5610'
-        - '56101'
-        - '56102'
-        - '5621'
-        - '5629'
-        - '5630'
-      toezichthouder:
-        value: NVWA
+      - '1011'
+      - '1012'
+      - '1013'
+      - '1020'
+      - '1031'
+      - '1032'
+      - '1039'
+      - '1041'
+      - '1042'
+      - '1051'
+      - '1052'
+      - '1061'
+      - '1062'
+      - '1071'
+      - '1072'
+      - '1073'
+      - '1081'
+      - '1082'
+      - '1083'
+      - '1084'
+      - '1085'
+      - '1086'
+      - '1089'
+      - '1101'
+      - '1102'
+      - '1103'
+      - '1104'
+      - '1105'
+      - '1106'
+      - '1107'
+      - '4711'
+      - '4721'
+      - '4722'
+      - '4723'
+      - '4724'
+      - '4725'
+      - '4726'
+      - '4729'
+      - '5610'
+      - '56101'
+      - '56102'
+      - '5621'
+      - '5629'
+      - '5630'
+      toezichthouder: NVWA
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -82,48 +93,16 @@ articles:
       input:
       - name: sbi_code
         type: string
-        source_reference:
-          source_type: KVK
-          table: organisaties
-          field: sbi_code
-          select_on:
-          - name: kvk_nummer
-            description: KvK-nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: is_geregistreerd_nvwa
         type: boolean
-        source_reference:
-          source_type: NVWA
-          table: nvwa_registratie
-          field: is_geregistreerd_nvwa
-          select_on:
-          - name: kvk_nummer
-            description: KvK-nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: heeft_haccp_systeem
         type: boolean
-        source_reference:
-          source_type: NVWA
-          table: nvwa_registratie
-          field: heeft_haccp_systeem
-          select_on:
-          - name: kvk_nummer
-            description: KvK-nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: type_haccp_systeem
         type: string
-        source_reference:
-          source_type: NVWA
-          table: nvwa_registratie
-          field: type_haccp_systeem
-          select_on:
-          - name: kvk_nummer
-            description: KvK-nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -160,7 +139,8 @@ articles:
           article: '2'
           url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
           juriconnect: jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01
-          explanation: Het bedrijf kwalificeert als levensmiddelenbedrijf op basis van SBI-code en/of activiteiten
+          explanation: Het bedrijf kwalificeert als levensmiddelenbedrijf op basis
+            van SBI-code en/of activiteiten
       - output: heeft_haccp_verplichting
         value: true
         legal_basis:
@@ -169,7 +149,8 @@ articles:
           article: '2'
           url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel2
           juriconnect: jci1.3:c:BWBR0018823&artikel=2&z=2024-01-01&g=2024-01-01
-          explanation: Het bedrijf is een levensmiddelenbedrijf; de HACCP-verplichting is van toepassing
+          explanation: Het bedrijf is een levensmiddelenbedrijf; de HACCP-verplichting
+            is van toepassing
       - output: is_geregistreerd
         value: $is_geregistreerd_nvwa
         legal_basis:
@@ -204,7 +185,8 @@ articles:
           article: '3'
           url: https://wetten.overheid.nl/BWBR0018823/2024-01-01#Artikel3
           juriconnect: jci1.3:c:BWBR0018823&artikel=3&z=2024-01-01&g=2024-01-01
-          explanation: Een bedrijf voldoet aan de verplichting wanneer het geregistreerd is bij de NVWA en een geldig HACCP-systeem heeft
+          explanation: Een bedrijf voldoet aan de verplichting wanneer het geregistreerd
+            is bij de NVWA en een geldig HACCP-systeem heeft
       - output: type_haccp_systeem
         value: $type_haccp_systeem
         legal_basis:

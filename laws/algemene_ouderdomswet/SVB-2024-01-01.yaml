@@ -11,28 +11,23 @@ uuid: 13dc8a31-91eb-4598-998c-012c9129b9ea
 discoverable: CITIZEN
 articles:
 - number: '7'
-  text: |-
-    1 Recht op ouderdomspensioen overeenkomstig de bepalingen van deze wet heeft degene, die
-      a. de pensioengerechtigde leeftijd heeft bereikt, en
-      b. ingevolge deze wet minimaal één kalenderjaar verzekerd is geweest in het tijdvak, aanvangende met de dag waarop de aanvangsleeftijd is bereikt en eindigende met de dag voorafgaande aan de dag waarop de pensioengerechtigde leeftijd is bereikt.
-    2 Bij ministeriële regeling worden regels gesteld omtrent de herleiding van gedeelten van kalenderjaren tot gehele kalenderjaren.
+  text: "1 Recht op ouderdomspensioen overeenkomstig de bepalingen van deze wet heeft\
+    \ degene, die\n  a. de pensioengerechtigde leeftijd heeft bereikt, en\n  b. ingevolge\
+    \ deze wet minimaal één kalenderjaar verzekerd is geweest in het tijdvak, aanvangende\
+    \ met de dag waarop de aanvangsleeftijd is bereikt en eindigende met de dag voorafgaande\
+    \ aan de dag waarop de pensioengerechtigde leeftijd is bereikt.\n2 Bij ministeriële\
+    \ regeling worden regels gesteld omtrent de herleiding van gedeelten van kalenderjaren\
+    \ tot gehele kalenderjaren."
   url: https://wetten.overheid.nl/BWBR0002221/2024-01-01#Artikel7
   machine_readable:
     definitions:
-      jaren_voor_volledig_pensioen:
-        value: 50
-      opbouw_per_jaar:
-        value: 0.02
-      basisbedrag_alleenstaand:
-        value: 138000
-      basisbedrag_gedeeld:
-        value: 95200
-      partner_toeslag_maximum:
-        value: 25800
-      inkomensgrens_partner:
-        value: 280000
-      kortingspercentage:
-        value: 0.02
+      jaren_voor_volledig_pensioen: 50
+      opbouw_per_jaar: 0.02
+      basisbedrag_alleenstaand: 138000
+      basisbedrag_gedeeld: 95200
+      partner_toeslag_maximum: 25800
+      inkomensgrens_partner: 280000
+      kortingspercentage: 0.02
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -190,14 +185,7 @@ articles:
           reference: $referencedate
       - name: woonachtige_verzekerde_jaren
         type: number
-        source_reference:
-          table: verzekerde_tijdvakken
-          field: woonperiodes
-          select_on:
-          - name: bsn
-            description: Burgerservicenummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -263,7 +251,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9
           juriconnect: jci1.3:c:BWBR0002221&artikel=9&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: 'Artikel 9 lid 1 AOW bepaalt bruto-ouderdomspensioen: gehuwde 50%, ongehuwde 70% van netto-minimumloon'
+          explanation: 'Artikel 9 lid 1 AOW bepaalt bruto-ouderdomspensioen: gehuwde
+            50%, ongehuwde 70% van netto-minimumloon'
       - output: opbouwpercentage
         value:
           operation: DIVIDE
@@ -283,7 +272,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel13
           juriconnect: jci1.3:c:BWBR0002221&artikel=13&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: 'Artikel 13 lid 1 AOW: pensioen verminderd met 2% voor elk niet-verzekerd jaar'
+          explanation: 'Artikel 13 lid 1 AOW: pensioen verminderd met 2% voor elk
+            niet-verzekerd jaar'
       - output: pensioenbedrag
         value:
           operation: MULTIPLY
@@ -333,4 +323,5 @@ articles:
           article: '9'
           url: https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9
           juriconnect: jci1.3:c:BWBR0002221&artikel=9&z=2024-01-01&g=2024-01-01
-          explanation: 'Artikel 9 AOW: berekening totaal ouderdomspensioen inclusief eventuele toeslag volgens artikel 8'
+          explanation: 'Artikel 9 AOW: berekening totaal ouderdomspensioen inclusief
+            eventuele toeslag volgens artikel 8'

@@ -1,3 +1,4 @@
+import json
 import re
 from collections import defaultdict
 from dataclasses import dataclass
@@ -14,6 +15,14 @@ except ImportError:
     from yaml import Loader
 
 BASE_DIR = "laws"
+
+# Mapping of (law_id:input_name) -> source_reference for inputs that lost
+# their table/field/select_on data during source_reference → source: {} conversion.
+_SOURCE_REF_MAPPING_PATH = Path(__file__).parent / "source_ref_mapping.json"
+_SOURCE_REF_MAPPING: dict[str, dict] = {}
+if _SOURCE_REF_MAPPING_PATH.exists():
+    with open(_SOURCE_REF_MAPPING_PATH) as _f:
+        _SOURCE_REF_MAPPING = json.load(_f)
 
 # TODO: remove v0.5.0→flat conversion code below once the Python engine fallback
 # (machine/regelrecht_services.py → RulesEngine) reads v0.5.1 YAML natively.
@@ -58,7 +67,10 @@ def _convert_source_to_reference(source: dict) -> tuple[str, dict]:
     lacks underscores or slashes (law names always contain them).
     """
     if not source:
-        return "service_reference", {}
+        # Empty source: {} means this was a table-based lookup (source_reference)
+        # that lost its table/field/select_on during conversion. Mark as
+        # source_reference so the engine can resolve via DataFrame field matching.
+        return "source_reference", {}
 
     regulation = source.get("regulation", "")
     output_field = source.get("output", "")
@@ -114,6 +126,7 @@ def _flatten_v050(data: dict) -> dict:
     Merges all articles' machine_readable sections into a single flat spec
     that the engine can process identically to v0.1.x files.
     """
+    law_id = data.get("$id", "")
     articles = data.get("articles") or []
 
     merged_parameters = []
@@ -166,11 +179,18 @@ def _flatten_v050(data: dict) -> dict:
                 # Convert v0.5.0 source format to service_reference or source_reference
                 if "source" in inp and "service_reference" not in inp and "source_reference" not in inp:
                     inp = dict(inp)  # Don't mutate the original
-                    ref_key, ref_dict = _convert_source_to_reference(inp.pop("source"))
-                    # For source_reference: default field to input name if not set
-                    if ref_key == "source_reference" and "field" not in ref_dict:
-                        ref_dict["field"] = name
-                    inp[ref_key] = ref_dict
+                    source = inp.pop("source")
+                    # Check mapping for empty sources (table lookups that lost their data)
+                    mapping_key = f"{law_id}:{name}"
+                    if not source and mapping_key in _SOURCE_REF_MAPPING:
+                        ref_dict = dict(_SOURCE_REF_MAPPING[mapping_key])
+                        inp["source_reference"] = ref_dict
+                    else:
+                        ref_key, ref_dict = _convert_source_to_reference(source)
+                        # For source_reference: default field to input name if not set
+                        if ref_key == "source_reference" and "field" not in ref_dict:
+                            ref_dict["field"] = name
+                        inp[ref_key] = ref_dict
                 merged_input.append(inp)
 
         # Output

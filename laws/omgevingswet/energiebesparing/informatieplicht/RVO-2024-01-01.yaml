@@ -11,25 +11,24 @@ uuid: d4ecfc05-c1a3-48f4-bd1c-184390cd0013
 discoverable: BUSINESS
 articles:
 - number: 5.15d
-  text: |-
-    Als voor de inwerkingtreding van dit besluit gegevens en bescheiden zijn verstrekt of hadden moeten worden verstrekt als bedoeld in artikel 2.15, tweede, negende of tiende lid, van het Activiteitenbesluit milieubeheer, blijft artikel 2.15 van dat besluit, zoals dat luidde voor de inwerkingtreding van dit besluit voor zover gericht op de verplichtingen als bedoeld in artikel 2.15, tweede, negende of tiende lid, en de regels die bij of krachtens dat artikel in samenhang met artikel 1.7, eerste lid, van het Activiteitenbesluit milieubeheer, zijn gesteld, tot 1 december 2027 van toepassing.
+  text: Als voor de inwerkingtreding van dit besluit gegevens en bescheiden zijn verstrekt
+    of hadden moeten worden verstrekt als bedoeld in artikel 2.15, tweede, negende
+    of tiende lid, van het Activiteitenbesluit milieubeheer, blijft artikel 2.15 van
+    dat besluit, zoals dat luidde voor de inwerkingtreding van dit besluit voor zover
+    gericht op de verplichtingen als bedoeld in artikel 2.15, tweede, negende of tiende
+    lid, en de regels die bij of krachtens dat artikel in samenhang met artikel 1.7,
+    eerste lid, van het Activiteitenbesluit milieubeheer, zijn gesteld, tot 1 december
+    2027 van toepassing.
   url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Artikel5.15d
   machine_readable:
     definitions:
-      drempel_elektriciteit_kwh:
-        value: 50000
-      drempel_gas_m3:
-        value: 25000
-      drempel_onderzoek_elektriciteit_kwh:
-        value: 10000000
-      drempel_onderzoek_gas_m3:
-        value: 170000
-      rapportage_frequentie_jaren:
-        value: 4
-      volgende_deadline:
-        value: '2027-12-01'
-      rapportage_methode:
-        value: RVO eLoket (mijn.rvo.nl) met eHerkenning niveau 2+
+      drempel_elektriciteit_kwh: 50000
+      drempel_gas_m3: 25000
+      drempel_onderzoek_elektriciteit_kwh: 10000000
+      drempel_onderzoek_gas_m3: 170000
+      rapportage_frequentie_jaren: 4
+      volgende_deadline: '2027-12-01'
+      rapportage_methode: RVO eLoket (mijn.rvo.nl) met eHerkenning niveau 2+
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -63,37 +62,13 @@ articles:
           reference: $referencedate
       - name: jaarlijks_elektriciteitsverbruik_kwh
         type: number
-        source_reference:
-          source_type: RVO
-          table: rvo_energiegegevens
-          field: elektriciteit_kwh
-          select_on:
-          - name: kvk_nummer
-            description: KvK-nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: jaarlijks_gasverbruik_m3
         type: number
-        source_reference:
-          source_type: RVO
-          table: rvo_energiegegevens
-          field: gasverbruik_m3
-          select_on:
-          - name: kvk_nummer
-            description: KvK-nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: is_woonfunctie
         type: boolean
-        source_reference:
-          source_type: RVO
-          table: rvo_energiegegevens
-          field: is_woonfunctie
-          select_on:
-          - name: kvk_nummer
-            description: KvK-nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -136,7 +111,8 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
           juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01
-          explanation: De organisatie voldoet aan de drempelwaarden en heeft geen woonfunctie; de energiebesparingsplicht is van toepassing
+          explanation: De organisatie voldoet aan de drempelwaarden en heeft geen
+            woonfunctie; de energiebesparingsplicht is van toepassing
       - output: heeft_informatieplicht
         value: true
         legal_basis:
@@ -145,7 +121,8 @@ articles:
           article: 5.15d
           url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d
           juriconnect: jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01
-          explanation: De informatieplicht geldt voor alle organisaties die onder de energiebesparingsplicht vallen
+          explanation: De informatieplicht geldt voor alle organisaties die onder
+            de energiebesparingsplicht vallen
       - output: heeft_onderzoeksplicht
         value:
           operation: OR
@@ -162,8 +139,8 @@ articles:
           article: 5.15a
           url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15a
           juriconnect: jci1.3:c:BWBR0041330&artikel=5.15a&z=2024-01-01&g=2024-01-01
-          explanation: |-
-            De onderzoeksplicht geldt voor grote verbruikers met meer dan 10 miljoen kWh elektriciteit of 170.000 m³ aardgas per jaar
+          explanation: De onderzoeksplicht geldt voor grote verbruikers met meer dan
+            10 miljoen kWh elektriciteit of 170.000 m³ aardgas per jaar
       - output: rapportage_frequentie_jaren
         value: $rapportage_frequentie_jaren
         legal_basis:
@@ -199,4 +176,5 @@ articles:
           article: '5.1'
           url: https://wetten.overheid.nl/BWBR0037885/2024-01-01#Hoofdstuk5_Afdeling5.1_Paragraaf5.1.1_Artikel5.1
           juriconnect: jci1.3:c:BWBR0037885&artikel=5.1&z=2024-01-01&g=2024-01-01
-          explanation: Voor de meeste bedrijven is de gemeente het bevoegd gezag; handhaving via de omgevingsdienst
+          explanation: Voor de meeste bedrijven is de gemeente het bevoegd gezag;
+            handhaving via de omgevingsdienst

@@ -11,25 +11,26 @@ uuid: 4d6e8f0a-3c5b-4e7f-a8b9-1c2d3e4f5a6b
 discoverable: CITIZEN
 articles:
 - number: 47a
-  text: |-
-    1 De Sociale verzekeringsbank heeft tot taak het verlenen van algemene bijstand in de vorm van een aanvullende inkomensvoorziening ouderen aan:
-      a. alleenstaanden en alleenstaande ouders die de pensioengerechtigde leeftijd hebben bereikt;
-      b. gehuwden, van wie beide echtgenoten de pensioengerechtigde leeftijd hebben bereikt dan wel van wie één echtgenoot de pensioengerechtigde leeftijd heeft bereikt;
-    hier te lande die in zodanige omstandigheden verkeren of dreigen te geraken dat zij niet over de middelen beschikken om in de noodzakelijke kosten van het bestaan te voorzien.
-    2 De artikelen 1 tot en met 6, hoofdstuk 2, met uitzondering van artikel 18, hoofdstuk 3, de paragrafen 5.1 en 5.2, hoofdstuk 6 en de artikelen 79, 80 en 81 zijn van toepassing op de uitvoering van de taak, bedoeld in het eerste lid, door de Sociale verzekeringsbank, tenzij in deze paragraaf anders is bepaald.
+  text: "1 De Sociale verzekeringsbank heeft tot taak het verlenen van algemene bijstand\
+    \ in de vorm van een aanvullende inkomensvoorziening ouderen aan:\n  a. alleenstaanden\
+    \ en alleenstaande ouders die de pensioengerechtigde leeftijd hebben bereikt;\n\
+    \  b. gehuwden, van wie beide echtgenoten de pensioengerechtigde leeftijd hebben\
+    \ bereikt dan wel van wie één echtgenoot de pensioengerechtigde leeftijd heeft\
+    \ bereikt;\nhier te lande die in zodanige omstandigheden verkeren of dreigen te\
+    \ geraken dat zij niet over de middelen beschikken om in de noodzakelijke kosten\
+    \ van het bestaan te voorzien.\n2 De artikelen 1 tot en met 6, hoofdstuk 2, met\
+    \ uitzondering van artikel 18, hoofdstuk 3, de paragrafen 5.1 en 5.2, hoofdstuk\
+    \ 6 en de artikelen 79, 80 en 81 zijn van toepassing op de uitvoering van de taak,\
+    \ bedoeld in het eerste lid, door de Sociale verzekeringsbank, tenzij in deze\
+    \ paragraaf anders is bepaald."
   url: https://wetten.overheid.nl/BWBR0015703/2026-01-01#Artikel47a
   machine_readable:
     definitions:
-      norm_alleenstaand:
-        value: 138000
-      norm_gehuwden:
-        value: 197000
-      vermogensgrens_alleenstaand:
-        value: 800000
-      vermogensgrens_gehuwden:
-        value: 1600000
-      maanden_per_jaar:
-        value: 12
+      norm_alleenstaand: 138000
+      norm_gehuwden: 197000
+      vermogensgrens_alleenstaand: 800000
+      vermogensgrens_gehuwden: 1600000
+      maanden_per_jaar: 12
     execution:
       produces:
         legal_character: BESCHIKKING

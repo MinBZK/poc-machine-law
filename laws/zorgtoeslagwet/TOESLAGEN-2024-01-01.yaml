@@ -11,38 +11,37 @@ uuid: 5be9dbe7-f565-40e2-8931-da82825dcf21
 discoverable: CITIZEN
 articles:
 - number: '1'
-  text: |-
-    1 In deze wet en de daarop berustende bepalingen wordt, tenzij anders is geregeld, verstaan onder:
-      a. Onze Minister: Onze Minister van Volksgezondheid, Welzijn en Sport;
-      b. zorgverzekering: de schadeverzekering, bedoeld in artikel 1, onder d, van de Zorgverzekeringswet;
-      c. verzekerde: de persoon, bedoeld in artikel 1, onder f, of in artikel 69 van de Zorgverzekeringswet, vanaf de eerste dag van de kalendermaand volgende op de maand waarin hij achttien jaar wordt, met uitzondering van de verzekerde, bedoeld in artikel 24, eerste of tweede lid, van die wet;
-      d. premie: een premie als bedoeld in afdeling 3.3.1 van de Zorgverzekeringswet;
-      e. zorgtoeslag: een tegemoetkoming in een premie dan wel in een bestuursrechtelijke premie als bedoeld in artikel 18d of 18e van de Zorgverzekeringswet en in het verplicht eigen risico, bedoeld in artikel 19 van de Zorgverzekeringswet;
-      f. drempelinkomen: 108% van het twaalfvoud van het voor de maand januari van het berekeningsjaar geldende in artikel 8, eerste lid, onderdeel b, van de Wet minimumloon en minimumvakantiebijslag bedoelde bedrag per maand;
-      g. de standaardpremie: het op grond van artikel 4 vastgestelde bedrag;
-      h. de normpremie: de aan de hand van het drempelinkomen en het toetsingsinkomen van de verzekerde berekende premie voor een zorgverzekering in het berekeningsjaar.
-    2 De hoogte van de zorgtoeslag is afhankelijk van de draagkracht op basis van het inkomen en het vermogen.
+  text: "1 In deze wet en de daarop berustende bepalingen wordt, tenzij anders is\
+    \ geregeld, verstaan onder:\n  a. Onze Minister: Onze Minister van Volksgezondheid,\
+    \ Welzijn en Sport;\n  b. zorgverzekering: de schadeverzekering, bedoeld in artikel\
+    \ 1, onder d, van de Zorgverzekeringswet;\n  c. verzekerde: de persoon, bedoeld\
+    \ in artikel 1, onder f, of in artikel 69 van de Zorgverzekeringswet, vanaf de\
+    \ eerste dag van de kalendermaand volgende op de maand waarin hij achttien jaar\
+    \ wordt, met uitzondering van de verzekerde, bedoeld in artikel 24, eerste of\
+    \ tweede lid, van die wet;\n  d. premie: een premie als bedoeld in afdeling 3.3.1\
+    \ van de Zorgverzekeringswet;\n  e. zorgtoeslag: een tegemoetkoming in een premie\
+    \ dan wel in een bestuursrechtelijke premie als bedoeld in artikel 18d of 18e\
+    \ van de Zorgverzekeringswet en in het verplicht eigen risico, bedoeld in artikel\
+    \ 19 van de Zorgverzekeringswet;\n  f. drempelinkomen: 108% van het twaalfvoud\
+    \ van het voor de maand januari van het berekeningsjaar geldende in artikel 8,\
+    \ eerste lid, onderdeel b, van de Wet minimumloon en minimumvakantiebijslag bedoelde\
+    \ bedrag per maand;\n  g. de standaardpremie: het op grond van artikel 4 vastgestelde\
+    \ bedrag;\n  h. de normpremie: de aan de hand van het drempelinkomen en het toetsingsinkomen\
+    \ van de verzekerde berekende premie voor een zorgverzekering in het berekeningsjaar.\n\
+    2 De hoogte van de zorgtoeslag is afhankelijk van de draagkracht op basis van\
+    \ het inkomen en het vermogen."
   url: https://wetten.overheid.nl/BWBR0018451/2024-01-01#Artikel1
   machine_readable:
     definitions:
-      minimum_leeftijd:
-        value: 18
-      percentage_drempelinkomen_met_partner:
-        value: 0.0486
-      percentage_drempelinkomen_alleenstaand:
-        value: 0.0486
-      afbouwpercentage_minimum:
-        value: 0.1367
-      afbouwpercentage_boven_drempel:
-        value: 0.0387
-      drempelinkomen_alleenstaande:
-        value: 3749600
-      drempelinkomen_toeslagpartner:
-        value: 4821800
-      vermogensgrens_alleenstaande:
-        value: 14193900
-      vermogensgrens_toeslagpartner:
-        value: 17942900
+      minimum_leeftijd: 18
+      percentage_drempelinkomen_met_partner: 0.0486
+      percentage_drempelinkomen_alleenstaand: 0.0486
+      afbouwpercentage_minimum: 0.1367
+      afbouwpercentage_boven_drempel: 0.0387
+      drempelinkomen_alleenstaande: 3749600
+      drempelinkomen_toeslagpartner: 4821800
+      vermogensgrens_alleenstaande: 14193900
+      vermogensgrens_toeslagpartner: 17942900
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -341,8 +340,8 @@ articles:
                         - $afbouwpercentage_boven_drempel
                     default: 0
 - number: '4'
-  text: |-
-    Onze Minister stelt jaarlijks, uiterlijk 22 dagen voorafgaande aan het berekeningsjaar, bij regeling de standaardpremie voor dat berekeningsjaar vast.
+  text: Onze Minister stelt jaarlijks, uiterlijk 22 dagen voorafgaande aan het berekeningsjaar,
+    bij regeling de standaardpremie voor dat berekeningsjaar vast.
   url: https://wetten.overheid.nl/BWBR0018451/2024-01-01#Artikel4
   machine_readable:
     open_terms:

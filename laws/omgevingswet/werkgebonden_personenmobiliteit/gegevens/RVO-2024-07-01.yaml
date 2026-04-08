@@ -11,18 +11,23 @@ uuid: 9c5d8e7a-4b2f-4d6e-8a1c-3e5b7d9a2f4c
 discoverable: BUSINESS
 articles:
 - number: '18.14'
-  text: '1 De emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit in kalenderjaargemiddelde per reizigerskilometer wordt berekend door de emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit in het kalenderjaar te delen door het aantal reizigerskilometers voor woon-werkmobiliteit respectievelijk zakelijke mobiliteit in het kalenderjaar.
+  text: '1 De emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke
+    mobiliteit in kalenderjaargemiddelde per reizigerskilometer wordt berekend door
+    de emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit
+    in het kalenderjaar te delen door het aantal reizigerskilometers voor woon-werkmobiliteit
+    respectievelijk zakelijke mobiliteit in het kalenderjaar.
 
-    2 De emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke mobiliteit, bedoeld in het eerste lid, wordt berekend door voor elke reismodaliteit het aantal in het kalenderjaar gereisde kilometers voor woon-werkmobiliteit respectievelijk zakelijke mobiliteit te vermenigvuldigen met de bij ministeriële regeling vastgestelde emissiefactor voor die reismodaliteit en de uitkomsten bij elkaar op te tellen.'
+    2 De emissie in de lucht van kooldioxide door woon-werkmobiliteit of zakelijke
+    mobiliteit, bedoeld in het eerste lid, wordt berekend door voor elke reismodaliteit
+    het aantal in het kalenderjaar gereisde kilometers voor woon-werkmobiliteit respectievelijk
+    zakelijke mobiliteit te vermenigvuldigen met de bij ministeriële regeling vastgestelde
+    emissiefactor voor die reismodaliteit en de uitkomsten bij elkaar op te tellen.'
   url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Artikel18.14
   machine_readable:
     definitions:
-      co2_factor_auto_benzine:
-        value: 170
-      co2_factor_auto_diesel:
-        value: 150
-      co2_factor_openbaar_vervoer:
-        value: 30
+      co2_factor_auto_benzine: 170
+      co2_factor_auto_diesel: 150
+      co2_factor_openbaar_vervoer: 30
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -34,59 +39,19 @@ articles:
       input:
       - name: woon_werk_auto_benzine
         type: number
-        source_reference:
-          source_type: RVO
-          table: wpm_reisgegevens
-          field: woon_werk_auto_benzine
-          select_on:
-          - name: kvk_nummer
-            description: KvK nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: woon_werk_auto_diesel
         type: number
-        source_reference:
-          source_type: RVO
-          table: wpm_reisgegevens
-          field: woon_werk_auto_diesel
-          select_on:
-          - name: kvk_nummer
-            description: KvK nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: zakelijk_auto_benzine
         type: number
-        source_reference:
-          source_type: RVO
-          table: wpm_reisgegevens
-          field: zakelijk_auto_benzine
-          select_on:
-          - name: kvk_nummer
-            description: KvK nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: zakelijk_auto_diesel
         type: number
-        source_reference:
-          source_type: RVO
-          table: wpm_reisgegevens
-          field: zakelijk_auto_diesel
-          select_on:
-          - name: kvk_nummer
-            description: KvK nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       - name: woon_werk_openbaar_vervoer
         type: number
-        source_reference:
-          source_type: RVO
-          table: wpm_reisgegevens
-          field: woon_werk_openbaar_vervoer
-          select_on:
-          - name: kvk_nummer
-            description: KvK nummer van de organisatie
-            type: string
-            value: $kvk_nummer
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -191,4 +156,5 @@ articles:
           paragraph: '1'
           url: https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14
           juriconnect: jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01
-          explanation: Totale CO2-uitstoot wordt berekend door kilometers te vermenigvuldigen met emissiefactoren per vervoermiddel
+          explanation: Totale CO2-uitstoot wordt berekend door kilometers te vermenigvuldigen
+            met emissiefactoren per vervoermiddel

@@ -70,26 +70,16 @@ articles:
   url: https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2
   machine_readable:
     definitions:
-      basisbedrag_per_kind:
-        value: 251100
-      extra_12_15_jaar:
-        value: 70300
-      extra_16_17_jaar:
-        value: 93600
-      alo_kop:
-        value: 348000
-      drempelinkomen_alleenstaand:
-        value: 2840600
-      drempelinkomen_partner:
-        value: 4041600
-      extra_drempel_partner:
-        value: 913900
-      afbouwpercentage:
-        value: 0.071
-      vermogensgrens_alleenstaand:
-        value: 14189600
-      vermogensgrens_partner:
-        value: 17942900
+      basisbedrag_per_kind: 251100
+      extra_12_15_jaar: 70300
+      extra_16_17_jaar: 93600
+      alo_kop: 348000
+      drempelinkomen_alleenstaand: 2840600
+      drempelinkomen_partner: 4041600
+      extra_drempel_partner: 913900
+      afbouwpercentage: 0.071
+      vermogensgrens_alleenstaand: 14189600
+      vermogensgrens_partner: 17942900
     execution:
       produces:
         legal_character: BESCHIKKING

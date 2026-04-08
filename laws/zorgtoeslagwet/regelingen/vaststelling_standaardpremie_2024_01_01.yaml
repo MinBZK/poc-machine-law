@@ -10,8 +10,8 @@ service: VWS
 uuid: ce827aca-e943-4588-bc49-457650f68b04
 articles:
 - number: '1'
-  text: De standaardpremie, bedoeld in artikel 1, onderdeel g, van de Wet op de zorgtoeslag, bedraagt voor het berekeningsjaar
-    2024 € 1.987.
+  text: De standaardpremie, bedoeld in artikel 1, onderdeel g, van de Wet op de zorgtoeslag,
+    bedraagt voor het berekeningsjaar 2024 € 1.987.
   url: https://wetten.overheid.nl/BWBR0049005/2024-01-01#Artikel1
   machine_readable:
     implements:
@@ -20,15 +20,7 @@ articles:
       open_term: standaardpremie
       gelet_op: Gelet op artikel 4 van de Wet op de zorgtoeslag
     definitions:
-      standaardpremie_2024:
-        value: 198700
-        legal_basis:
-          law: Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2024
-          bwb_id: BWBR0049005
-          article: '1'
-          url: https://wetten.overheid.nl/BWBR0049005/2024-01-01#Artikel1
-          juriconnect: jci1.3:c:BWBR0049005&artikel=1&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 1 stelt de standaardpremie voor 2024 vast op 1.987 euro
+      standaardpremie_2024: 198700
     execution:
       produces:
         legal_character: BESLUIT_VAN_ALGEMENE_STREKKING
@@ -44,9 +36,11 @@ articles:
       - output: standaardpremie
         value: $standaardpremie_2024
         legal_basis:
-          law: Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2024
+          law: Regeling vaststelling standaardpremie en bestuursrechtelijke premies
+            2024
           bwb_id: BWBR0049005
           article: '1'
           url: https://wetten.overheid.nl/BWBR0049005/2024-01-01#Artikel1
           juriconnect: jci1.3:c:BWBR0049005&artikel=1&z=2024-01-01&g=2024-01-01
-          explanation: De standaardpremie wordt toegekend conform artikel 1 van de regeling
+          explanation: De standaardpremie wordt toegekend conform artikel 1 van de
+            regeling

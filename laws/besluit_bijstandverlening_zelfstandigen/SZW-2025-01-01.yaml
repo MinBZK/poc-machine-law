@@ -11,65 +11,53 @@ uuid: 7d4e8f2a-3b6c-4a9d-8e1f-5c2d7a9b4e3f
 discoverable: CITIZEN
 articles:
 - number: '2'
-  text: |-
-    1 Algemene bijstand kan worden verleend aan:
-      a. de zelfstandige die gedurende een redelijke termijn als zodanig werkzaam is geweest en wiens bedrijf of zelfstandig beroep levensvatbaar is;
-      b. de persoon of de echtgenoot van de persoon die uit hoofde van werkloosheid een uitkering ontvangt en die een bedrijf of zelfstandig beroep begint dat levensvatbaar is;
-      c. de zelfstandige geboren voor 1 januari 1960, wiens bedrijf of zelfstandig beroep niet levensvatbaar is en die het bedrijf of zelfstandig beroep gedurende een aaneengesloten periode van 10 jaar onmiddellijk voorafgaand aan de aanvraag heeft uitgeoefend en hieruit een inkomen geniet dat duurzaam ontoereikend is om in de noodzakelijke kosten van het bestaan te voorzien;
-      d. de zelfstandige wiens bedrijf of zelfstandig beroep niet levensvatbaar is en die zich verplicht de activiteiten in het bedrijf of zelfstandig beroep zo spoedig mogelijk, doch uiterlijk binnen 12 maanden, te beëindigen.
-    2 Bijstand ter voorziening in de behoefte aan bedrijfskapitaal kan slechts worden verleend aan de zelfstandige, bedoeld in de onderdelen a, b en c van het eerste lid.
-    3 Bijstandsverlening aan een persoon die algemene bijstand ontvangt, die voornemens is een bedrijf of zelfstandig beroep te beginnen en zich in verband hiermee niet beschikbaar stelt voor arbeid in dienstbetrekking kan gedurende een voorbereidingsperiode van ten hoogste 12 maanden worden voortgezet. In een zodanig geval:
-      a. zijn de artikelen 9, met uitzondering van het eerste lid, onderdeel c, en 10 van de wet niet van toepassing;
-      b. is de belanghebbende verplicht mee te werken aan door het college aangewezen begeleiding.
+  text: "1 Algemene bijstand kan worden verleend aan:\n  a. de zelfstandige die gedurende\
+    \ een redelijke termijn als zodanig werkzaam is geweest en wiens bedrijf of zelfstandig\
+    \ beroep levensvatbaar is;\n  b. de persoon of de echtgenoot van de persoon die\
+    \ uit hoofde van werkloosheid een uitkering ontvangt en die een bedrijf of zelfstandig\
+    \ beroep begint dat levensvatbaar is;\n  c. de zelfstandige geboren voor 1 januari\
+    \ 1960, wiens bedrijf of zelfstandig beroep niet levensvatbaar is en die het bedrijf\
+    \ of zelfstandig beroep gedurende een aaneengesloten periode van 10 jaar onmiddellijk\
+    \ voorafgaand aan de aanvraag heeft uitgeoefend en hieruit een inkomen geniet\
+    \ dat duurzaam ontoereikend is om in de noodzakelijke kosten van het bestaan te\
+    \ voorzien;\n  d. de zelfstandige wiens bedrijf of zelfstandig beroep niet levensvatbaar\
+    \ is en die zich verplicht de activiteiten in het bedrijf of zelfstandig beroep\
+    \ zo spoedig mogelijk, doch uiterlijk binnen 12 maanden, te beëindigen.\n2 Bijstand\
+    \ ter voorziening in de behoefte aan bedrijfskapitaal kan slechts worden verleend\
+    \ aan de zelfstandige, bedoeld in de onderdelen a, b en c van het eerste lid.\n\
+    3 Bijstandsverlening aan een persoon die algemene bijstand ontvangt, die voornemens\
+    \ is een bedrijf of zelfstandig beroep te beginnen en zich in verband hiermee\
+    \ niet beschikbaar stelt voor arbeid in dienstbetrekking kan gedurende een voorbereidingsperiode\
+    \ van ten hoogste 12 maanden worden voortgezet. In een zodanig geval:\n  a. zijn\
+    \ de artikelen 9, met uitzondering van het eerste lid, onderdeel c, en 10 van\
+    \ de wet niet van toepassing;\n  b. is de belanghebbende verplicht mee te werken\
+    \ aan door het college aangewezen begeleiding."
   url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Artikel2
   machine_readable:
     definitions:
-      vermogensgrens_algemeen:
-        value: 24389200
-      vermogensgrens_ouder:
-        value: 17072500
-      vermogensgrens_laag:
-        value: 5803500
-      bedrijfskapitaal_gevestigd:
-        value: 25342000
-      bedrijfskapitaal_beginnend:
-        value: 4665600
-      bedrijfskapitaal_ouder:
-        value: 1267100
-      rente_percentage:
-        value: 0.08
-      belasting_percentage:
-        value: 0.2
-      min_inkomen_ouder:
-        value: 1006500
-      geboren_voor_datum:
-        value: '1960-01-01'
-      urencriterium_per_jaar:
-        value: 1225
-      max_duur_gevestigd:
-        value: 12
-      max_duur_beginnend:
-        value: 36
-      max_duur_beeindigend:
-        value: 12
-      max_duur_ouder:
-        value: 0
-      minimum_leeftijd:
-        value: 18
-      categorie_gevestigd:
-        value: GEVESTIGD
-      categorie_beginnend:
-        value: BEGINNEND
-      categorie_ouder:
-        value: OUDER
-      categorie_beeindigend:
-        value: BEEINDIGEND
-      type_lening_rente:
-        value: LENING_RENTE
-      type_lening_renteloos:
-        value: LENING_RENTELOOS
-      type_om_niet:
-        value: OM_NIET
+      vermogensgrens_algemeen: 24389200
+      vermogensgrens_ouder: 17072500
+      vermogensgrens_laag: 5803500
+      bedrijfskapitaal_gevestigd: 25342000
+      bedrijfskapitaal_beginnend: 4665600
+      bedrijfskapitaal_ouder: 1267100
+      rente_percentage: 0.08
+      belasting_percentage: 0.2
+      min_inkomen_ouder: 1006500
+      geboren_voor_datum: '1960-01-01'
+      urencriterium_per_jaar: 1225
+      max_duur_gevestigd: 12
+      max_duur_beginnend: 36
+      max_duur_beeindigend: 12
+      max_duur_ouder: 0
+      minimum_leeftijd: 18
+      categorie_gevestigd: GEVESTIGD
+      categorie_beginnend: BEGINNEND
+      categorie_ouder: OUDER
+      categorie_beeindigend: BEEINDIGEND
+      type_lening_rente: LENING_RENTE
+      type_lening_renteloos: LENING_RENTELOOS
+      type_om_niet: OM_NIET
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -159,19 +147,7 @@ articles:
             bsn: $bsn
       - name: bbz_aanvraag
         type: object
-        source_reference:
-          table: bbz_aanvraag
-          fields:
-          - type_zelfstandige
-          - bedrijf_levensvatbaar
-          - jaren_ondernemerschap
-          - uren_per_week
-          - beeindigingsdatum
-          select_on:
-          - name: bsn
-            description: BSN van de zelfstandige
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -284,7 +260,8 @@ articles:
           article: '2'
           url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel2
           juriconnect: jci1.3:c:BWBR0015711&artikel=2&z=2025-01-01&g=2025-01-01
-          explanation: Als aan alle voorwaarden is voldaan, is de zelfstandige gerechtigd tot Bbz
+          explanation: Als aan alle voorwaarden is voldaan, is de zelfstandige gerechtigd
+            tot Bbz
       - output: categorie_zelfstandige
         value: $bbz_aanvraag.type_zelfstandige
         legal_basis:
@@ -303,7 +280,8 @@ articles:
           article: '10'
           url: https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk2_Artikel10
           juriconnect: jci1.3:c:BWBR0015711&artikel=10&z=2025-01-01&g=2025-01-01
-          explanation: Artikel 10 bepaalt dat de algemene bijstand wordt vastgesteld volgens de Participatiewet
+          explanation: Artikel 10 bepaalt dat de algemene bijstand wordt vastgesteld
+            volgens de Participatiewet
       - output: max_duur_maanden
         value:
           operation: IF

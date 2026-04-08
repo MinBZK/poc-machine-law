@@ -11,78 +11,45 @@ uuid: cdd0ec9f-4975-4969-9d8a-808f2d6abfc9
 discoverable: CITIZEN
 articles:
 - number: '2.1'
-  text: |-
-    1 Belastingplichtigen voor de inkomstenbelasting zijn de natuurlijke personen die:
-      a. in Nederland wonen (binnenlandse belastingplichtigen) of
-      b. niet in Nederland wonen maar wel Nederlands inkomen genieten (buitenlandse belastingplichtigen).
-    2 Nederlands inkomen is inkomen bedoeld in hoofdstuk 7.
+  text: "1 Belastingplichtigen voor de inkomstenbelasting zijn de natuurlijke personen\
+    \ die:\n  a. in Nederland wonen (binnenlandse belastingplichtigen) of\n  b. niet\
+    \ in Nederland wonen maar wel Nederlands inkomen genieten (buitenlandse belastingplichtigen).\n\
+    2 Nederlands inkomen is inkomen bedoeld in hoofdstuk 7."
   url: https://wetten.overheid.nl/BWBR0011353/2001-01-01#Artikel2.1
   machine_readable:
     definitions:
-      box1_schijf1_grens:
-        value: 7457300
-      box1_schijf2_grens:
-        value: 11932700
-      box1_tarief1:
-        value: 0.3693
-      box1_tarief2:
-        value: 0.4953
-      box1_tarief1_aow:
-        value: 0.1975
-      box1_tarief2_aow:
-        value: 0.4953
-      box2_schijf1_grens:
-        value: 6700000
-      box2_tarief1:
-        value: 0.245
-      box2_tarief2:
-        value: 0.33
-      box3_heffingsvrije_voet_alleenstaand:
-        value: 5772900
-      box3_heffingsvrije_voet_partners:
-        value: 11545800
-      box3_forfaitair_rendement:
-        value: 0.06
-      box3_belastingtarief:
-        value: 0.34
-      box3_rendement:
-        value: 0.0674
-      heffingsvrij_vermogen:
-        value: 5720000
-      algemene_heffingskorting_max:
-        value: 310400
-      algemene_heffingskorting_afbouw_start:
-        value: 2466800
-      algemene_heffingskorting_afbouw:
-        value: 0.06578
-      algemene_heffingskorting_nulpunt:
-        value: 7243000
-      algemene_heffingskorting_max_aow:
-        value: 165800
-      algemene_heffingskorting_afbouw_aow:
-        value: 0.03427
-      arbeidskorting_max:
-        value: 446400
-      arbeidskorting_afbouw_start:
-        value: 4081200
-      arbeidskorting_afbouw:
-        value: 0.0651
-      arbeidskorting_nulpunt:
-        value: 11932700
-      arbeidskorting_max_aow:
-        value: 238500
-      arbeidskorting_afbouw_aow:
-        value: 0.034
-      inkomensafhankelijke_combinatiekorting_basis:
-        value: 88800
-      inkomensafhankelijke_combinatiekorting_percentage:
-        value: 0.11213
-      inkomensafhankelijke_combinatiekorting_min_inkomen:
-        value: 550300
-      inkomensafhankelijke_combinatiekorting_max:
-        value: 265000
-      min_personal_income:
-        value: 0
+      box1_schijf1_grens: 7457300
+      box1_schijf2_grens: 11932700
+      box1_tarief1: 0.3693
+      box1_tarief2: 0.4953
+      box1_tarief1_aow: 0.1975
+      box1_tarief2_aow: 0.4953
+      box2_schijf1_grens: 6700000
+      box2_tarief1: 0.245
+      box2_tarief2: 0.33
+      box3_heffingsvrije_voet_alleenstaand: 5772900
+      box3_heffingsvrije_voet_partners: 11545800
+      box3_forfaitair_rendement: 0.06
+      box3_belastingtarief: 0.34
+      box3_rendement: 0.0674
+      heffingsvrij_vermogen: 5720000
+      algemene_heffingskorting_max: 310400
+      algemene_heffingskorting_afbouw_start: 2466800
+      algemene_heffingskorting_afbouw: 0.06578
+      algemene_heffingskorting_nulpunt: 7243000
+      algemene_heffingskorting_max_aow: 165800
+      algemene_heffingskorting_afbouw_aow: 0.03427
+      arbeidskorting_max: 446400
+      arbeidskorting_afbouw_start: 4081200
+      arbeidskorting_afbouw: 0.0651
+      arbeidskorting_nulpunt: 11932700
+      arbeidskorting_max_aow: 238500
+      arbeidskorting_afbouw_aow: 0.034
+      inkomensafhankelijke_combinatiekorting_basis: 88800
+      inkomensafhankelijke_combinatiekorting_percentage: 0.11213
+      inkomensafhankelijke_combinatiekorting_min_inkomen: 550300
+      inkomensafhankelijke_combinatiekorting_max: 265000
+      min_personal_income: 0
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -142,254 +109,79 @@ articles:
             bsn: $bsn
       - name: box1_dienstbetrekking
         type: amount
-        source_reference:
-          table: box1
-          field: loon_uit_dienstbetrekking
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: box1_uitkeringen
         type: amount
-        source_reference:
-          table: box1
-          field: uitkeringen_en_pensioenen
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: box1_onderneming
         type: amount
-        source_reference:
-          table: box1
-          field: winst_uit_onderneming
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: box1_overige_werkzaamheden
         type: amount
-        source_reference:
-          table: box1
-          field: resultaat_overige_werkzaamheden
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: box1_eigen_woning
         type: amount
-        source_reference:
-          table: box1
-          field: eigen_woning
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: box2_dividend
         type: amount
-        source_reference:
-          table: box2
-          field: reguliere_voordelen
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: box2_aandelen
         type: amount
-        source_reference:
-          table: box2
-          field: vervreemdingsvoordelen
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: box3_sparen
         type: amount
-        source_reference:
-          table: box3
-          field: spaargeld
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: box3_beleggen
         type: amount
-        source_reference:
-          table: box3
-          field: beleggingen
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: box3_onroerend_goed
         type: amount
-        source_reference:
-          table: box3
-          field: onroerend_goed
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: box3_schulden
         type: amount
-        source_reference:
-          table: box3
-          field: schulden
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: persoonsgebonden_aftrek
         type: amount
-        source_reference:
-          table: aftrekposten
-          field: persoonsgebonden_aftrek
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: partner_box1_dienstbetrekking
         type: amount
-        source_reference:
-          table: box1
-          field: loon_uit_dienstbetrekking
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_box1_uitkeringen
         type: amount
-        source_reference:
-          table: box1
-          field: uitkeringen_en_pensioenen
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_box1_onderneming
         type: amount
-        source_reference:
-          table: box1
-          field: winst_uit_onderneming
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_box1_overige_werkzaamheden
         type: amount
-        source_reference:
-          table: box1
-          field: resultaat_overige_werkzaamheden
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_box1_eigen_woning
         type: amount
-        source_reference:
-          table: box1
-          field: eigen_woning
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_box2_dividend
         type: amount
-        source_reference:
-          table: box2
-          field: reguliere_voordelen
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_box2_aandelen
         type: amount
-        source_reference:
-          table: box2
-          field: vervreemdingsvoordelen
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_box3_sparen
         type: amount
-        source_reference:
-          table: box3
-          field: spaargeld
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_box3_beleggen
         type: amount
-        source_reference:
-          table: box3
-          field: beleggingen
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_box3_onroerend_goed
         type: amount
-        source_reference:
-          table: box3
-          field: onroerend_goed
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_box3_schulden
         type: amount
-        source_reference:
-          table: box3
-          field: schulden
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: partner_buitenlands_inkomen
         type: amount
-        source_reference:
-          table: buitenlands
-          field: inkomen
-          select_on:
-          - name: bsn
-            description: BSN nummer van de partner
-            type: string
-            value: $partner_bsn
+        source: {}
       - name: buitenlands_inkomen
         type: amount
-        source_reference:
-          table: buitenlands
-          field: inkomen
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: totale_belastingschuld
         type: amount

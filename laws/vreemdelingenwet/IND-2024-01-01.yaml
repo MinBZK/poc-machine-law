@@ -10,39 +10,59 @@ service: IND
 uuid: af0fed0d-ee11-48f3-b629-07becda4b7e9
 articles:
 - number: '8'
-  text: |-
-    De vreemdeling heeft in Nederland uitsluitend rechtmatig verblijf:
-      a. op grond van een verblijfsvergunning voor bepaalde tijd als bedoeld in artikel 14;
-      b. op grond van een verblijfsvergunning voor onbepaalde tijd als bedoeld in artikel 20, of een EU-verblijfsvergunning voor langdurig ingezetenen als bedoeld in artikel 45a indien op het aan de vreemdeling verschafte document, bedoeld in artikel 9, geen aantekening als bedoeld in artikel 45c, eerste lid, is geplaatst;
-      c. op grond van een verblijfsvergunning voor bepaalde tijd als bedoeld in artikel 28;
-      d. op grond van een verblijfsvergunning voor onbepaalde tijd als bedoeld in artikel 33, of een EU-verblijfsvergunning voor langdurig ingezetenen als bedoeld in artikel 45a indien op het aan de vreemdeling verschafte document, bedoeld in artikel 9, de aantekening, bedoeld in artikel 45c, eerste lid, is geplaatst;
-      e. als gemeenschapsonderdaan zolang deze onderdaan verblijf houdt op grond van een regeling krachtens het Verdrag betreffende de werking van de Europese Unie dan wel de Overeenkomst betreffende de Europese Economische Ruimte;
-      f. in afwachting van de beslissing op een aanvraag tot het verlenen van de verblijfsvergunning, bedoeld in de artikelen 14 en 28, terwijl bij of krachtens deze wet dan wel op grond van een rechterlijke beslissing uitzetting van de aanvrager achterwege dient te blijven totdat op de aanvraag is beslist;
-      g. in afwachting van de beslissing op een aanvraag tot het verlenen van de verblijfsvergunning, bedoeld in de artikelen 20, 33 en 45a, of tot het verlengen van de geldigheidsduur van de verblijfsvergunning, bedoeld in de artikelen 14 en 28, of een wijziging ervan, terwijl bij of krachtens deze wet of op grond van een rechterlijke beslissing uitzetting van de aanvrager achterwege dient te blijven totdat op de aanvraag is beslist;
-      h. in afwachting van de beslissing op een bezwaarschrift of een beroepschrift, terwijl bij of krachtens deze wet of op grond van een rechterlijke beslissing uitzetting van de aanvrager achterwege dient te blijven totdat op het bezwaarschrift of het beroepschrift is beslist;
-      i. gedurende de vrije termijn, bedoeld in artikel 12, zolang het verblijf van de vreemdeling bij of krachtens artikel 12 is toegestaan;
-      j. indien tegen de uitzetting beletselen bestaan als bedoeld in artikel 64;
-      k. gedurende de periode waarin de vreemdeling door Onze Minister in de gelegenheid wordt gesteld aangifte te doen van overtreding van artikel 273f van het Wetboek van Strafrecht;
-      l. indien de vreemdeling verblijfsrecht ontleent aan het Associatiebesluit 1/80 van de Associatieraad EEG/Turkije;
-      m. indien de aanvraag tot het verlenen van een verblijfsvergunning voor bepaalde tijd als bedoeld in artikel 28 niet in behandeling is genomen op grond van artikel 30 terwijl hij in afwachting is van de feitelijke overdracht naar een verantwoordelijke lidstaat in de zin van de Dublinverordening.
+  text: "De vreemdeling heeft in Nederland uitsluitend rechtmatig verblijf:\n  a.\
+    \ op grond van een verblijfsvergunning voor bepaalde tijd als bedoeld in artikel\
+    \ 14;\n  b. op grond van een verblijfsvergunning voor onbepaalde tijd als bedoeld\
+    \ in artikel 20, of een EU-verblijfsvergunning voor langdurig ingezetenen als\
+    \ bedoeld in artikel 45a indien op het aan de vreemdeling verschafte document,\
+    \ bedoeld in artikel 9, geen aantekening als bedoeld in artikel 45c, eerste lid,\
+    \ is geplaatst;\n  c. op grond van een verblijfsvergunning voor bepaalde tijd\
+    \ als bedoeld in artikel 28;\n  d. op grond van een verblijfsvergunning voor onbepaalde\
+    \ tijd als bedoeld in artikel 33, of een EU-verblijfsvergunning voor langdurig\
+    \ ingezetenen als bedoeld in artikel 45a indien op het aan de vreemdeling verschafte\
+    \ document, bedoeld in artikel 9, de aantekening, bedoeld in artikel 45c, eerste\
+    \ lid, is geplaatst;\n  e. als gemeenschapsonderdaan zolang deze onderdaan verblijf\
+    \ houdt op grond van een regeling krachtens het Verdrag betreffende de werking\
+    \ van de Europese Unie dan wel de Overeenkomst betreffende de Europese Economische\
+    \ Ruimte;\n  f. in afwachting van de beslissing op een aanvraag tot het verlenen\
+    \ van de verblijfsvergunning, bedoeld in de artikelen 14 en 28, terwijl bij of\
+    \ krachtens deze wet dan wel op grond van een rechterlijke beslissing uitzetting\
+    \ van de aanvrager achterwege dient te blijven totdat op de aanvraag is beslist;\n\
+    \  g. in afwachting van de beslissing op een aanvraag tot het verlenen van de\
+    \ verblijfsvergunning, bedoeld in de artikelen 20, 33 en 45a, of tot het verlengen\
+    \ van de geldigheidsduur van de verblijfsvergunning, bedoeld in de artikelen 14\
+    \ en 28, of een wijziging ervan, terwijl bij of krachtens deze wet of op grond\
+    \ van een rechterlijke beslissing uitzetting van de aanvrager achterwege dient\
+    \ te blijven totdat op de aanvraag is beslist;\n  h. in afwachting van de beslissing\
+    \ op een bezwaarschrift of een beroepschrift, terwijl bij of krachtens deze wet\
+    \ of op grond van een rechterlijke beslissing uitzetting van de aanvrager achterwege\
+    \ dient te blijven totdat op het bezwaarschrift of het beroepschrift is beslist;\n\
+    \  i. gedurende de vrije termijn, bedoeld in artikel 12, zolang het verblijf van\
+    \ de vreemdeling bij of krachtens artikel 12 is toegestaan;\n  j. indien tegen\
+    \ de uitzetting beletselen bestaan als bedoeld in artikel 64;\n  k. gedurende\
+    \ de periode waarin de vreemdeling door Onze Minister in de gelegenheid wordt\
+    \ gesteld aangifte te doen van overtreding van artikel 273f van het Wetboek van\
+    \ Strafrecht;\n  l. indien de vreemdeling verblijfsrecht ontleent aan het Associatiebesluit\
+    \ 1/80 van de Associatieraad EEG/Turkije;\n  m. indien de aanvraag tot het verlenen\
+    \ van een verblijfsvergunning voor bepaalde tijd als bedoeld in artikel 28 niet\
+    \ in behandeling is genomen op grond van artikel 30 terwijl hij in afwachting\
+    \ is van de feitelijke overdracht naar een verantwoordelijke lidstaat in de zin\
+    \ van de Dublinverordening."
   url: https://wetten.overheid.nl/BWBR0011823/2024-01-01#Artikel8
   machine_readable:
     definitions:
       valid_permit_statuses:
-        value:
-        - VERLEEND
-        - VERLENGD
-        - VAN_RECHTSWEGE
+      - VERLEEND
+      - VERLENGD
+      - VAN_RECHTSWEGE
       permanent_types:
-        value:
-        - ONBEPAALDE_TIJD_REGULIER
-        - ONBEPAALDE_TIJD_ASIEL
-        - ONBEPAALDE_TIJD_EU
-        - DUURZAAM_VERBLIJF_EU
+      - ONBEPAALDE_TIJD_REGULIER
+      - ONBEPAALDE_TIJD_ASIEL
+      - ONBEPAALDE_TIJD_EU
+      - DUURZAAM_VERBLIJF_EU
       eu_types:
-        value:
-        - EU_BURGER
-        - FAMILIE_EU_BURGER
+      - EU_BURGER
+      - FAMILIE_EU_BURGER
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -54,30 +74,10 @@ articles:
       input:
       - name: vergunning_gegevens
         type: object
-        source_reference:
-          table: verblijfsvergunningen
-          fields:
-          - type
-          - status
-          - ingangsdatum
-          - einddatum
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       - name: eu_inschrijving
         type: object
-        source_reference:
-          table: eu_registraties
-          fields:
-          - type
-          - ingangsdatum
-          select_on:
-          - name: bsn
-            description: BSN nummer van de persoon
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: verblijfsvergunning_type
         type: string
@@ -120,4 +120,5 @@ articles:
           article: '8'
           url: https://wetten.overheid.nl/BWBR0011823/2024-01-01#Hoofdstuk3_Afdeling1_Artikel8
           juriconnect: jci1.3:c:BWBR0011823&artikel=8&z=2024-01-01&g=2024-01-01
-          explanation: Artikel 8 Vw 2000 bepaalt de vaststelling van het type rechtmatig verblijf
+          explanation: Artikel 8 Vw 2000 bepaalt de vaststelling van het type rechtmatig
+            verblijf

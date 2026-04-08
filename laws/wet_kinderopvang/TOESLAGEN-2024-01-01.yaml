@@ -22,26 +22,16 @@ articles:
   url: https://wetten.overheid.nl/BWBR0017017/2024-01-01#Artikel1.5
   machine_readable:
     definitions:
-      max_uurtarief_dagopvang:
-        value: 902
-      max_uurtarief_bso:
-        value: 766
-      max_hours_per_year:
-        value: 2760
-      inkomensdrempel_1:
-        value: 3500000
-      inkomensdrempel_2:
-        value: 7000000
-      percentage_1:
-        value: 0.96
-      percentage_2:
-        value: 0.8
-      percentage_3:
-        value: 0.33
-      min_hours_partner:
-        value: 1040
-      min_hours_per_week:
-        value: 20
+      max_uurtarief_dagopvang: 902
+      max_uurtarief_bso: 766
+      max_hours_per_year: 2760
+      inkomensdrempel_1: 3500000
+      inkomensdrempel_2: 7000000
+      percentage_1: 0.96
+      percentage_2: 0.8
+      percentage_3: 0.33
+      min_hours_partner: 1040
+      min_hours_per_week: 20
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -106,18 +96,15 @@ articles:
       - name: kinderopvang_kvk
         type: string
         required: true
-        source_reference:
-          source_type: claim
+        source: {}
       - name: aangegeven_uren
         type: array
         required: true
-        source_reference:
-          source_type: claim
+        source: {}
       - name: verwachte_partner_uren
         type: number
         required: true
-        source_reference:
-          source_type: claim
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

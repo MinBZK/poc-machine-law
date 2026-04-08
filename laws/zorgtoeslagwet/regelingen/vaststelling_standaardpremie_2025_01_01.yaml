@@ -10,7 +10,8 @@ service: VWS
 uuid: ac962262-6628-49bf-a465-5d831271936a
 articles:
 - number: '1'
-  text: De standaardpremie, bedoeld in de Wet op de zorgtoeslag, bedraagt voor het berekeningsjaar 2025 € 2.112,–.
+  text: De standaardpremie, bedoeld in de Wet op de zorgtoeslag, bedraagt voor het
+    berekeningsjaar 2025 € 2.112,–.
   url: https://wetten.overheid.nl/BWBR0050536/2025-01-01#Artikel1
   machine_readable:
     implements:
@@ -19,15 +20,7 @@ articles:
       open_term: standaardpremie
       gelet_op: Gelet op artikel 4 van de Wet op de zorgtoeslag
     definitions:
-      standaardpremie_2025:
-        value: 211200
-        legal_basis:
-          law: Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2025
-          bwb_id: BWBR0050536
-          article: '1'
-          url: https://wetten.overheid.nl/BWBR0050536/2025-01-01#Artikel1
-          juriconnect: jci1.3:c:BWBR0050536&artikel=1&z=2025-01-01&g=2025-01-01
-          explanation: Artikel 1 stelt de standaardpremie voor 2025 vast op 2.112 euro
+      standaardpremie_2025: 211200
     execution:
       produces:
         legal_character: BESLUIT_VAN_ALGEMENE_STREKKING
@@ -43,9 +36,11 @@ articles:
       - output: standaardpremie
         value: $standaardpremie_2025
         legal_basis:
-          law: Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2025
+          law: Regeling vaststelling standaardpremie en bestuursrechtelijke premies
+            2025
           bwb_id: BWBR0050536
           article: '1'
           url: https://wetten.overheid.nl/BWBR0050536/2025-01-01#Artikel1
           juriconnect: jci1.3:c:BWBR0050536&artikel=1&z=2025-01-01&g=2025-01-01
-          explanation: De standaardpremie wordt toegekend conform artikel 1 van de regeling
+          explanation: De standaardpremie wordt toegekend conform artikel 1 van de
+            regeling

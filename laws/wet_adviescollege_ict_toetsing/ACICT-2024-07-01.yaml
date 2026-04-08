@@ -11,22 +11,29 @@ uuid: 50a9a87f-f222-473b-978f-6846f3cee076
 discoverable: BUSINESS
 articles:
 - number: '1'
-  text: |-
-    In deze wet wordt verstaan onder:
-      – Adviescollege: het Adviescollege ICT-toetsing, bedoeld in artikel 2;
-      – centrale overheid: de ministeries, de krachtens publiekrecht ingestelde zelfstandige bestuursorganen als bedoeld in artikel 4 van de Kaderwet zelfstandige bestuursorganen, de politie en de Raad voor de rechtspraak;
-      – ICT-project: een project of programma, dan wel projecten of programma’s die onderlinge samenhang hebben, van de centrale overheid waarvan de kosten voor de ICT-componenten over de gehele looptijd van het project of programma ten minste € 5.000.000 bedragen;
-      – informatiesysteem: een samenhangend geheel van gegevensverzamelingen, procedures, processen en programmatuur van de centrale overheid, alsmede de voor het informatiesysteem getroffen voorzieningen voor opslag, verwerking en communicatie;
-      – korpschef van politie: de korpschef, bedoeld in artikel 27 van de Politiewet 2012;
-      – Onze Minister: Onze Minister van Binnenlandse Zaken en Koninkrijksrelaties;
-      – Onze Minister die verantwoordelijk is voor de ICT-voorziening: Onze Minister die verantwoordelijk is voor het ICT-project of het informatiesysteem waarop het advies betrekking heeft;
-      – Onze Minister die het aangaat: Onze Minister die de eerste ondertekenaar is van de wet of lagere regelgeving bij welke een zelfstandig bestuursorgaan is ingesteld;
-      – zelfstandig bestuursorgaan: een krachtens publiekrecht ingesteld zelfstandig bestuursorgaan als bedoeld in artikel 4 van de Kaderwet zelfstandige bestuursorganen.
+  text: "In deze wet wordt verstaan onder:\n  – Adviescollege: het Adviescollege ICT-toetsing,\
+    \ bedoeld in artikel 2;\n  – centrale overheid: de ministeries, de krachtens publiekrecht\
+    \ ingestelde zelfstandige bestuursorganen als bedoeld in artikel 4 van de Kaderwet\
+    \ zelfstandige bestuursorganen, de politie en de Raad voor de rechtspraak;\n \
+    \ – ICT-project: een project of programma, dan wel projecten of programma’s die\
+    \ onderlinge samenhang hebben, van de centrale overheid waarvan de kosten voor\
+    \ de ICT-componenten over de gehele looptijd van het project of programma ten\
+    \ minste € 5.000.000 bedragen;\n  – informatiesysteem: een samenhangend geheel\
+    \ van gegevensverzamelingen, procedures, processen en programmatuur van de centrale\
+    \ overheid, alsmede de voor het informatiesysteem getroffen voorzieningen voor\
+    \ opslag, verwerking en communicatie;\n  – korpschef van politie: de korpschef,\
+    \ bedoeld in artikel 27 van de Politiewet 2012;\n  – Onze Minister: Onze Minister\
+    \ van Binnenlandse Zaken en Koninkrijksrelaties;\n  – Onze Minister die verantwoordelijk\
+    \ is voor de ICT-voorziening: Onze Minister die verantwoordelijk is voor het ICT-project\
+    \ of het informatiesysteem waarop het advies betrekking heeft;\n  – Onze Minister\
+    \ die het aangaat: Onze Minister die de eerste ondertekenaar is van de wet of\
+    \ lagere regelgeving bij welke een zelfstandig bestuursorgaan is ingesteld;\n\
+    \  – zelfstandig bestuursorgaan: een krachtens publiekrecht ingesteld zelfstandig\
+    \ bestuursorgaan als bedoeld in artikel 4 van de Kaderwet zelfstandige bestuursorganen."
   url: https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1
   machine_readable:
     definitions:
-      kosten_drempel:
-        value: 500000000
+      kosten_drempel: 500000000
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -38,37 +45,13 @@ articles:
       input:
       - name: project_kosten
         type: number
-        source_reference:
-          source_type: ACICT
-          table: ict_projecten
-          field: totale_kosten
-          select_on:
-          - name: project_id
-            description: Project identificatie
-            type: string
-            value: $project_id
+        source: {}
       - name: organisatie_type
         type: string
-        source_reference:
-          source_type: ACICT
-          table: ict_projecten
-          field: organisatie_type
-          select_on:
-          - name: project_id
-            description: Project identificatie
-            type: string
-            value: $project_id
+        source: {}
       - name: project_type
         type: string
-        source_reference:
-          source_type: ACICT
-          table: ict_projecten
-          field: project_type
-          select_on:
-          - name: project_id
-            description: Project identificatie
-            type: string
-            value: $project_id
+        source: {}
       output:
       - name: adviesplicht
         type: boolean
@@ -104,7 +87,8 @@ articles:
           article: '7'
           url: https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel7
           juriconnect: jci1.3:c:BWBR0049412&artikel=7&z=2024-07-01&g=2024-07-01
-          explanation: De adviesplicht wordt bepaald door de cumulatieve voorwaarden uit artikel 1, 7 en 14
+          explanation: De adviesplicht wordt bepaald door de cumulatieve voorwaarden
+            uit artikel 1, 7 en 14
       - output: project_kosten
         value: $project_kosten
         legal_basis:

@@ -11,16 +11,14 @@ uuid: 2b4c6d8e-1a3f-4e5b-8c7d-9f0e1a2b3c4d
 discoverable: CITIZEN
 articles:
 - number: '41'
-  text: De inhoudingsplichtige en de verzekeringsplichtige zijn een inkomensafhankelijke bijdrage verschuldigd.
+  text: De inhoudingsplichtige en de verzekeringsplichtige zijn een inkomensafhankelijke
+    bijdrage verschuldigd.
   url: https://wetten.overheid.nl/BWBR0018450/2026-01-01#Artikel41
   machine_readable:
     definitions:
-      maximum_bijdrage_inkomen:
-        value: 7541200
-      percentage_hoog:
-        value: 0.065
-      percentage_laag:
-        value: 0.0525
+      maximum_bijdrage_inkomen: 7541200
+      percentage_hoog: 0.065
+      percentage_laag: 0.0525
     execution:
       produces:
         legal_character: BESCHIKKING

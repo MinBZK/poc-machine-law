@@ -11,122 +11,241 @@ uuid: 8a3f5c2d-4e6b-4a1f-9c8d-7e2f3a4b5c6d
 discoverable: CITIZEN
 articles:
 - number: '1'
-  text: |-
-    Voor de toepassing van deze wet en de daarop berustende bepalingen wordt verstaan onder:
-      – aanspraakgerechtigde: persoon die begunstigde is voor een nog niet ingegaan pensioen;
-      – accountant: een accountant als bedoeld in artikel 393, eerste lid, van Boek 2 van het Burgerlijk Wetboek;
-      – afkoop: iedere handeling waardoor pensioenaanspraken en pensioenrechten hun pensioenbestemming verliezen, behoudens in geval van toepassing van de artikelen 55, vijfde lid, 134 of 220b, tweede lid, of van artikel 3A:85 van de Wet op het financieel toezicht;
-      – algemeen pensioenfonds: een pensioenfonds dat een of meerdere pensioenregelingen of beroepspensioenregelingen als bedoeld in artikel 1 van de Wet verplichte beroepspensioenregeling uitvoert en daarvoor een afgescheiden vermogen aanhoudt per collectiviteitkring;
-      – arbeidsongeschiktheidspensioen: een geldelijke uitkering, die vastgesteld of variabel is, wegens arbeidsongeschiktheid van de werknemer of gewezen werknemer, waarop recht bestaat na afloop van de periode bedoeld in artikel 29, eerste lid, van de Ziektewet of, indien de werknemer of gewezen werknemer Ziektewetuitkering ontvangt, na afloop van de periode bedoeld in artikel 29, vijfde en tiende lid, van de Ziektewet;
-      – basispensioenregeling: de collectieve pensioenregeling of het deel van de pensioenregeling waaraan de werknemer op basis van de pensioenovereenkomst gehouden is om deel te nemen;
-      – bedrijfstakpensioenfonds: een pensioenfonds ten behoeve van een of meer bedrijfstakken of delen van een bedrijfstak;
-      – beëindiging van de deelneming: het beëindigen van de pensioenverwerving op basis van een pensioenovereenkomst anders dan door:
-      a. het overlijden van de deelnemer; of
-      b. het ingaan van het ouderdomspensioen;
-      – beschermingsrendement: de vermogensbijschrijving die ervoor zorgt dat de, uit het opgebouwde pensioenvermogen te financieren, toekomstige pensioenuitkeringen en lopende pensioenuitkeringen nominaal stabiel blijven, dat wordt gefinancierd vanuit het totaal behaalde rendement en looptijdafhankelijk wordt toebedeeld aan de vermogens op basis van marktwaardering, waarbij toedelingsregels worden gehanteerd;
-      – bevoegde autoriteiten: nationale autoriteiten van andere lidstaten dan Nederland als bedoeld in artikel 6, onderdeel 8, van richtlijn 2016/2341/EU;
-      – bijdrage: iedere geldsom die wordt voldaan aan een pensioenuitvoerder in het kader van de uitvoering van pensioenovereenkomsten en uitvoeringsovereenkomsten;
-      – bijdragende onderneming: een onderneming of ander lichaam, ongeacht of deze een of meer natuurlijke personen of rechtspersonen die optreden als werkgever of zelfstandige, dan wel een combinatie daarvan, omvat of hieruit bestaat, en die een pensioenregeling aanbiedt of aan een pensioenfonds, premiepensioeninstelling of pensioeninstelling uit een andere lidstaat bijdragen betaalt;
-      – bijzonder partnerpensioen: de aanspraak op partnerpensioen die op grond van artikel 57, eerste, tweede of derde lid, verkregen wordt door de gewezen partner;
-      – buitenlandse instelling: een instelling met zetel buiten Nederland, niet zijnde een pensioeninstelling uit een andere lidstaat, een verzekeraar met een zetel buiten Nederland, een lidstaat van de Europese Unie of een instelling als bedoeld in artikel 70, tweede lid;
-      – collectief toedelingsmechanisme: wijze waarop financiële mee- en tegenvallers collectief worden verwerkt in variabele uitkeringen van flexibele premieovereenkomsten;
-      – collectiviteitkring: een of meerdere pensioenregelingen of beroepspensioenregelingen als bedoeld in artikel 1 van de Wet verplichte beroepspensioenregeling waarvoor een algemeen pensioenfonds een afgescheiden vermogen aanhoudt;
-      – deelnemer: de werknemer of gewezen werknemer die op grond van een pensioenovereenkomst pensioenaanspraken verwerft jegens een pensioenuitvoerder;
-      – dekkingsgraad: de verhouding tussen het vermogen inzake de bij een pensioenfonds ondergebrachte pensioenregeling of pensioenregelingen en de technische voorzieningen van een pensioenfonds;
-      – dienstbetrekking: de rechtsbetrekking tussen werkgever en werknemer;
-      – directeur-grootaandeelhouder:
-      a. persoonlijk houder van aandelen welke ten minste een tiende deel van het geplaatste kapitaal van de vennootschap van de werkgever vertegenwoordigen en waaraan stemrecht in de algemene vergadering is verbonden;
-      b. indirect persoonlijk houder van aandelen welke ten minste een tiende deel van het geplaatste kapitaal van de vennootschap van de werkgever vertegenwoordigen en waaraan stemrecht in de algemene vergadering is verbonden; of
-      c. houder van certificaten van aandelen, uitgegeven door tussenkomst van een administratiekantoor waarvan hij voor ten minste een tiende deel in het bestuur vertegenwoordigd is, welke ten minste een tiende deel van het geplaatste kapitaal van de vennootschap vertegenwoordigen en aan welke aandelen stemrecht in de algemene vergadering is verbonden;
-      – elektronisch: door middel van een elektronische informatiedrager die de ontvanger in staat stelt de verstrekte informatie duurzaam te bewaren;
-      – flexibele premieovereenkomst: premieovereenkomst waarbij de premie individueel wordt belegd en waarbij het kapitaal voortvloeiend uit de premie vanaf de pensioendatum wordt aangewend voor financiering van een variabele uitkering of voor de aankoop van een vastgestelde uitkering;
-      – gedetacheerde werknemer: een werknemer die in een andere lidstaat wordt gedetacheerd om daar te werken en die krachtens titel II van verordening (EEG) nr. 1408/71 van de Raad van de Europese Gemeenschappen van 14 juni 1971 betreffende de toepassing van de socialezekerheidsregelingen op loontrekkenden en hun gezinnen, die zich binnen de gemeenschap verplaatsen (PbEG L 149), onderworpen blijft aan de wetgeving van de lidstaat van oorsprong;
-      – gepensioneerde: pensioengerechtigde voor wie het ouderdomspensioen is ingegaan;
-      – gewezen deelnemer: de werknemer of gewezen werknemer door wie op grond van een pensioenovereenkomst geen pensioen meer wordt verworven en die bij beëindiging van de deelneming een pensioenaanspraak heeft behouden jegens een pensioenuitvoerder;
-      – groep: een groep als bedoeld in artikel 24b van Boek 2 van het Burgerlijk Wetboek;
-      – lidstaat: een lidstaat van de Europese Unie alsmede een staat, niet zijnde een lidstaat van de Europese Unie, die partij is bij de Overeenkomst betreffende Europese Economische Ruimte;
-      – nabestaandenpensioen: partnerpensioen of wezenpensioen;
-      – nettopensioen: ouderdomspensioen of nabestaandenpensioen in de vorm van een nettopensioen als bedoeld in afdeling 5.3B van de Wet inkomstenbelasting 2001;
-      – ondernemingspensioenfonds: een pensioenfonds verbonden aan een onderneming of een groep;
-      – ondernemingsraad: de ondernemingsraad, bedoeld in de Wet op de ondernemingsraden;
-      – ontvangende pensioenuitvoerder: de pensioenuitvoerder aan wie in het kader van waardeoverdracht waarde wordt overgedragen;
-      – Onze Minister: Onze Minister voor Armoedebeleid, Participatie en Pensioenen;
-      – ouderdomspensioen: een geldelijke uitkering, die vastgesteld of variabel is, voor de werknemer of de gewezen werknemer bij wijze van inkomensvoorziening bij ouderdom;
-      – overdrachtswaarde: de ten behoeve van de waardeoverdracht vastgestelde waarde van de over te dragen pensioenaanspraken of pensioenrechten;
-      – overdragende pensioenuitvoerder: de pensioenuitvoerder die in het kader van waardeoverdracht waarde overdraagt aan een andere pensioenuitvoerder;
-      – overrendement: het saldo van het totaal behaalde rendement op de beleggingen, de ontwikkeling van de levensverwachting en het sterfteresultaat en het toebedeelde beschermingsrendement op basis van de toedelingsregels;
-      – partner:
-      a. echtgenoot;
-      b. geregistreerd partner; of
-      c. partner in de zin van de pensioenovereenkomst zijnde de meerderjarige persoon die met de werknemer of de gewezen werknemer een gezamenlijke huishouding voert, tenzij het betreft een bloedverwant in de eerste graad, een bloedverwant in de tweede graad in de rechte lijn, een meerderjarig stiefkind of meerderjarig voormalig pleegkind;
-      – partnerpensioen: een geldelijke uitkering, die vastgesteld of variabel is, voor de partner of gewezen partner wegens het overlijden van de werknemer of gewezen werknemer;
-      – partnerrelatie: huwelijk, geregistreerd partnerschap of partnerrelatie in de zin van de pensioenovereenkomst;
-      – pensioen: ouderdomspensioen, arbeidsongeschiktheidspensioen of nabestaandenpensioen, zoals tussen werkgever en werknemer overeengekomen;
-      – pensioenaanspraak: het recht op een nog niet ingegaan pensioen, uitgezonderd overeengekomen voorwaardelijke toeslagverlening;
-      – pensioenbewaarder: de pensioenbewaarder, bedoeld in artikel 1:1 van de Wet op het financieel toezicht;
-      – pensioeneenheid: eenheid van deelname in een beleggingsportefeuille, waarbij de waarde fluctueert met de koersontwikkeling van deze portefeuille en eventueel met de ontwikkeling van de levensverwachting;
-      – pensioenfonds: een stichting die niet een premiepensioeninstelling is, waarin ten behoeve van ten minste twee deelnemers, gewezen deelnemers of hun nabestaanden gelden worden of werden bijeengebracht en worden beheerd ter uitvoering van ten minste een basispensioenregeling;
-      – pensioengerechtigde: persoon voor wie op grond van een pensioenovereenkomst het pensioen is ingegaan;
-      – pensioeninstelling uit een andere lidstaat: een op basis van kapitaaldekking gefinancierde instelling, ongeacht de rechtsvorm, die zetel heeft in een andere lidstaat dan Nederland en die onafhankelijk van enige bijdragende onderneming of bedrijfstak is opgericht met als doel het verstrekken van arbeidsgerelateerde pensioenuitkeringen op basis van een als volgt gesloten overeenkomst:
-      a. individueel of collectief tussen een of meerdere werkgevers en een of meerdere werknemers of hun respectievelijke vertegenwoordigers; of
-      b. individueel of collectief met zelfstandigen,
-    en die hiermee rechtstreeks verband houdende werkzaamheden verricht;
-      – pensioenovereenkomst: hetgeen tussen een werkgever en een werknemer is overeengekomen betreffende pensioen;
-      – pensioenrecht: het recht op een ingegaan pensioen, uitgezonderd overeengekomen voorwaardelijke toeslagverlening;
-      – pensioenregeling:
-      a. een pensioenregeling op grond van een pensioenovereenkomst; of
-      b. indien de bijdragende onderneming zetel heeft in een andere lidstaat dan Nederland, een overeenkomst, een trustakte of voorschriften waarin is bepaald welke pensioenuitkeringen worden toegezegd en onder welke voorwaarden;
-      – pensioenreglement: de door de pensioenuitvoerder opgestelde regeling met betrekking tot de verhouding tussen pensioenuitvoerder en deelnemer, gewezen deelnemer, andere aanspraakgerechtigde of pensioengerechtigde;
-      – pensioenuitvoerder: een ondernemingspensioenfonds, een bedrijfstakpensioenfonds, een algemeen pensioenfonds, of een premiepensioeninstelling of verzekeraar die zetel heeft in Nederland;
-      – pensioenverplichtingen: verplichtingen van de pensioenuitvoerder uit hoofde van pensioenaanspraken en pensioenrechten;
-      – premie: de in geld uitgedrukte periodiek vastgestelde structurele prestatie die verschuldigd is aan de pensioenuitvoerder en die bestemd is voor pensioen en de daaraan verbonden kosten;
-      – premie-uitkeringsovereenkomst: premieovereenkomst uitgevoerd door een verzekeraar of door een premiepensioeninstelling waarbij de premie individueel wordt belegd, waarbij de premie of het kapitaal voortvloeiend uit de premie in de laatste 15 jaar voor de pensioengerechtigde leeftijd, bedoeld in artikel 7a, eerste lid, van de Algemene Ouderdomswet, kan worden aangewend voor aankoop van een vastgestelde uitkering vanaf de pensioendatum en waarbij het resterend kapitaal vanaf de pensioendatum wordt aangewend voor financiering van een variabele uitkering of voor de aankoop van een vastgestelde uitkering;
-      – premieovereenkomst: een pensioenovereenkomst inzake een vastgestelde premie die uiterlijk op de pensioendatum wordt omgezet in een vastgestelde of variabele pensioenuitkering;
-      – premiepensioeninstelling: een premiepensioeninstelling die op grond van de Wet op het financieel toezicht in Nederland het bedrijf van premiepensioeninstelling mag uitoefenen;
-      – projectierendement: het ingerekende toekomstig rendement voor de vaststelling van variabele uitkeringen;
-      – richtlijn 2016/2341/EU: richtlijn 2016/2341/EU van het Europees Parlement en de Raad van 14 december 2016 betreffende de werkzaamheden van en het toezicht op instellingen voor bedrijfspensioenvoorziening (IBPV’s) (PbEU L 2016, 354);
-      – risicodelingsreserve: een collectieve vermogensreserve waarmee in een flexibele premieovereenkomst financiële mee- of tegenvallers kunnen worden gedeeld;
-      – risicohouding: de vastgestelde mate waarin een groep deelnemers, gewezen deelnemers of pensioengerechtigden bereid is beleggingsrisico’s te lopen met oog op hun doelstellingen en de mate waarin deze groep beleggingsrisico’s kan dragen gegeven de kenmerken van deze groep;
-      – risicovrije rente: de door De Nederlandsche Bank N.V. gepubliceerde actuele rentetermijnstructuur;
-      – scheiding: echtscheiding, ontbinding van het huwelijk na scheiding van tafel en bed, beëindiging van een geregistreerd partnerschap anders dan door dood, vermissing of omzetting van een geregistreerd partnerschap in een huwelijk of beëindiging van een partnerrelatie in de zin van de pensioenovereenkomst;
-      – schriftelijk: in schrifttekens op papier;
-      – solidaire premieovereenkomst: premieovereenkomst waarbij de premie collectief wordt belegd, de resultaten in ieder geval naar leeftijdscohorten worden toebedeeld en waarbij het voor pensioenuitkering bestemd vermogen gedurende de uitkeringsfase wordt aangewend voor financiering van een variabele uitkering;
-      – solidariteitsreserve: een collectieve vermogensreserve waarmee in een solidaire premieovereenkomst financiële mee- of tegenvallers kunnen worden gedeeld;
-      – toedelingskring: groep personen waarop een collectief toedelingsmechanisme wordt toegepast;
-      – toedelingsregels: de wijze waarop bij de solidaire premieovereenkomst financiële mee- of tegenvallers als gevolg van het collectief gevoerde beleggingsbeleid, de ontwikkeling van de levensverwachting en het sterfteresultaat via beschermingsrendementen en overrendementen in de voor pensioenuitkering bestemde vermogens of in de solidariteitsreserve worden verwerkt;
-      – toeslag: een verhoging van:
-      a. een pensioenrecht in de vorm van een vastgestelde uitkering; of
-      b. een pensioenaanspraak in de vorm van een aanspraak op een vastgestelde uitkering, mits die verhoging geen verband houdt met een verhoging van de pensioengrondslag, de toename van het in aanmerking te nemen aantal jaren of een wijziging van de pensioenovereenkomst;
-      – toezichthouder: de Stichting Autoriteit Financiële Markten of De Nederlandsche Bank N.V., ieder voor zover belast met de uitoefening van het toezicht bij of krachtens artikel 151;
-      – uitvoeringsovereenkomst: de overeenkomst tussen een werkgever en een pensioenuitvoerder over de uitvoering van een of meer pensioenovereenkomsten;
-      – uitvoeringsreglement:
-      a. de door een bedrijftakpensioenfonds opgestelde regeling met betrekking tot de verhouding tussen pensioenuitvoerder en werkgever;
-      b. de door een pensioenuitvoerder opgestelde regeling inzake de uitvoering van de pensioenovereenkomsten met zijn werknemers;
-      c. de door een algemeen pensioenfonds opgestelde regeling inzake de uitvoering van een beëindigde pensioenregeling of beroepspensioenregeling als bedoeld in artikel 23a of artikel 4a, derde lid, van de Wet verplichte beroepspensioenregeling;
-      – verplichtgesteld bedrijfstakpensioenfonds: een bedrijfstakpensioenfonds waarin de deelneming verplicht is gesteld als bedoeld in artikel 2, eerste lid, van de Wet verplichte deelneming in een bedrijfstakpensioenfonds 2000, artikel 21, eerste lid, van de Wet privatisering ABP en artikel 113a, eerste lid, van de Wet op het notarisambt;
-      – verzekeraar: een verzekeraar die op grond van de Wet op het financieel toezicht in Nederland het bedrijf van levensverzekeraar of schadeverzekeraar mag uitoefenen;
-      – voorwaarden in verband met de partnerrelatie: huwelijkse voorwaarden, voorwaarden van een geregistreerd partnerschap of voorwaarden in verband met een partnerrelatie in de zin van de pensioenovereenkomst;
-      – vrijwillige pensioenregeling: het deel van de pensioenregeling waaraan de werknemer op basis van de pensioenovereenkomst de mogelijkheid heeft om deel te nemen;
-      – waardeoverdracht: iedere handeling waarbij de waarde van opgebouwde pensioenaanspraken of pensioenrechten wordt aangewend ten behoeve van:
-      1°. andere pensioenaanspraken of pensioenrechten bij dezelfde of een andere pensioenuitvoerder; of
-      2°. dezelfde pensioenaanspraken of pensioenrechten bij een andere pensioenuitvoerder;
-      – werkgever: degene die een werknemer krachtens arbeidsovereenkomst naar burgerlijk recht of publiekrechtelijke aanstelling arbeid laat verrichten;
-      – werkgeverspremie: het deel van de premie dat voor rekening komt van de werkgever;
-      – werknemer: degene die krachtens arbeidsovereenkomst naar burgerlijk recht of publiekrechtelijke aanstelling arbeid verricht voor een werkgever, met uitzondering van de directeur-grootaandeelhouder en de werknemer die onder de werkingsfeer van een verplichtgestelde beroepspensioenregeling als bedoeld in de Wet verplichte beroepspensioenregeling valt;
-      – werknemerspremie: het deel van de premie dat voor rekening komt van de werknemer;
-      – wezenpensioen: een geldelijke uitkering, die vastgesteld of variabel is, voor een kind tot wie de overleden werknemer of gewezen werknemer als ouder in familierechtelijke betrekking stond of voor diens stief- of pleegkind, wegens het overlijden van de werknemer of gewezen werknemer;
-      – zetel: de plaats waar een rechtspersoon volgens zijn statuten of reglementen is gevestigd of, indien het een pensioenfonds of pensioeninstelling uit een andere lidstaat betreft, de plaats waar deze volgens zijn statuten of reglementen is gevestigd en zijn hoofdbestuur heeft of, indien het een pensioeninstelling uit een andere lidstaat betreft die geen rechtspersoon is of een natuurlijke persoon betreft, de plaats waar die pensioeninstelling of persoon zijn hoofdbestuur heeft.
+  text: "Voor de toepassing van deze wet en de daarop berustende bepalingen wordt\
+    \ verstaan onder:\n  – aanspraakgerechtigde: persoon die begunstigde is voor een\
+    \ nog niet ingegaan pensioen;\n  – accountant: een accountant als bedoeld in artikel\
+    \ 393, eerste lid, van Boek 2 van het Burgerlijk Wetboek;\n  – afkoop: iedere\
+    \ handeling waardoor pensioenaanspraken en pensioenrechten hun pensioenbestemming\
+    \ verliezen, behoudens in geval van toepassing van de artikelen 55, vijfde lid,\
+    \ 134 of 220b, tweede lid, of van artikel 3A:85 van de Wet op het financieel toezicht;\n\
+    \  – algemeen pensioenfonds: een pensioenfonds dat een of meerdere pensioenregelingen\
+    \ of beroepspensioenregelingen als bedoeld in artikel 1 van de Wet verplichte\
+    \ beroepspensioenregeling uitvoert en daarvoor een afgescheiden vermogen aanhoudt\
+    \ per collectiviteitkring;\n  – arbeidsongeschiktheidspensioen: een geldelijke\
+    \ uitkering, die vastgesteld of variabel is, wegens arbeidsongeschiktheid van\
+    \ de werknemer of gewezen werknemer, waarop recht bestaat na afloop van de periode\
+    \ bedoeld in artikel 29, eerste lid, van de Ziektewet of, indien de werknemer\
+    \ of gewezen werknemer Ziektewetuitkering ontvangt, na afloop van de periode bedoeld\
+    \ in artikel 29, vijfde en tiende lid, van de Ziektewet;\n  – basispensioenregeling:\
+    \ de collectieve pensioenregeling of het deel van de pensioenregeling waaraan\
+    \ de werknemer op basis van de pensioenovereenkomst gehouden is om deel te nemen;\n\
+    \  – bedrijfstakpensioenfonds: een pensioenfonds ten behoeve van een of meer bedrijfstakken\
+    \ of delen van een bedrijfstak;\n  – beëindiging van de deelneming: het beëindigen\
+    \ van de pensioenverwerving op basis van een pensioenovereenkomst anders dan door:\n\
+    \  a. het overlijden van de deelnemer; of\n  b. het ingaan van het ouderdomspensioen;\n\
+    \  – beschermingsrendement: de vermogensbijschrijving die ervoor zorgt dat de,\
+    \ uit het opgebouwde pensioenvermogen te financieren, toekomstige pensioenuitkeringen\
+    \ en lopende pensioenuitkeringen nominaal stabiel blijven, dat wordt gefinancierd\
+    \ vanuit het totaal behaalde rendement en looptijdafhankelijk wordt toebedeeld\
+    \ aan de vermogens op basis van marktwaardering, waarbij toedelingsregels worden\
+    \ gehanteerd;\n  – bevoegde autoriteiten: nationale autoriteiten van andere lidstaten\
+    \ dan Nederland als bedoeld in artikel 6, onderdeel 8, van richtlijn 2016/2341/EU;\n\
+    \  – bijdrage: iedere geldsom die wordt voldaan aan een pensioenuitvoerder in\
+    \ het kader van de uitvoering van pensioenovereenkomsten en uitvoeringsovereenkomsten;\n\
+    \  – bijdragende onderneming: een onderneming of ander lichaam, ongeacht of deze\
+    \ een of meer natuurlijke personen of rechtspersonen die optreden als werkgever\
+    \ of zelfstandige, dan wel een combinatie daarvan, omvat of hieruit bestaat, en\
+    \ die een pensioenregeling aanbiedt of aan een pensioenfonds, premiepensioeninstelling\
+    \ of pensioeninstelling uit een andere lidstaat bijdragen betaalt;\n  – bijzonder\
+    \ partnerpensioen: de aanspraak op partnerpensioen die op grond van artikel 57,\
+    \ eerste, tweede of derde lid, verkregen wordt door de gewezen partner;\n  – buitenlandse\
+    \ instelling: een instelling met zetel buiten Nederland, niet zijnde een pensioeninstelling\
+    \ uit een andere lidstaat, een verzekeraar met een zetel buiten Nederland, een\
+    \ lidstaat van de Europese Unie of een instelling als bedoeld in artikel 70, tweede\
+    \ lid;\n  – collectief toedelingsmechanisme: wijze waarop financiële mee- en tegenvallers\
+    \ collectief worden verwerkt in variabele uitkeringen van flexibele premieovereenkomsten;\n\
+    \  – collectiviteitkring: een of meerdere pensioenregelingen of beroepspensioenregelingen\
+    \ als bedoeld in artikel 1 van de Wet verplichte beroepspensioenregeling waarvoor\
+    \ een algemeen pensioenfonds een afgescheiden vermogen aanhoudt;\n  – deelnemer:\
+    \ de werknemer of gewezen werknemer die op grond van een pensioenovereenkomst\
+    \ pensioenaanspraken verwerft jegens een pensioenuitvoerder;\n  – dekkingsgraad:\
+    \ de verhouding tussen het vermogen inzake de bij een pensioenfonds ondergebrachte\
+    \ pensioenregeling of pensioenregelingen en de technische voorzieningen van een\
+    \ pensioenfonds;\n  – dienstbetrekking: de rechtsbetrekking tussen werkgever en\
+    \ werknemer;\n  – directeur-grootaandeelhouder:\n  a. persoonlijk houder van aandelen\
+    \ welke ten minste een tiende deel van het geplaatste kapitaal van de vennootschap\
+    \ van de werkgever vertegenwoordigen en waaraan stemrecht in de algemene vergadering\
+    \ is verbonden;\n  b. indirect persoonlijk houder van aandelen welke ten minste\
+    \ een tiende deel van het geplaatste kapitaal van de vennootschap van de werkgever\
+    \ vertegenwoordigen en waaraan stemrecht in de algemene vergadering is verbonden;\
+    \ of\n  c. houder van certificaten van aandelen, uitgegeven door tussenkomst van\
+    \ een administratiekantoor waarvan hij voor ten minste een tiende deel in het\
+    \ bestuur vertegenwoordigd is, welke ten minste een tiende deel van het geplaatste\
+    \ kapitaal van de vennootschap vertegenwoordigen en aan welke aandelen stemrecht\
+    \ in de algemene vergadering is verbonden;\n  – elektronisch: door middel van\
+    \ een elektronische informatiedrager die de ontvanger in staat stelt de verstrekte\
+    \ informatie duurzaam te bewaren;\n  – flexibele premieovereenkomst: premieovereenkomst\
+    \ waarbij de premie individueel wordt belegd en waarbij het kapitaal voortvloeiend\
+    \ uit de premie vanaf de pensioendatum wordt aangewend voor financiering van een\
+    \ variabele uitkering of voor de aankoop van een vastgestelde uitkering;\n  –\
+    \ gedetacheerde werknemer: een werknemer die in een andere lidstaat wordt gedetacheerd\
+    \ om daar te werken en die krachtens titel II van verordening (EEG) nr. 1408/71\
+    \ van de Raad van de Europese Gemeenschappen van 14 juni 1971 betreffende de toepassing\
+    \ van de socialezekerheidsregelingen op loontrekkenden en hun gezinnen, die zich\
+    \ binnen de gemeenschap verplaatsen (PbEG L 149), onderworpen blijft aan de wetgeving\
+    \ van de lidstaat van oorsprong;\n  – gepensioneerde: pensioengerechtigde voor\
+    \ wie het ouderdomspensioen is ingegaan;\n  – gewezen deelnemer: de werknemer\
+    \ of gewezen werknemer door wie op grond van een pensioenovereenkomst geen pensioen\
+    \ meer wordt verworven en die bij beëindiging van de deelneming een pensioenaanspraak\
+    \ heeft behouden jegens een pensioenuitvoerder;\n  – groep: een groep als bedoeld\
+    \ in artikel 24b van Boek 2 van het Burgerlijk Wetboek;\n  – lidstaat: een lidstaat\
+    \ van de Europese Unie alsmede een staat, niet zijnde een lidstaat van de Europese\
+    \ Unie, die partij is bij de Overeenkomst betreffende Europese Economische Ruimte;\n\
+    \  – nabestaandenpensioen: partnerpensioen of wezenpensioen;\n  – nettopensioen:\
+    \ ouderdomspensioen of nabestaandenpensioen in de vorm van een nettopensioen als\
+    \ bedoeld in afdeling 5.3B van de Wet inkomstenbelasting 2001;\n  – ondernemingspensioenfonds:\
+    \ een pensioenfonds verbonden aan een onderneming of een groep;\n  – ondernemingsraad:\
+    \ de ondernemingsraad, bedoeld in de Wet op de ondernemingsraden;\n  – ontvangende\
+    \ pensioenuitvoerder: de pensioenuitvoerder aan wie in het kader van waardeoverdracht\
+    \ waarde wordt overgedragen;\n  – Onze Minister: Onze Minister voor Armoedebeleid,\
+    \ Participatie en Pensioenen;\n  – ouderdomspensioen: een geldelijke uitkering,\
+    \ die vastgesteld of variabel is, voor de werknemer of de gewezen werknemer bij\
+    \ wijze van inkomensvoorziening bij ouderdom;\n  – overdrachtswaarde: de ten behoeve\
+    \ van de waardeoverdracht vastgestelde waarde van de over te dragen pensioenaanspraken\
+    \ of pensioenrechten;\n  – overdragende pensioenuitvoerder: de pensioenuitvoerder\
+    \ die in het kader van waardeoverdracht waarde overdraagt aan een andere pensioenuitvoerder;\n\
+    \  – overrendement: het saldo van het totaal behaalde rendement op de beleggingen,\
+    \ de ontwikkeling van de levensverwachting en het sterfteresultaat en het toebedeelde\
+    \ beschermingsrendement op basis van de toedelingsregels;\n  – partner:\n  a.\
+    \ echtgenoot;\n  b. geregistreerd partner; of\n  c. partner in de zin van de pensioenovereenkomst\
+    \ zijnde de meerderjarige persoon die met de werknemer of de gewezen werknemer\
+    \ een gezamenlijke huishouding voert, tenzij het betreft een bloedverwant in de\
+    \ eerste graad, een bloedverwant in de tweede graad in de rechte lijn, een meerderjarig\
+    \ stiefkind of meerderjarig voormalig pleegkind;\n  – partnerpensioen: een geldelijke\
+    \ uitkering, die vastgesteld of variabel is, voor de partner of gewezen partner\
+    \ wegens het overlijden van de werknemer of gewezen werknemer;\n  – partnerrelatie:\
+    \ huwelijk, geregistreerd partnerschap of partnerrelatie in de zin van de pensioenovereenkomst;\n\
+    \  – pensioen: ouderdomspensioen, arbeidsongeschiktheidspensioen of nabestaandenpensioen,\
+    \ zoals tussen werkgever en werknemer overeengekomen;\n  – pensioenaanspraak:\
+    \ het recht op een nog niet ingegaan pensioen, uitgezonderd overeengekomen voorwaardelijke\
+    \ toeslagverlening;\n  – pensioenbewaarder: de pensioenbewaarder, bedoeld in artikel\
+    \ 1:1 van de Wet op het financieel toezicht;\n  – pensioeneenheid: eenheid van\
+    \ deelname in een beleggingsportefeuille, waarbij de waarde fluctueert met de\
+    \ koersontwikkeling van deze portefeuille en eventueel met de ontwikkeling van\
+    \ de levensverwachting;\n  – pensioenfonds: een stichting die niet een premiepensioeninstelling\
+    \ is, waarin ten behoeve van ten minste twee deelnemers, gewezen deelnemers of\
+    \ hun nabestaanden gelden worden of werden bijeengebracht en worden beheerd ter\
+    \ uitvoering van ten minste een basispensioenregeling;\n  – pensioengerechtigde:\
+    \ persoon voor wie op grond van een pensioenovereenkomst het pensioen is ingegaan;\n\
+    \  – pensioeninstelling uit een andere lidstaat: een op basis van kapitaaldekking\
+    \ gefinancierde instelling, ongeacht de rechtsvorm, die zetel heeft in een andere\
+    \ lidstaat dan Nederland en die onafhankelijk van enige bijdragende onderneming\
+    \ of bedrijfstak is opgericht met als doel het verstrekken van arbeidsgerelateerde\
+    \ pensioenuitkeringen op basis van een als volgt gesloten overeenkomst:\n  a.\
+    \ individueel of collectief tussen een of meerdere werkgevers en een of meerdere\
+    \ werknemers of hun respectievelijke vertegenwoordigers; of\n  b. individueel\
+    \ of collectief met zelfstandigen,\nen die hiermee rechtstreeks verband houdende\
+    \ werkzaamheden verricht;\n  – pensioenovereenkomst: hetgeen tussen een werkgever\
+    \ en een werknemer is overeengekomen betreffende pensioen;\n  – pensioenrecht:\
+    \ het recht op een ingegaan pensioen, uitgezonderd overeengekomen voorwaardelijke\
+    \ toeslagverlening;\n  – pensioenregeling:\n  a. een pensioenregeling op grond\
+    \ van een pensioenovereenkomst; of\n  b. indien de bijdragende onderneming zetel\
+    \ heeft in een andere lidstaat dan Nederland, een overeenkomst, een trustakte\
+    \ of voorschriften waarin is bepaald welke pensioenuitkeringen worden toegezegd\
+    \ en onder welke voorwaarden;\n  – pensioenreglement: de door de pensioenuitvoerder\
+    \ opgestelde regeling met betrekking tot de verhouding tussen pensioenuitvoerder\
+    \ en deelnemer, gewezen deelnemer, andere aanspraakgerechtigde of pensioengerechtigde;\n\
+    \  – pensioenuitvoerder: een ondernemingspensioenfonds, een bedrijfstakpensioenfonds,\
+    \ een algemeen pensioenfonds, of een premiepensioeninstelling of verzekeraar die\
+    \ zetel heeft in Nederland;\n  – pensioenverplichtingen: verplichtingen van de\
+    \ pensioenuitvoerder uit hoofde van pensioenaanspraken en pensioenrechten;\n \
+    \ – premie: de in geld uitgedrukte periodiek vastgestelde structurele prestatie\
+    \ die verschuldigd is aan de pensioenuitvoerder en die bestemd is voor pensioen\
+    \ en de daaraan verbonden kosten;\n  – premie-uitkeringsovereenkomst: premieovereenkomst\
+    \ uitgevoerd door een verzekeraar of door een premiepensioeninstelling waarbij\
+    \ de premie individueel wordt belegd, waarbij de premie of het kapitaal voortvloeiend\
+    \ uit de premie in de laatste 15 jaar voor de pensioengerechtigde leeftijd, bedoeld\
+    \ in artikel 7a, eerste lid, van de Algemene Ouderdomswet, kan worden aangewend\
+    \ voor aankoop van een vastgestelde uitkering vanaf de pensioendatum en waarbij\
+    \ het resterend kapitaal vanaf de pensioendatum wordt aangewend voor financiering\
+    \ van een variabele uitkering of voor de aankoop van een vastgestelde uitkering;\n\
+    \  – premieovereenkomst: een pensioenovereenkomst inzake een vastgestelde premie\
+    \ die uiterlijk op de pensioendatum wordt omgezet in een vastgestelde of variabele\
+    \ pensioenuitkering;\n  – premiepensioeninstelling: een premiepensioeninstelling\
+    \ die op grond van de Wet op het financieel toezicht in Nederland het bedrijf\
+    \ van premiepensioeninstelling mag uitoefenen;\n  – projectierendement: het ingerekende\
+    \ toekomstig rendement voor de vaststelling van variabele uitkeringen;\n  – richtlijn\
+    \ 2016/2341/EU: richtlijn 2016/2341/EU van het Europees Parlement en de Raad van\
+    \ 14 december 2016 betreffende de werkzaamheden van en het toezicht op instellingen\
+    \ voor bedrijfspensioenvoorziening (IBPV’s) (PbEU L 2016, 354);\n  – risicodelingsreserve:\
+    \ een collectieve vermogensreserve waarmee in een flexibele premieovereenkomst\
+    \ financiële mee- of tegenvallers kunnen worden gedeeld;\n  – risicohouding: de\
+    \ vastgestelde mate waarin een groep deelnemers, gewezen deelnemers of pensioengerechtigden\
+    \ bereid is beleggingsrisico’s te lopen met oog op hun doelstellingen en de mate\
+    \ waarin deze groep beleggingsrisico’s kan dragen gegeven de kenmerken van deze\
+    \ groep;\n  – risicovrije rente: de door De Nederlandsche Bank N.V. gepubliceerde\
+    \ actuele rentetermijnstructuur;\n  – scheiding: echtscheiding, ontbinding van\
+    \ het huwelijk na scheiding van tafel en bed, beëindiging van een geregistreerd\
+    \ partnerschap anders dan door dood, vermissing of omzetting van een geregistreerd\
+    \ partnerschap in een huwelijk of beëindiging van een partnerrelatie in de zin\
+    \ van de pensioenovereenkomst;\n  – schriftelijk: in schrifttekens op papier;\n\
+    \  – solidaire premieovereenkomst: premieovereenkomst waarbij de premie collectief\
+    \ wordt belegd, de resultaten in ieder geval naar leeftijdscohorten worden toebedeeld\
+    \ en waarbij het voor pensioenuitkering bestemd vermogen gedurende de uitkeringsfase\
+    \ wordt aangewend voor financiering van een variabele uitkering;\n  – solidariteitsreserve:\
+    \ een collectieve vermogensreserve waarmee in een solidaire premieovereenkomst\
+    \ financiële mee- of tegenvallers kunnen worden gedeeld;\n  – toedelingskring:\
+    \ groep personen waarop een collectief toedelingsmechanisme wordt toegepast;\n\
+    \  – toedelingsregels: de wijze waarop bij de solidaire premieovereenkomst financiële\
+    \ mee- of tegenvallers als gevolg van het collectief gevoerde beleggingsbeleid,\
+    \ de ontwikkeling van de levensverwachting en het sterfteresultaat via beschermingsrendementen\
+    \ en overrendementen in de voor pensioenuitkering bestemde vermogens of in de\
+    \ solidariteitsreserve worden verwerkt;\n  – toeslag: een verhoging van:\n  a.\
+    \ een pensioenrecht in de vorm van een vastgestelde uitkering; of\n  b. een pensioenaanspraak\
+    \ in de vorm van een aanspraak op een vastgestelde uitkering, mits die verhoging\
+    \ geen verband houdt met een verhoging van de pensioengrondslag, de toename van\
+    \ het in aanmerking te nemen aantal jaren of een wijziging van de pensioenovereenkomst;\n\
+    \  – toezichthouder: de Stichting Autoriteit Financiële Markten of De Nederlandsche\
+    \ Bank N.V., ieder voor zover belast met de uitoefening van het toezicht bij of\
+    \ krachtens artikel 151;\n  – uitvoeringsovereenkomst: de overeenkomst tussen\
+    \ een werkgever en een pensioenuitvoerder over de uitvoering van een of meer pensioenovereenkomsten;\n\
+    \  – uitvoeringsreglement:\n  a. de door een bedrijftakpensioenfonds opgestelde\
+    \ regeling met betrekking tot de verhouding tussen pensioenuitvoerder en werkgever;\n\
+    \  b. de door een pensioenuitvoerder opgestelde regeling inzake de uitvoering\
+    \ van de pensioenovereenkomsten met zijn werknemers;\n  c. de door een algemeen\
+    \ pensioenfonds opgestelde regeling inzake de uitvoering van een beëindigde pensioenregeling\
+    \ of beroepspensioenregeling als bedoeld in artikel 23a of artikel 4a, derde lid,\
+    \ van de Wet verplichte beroepspensioenregeling;\n  – verplichtgesteld bedrijfstakpensioenfonds:\
+    \ een bedrijfstakpensioenfonds waarin de deelneming verplicht is gesteld als bedoeld\
+    \ in artikel 2, eerste lid, van de Wet verplichte deelneming in een bedrijfstakpensioenfonds\
+    \ 2000, artikel 21, eerste lid, van de Wet privatisering ABP en artikel 113a,\
+    \ eerste lid, van de Wet op het notarisambt;\n  – verzekeraar: een verzekeraar\
+    \ die op grond van de Wet op het financieel toezicht in Nederland het bedrijf\
+    \ van levensverzekeraar of schadeverzekeraar mag uitoefenen;\n  – voorwaarden\
+    \ in verband met de partnerrelatie: huwelijkse voorwaarden, voorwaarden van een\
+    \ geregistreerd partnerschap of voorwaarden in verband met een partnerrelatie\
+    \ in de zin van de pensioenovereenkomst;\n  – vrijwillige pensioenregeling: het\
+    \ deel van de pensioenregeling waaraan de werknemer op basis van de pensioenovereenkomst\
+    \ de mogelijkheid heeft om deel te nemen;\n  – waardeoverdracht: iedere handeling\
+    \ waarbij de waarde van opgebouwde pensioenaanspraken of pensioenrechten wordt\
+    \ aangewend ten behoeve van:\n  1°. andere pensioenaanspraken of pensioenrechten\
+    \ bij dezelfde of een andere pensioenuitvoerder; of\n  2°. dezelfde pensioenaanspraken\
+    \ of pensioenrechten bij een andere pensioenuitvoerder;\n  – werkgever: degene\
+    \ die een werknemer krachtens arbeidsovereenkomst naar burgerlijk recht of publiekrechtelijke\
+    \ aanstelling arbeid laat verrichten;\n  – werkgeverspremie: het deel van de premie\
+    \ dat voor rekening komt van de werkgever;\n  – werknemer: degene die krachtens\
+    \ arbeidsovereenkomst naar burgerlijk recht of publiekrechtelijke aanstelling\
+    \ arbeid verricht voor een werkgever, met uitzondering van de directeur-grootaandeelhouder\
+    \ en de werknemer die onder de werkingsfeer van een verplichtgestelde beroepspensioenregeling\
+    \ als bedoeld in de Wet verplichte beroepspensioenregeling valt;\n  – werknemerspremie:\
+    \ het deel van de premie dat voor rekening komt van de werknemer;\n  – wezenpensioen:\
+    \ een geldelijke uitkering, die vastgesteld of variabel is, voor een kind tot\
+    \ wie de overleden werknemer of gewezen werknemer als ouder in familierechtelijke\
+    \ betrekking stond of voor diens stief- of pleegkind, wegens het overlijden van\
+    \ de werknemer of gewezen werknemer;\n  – zetel: de plaats waar een rechtspersoon\
+    \ volgens zijn statuten of reglementen is gevestigd of, indien het een pensioenfonds\
+    \ of pensioeninstelling uit een andere lidstaat betreft, de plaats waar deze volgens\
+    \ zijn statuten of reglementen is gevestigd en zijn hoofdbestuur heeft of, indien\
+    \ het een pensioeninstelling uit een andere lidstaat betreft die geen rechtspersoon\
+    \ is of een natuurlijke persoon betreft, de plaats waar die pensioeninstelling\
+    \ of persoon zijn hoofdbestuur heeft."
   url: https://wetten.overheid.nl/BWBR0020809/2026-01-01#Artikel1
   machine_readable:
     definitions:
-      opbouw_middelloon:
-        value: 0.0175
-      opbouw_eindloon:
-        value: 0.0167
-      omrekenfactor_kapitaal:
-        value: 0.05
-      maanden_per_jaar:
-        value: 12
+      opbouw_middelloon: 0.0175
+      opbouw_eindloon: 0.0167
+      omrekenfactor_kapitaal: 0.05
+      maanden_per_jaar: 12
     execution:
       produces:
         legal_character: BESCHIKKING
@@ -164,64 +283,22 @@ articles:
           reference: $referencedate
       - name: pensioenkapitaal
         type: amount
-        source_reference:
-          table: pensioen_deelnemers
-          field: pensioenkapitaal
-          select_on:
-          - name: bsn
-            description: BSN van de deelnemer
-            type: string
-            value: $bsn
+        source: {}
       - name: pensioenjaren
         type: number
-        source_reference:
-          table: pensioen_deelnemers
-          field: pensioenjaren
-          select_on:
-          - name: bsn
-            description: BSN van de deelnemer
-            type: string
-            value: $bsn
+        source: {}
       - name: type_regeling
         type: string
-        source_reference:
-          table: pensioen_deelnemers
-          field: type_regeling
-          select_on:
-          - name: bsn
-            description: BSN van de deelnemer
-            type: string
-            value: $bsn
+        source: {}
       - name: franchise
         type: amount
-        source_reference:
-          table: pensioen_deelnemers
-          field: franchise
-          select_on:
-          - name: bsn
-            description: BSN van de deelnemer
-            type: string
-            value: $bsn
+        source: {}
       - name: pensioengevend_loon
         type: amount
-        source_reference:
-          table: pensioen_deelnemers
-          field: pensioengevend_loon
-          select_on:
-          - name: bsn
-            description: BSN van de deelnemer
-            type: string
-            value: $bsn
+        source: {}
       - name: pensioen_leeftijd_fonds
         type: number
-        source_reference:
-          table: pensioen_deelnemers
-          field: pensioenleeftijd
-          select_on:
-          - name: bsn
-            description: BSN van de deelnemer
-            type: string
-            value: $bsn
+        source: {}
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean
@@ -280,7 +357,8 @@ articles:
           article: '51'
           url: https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk5_Artikel51
           juriconnect: jci1.3:c:BWBR0020809&artikel=51&z=2024-01-01&g=2024-01-01
-          explanation: 'Artikel 51 Pensioenwet: informatieverstrekking over opgebouwd kapitaal'
+          explanation: 'Artikel 51 Pensioenwet: informatieverstrekking over opgebouwd
+            kapitaal'
       - output: pensioenleeftijd
         value: $pensioen_leeftijd_fonds
         legal_basis:
@@ -341,7 +419,8 @@ articles:
           article: '10'
           url: https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10
           juriconnect: jci1.3:c:BWBR0020809&artikel=10&z=2024-01-01&g=2024-01-01
-          explanation: 'Artikel 10 Pensioenwet: berekening ouderdomspensioen afhankelijk van type regeling'
+          explanation: 'Artikel 10 Pensioenwet: berekening ouderdomspensioen afhankelijk
+            van type regeling'
       - output: pensioen_uitkering_maandelijks
         value:
           operation: DIVIDE
