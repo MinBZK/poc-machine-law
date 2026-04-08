@@ -406,6 +406,93 @@ class RegelrechtServices:
                         params[input_name] = _to_native(matched.iloc[0][input_name])
                         break
 
+    def _pre_resolve_data_sources_phase1_only(self, law_id: str, params: dict[str, Any], data: dict) -> None:
+        """Phase 1 only: resolve inputs via source_ref_mapping (precise matching).
+
+        Unlike ``_pre_resolve_data_sources``, this skips the Phase 2 fallback
+        that scans all DataFrames for matching columns. This avoids contaminating
+        inputs by matching the wrong table when used in cross-law pre-resolution.
+        """
+        all_sources: dict[str, pd.DataFrame] = {}
+        for svc in self._services.services.values():
+            all_sources.update(svc.source_dataframes)
+
+        # Build input type lookup from YAML for array detection
+        input_types: dict[str, str] = {}
+        for art in data.get("articles", []):
+            for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+                iname = inp.get("name", "")
+                itype = inp.get("type", "")
+                if iname:
+                    input_types[iname] = itype
+
+        input_mapping = _LAW_INPUT_MAPPING.get(law_id, {})
+        # Multi-pass: some inputs depend on others (e.g., partner_geboortedatum
+        # needs partner_bsn). Two passes handles one level of dependency.
+        for _pass in range(2):
+            resolved_any = False
+            for input_name, entry in input_mapping.items():
+                if input_name in params:
+                    continue
+
+                table = entry.get("table", "")
+                if not table or table not in all_sources:
+                    continue
+
+                df = all_sources[table]
+                if df.empty:
+                    continue
+
+                field = entry.get("field", input_name)
+                select_on = entry.get("select_on", [])
+                fields = entry.get("fields")
+
+                mask = pd.Series(True, index=df.index)
+                for criterion in select_on:
+                    col = criterion.get("name", "")
+                    ref = criterion.get("value", "")
+                    if not col or col not in df.columns:
+                        mask = pd.Series(False, index=df.index)
+                        break
+                    if isinstance(ref, str) and ref.startswith("$"):
+                        param_name = ref[1:]
+                        param_val = params.get(param_name)
+                        if param_val is None:
+                            mask = pd.Series(False, index=df.index)
+                            break
+                        mask = mask & (df[col].astype(str) == str(param_val))
+                    else:
+                        mask = mask & (df[col] == ref)
+
+                matched = df[mask]
+                if matched.empty:
+                    continue
+
+                is_array_input = input_name == table or input_types.get(input_name) == "array"
+                if fields and is_array_input:
+                    rows = []
+                    for _, row in matched.iterrows():
+                        obj = {f: _to_native(row[f]) for f in fields if f in row.index}
+                        if obj:
+                            rows.append(obj)
+                    if rows:
+                        params[input_name] = rows
+                        resolved_any = True
+                    continue
+
+                if fields:
+                    row = matched.iloc[0]
+                    obj = {f: _to_native(row[f]) for f in fields if f in row.index}
+                    if obj:
+                        params[input_name] = obj
+                        resolved_any = True
+                elif field in matched.columns:
+                    val = _to_native(matched.iloc[0][field])
+                    params[input_name] = val
+                    resolved_any = True
+            if not resolved_any:
+                break
+
     # -- Cross-law pre-resolution -----------------------------------------------
 
     def _pre_resolve_cross_law_inputs(
@@ -472,9 +559,9 @@ class RegelrechtServices:
     ) -> Any | None:
         """Evaluate a cross-law reference for pre-resolution.
 
-        Uses the Rust engine directly with only the mapped parameters.
-        The engine resolves the target law's own data source inputs via
-        its internal DataSourceRegistry.
+        Pre-resolves data source inputs (source: {}) for the target law
+        using source_ref_mapping.json, then delegates to the engine.
+        Cross-law inputs of the target law are recursively pre-resolved.
         """
         rule = self.resolver.find_rule(law, reference_date, service or None)
         if not rule:
@@ -485,6 +572,17 @@ class RegelrechtServices:
         data = yaml_mod.safe_load(Path(rule.path).read_text())
         law_id = data.get("$id", law)
         params = _to_native(dict(parameters))
+
+        # Only use Phase 1 of data source pre-resolution (mapped inputs).
+        # Phase 2 fallback can contaminate inputs by matching wrong tables.
+        self._pre_resolve_data_sources_phase1_only(law_id, params, data)
+
+        # Recursively pre-resolve cross-law inputs of the target law
+        self._pre_resolve_cross_law_inputs(data, params, reference_date, depth)
+
+        # DON'T fill defaults here - the engine's DataSourceRegistry handles
+        # the remaining source: {} inputs. Filling defaults would override
+        # correct values from the data sources.
 
         try:
             result = self._engine.evaluate(law_id, [requested_output], params, reference_date)

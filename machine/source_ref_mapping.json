@@ -1416,7 +1416,7 @@
       }
     ]
   },
-  "wet_brp:partnertype": {
+  "wet_brp:partnerschap_type": {
     "table": "relaties",
     "field": "partnerschap_type",
     "select_on": [
