@@ -99,10 +99,8 @@ articles:
         value:
           operation: AND
           conditions:
-          - operation: NOT
-            value:
-              operation: IS_NULL
-              subject: $adres
+          - operation: EXISTS
+            subject: $adres
       - output: genereer_signaal
         value:
           operation: OR

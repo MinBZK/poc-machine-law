@@ -114,10 +114,8 @@ articles:
             '
       - output: is_onder_curatele
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $actieve_curatele
+          operation: EXISTS
+          subject: $actieve_curatele
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656
@@ -141,10 +139,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $actieve_curatele.bsn_curator
+              operation: EXISTS
+              subject: $actieve_curatele.bsn_curator
             then: $actieve_curatele.bsn_curator
           default: null
         legal_basis:

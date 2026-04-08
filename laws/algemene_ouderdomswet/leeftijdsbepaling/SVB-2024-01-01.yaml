@@ -104,10 +104,8 @@ articles:
         value:
           operation: AND
           conditions:
-          - operation: NOT
-            value:
-              operation: IS_NULL
-              subject: $geboortedatum
+          - operation: EXISTS
+            subject: $geboortedatum
       - output: pensioenleeftijd
         value:
           operation: ADD

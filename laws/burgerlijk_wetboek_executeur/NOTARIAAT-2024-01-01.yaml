@@ -60,10 +60,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $executeur_registraties
+          operation: EXISTS
+          subject: $executeur_registraties
       - output: actief_executeurschap
         value:
           operation: FOREACH
@@ -98,10 +96,8 @@ articles:
             '
       - output: heeft_delegaties
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $actief_executeurschap
+          operation: EXISTS
+          subject: $actief_executeurschap
         legal_basis:
           law: Burgerlijk Wetboek Boek 4
           bwb_id: BWBR0002761

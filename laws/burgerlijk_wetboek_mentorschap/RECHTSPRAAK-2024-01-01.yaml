@@ -70,10 +70,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $mentorschap_registraties
+          operation: EXISTS
+          subject: $mentorschap_registraties
       - output: actief_mentorschap
         value:
           operation: FOREACH
@@ -108,10 +106,8 @@ articles:
             '
       - output: heeft_delegaties
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $actief_mentorschap
+          operation: EXISTS
+          subject: $actief_mentorschap
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

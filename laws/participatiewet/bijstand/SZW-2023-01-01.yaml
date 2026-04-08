@@ -245,10 +245,8 @@ articles:
             - operation: IN
               subject: $verblijfsvergunning_type
               value: $geldige_verblijfsvergunningen
-          - operation: NOT
-            value:
-              operation: IS_NULL
-              subject: $verblijfsadres
+          - operation: EXISTS
+            subject: $verblijfsadres
           - operation: OR
             conditions:
             - subject: $is_student

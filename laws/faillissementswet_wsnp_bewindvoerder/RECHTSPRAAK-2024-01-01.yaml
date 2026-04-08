@@ -59,10 +59,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $wsnp_registraties
+          operation: EXISTS
+          subject: $wsnp_registraties
       - output: actieve_wsnp
         value:
           operation: FOREACH
@@ -97,10 +95,8 @@ articles:
             '
       - output: heeft_delegaties
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $actieve_wsnp
+          operation: EXISTS
+          subject: $actieve_wsnp
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860

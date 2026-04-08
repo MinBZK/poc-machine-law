@@ -76,10 +76,8 @@ articles:
           - operation: IF
             cases:
             - when:
-                operation: NOT
-                value:
-                  operation: IS_NULL
-                  subject: $bewaartermijn_jaren
+                operation: EXISTS
+                subject: $bewaartermijn_jaren
               then:
                 operation: GREATER_THAN_OR_EQUAL
                 subject:
@@ -106,10 +104,8 @@ articles:
               - operation: EQUALS
                 subject: $op_selectielijst_vernietiging
                 value: true
-              - operation: NOT
-                value:
-                  operation: IS_NULL
-                  subject: $bewaartermijn_jaren
+              - operation: EXISTS
+                subject: $bewaartermijn_jaren
             then:
               operation: DATE_ADD
               date: $aanmaakdatum
@@ -155,10 +151,8 @@ articles:
               - when:
                   operation: AND
                   conditions:
-                  - operation: NOT
-                    value:
-                      operation: IS_NULL
-                      subject: $bewaartermijn_jaren
+                  - operation: EXISTS
+                    subject: $bewaartermijn_jaren
                   - operation: LESS_THAN
                     subject:
                       operation: AGE

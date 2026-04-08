@@ -711,10 +711,8 @@ articles:
           - operation: IF
             cases:
             - when:
-                operation: NOT
-                value:
-                  operation: IS_NULL
-                  subject: $partner_bsn
+                operation: EXISTS
+                subject: $partner_bsn
               then:
                 operation: ADD
                 values:
@@ -731,10 +729,8 @@ articles:
           - operation: IF
             cases:
             - when:
-                operation: NOT
-                value:
-                  operation: IS_NULL
-                  subject: $partner_bsn
+                operation: EXISTS
+                subject: $partner_bsn
               then:
                 operation: ADD
                 values:
@@ -746,10 +742,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $partner_bsn
+              operation: EXISTS
+              subject: $partner_bsn
             then:
               operation: MULTIPLY
               values:
@@ -782,10 +776,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $partner_bsn
+              operation: EXISTS
+              subject: $partner_bsn
             then:
               operation: ADD
               values:

@@ -66,10 +66,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $curatele_registraties
+          operation: EXISTS
+          subject: $curatele_registraties
       - output: actieve_curatele
         value:
           operation: FOREACH
@@ -104,10 +102,8 @@ articles:
             '
       - output: heeft_delegaties
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $actieve_curatele
+          operation: EXISTS
+          subject: $actieve_curatele
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

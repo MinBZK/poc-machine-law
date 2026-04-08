@@ -142,10 +142,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $wet.bezwaartermijn_weken
+              operation: EXISTS
+              subject: $wet.bezwaartermijn_weken
             then: $wet.bezwaartermijn_weken
           default: $default_termijn_bezwaar_weken
         legal_basis:
@@ -160,10 +158,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $wet.beslistermijn_weken
+              operation: EXISTS
+              subject: $wet.beslistermijn_weken
             then: $wet.beslistermijn_weken
           default: $default_termijn_beslissing_weken
         legal_basis:
@@ -180,10 +176,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $wet.verdagingstermijn_weken
+              operation: EXISTS
+              subject: $wet.verdagingstermijn_weken
             then: $wet.verdagingstermijn_weken
           default: $default_termijn_verdaging_weken
         legal_basis:

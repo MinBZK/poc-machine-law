@@ -49,10 +49,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $stemrecht_uitsluitingen
+              operation: EXISTS
+              subject: $stemrecht_uitsluitingen
             then:
               operation: FOREACH
               collection: $stemrecht_uitsluitingen

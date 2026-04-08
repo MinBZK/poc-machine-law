@@ -96,10 +96,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $functionarissen
+          operation: EXISTS
+          subject: $functionarissen
       - output: bevoegde_functionarissen
         value:
           operation: FOREACH
@@ -125,10 +123,8 @@ articles:
             '
       - output: heeft_delegaties
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $bevoegde_functionarissen
+          operation: EXISTS
+          subject: $bevoegde_functionarissen
         legal_basis:
           law: Burgerlijk Wetboek Boek 2
           bwb_id: BWBR0003045

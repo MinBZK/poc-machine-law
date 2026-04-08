@@ -108,10 +108,8 @@ articles:
           - when:
               operation: AND
               conditions:
-              - operation: NOT
-                value:
-                  operation: IS_NULL
-                  subject: $dosis_buiten_locatie
+              - operation: EXISTS
+                subject: $dosis_buiten_locatie
               - operation: GREATER_THAN
                 subject: $dosis_buiten_locatie
                 value: $dosis_limiet_bevolking_buiten_locatie
@@ -120,10 +118,8 @@ articles:
           - when:
               operation: AND
               conditions:
-              - operation: NOT
-                value:
-                  operation: IS_NULL
-                  subject: $verwachte_dosis_huid
+              - operation: EXISTS
+                subject: $verwachte_dosis_huid
               - operation: GREATER_THAN
                 subject: $verwachte_dosis_huid
                 value: $dosis_limiet_huid

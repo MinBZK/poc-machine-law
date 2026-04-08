@@ -74,10 +74,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $bewind_registraties
+          operation: EXISTS
+          subject: $bewind_registraties
       - output: actief_bewind
         value:
           operation: FOREACH
@@ -112,10 +110,8 @@ articles:
             '
       - output: heeft_delegaties
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $actief_bewind
+          operation: EXISTS
+          subject: $actief_bewind
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

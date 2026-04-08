@@ -75,10 +75,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $gezag_relaties
+          operation: EXISTS
+          subject: $gezag_relaties
       - output: bevoegde_gezag_relaties
         value:
           operation: FOREACH
@@ -124,10 +122,8 @@ articles:
             '
       - output: heeft_delegaties
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $bevoegde_gezag_relaties
+          operation: EXISTS
+          subject: $bevoegde_gezag_relaties
         legal_basis:
           law: Burgerlijk Wetboek Boek 1
           bwb_id: BWBR0002656

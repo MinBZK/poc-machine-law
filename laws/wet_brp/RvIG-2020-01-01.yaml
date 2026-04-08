@@ -174,10 +174,8 @@ articles:
         value:
           operation: AND
           conditions:
-          - operation: NOT
-            value:
-              operation: IS_NULL
-              subject: $geboortedatum
+          - operation: EXISTS
+            subject: $geboortedatum
       - output: geboortedatum
         value: $geboortedatum
       - output: partner_geboortedatum
@@ -301,10 +299,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $adres
+              operation: EXISTS
+              subject: $adres
             then:
               operation: CONCAT
               values:
@@ -320,10 +316,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $medebewoners
+              operation: EXISTS
+              subject: $medebewoners
             then:
               operation: ADD
               values:
@@ -366,10 +360,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $medebewoners
+              operation: EXISTS
+              subject: $medebewoners
             then: $medebewoners
           default:
             value: null
@@ -386,10 +378,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $kinderen_gegevens
+              operation: EXISTS
+              subject: $kinderen_gegevens
             then: $kinderen_gegevens
           default:
             value: null
@@ -406,15 +396,11 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $kinderen_gegevens
+              operation: EXISTS
+              subject: $kinderen_gegevens
             then:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $kinderen_gegevens
+              operation: EXISTS
+              subject: $kinderen_gegevens
           default: false
         legal_basis:
           law: Wet basisregistratie personen

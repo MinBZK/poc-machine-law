@@ -174,10 +174,8 @@ articles:
             - operation: IN
               subject: $arbeidsvermogen.arbeidsvermogen
               value: $volledige_ontheffing_redenen
-            - operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $arbeidsvermogen.re_integratie_traject
+            - operation: EXISTS
+              subject: $arbeidsvermogen.re_integratie_traject
       - output: is_gerechtigd
         value: true
       - output: uitkeringsbedrag

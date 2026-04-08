@@ -375,10 +375,8 @@ articles:
             uit de som van basisbeurs en aanvullende beurs.
       - output: is_student
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $onderwijstype
+          operation: EXISTS
+          subject: $onderwijstype
         legal_basis:
           law: Wet studiefinanciering 2000
           bwb_id: BWBR0011453

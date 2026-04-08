@@ -106,10 +106,8 @@ articles:
               operation: IF
               cases:
               - when:
-                  operation: NOT
-                  value:
-                    operation: IS_NULL
-                    subject: $adres
+                  operation: EXISTS
+                  subject: $adres
                 then: $jurisdictie.rechtbank
               default: $default_court
           - when:
@@ -246,10 +244,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $wet.beroepstermijn_weken
+              operation: EXISTS
+              subject: $wet.beroepstermijn_weken
             then: $wet.beroepstermijn_weken
           default: $default_termijn_beroep_weken
         legal_basis:

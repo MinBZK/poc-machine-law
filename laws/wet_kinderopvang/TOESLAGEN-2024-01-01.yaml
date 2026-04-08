@@ -171,10 +171,8 @@ articles:
                     - operation: IF
                       cases:
                       - when:
-                          operation: NOT
-                          value:
-                            operation: IS_NULL
-                            subject: $partner_bsn
+                          operation: EXISTS
+                          subject: $partner_bsn
                         then: $partner_inkomen
                       default: 0
                   value: $inkomensdrempel_1
@@ -188,10 +186,8 @@ articles:
                     - operation: IF
                       cases:
                       - when:
-                          operation: NOT
-                          value:
-                            operation: IS_NULL
-                            subject: $partner_bsn
+                          operation: EXISTS
+                          subject: $partner_bsn
                         then: $partner_inkomen
                       default: 0
                   value: $inkomensdrempel_2

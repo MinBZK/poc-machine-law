@@ -89,10 +89,8 @@ articles:
             conditions:
             - operation: IS_NULL
               subject: $beperking_type
-            - operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $overbrengdatum
+            - operation: EXISTS
+              subject: $overbrengdatum
           - operation: AND
             conditions:
             - operation: GREATER_THAN_OR_EQUAL
@@ -118,14 +116,10 @@ articles:
                   value: false
           - operation: AND
             conditions:
-            - operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $beperking_termijn_jaren
-            - operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $overbrengdatum
+            - operation: EXISTS
+              subject: $beperking_termijn_jaren
+            - operation: EXISTS
+              subject: $overbrengdatum
             - operation: GREATER_THAN_OR_EQUAL
               subject:
                 operation: AGE

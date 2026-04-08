@@ -90,10 +90,8 @@ articles:
         value:
           operation: AND
           conditions:
-          - operation: NOT
-            value:
-              operation: IS_NULL
-              subject: $adres
+          - operation: EXISTS
+            subject: $adres
       - output: gebruiksdoel
         value: $verblijfsobject.gebruiksdoel
         legal_basis:

@@ -67,10 +67,8 @@ articles:
         value:
           operation: AND
           conditions:
-          - operation: NOT
-            value:
-              operation: IS_NULL
-              subject: $adres
+          - operation: EXISTS
+            subject: $adres
       - output: heeft_gerede_twijfel_adres
         value:
           operation: OR

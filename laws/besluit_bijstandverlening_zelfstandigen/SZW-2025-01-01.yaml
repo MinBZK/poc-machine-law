@@ -248,10 +248,8 @@ articles:
               - subject: $bbz_aanvraag.type_zelfstandige
                 operation: EQUALS
                 value: BEEINDIGEND
-              - operation: NOT
-                value:
-                  operation: IS_NULL
-                  subject: $bbz_aanvraag.beeindigingsdatum
+              - operation: EXISTS
+                subject: $bbz_aanvraag.beeindigingsdatum
       - output: is_gerechtigd
         value: true
         legal_basis:

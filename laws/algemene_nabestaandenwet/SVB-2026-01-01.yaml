@@ -147,10 +147,8 @@ articles:
           - subject: $partner_verzekerd
             operation: EQUALS
             value: true
-          - operation: NOT
-            value:
-              operation: IS_NULL
-              subject: $overlijdensdatum_partner
+          - operation: EXISTS
+            subject: $overlijdensdatum_partner
           - subject: $leeftijd
             operation: LESS_THAN
             value: $pensioenleeftijd

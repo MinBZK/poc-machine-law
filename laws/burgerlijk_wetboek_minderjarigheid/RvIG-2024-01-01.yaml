@@ -75,10 +75,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $persoonsgegevens
+          operation: EXISTS
+          subject: $persoonsgegevens
       - output: leeftijd
         value:
           operation: AGE
@@ -108,10 +106,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $persoonsgegevens.heeft_handlichting
+              operation: EXISTS
+              subject: $persoonsgegevens.heeft_handlichting
             then: $persoonsgegevens.heeft_handlichting
           default: false
         legal_basis:
@@ -126,10 +122,8 @@ articles:
           operation: IF
           cases:
           - when:
-              operation: NOT
-              value:
-                operation: IS_NULL
-                subject: $persoonsgegevens.handlichting_gebieden
+              operation: EXISTS
+              subject: $persoonsgegevens.handlichting_gebieden
             then: $persoonsgegevens.handlichting_gebieden
           default: []
         legal_basis:

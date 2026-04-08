@@ -68,10 +68,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $faillissement_registraties
+          operation: EXISTS
+          subject: $faillissement_registraties
       - output: actieve_faillissementen
         value:
           operation: FOREACH
@@ -106,10 +104,8 @@ articles:
             '
       - output: heeft_delegaties
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $actieve_faillissementen
+          operation: EXISTS
+          subject: $actieve_faillissementen
         legal_basis:
           law: Faillissementswet
           bwb_id: BWBR0001860

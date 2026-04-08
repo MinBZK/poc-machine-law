@@ -121,10 +121,8 @@ articles:
         value:
           operation: AND
           conditions:
-          - operation: NOT
-            value:
-              operation: IS_NULL
-              subject: $polis_status
+          - operation: EXISTS
+            subject: $polis_status
           - operation: IN
             subject: $polis_status
             value: $actieve_polis_statussen
@@ -139,10 +137,8 @@ articles:
         value:
           operation: AND
           conditions:
-          - operation: NOT
-            value:
-              operation: IS_NULL
-              subject: $registratie
+          - operation: EXISTS
+            subject: $registratie
           - operation: IN
             subject: $verblijfsland
             value: $geldige_verdragslanden

@@ -61,10 +61,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $volmacht_registraties
+          operation: EXISTS
+          subject: $volmacht_registraties
       - output: actieve_volmachten
         value:
           operation: FOREACH
@@ -104,10 +102,8 @@ articles:
             '
       - output: heeft_delegaties
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $actieve_volmachten
+          operation: EXISTS
+          subject: $actieve_volmachten
         legal_basis:
           law: Burgerlijk Wetboek Boek 3
           bwb_id: BWBR0005291

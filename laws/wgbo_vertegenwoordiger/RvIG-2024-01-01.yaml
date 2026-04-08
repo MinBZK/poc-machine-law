@@ -96,10 +96,8 @@ articles:
       actions:
       - output: voldoet_aan_voorwaarden
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $familie_relaties
+          operation: EXISTS
+          subject: $familie_relaties
       - output: wgbo_vertegenwoordigingen
         value:
           operation: FOREACH
@@ -128,10 +126,8 @@ articles:
             '
       - output: heeft_delegaties
         value:
-          operation: NOT
-          value:
-            operation: IS_NULL
-            subject: $wgbo_vertegenwoordigingen
+          operation: EXISTS
+          subject: $wgbo_vertegenwoordigingen
         legal_basis:
           law: Burgerlijk Wetboek Boek 7
           bwb_id: BWBR0005290
