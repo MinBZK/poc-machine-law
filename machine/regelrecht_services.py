@@ -294,10 +294,6 @@ class RegelrechtServices:
             select_on = entry.get("select_on", [])
             fields = entry.get("fields")
 
-            # Skip array-type inputs (input_name == table)
-            if fields and input_name == table:
-                continue
-
             # Build selection mask from select_on criteria
             mask = pd.Series(True, index=df.index)
             for criterion in select_on:
@@ -318,6 +314,18 @@ class RegelrechtServices:
 
             matched = df[mask]
             if matched.empty:
+                continue
+
+            # Array-type inputs (input_name == table): collect ALL matching
+            # rows as a list of objects so the engine can iterate with FOREACH.
+            if fields and input_name == table:
+                rows = []
+                for _, row in matched.iterrows():
+                    obj = {f: _to_native(row[f]) for f in fields if f in row.index}
+                    if obj:
+                        rows.append(obj)
+                if rows:
+                    params[input_name] = rows
                 continue
 
             if fields:
@@ -347,9 +355,11 @@ class RegelrechtServices:
                     continue
                 if source is None or source != {}:
                     continue  # Only handle empty source: {}
-                # Skip if already resolved (Phase 1 may have set it)
-                # Don't skip just because it's in the mapping - Phase 1
-                # might not have resolved it (e.g. object input without fields)
+                # Skip inputs that Phase 1 already handled via the mapping.
+                # If the mapping had select_on criteria that didn't match,
+                # we should NOT fall back to unfiltered data.
+                if input_name in input_mapping:
+                    continue
 
                 # Sort tables: prefer name matching input_name first
                 sorted_tables = sorted(
@@ -368,7 +378,15 @@ class RegelrechtServices:
                     if matched.empty:
                         matched = df  # Try without filtering
 
-                    if input_type == "object":
+                    if input_type == "array":
+                        # Collect all matching rows as a list of dicts
+                        if not matched.empty and tbl_name == input_name:
+                            rows = []
+                            for _, row in matched.iterrows():
+                                rows.append(_to_native({col: row[col] for col in df.columns}))
+                            params[input_name] = rows
+                            break
+                    elif input_type == "object":
                         if not matched.empty:
                             row = matched.iloc[0]
                             obj = _to_native({col: row[col] for col in df.columns})
