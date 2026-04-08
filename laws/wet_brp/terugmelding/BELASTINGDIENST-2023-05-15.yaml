@@ -52,7 +52,7 @@ articles:
       - name: belasting_adres
         type: object
         source: {}
-      - name: langdurig_buitenland
+      - name: langdurig_afwezig
         type: boolean
         source: {}
       output:
@@ -81,7 +81,7 @@ articles:
               subject: $adres
               value: $belasting_adres
           - operation: EQUALS
-            subject: $langdurig_buitenland
+            subject: $langdurig_afwezig
             value: true
         legal_basis:
           law: Wet basisregistratie personen
@@ -103,7 +103,7 @@ articles:
             then: $twijfel_adres_afwijking
           - when:
               operation: EQUALS
-              subject: $langdurig_buitenland
+              subject: $langdurig_afwezig
               value: true
             then: $twijfel_langdurig_afwezig
         legal_basis:

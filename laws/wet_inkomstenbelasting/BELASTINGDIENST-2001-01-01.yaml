@@ -107,73 +107,73 @@ articles:
           service: RvIG
           parameters:
             bsn: $bsn
-      - name: box1_dienstbetrekking
+      - name: loon_uit_dienstbetrekking
         type: amount
         source: {}
-      - name: box1_uitkeringen
+      - name: uitkeringen_en_pensioenen
         type: amount
         source: {}
-      - name: box1_onderneming
+      - name: winst_uit_onderneming
         type: amount
         source: {}
-      - name: box1_overige_werkzaamheden
+      - name: resultaat_overige_werkzaamheden
         type: amount
         source: {}
-      - name: box1_eigen_woning
+      - name: eigen_woning
         type: amount
         source: {}
-      - name: box2_dividend
+      - name: reguliere_voordelen
         type: amount
         source: {}
-      - name: box2_aandelen
+      - name: vervreemdingsvoordelen
         type: amount
         source: {}
-      - name: box3_sparen
+      - name: spaargeld
         type: amount
         source: {}
-      - name: box3_beleggen
+      - name: beleggingen
         type: amount
         source: {}
-      - name: box3_onroerend_goed
+      - name: onroerend_goed
         type: amount
         source: {}
-      - name: box3_schulden
+      - name: schulden
         type: amount
         source: {}
       - name: persoonsgebonden_aftrek
         type: amount
         source: {}
-      - name: partner_box1_dienstbetrekking
+      - name: partner_loon_uit_dienstbetrekking
         type: amount
         source: {}
-      - name: partner_box1_uitkeringen
+      - name: partner_uitkeringen_en_pensioenen
         type: amount
         source: {}
-      - name: partner_box1_onderneming
+      - name: partner_winst_uit_onderneming
         type: amount
         source: {}
-      - name: partner_box1_overige_werkzaamheden
+      - name: partner_resultaat_overige_werkzaamheden
         type: amount
         source: {}
-      - name: partner_box1_eigen_woning
+      - name: partner_eigen_woning
         type: amount
         source: {}
-      - name: partner_box2_dividend
+      - name: partner_reguliere_voordelen
         type: amount
         source: {}
-      - name: partner_box2_aandelen
+      - name: partner_vervreemdingsvoordelen
         type: amount
         source: {}
-      - name: partner_box3_sparen
+      - name: partner_spaargeld
         type: amount
         source: {}
-      - name: partner_box3_beleggen
+      - name: partner_beleggingen
         type: amount
         source: {}
-      - name: partner_box3_onroerend_goed
+      - name: partner_onroerend_goed
         type: amount
         source: {}
-      - name: partner_box3_schulden
+      - name: partner_schulden
         type: amount
         source: {}
       - name: partner_buitenlands_inkomen
@@ -316,17 +316,17 @@ articles:
         value:
           operation: ADD
           values:
-          - $box1_dienstbetrekking
-          - $box1_onderneming
-          - $box1_uitkeringen
-          - $box1_overige_werkzaamheden
-          - $box1_eigen_woning
+          - $loon_uit_dienstbetrekking
+          - $winst_uit_onderneming
+          - $uitkeringen_en_pensioenen
+          - $resultaat_overige_werkzaamheden
+          - $eigen_woning
       - output: box2_inkomen
         value:
           operation: ADD
           values:
-          - $box2_dividend
-          - $box2_aandelen
+          - $reguliere_voordelen
+          - $vervreemdingsvoordelen
       - output: box3_bezittingen
         value:
           operation: MAX
@@ -335,10 +335,10 @@ articles:
             values:
             - operation: ADD
               values:
-              - $box3_sparen
-              - $box3_beleggen
-              - $box3_onroerend_goed
-            - $box3_schulden
+              - $spaargeld
+              - $beleggingen
+              - $onroerend_goed
+            - $schulden
             - operation: IF
               cases:
               - when:
@@ -590,7 +590,7 @@ articles:
                   cases:
                   - when:
                       operation: GREATER_THAN
-                      subject: $box1_dienstbetrekking
+                      subject: $loon_uit_dienstbetrekking
                       value: $arbeidskorting_afbouw_start
                     then:
                       operation: MULTIPLY
@@ -599,7 +599,7 @@ articles:
                         values:
                         - operation: SUBTRACT
                           values:
-                          - $box1_dienstbetrekking
+                          - $loon_uit_dienstbetrekking
                           - $arbeidskorting_afbouw_start
                         - operation: SUBTRACT
                           values:
@@ -618,7 +618,7 @@ articles:
                 cases:
                 - when:
                     operation: GREATER_THAN
-                    subject: $box1_dienstbetrekking
+                    subject: $loon_uit_dienstbetrekking
                     value: $arbeidskorting_afbouw_start
                   then:
                     operation: MULTIPLY
@@ -627,7 +627,7 @@ articles:
                       values:
                       - operation: SUBTRACT
                         values:
-                        - $box1_dienstbetrekking
+                        - $loon_uit_dienstbetrekking
                         - $arbeidskorting_afbouw_start
                       - operation: SUBTRACT
                         values:
@@ -647,7 +647,7 @@ articles:
                 subject: $heeft_kinderen_onder_12
                 value: true
               - operation: GREATER_THAN
-                subject: $box1_dienstbetrekking
+                subject: $loon_uit_dienstbetrekking
                 value: $inkomensafhankelijke_combinatiekorting_min_inkomen
             then:
               operation: MIN
@@ -659,7 +659,7 @@ articles:
                   values:
                   - operation: SUBTRACT
                     values:
-                    - $box1_dienstbetrekking
+                    - $loon_uit_dienstbetrekking
                     - $inkomensafhankelijke_combinatiekorting_min_inkomen
                   - $inkomensafhankelijke_combinatiekorting_percentage
               - $inkomensafhankelijke_combinatiekorting_max
@@ -700,10 +700,10 @@ articles:
           values:
           - operation: ADD
             values:
-            - $box3_sparen
-            - $box3_beleggen
-            - $box3_onroerend_goed
-          - $box3_schulden
+            - $spaargeld
+            - $beleggingen
+            - $onroerend_goed
+          - $schulden
       - output: partner_box1_inkomen
         value:
           operation: ADD
@@ -718,11 +718,11 @@ articles:
               then:
                 operation: ADD
                 values:
-                - $partner_box1_dienstbetrekking
-                - $partner_box1_uitkeringen
-                - $partner_box1_onderneming
-                - $partner_box1_overige_werkzaamheden
-                - $partner_box1_eigen_woning
+                - $partner_loon_uit_dienstbetrekking
+                - $partner_uitkeringen_en_pensioenen
+                - $partner_winst_uit_onderneming
+                - $partner_resultaat_overige_werkzaamheden
+                - $partner_eigen_woning
             default: 0
       - output: partner_box2_inkomen
         value:
@@ -738,8 +738,8 @@ articles:
               then:
                 operation: ADD
                 values:
-                - $partner_box2_dividend
-                - $partner_box2_aandelen
+                - $partner_reguliere_voordelen
+                - $partner_vervreemdingsvoordelen
             default: 0
       - output: partner_box3_inkomen
         value:
@@ -759,10 +759,10 @@ articles:
                   values:
                   - operation: ADD
                     values:
-                    - $partner_box3_sparen
-                    - $partner_box3_beleggen
-                    - $partner_box3_onroerend_goed
-                  - $partner_box3_schulden
+                    - $partner_spaargeld
+                    - $partner_beleggingen
+                    - $partner_onroerend_goed
+                  - $partner_schulden
                   - $heffingsvrij_vermogen
                 - 0
               - $box3_rendement
@@ -794,23 +794,23 @@ articles:
                 values:
                 - operation: ADD
                   values:
-                  - $partner_box3_sparen
-                  - $partner_box3_beleggen
-                  - $partner_box3_onroerend_goed
-                - $partner_box3_schulden
+                  - $partner_spaargeld
+                  - $partner_beleggingen
+                  - $partner_onroerend_goed
+                - $partner_schulden
           default: $vermogen
       - output: bezittingen
         value:
           operation: ADD
           values:
-          - $box3_sparen
-          - $box3_beleggen
-          - $box3_onroerend_goed
+          - $spaargeld
+          - $beleggingen
+          - $onroerend_goed
       - output: bedrijfsinkomen
         value:
           operation: DIVIDE
           values:
-          - $box1_onderneming
+          - $winst_uit_onderneming
           - 12
       - output: maandelijks_inkomen
         value:

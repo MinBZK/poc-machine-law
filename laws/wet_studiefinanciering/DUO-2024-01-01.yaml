@@ -137,16 +137,16 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: opleiding_type
+      - name: onderwijstype
         type: string
         source: {}
-      - name: studerend_gezin
+      - name: aantal_studerend_gezin
         type: number
         source: {}
-      - name: partner_opleiding_type
+      - name: partner_onderwijstype
         type: string
         source: {}
-      - name: partner_studerend_gezin
+      - name: partner_aantal_studerend_gezin
         type: number
         source: {}
       output:
@@ -175,7 +175,7 @@ articles:
             cases:
             - when:
                 operation: EQUALS
-                subject: $opleiding_type
+                subject: $onderwijstype
                 value: WO
               then:
                 operation: IF
@@ -188,7 +188,7 @@ articles:
                 default: $basisbeurs_wo_thuis
             - when:
                 operation: EQUALS
-                subject: $opleiding_type
+                subject: $onderwijstype
                 value: HBO
               then:
                 operation: IF
@@ -201,7 +201,7 @@ articles:
                 default: $basisbeurs_hbo_thuis
             - when:
                 operation: EQUALS
-                subject: $opleiding_type
+                subject: $onderwijstype
                 value: MBO
               then:
                 operation: IF
@@ -229,17 +229,17 @@ articles:
                   cases:
                   - when:
                       operation: EQUALS
-                      subject: $opleiding_type
+                      subject: $onderwijstype
                       value: WO
                     then: $max_aanvullende_beurs_wo
                   - when:
                       operation: EQUALS
-                      subject: $opleiding_type
+                      subject: $onderwijstype
                       value: HBO
                     then: $max_aanvullende_beurs_hbo
                   - when:
                       operation: EQUALS
-                      subject: $opleiding_type
+                      subject: $onderwijstype
                       value: MBO
                     then: $max_aanvullende_beurs_mbo
                 - operation: SUBTRACT
@@ -256,7 +256,7 @@ articles:
                       - $inkomensdrempel_basis
                       - operation: MULTIPLY
                         values:
-                        - $studerend_gezin
+                        - $aantal_studerend_gezin
                         - $verhoging_drempel_per_kind
                     - operation: SUBTRACT
                       values:
@@ -278,7 +278,7 @@ articles:
             cases:
             - when:
                 operation: EQUALS
-                subject: $partner_opleiding_type
+                subject: $partner_onderwijstype
                 value: WO
               then:
                 operation: IF
@@ -291,7 +291,7 @@ articles:
                 default: $basisbeurs_wo_thuis
             - when:
                 operation: EQUALS
-                subject: $partner_opleiding_type
+                subject: $partner_onderwijstype
                 value: HBO
               then:
                 operation: IF
@@ -304,7 +304,7 @@ articles:
                 default: $basisbeurs_hbo_thuis
             - when:
                 operation: EQUALS
-                subject: $partner_opleiding_type
+                subject: $partner_onderwijstype
                 value: MBO
               then:
                 operation: IF
@@ -332,17 +332,17 @@ articles:
                   cases:
                   - when:
                       operation: EQUALS
-                      subject: $partner_opleiding_type
+                      subject: $partner_onderwijstype
                       value: WO
                     then: $max_aanvullende_beurs_wo
                   - when:
                       operation: EQUALS
-                      subject: $partner_opleiding_type
+                      subject: $partner_onderwijstype
                       value: HBO
                     then: $max_aanvullende_beurs_hbo
                   - when:
                       operation: EQUALS
-                      subject: $partner_opleiding_type
+                      subject: $partner_onderwijstype
                       value: MBO
                     then: $max_aanvullende_beurs_mbo
                 - operation: SUBTRACT
@@ -359,7 +359,7 @@ articles:
                       - $inkomensdrempel_basis
                       - operation: MULTIPLY
                         values:
-                        - $partner_studerend_gezin
+                        - $partner_aantal_studerend_gezin
                         - $verhoging_drempel_per_kind
                     - operation: SUBTRACT
                       values:
@@ -378,7 +378,7 @@ articles:
           operation: NOT
           value:
             operation: IS_NULL
-            subject: $opleiding_type
+            subject: $onderwijstype
         legal_basis:
           law: Wet studiefinanciering 2000
           bwb_id: BWBR0011453

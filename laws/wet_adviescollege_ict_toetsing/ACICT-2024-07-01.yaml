@@ -43,7 +43,7 @@ articles:
         type: string
         required: true
       input:
-      - name: project_kosten
+      - name: totale_kosten
         type: number
         source: {}
       - name: organisatie_type
@@ -67,7 +67,7 @@ articles:
           operation: AND
           conditions:
           - operation: GREATER_THAN_OR_EQUAL
-            subject: $project_kosten
+            subject: $totale_kosten
             value: $kosten_drempel
           - operation: IN
             subject: $organisatie_type
@@ -90,7 +90,7 @@ articles:
           explanation: De adviesplicht wordt bepaald door de cumulatieve voorwaarden
             uit artikel 1, 7 en 14
       - output: project_kosten
-        value: $project_kosten
+        value: $totale_kosten
         legal_basis:
           law: Wet Adviescollege ICT-toetsing
           bwb_id: BWBR0049412

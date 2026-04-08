@@ -103,10 +103,10 @@ articles:
         temporal:
           type: point_in_time
           reference: $prev_january_first
-      - name: verzekeringspolis
+      - name: polis_status
         type: object
         source: {}
-      - name: verdragsinschrijving
+      - name: registratie
         type: object
         source: {}
       output:
@@ -124,9 +124,9 @@ articles:
           - operation: NOT
             value:
               operation: IS_NULL
-              subject: $verzekeringspolis
+              subject: $polis_status
           - operation: IN
-            subject: $verzekeringspolis
+            subject: $polis_status
             values: $actieve_polis_statussen
         legal_basis:
           law: Zorgverzekeringswet
@@ -142,12 +142,12 @@ articles:
           - operation: NOT
             value:
               operation: IS_NULL
-              subject: $verdragsinschrijving
+              subject: $registratie
           - operation: IN
             subject: $verblijfsland
             values: $geldige_verdragslanden
           - operation: EQUALS
-            subject: $verdragsinschrijving
+            subject: $registratie
             value: ACTIEF
         legal_basis:
           law: Zorgverzekeringswet

@@ -38,7 +38,7 @@ articles:
           output: leeftijd
           service: RvIG
           parameters:
-            bsn: $bsn_leidinggevende
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $referencedate
@@ -49,7 +49,7 @@ articles:
           output: is_onder_curatele
           service: RECHTSPRAAK
           parameters:
-            bsn: $bsn_leidinggevende
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $referencedate
@@ -68,7 +68,7 @@ articles:
           output: is_geregistreerd
           service: SVH
           parameters:
-            bsn: $bsn_leidinggevende
+            bsn: $bsn
       - name: svh_registratienummer
         type: string
         source:
@@ -76,7 +76,7 @@ articles:
           output: registratienummer
           service: SVH
           parameters:
-            bsn: $bsn_leidinggevende
+            bsn: $bsn
       - name: voldoet_aan_nationale_eisen
         type: boolean
         source:
@@ -111,7 +111,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $referencedate
-      - name: bsn_leidinggevende
+      - name: bsn
         type: string
         source: {}
       - name: vloeroppervlakte_horecalokaliteit
@@ -120,7 +120,7 @@ articles:
       - name: type_bedrijf
         type: string
         source: {}
-      - name: heeft_actieve_alcoholwetvergunning
+      - name: heeft_alcoholvergunning
         type: boolean
         source: {}
       output:
@@ -165,7 +165,7 @@ articles:
           explanation: Geen weigeringsgrond is van toepassing, dus de vergunning wordt
             verleend
       - output: heeft_actieve_vergunning
-        value: $heeft_actieve_alcoholwetvergunning
+        value: $heeft_alcoholvergunning
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458

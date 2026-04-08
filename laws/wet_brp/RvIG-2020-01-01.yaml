@@ -96,7 +96,7 @@ articles:
       - name: partner_geboortedatum
         type: date
         source: {}
-      - name: partnertype
+      - name: partnerschap_type
         type: object
         source: {}
       - name: partner_bsn
@@ -111,7 +111,7 @@ articles:
       - name: ouder_adressen
         type: array
         source: {}
-      - name: land_van_verblijf
+      - name: land_verblijf
         type: string
         source: {}
       - name: nationaliteit
@@ -120,7 +120,7 @@ articles:
       - name: adres
         type: object
         source: {}
-      - name: huishouden
+      - name: medebewoners
         type: array
         source: {}
       output:
@@ -188,7 +188,7 @@ articles:
           cases:
           - when:
               operation: IN
-              subject: $partnertype
+              subject: $partnerschap_type
               values: $geldige_partnertypen
             then: $partner_bsn
       - output: leeftijd
@@ -219,7 +219,7 @@ articles:
       - output: heeft_partner
         value:
           operation: IN
-          subject: $partnertype
+          subject: $partnerschap_type
           values: $geldige_partnertypen
         legal_basis:
           law: Wet basisregistratie personen
@@ -248,7 +248,7 @@ articles:
           explanation: Artikel 2.4 Wet BRP bepaalt meldingsplicht bij adreswijziging
             en woonsituatie
       - output: land_van_verblijf
-        value: $land_van_verblijf
+        value: $land_verblijf
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -274,7 +274,7 @@ articles:
       - output: woont_in_nederland
         value:
           operation: EQUALS
-          subject: $land_van_verblijf
+          subject: $land_verblijf
           value: NEDERLAND
         legal_basis:
           law: Wet basisregistratie personen
@@ -323,13 +323,13 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $huishouden
+                subject: $medebewoners
             then:
               operation: ADD
               values:
               - 1
               - operation: FOREACH
-                collection: $huishouden
+                collection: $medebewoners
                 body: 1
                 combine: ADD
           default: 1
@@ -369,8 +369,8 @@ articles:
               operation: NOT
               value:
                 operation: IS_NULL
-                subject: $huishouden
-            then: $huishouden
+                subject: $medebewoners
+            then: $medebewoners
           default:
             value: null
         legal_basis:

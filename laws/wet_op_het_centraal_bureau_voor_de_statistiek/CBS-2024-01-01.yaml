@@ -30,7 +30,7 @@ articles:
         type: string
         required: true
       input:
-      - name: levensverwachting_gegevens
+      - name: verwachting_65
         type: number
         source: {}
       output:
@@ -42,4 +42,4 @@ articles:
           min: 0
       actions:
       - output: levensverwachting_65
-        value: $levensverwachting_gegevens
+        value: $verwachting_65

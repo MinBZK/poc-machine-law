@@ -50,7 +50,7 @@ articles:
         type: object
         required: true
       input:
-      - name: post_onbestelbaar
+      - name: onbestelbaar_retour
         type: boolean
         source: {}
       - name: aantal_onbestelbaar
@@ -75,7 +75,7 @@ articles:
       - output: heeft_gerede_twijfel_adres
         value:
           operation: EQUALS
-          subject: $post_onbestelbaar
+          subject: $onbestelbaar_retour
           value: true
         legal_basis:
           law: Wet basisregistratie personen
@@ -95,7 +95,7 @@ articles:
             then: $twijfel_obr_herhaald
           - when:
               operation: EQUALS
-              subject: $post_onbestelbaar
+              subject: $onbestelbaar_retour
               value: true
             then: $twijfel_obr_enkel
         legal_basis:

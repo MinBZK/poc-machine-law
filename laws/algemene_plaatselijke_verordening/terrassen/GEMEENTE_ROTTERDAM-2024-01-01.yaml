@@ -239,25 +239,25 @@ articles:
       - name: heeft_alcoholvergunning
         type: boolean
         source: {}
-      - name: bgt_oppervlakte_beschikbaar
+      - name: beschikbare_oppervlakte
         type: number
         source: {}
-      - name: bgt_functie_oppervlak
+      - name: functie_oppervlak
         type: string
         source: {}
-      - name: locatie_op_openbare_weg
+      - name: is_openbare_weg
         type: boolean
         source: {}
       - name: terrassenbeleid_gebied
         type: object
         source: {}
-      - name: maximale_sluitingstijd_doordeweeks
+      - name: max_sluitingstijd_doordeweeks
         type: number
         source: {}
-      - name: maximale_sluitingstijd_weekend
+      - name: max_sluitingstijd_weekend
         type: number
         source: {}
-      - name: precario_tarief_per_m2
+      - name: tarief_per_m2
         type: number
         source: {}
       output:
@@ -295,16 +295,16 @@ articles:
             value: $minimale_obstakelvrije_ruimte
           - operation: LESS_THAN_OR_EQUAL
             subject: $terras_oppervlakte
-            value: $bgt_oppervlakte_beschikbaar
-          - subject: $bgt_functie_oppervlak
+            value: $beschikbare_oppervlakte
+          - subject: $functie_oppervlak
             operation: IN
             values: $toegestane_bgt_functies
           - operation: LESS_THAN_OR_EQUAL
             subject: $gewenste_sluitingstijd_doordeweeks
-            value: $maximale_sluitingstijd_doordeweeks
+            value: $max_sluitingstijd_doordeweeks
           - operation: LESS_THAN_OR_EQUAL
             subject: $gewenste_sluitingstijd_weekend
-            value: $maximale_sluitingstijd_weekend
+            value: $max_sluitingstijd_weekend
           - operation: OR
             conditions:
             - subject: $schenkt_alcohol
@@ -328,16 +328,16 @@ articles:
             value: $minimale_obstakelvrije_ruimte
           - operation: LESS_THAN_OR_EQUAL
             subject: $terras_oppervlakte
-            value: $bgt_oppervlakte_beschikbaar
+            value: $beschikbare_oppervlakte
           - operation: IN
-            subject: $bgt_functie_oppervlak
+            subject: $functie_oppervlak
             values: $toegestane_bgt_functies
           - operation: LESS_THAN_OR_EQUAL
             subject: $gewenste_sluitingstijd_doordeweeks
-            value: $maximale_sluitingstijd_doordeweeks
+            value: $max_sluitingstijd_doordeweeks
           - operation: LESS_THAN_OR_EQUAL
             subject: $gewenste_sluitingstijd_weekend
-            value: $maximale_sluitingstijd_weekend
+            value: $max_sluitingstijd_weekend
           - operation: OR
             conditions:
             - operation: EQUALS
@@ -381,23 +381,23 @@ articles:
           - when:
               operation: GREATER_THAN
               subject: $terras_oppervlakte
-              value: $bgt_oppervlakte_beschikbaar
+              value: $beschikbare_oppervlakte
             then: Gevraagde oppervlakte groter dan beschikbare ruimte
           - when:
               operation: NOT_IN
-              subject: $bgt_functie_oppervlak
+              subject: $functie_oppervlak
               values: $toegestane_bgt_functies
             then: Locatie niet geschikt voor terras (verkeerde BGT-functie)
           - when:
               operation: GREATER_THAN
               subject: $gewenste_sluitingstijd_doordeweeks
-              value: $maximale_sluitingstijd_doordeweeks
+              value: $max_sluitingstijd_doordeweeks
             then: Gevraagde sluitingstijd doordeweeks (zo-do) later dan toegestaan
               in dit gebied
           - when:
               operation: GREATER_THAN
               subject: $gewenste_sluitingstijd_weekend
-              value: $maximale_sluitingstijd_weekend
+              value: $max_sluitingstijd_weekend
             then: Gevraagde sluitingstijd weekend (vr-za) later dan toegestaan in
               dit gebied
           - when:
@@ -422,7 +422,7 @@ articles:
           operation: MIN
           values:
           - $terras_oppervlakte
-          - $bgt_oppervlakte_beschikbaar
+          - $beschikbare_oppervlakte
         legal_basis:
           law: Algemene plaatselijke verordening Rotterdam 2012
           article: 2:30b
@@ -434,7 +434,7 @@ articles:
           operation: MIN
           values:
           - $gewenste_sluitingstijd_doordeweeks
-          - $maximale_sluitingstijd_doordeweeks
+          - $max_sluitingstijd_doordeweeks
         legal_basis:
           law: Terrassenbeleid Rotterdam 2023
           article: '5'
@@ -446,7 +446,7 @@ articles:
           operation: MIN
           values:
           - $gewenste_sluitingstijd_weekend
-          - $maximale_sluitingstijd_weekend
+          - $max_sluitingstijd_weekend
         legal_basis:
           law: Terrassenbeleid Rotterdam 2023
           article: '5'
@@ -454,7 +454,7 @@ articles:
           explanation: De vergunde sluitingstijd weekend (vr-za) is het minimum van
             de aangevraagde en maximaal toegestane tijd
       - output: precariobelasting_verschuldigd
-        value: $locatie_op_openbare_weg
+        value: $is_openbare_weg
         legal_basis:
           law: Verordening precariobelasting Rotterdam 2024
           article: '2'
@@ -467,7 +467,7 @@ articles:
           cases:
           - when:
               operation: EQUALS
-              subject: $locatie_op_openbare_weg
+              subject: $is_openbare_weg
               value: true
             then:
               operation: MULTIPLY
@@ -479,10 +479,10 @@ articles:
                   - operation: MIN
                     values:
                     - $terras_oppervlakte
-                    - $bgt_oppervlakte_beschikbaar
+                    - $beschikbare_oppervlakte
                   - 50
                 - 0
-              - $precario_tarief_per_m2
+              - $tarief_per_m2
           default: 0
         legal_basis:
           law: Verordening precario- en reclamebelasting Rotterdam 2024

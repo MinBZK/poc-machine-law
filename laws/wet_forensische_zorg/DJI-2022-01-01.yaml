@@ -83,7 +83,7 @@ articles:
       - name: zorgtype
         type: string
         source: {}
-      - name: juridische_grondslag
+      - name: juridische_titel
         type: string
         source: {}
       output:
@@ -98,7 +98,7 @@ articles:
             subject: $zorgtype
             values: $forensische_zorgtypen
           - operation: IN
-            subject: $juridische_grondslag
+            subject: $juridische_titel
             values: $geldige_juridische_titels
         legal_basis:
           law: Wet forensische zorg

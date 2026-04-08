@@ -104,13 +104,13 @@ articles:
         temporal:
           type: period
           period_type: year
-      - name: was_partner_verzekerd
+      - name: partner_verzekerd
         type: boolean
         source: {}
       - name: overlijdensdatum_partner
         type: date
         source: {}
-      - name: arbeidsongeschiktheidspercentage
+      - name: ao_percentage
         type: number
         source: {}
       - name: heeft_kinderen_onder_18
@@ -144,7 +144,7 @@ articles:
         value:
           operation: AND
           conditions:
-          - subject: $was_partner_verzekerd
+          - subject: $partner_verzekerd
             operation: EQUALS
             value: true
           - operation: NOT
@@ -159,7 +159,7 @@ articles:
             - subject: $heeft_kinderen_onder_18
               operation: EQUALS
               value: true
-            - subject: $arbeidsongeschiktheidspercentage
+            - subject: $ao_percentage
               operation: GREATER_THAN_OR_EQUAL
               value: $ao_drempel
       - output: is_gerechtigd

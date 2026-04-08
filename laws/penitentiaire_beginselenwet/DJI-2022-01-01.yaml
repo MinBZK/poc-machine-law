@@ -34,7 +34,7 @@ articles:
         type: string
         required: true
       input:
-      - name: detentiestatus
+      - name: status
         type: string
         source: {}
       - name: inrichting_type
@@ -54,7 +54,7 @@ articles:
             - PENITENTIAIRE_INRICHTING
             - HUIS_VAN_BEWARING
           - operation: IN
-            subject: $detentiestatus
+            subject: $status
             values:
             - INGESLOTEN
             - TIJDELIJK_AFWEZIG

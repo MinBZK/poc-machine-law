@@ -54,7 +54,7 @@ articles:
       - name: verleende_ontheffingen_dit_jaar
         type: array
         source: {}
-      - name: heeft_geluidsklachten
+      - name: heeft_actieve_klachten
         type: boolean
         source: {}
       output:
@@ -83,7 +83,7 @@ articles:
             subject: $kvk_status
             value: Actief
           - operation: EQUALS
-            subject: $heeft_geluidsklachten
+            subject: $heeft_actieve_klachten
             value: false
           - operation: LESS_THAN
             subject:
@@ -143,7 +143,7 @@ articles:
       - output: geen_geluidsklachten
         value:
           operation: EQUALS
-          subject: $heeft_geluidsklachten
+          subject: $heeft_actieve_klachten
           value: false
         legal_basis:
           law: Algemene plaatselijke verordening Rotterdam 2012

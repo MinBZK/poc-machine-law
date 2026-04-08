@@ -183,7 +183,7 @@ articles:
         temporal:
           type: point_in_time
           reference: $referencedate
-      - name: woonachtige_verzekerde_jaren
+      - name: woonperiodes
         type: number
         source: {}
       output:
@@ -221,7 +221,7 @@ articles:
             subject:
               operation: ADD
               values:
-              - $woonachtige_verzekerde_jaren
+              - $woonperiodes
               - $werkzame_verzekerde_jaren
             value: 0
       - output: is_gerechtigd
@@ -261,7 +261,7 @@ articles:
             values:
             - operation: ADD
               values:
-              - $woonachtige_verzekerde_jaren
+              - $woonperiodes
               - $werkzame_verzekerde_jaren
             - $jaren_voor_volledig_pensioen
           - $jaren_voor_volledig_pensioen

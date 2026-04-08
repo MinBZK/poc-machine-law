@@ -60,10 +60,10 @@ articles:
         temporal:
           type: point_in_time
           reference: $referencedate
-      - name: jaarlijks_elektriciteitsverbruik_kwh
+      - name: elektriciteit_kwh
         type: number
         source: {}
-      - name: jaarlijks_gasverbruik_m3
+      - name: gasverbruik_m3
         type: number
         source: {}
       - name: is_woonfunctie
@@ -96,10 +96,10 @@ articles:
             value: false
           - operation: OR
             conditions:
-            - subject: $jaarlijks_elektriciteitsverbruik_kwh
+            - subject: $elektriciteit_kwh
               operation: GREATER_THAN_OR_EQUAL
               value: $drempel_elektriciteit_kwh
-            - subject: $jaarlijks_gasverbruik_m3
+            - subject: $gasverbruik_m3
               operation: GREATER_THAN_OR_EQUAL
               value: $drempel_gas_m3
       - output: heeft_energiebesparingsplicht
@@ -128,10 +128,10 @@ articles:
           operation: OR
           conditions:
           - operation: GREATER_THAN_OR_EQUAL
-            subject: $jaarlijks_elektriciteitsverbruik_kwh
+            subject: $elektriciteit_kwh
             value: $drempel_onderzoek_elektriciteit_kwh
           - operation: GREATER_THAN_OR_EQUAL
-            subject: $jaarlijks_gasverbruik_m3
+            subject: $gasverbruik_m3
             value: $drempel_onderzoek_gas_m3
         legal_basis:
           law: Besluit activiteiten leefomgeving
