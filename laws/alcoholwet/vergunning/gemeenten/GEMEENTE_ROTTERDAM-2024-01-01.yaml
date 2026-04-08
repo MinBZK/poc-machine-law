@@ -156,14 +156,13 @@ articles:
                 subject: $bibob_mate_van_gevaar
                 value: $bibob_ernstig_gevaar
       - output: heeft_recht_op_vergunning
-        value: true
+        value: $voldoet_aan_voorwaarden
         legal_basis:
           law: Alcoholwet
           bwb_id: BWBR0002458
           article: '27'
           url: https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27
-          explanation: Geen weigeringsgrond is van toepassing, dus de vergunning wordt
-            verleend
+          explanation: Vergunning wordt verleend als aan alle voorwaarden is voldaan
       - output: heeft_actieve_vergunning
         value: $heeft_alcoholvergunning
         legal_basis:

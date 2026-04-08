@@ -52,8 +52,76 @@ def _build_object_field_mapping() -> dict[str, dict[str, list[str]]]:
     return result
 
 
-# Module-level cache so we parse the JSON once.
+def _build_law_input_mapping() -> dict[str, dict[str, dict]]:
+    """Build mapping: {law_id: {input_name: {table, field, select_on, fields?}}}
+
+    Used to pre-resolve data source values before passing to the Rust engine,
+    which cannot resolve ``source: {}`` inputs by itself when the DataFrame
+    column name differs from the law input name.
+    """
+    if not _SOURCE_REF_MAPPING_PATH.exists():
+        return {}
+    with open(_SOURCE_REF_MAPPING_PATH) as f:
+        mapping = json.load(f)
+    result: dict[str, dict[str, dict]] = {}
+    for key, entry in mapping.items():
+        law_path, _, input_name = key.rpartition(":")
+        if not law_path:
+            continue
+        if law_path not in result:
+            result[law_path] = {}
+        result[law_path][input_name] = entry
+    return result
+
+
+def _build_field_alias_mapping() -> dict[str, dict[str, str]]:
+    """Build mapping: {table: {input_name: field_name}} for mismatched field names.
+
+    When registering data sources, these aliases are added so the engine can
+    look up values by input name even when the DataFrame column has a different name.
+    """
+    if not _SOURCE_REF_MAPPING_PATH.exists():
+        return {}
+    with open(_SOURCE_REF_MAPPING_PATH) as f:
+        mapping = json.load(f)
+    result: dict[str, dict[str, str]] = {}
+    for key, entry in mapping.items():
+        input_name = key.rsplit(":", 1)[-1]
+        field = entry.get("field", input_name)
+        table = entry.get("table", "")
+        if field != input_name and table:
+            result.setdefault(table, {})[input_name] = field
+    return result
+
+
+def _build_whole_row_object_mapping() -> dict[str, set[str]]:
+    """Build mapping: {table_name: {input_name, ...}} for object inputs without explicit fields.
+
+    These are ``source: {}`` inputs where the entire DataFrame row should be
+    injected as an object. The mapping entry has a ``table`` but neither
+    ``fields`` nor ``field``.
+    """
+    if not _SOURCE_REF_MAPPING_PATH.exists():
+        return {}
+    with open(_SOURCE_REF_MAPPING_PATH) as f:
+        mapping = json.load(f)
+    result: dict[str, set[str]] = {}
+    for key, entry in mapping.items():
+        if "fields" in entry or "field" in entry:
+            continue
+        table = entry.get("table", "")
+        if not table:
+            continue
+        input_name = key.rsplit(":", 1)[-1]
+        result.setdefault(table, set()).add(input_name)
+    return result
+
+
+# Module-level caches so we parse the JSON once.
 _OBJECT_FIELD_MAPPING: dict[str, dict[str, list[str]]] = _build_object_field_mapping()
+_WHOLE_ROW_OBJECT_MAPPING: dict[str, set[str]] = _build_whole_row_object_mapping()
+_FIELD_ALIAS_MAPPING: dict[str, dict[str, str]] = _build_field_alias_mapping()
+_LAW_INPUT_MAPPING: dict[str, dict[str, dict]] = _build_law_input_mapping()
 
 
 class RegelrechtServices:
@@ -139,6 +207,15 @@ class RegelrechtServices:
                 obj = {f: record[f] for f in field_list if f in record}
                 if obj:
                     record[input_name] = obj
+            # Inject whole-row objects for inputs without explicit field lists.
+            for input_name in _WHOLE_ROW_OBJECT_MAPPING.get(table, set()):
+                if input_name not in record:
+                    record[input_name] = dict(record)
+            # Add field aliases so the engine can look up by input name
+            # when the DataFrame column has a different name.
+            for alias_name, source_field in _FIELD_ALIAS_MAPPING.get(table, {}).items():
+                if alias_name not in record and source_field in record:
+                    record[alias_name] = record[source_field]
             records.append(record)
 
         try:
@@ -177,6 +254,125 @@ class RegelrechtServices:
             self._engine.register_data_source(f"{table}_array", param_key, array_records)
         except Exception as e:
             logger.debug("Could not register array data source %s: %s", table, e)
+
+    # -- Data source pre-resolution ---------------------------------------------
+
+    def _pre_resolve_data_sources(self, law_id: str, params: dict[str, Any], data: dict) -> None:
+        """Resolve ``source: {}`` inputs from DataFrames and inject into params.
+
+        The Rust engine resolves data source inputs by looking up the input
+        name in the DataSourceRegistry. When the DataFrame column name differs
+        from the law input name (e.g. input ``advies_mate_van_gevaar`` vs column
+        ``mate_van_gevaar``), the engine cannot find it. This method uses
+        ``source_ref_mapping.json`` to bridge the gap: it looks up the correct
+        table and column, queries the Python-side DataFrames, and injects the
+        resolved values as parameters so the engine finds them directly.
+
+        Additionally, for ``source: {}`` inputs with no mapping entry, it scans
+        all DataFrames for a matching column name (fallback resolution).
+        """
+        # Gather all service DataFrames
+        all_sources: dict[str, pd.DataFrame] = {}
+        for svc in self._services.services.values():
+            all_sources.update(svc.source_dataframes)
+
+        # Phase 1: resolve inputs via source_ref_mapping (precise matching)
+        input_mapping = _LAW_INPUT_MAPPING.get(law_id, {})
+        for input_name, entry in input_mapping.items():
+            if input_name in params:
+                continue
+
+            table = entry.get("table", "")
+            if not table or table not in all_sources:
+                continue
+
+            df = all_sources[table]
+            if df.empty:
+                continue
+
+            field = entry.get("field", input_name)
+            select_on = entry.get("select_on", [])
+            fields = entry.get("fields")
+
+            # Skip array-type inputs (input_name == table)
+            if fields and input_name == table:
+                continue
+
+            # Build selection mask from select_on criteria
+            mask = pd.Series(True, index=df.index)
+            for criterion in select_on:
+                col = criterion.get("name", "")
+                ref = criterion.get("value", "")
+                if not col or col not in df.columns:
+                    mask = pd.Series(False, index=df.index)
+                    break
+                if isinstance(ref, str) and ref.startswith("$"):
+                    param_name = ref[1:]
+                    param_val = params.get(param_name)
+                    if param_val is None:
+                        mask = pd.Series(False, index=df.index)
+                        break
+                    mask = mask & (df[col].astype(str) == str(param_val))
+                else:
+                    mask = mask & (df[col] == ref)
+
+            matched = df[mask]
+            if matched.empty:
+                continue
+
+            if fields:
+                row = matched.iloc[0]
+                obj = {f: _to_native(row[f]) for f in fields if f in row.index}
+                if obj:
+                    params[input_name] = obj
+            elif field in matched.columns:
+                val = _to_native(matched.iloc[0][field])
+                params[input_name] = val
+            elif field == input_name and field not in matched.columns:
+                # Object input without explicit fields list in mapping:
+                # compose an object from the entire matched row.
+                row = matched.iloc[0]
+                obj = _to_native({col: row[col] for col in matched.columns})
+                params[input_name] = obj
+
+        # Phase 2: fallback for source: {} inputs not in the mapping.
+        # For scalar inputs, scan all DataFrames for a matching column.
+        # For object inputs, compose an object from the matched row.
+        for art in data.get("articles", []):
+            for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+                input_name = inp.get("name", "")
+                source = inp.get("source")
+                input_type = inp.get("type", "")
+                if input_name in params:
+                    continue
+                if source is None or source != {}:
+                    continue  # Only handle empty source: {}
+                # Skip if already resolved (Phase 1 may have set it)
+                # Don't skip just because it's in the mapping - Phase 1
+                # might not have resolved it (e.g. object input without fields)
+
+                for tbl_name, df in all_sources.items():
+                    if df.empty:
+                        continue
+                    # Use params to filter rows
+                    mask = pd.Series(True, index=df.index)
+                    for pkey, pval in params.items():
+                        if pkey in df.columns:
+                            mask = mask & (df[pkey].astype(str) == str(pval))
+                    matched = df[mask]
+                    if matched.empty:
+                        matched = df  # Try without filtering
+
+                    if input_type == "object":
+                        # Compose an object from the matched row
+                        if not matched.empty:
+                            row = matched.iloc[0]
+                            obj = _to_native({col: row[col] for col in df.columns})
+                            params[input_name] = obj
+                            break
+                    elif input_name in df.columns and not matched.empty:
+                        params[input_name] = _to_native(matched.iloc[0][input_name])
+                        break
 
     # -- Evaluation ------------------------------------------------------------
 
@@ -231,6 +427,9 @@ class RegelrechtServices:
                 path=None,
                 missing_required=True,
             )
+
+        # Pre-resolve data source inputs that the engine can't resolve itself
+        self._pre_resolve_data_sources(law_id, params, data)
 
         try:
             result = self._engine.evaluate(law_id, output_names, params, reference_date)
