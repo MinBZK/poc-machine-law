@@ -276,6 +276,15 @@ class RegelrechtServices:
         for svc in self._services.services.values():
             all_sources.update(svc.source_dataframes)
 
+        # Build input type lookup from YAML for array detection
+        input_types: dict[str, str] = {}
+        for art in data.get("articles", []):
+            for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+                iname = inp.get("name", "")
+                itype = inp.get("type", "")
+                if iname:
+                    input_types[iname] = itype
+
         # Phase 1: resolve inputs via source_ref_mapping (precise matching)
         input_mapping = _LAW_INPUT_MAPPING.get(law_id, {})
         for input_name, entry in input_mapping.items():
@@ -316,9 +325,10 @@ class RegelrechtServices:
             if matched.empty:
                 continue
 
-            # Array-type inputs (input_name == table): collect ALL matching
-            # rows as a list of objects so the engine can iterate with FOREACH.
-            if fields and input_name == table:
+            # Array-type inputs: collect ALL matching rows as a list of objects
+            # so the engine can iterate with FOREACH.
+            is_array_input = input_name == table or input_types.get(input_name) == "array"
+            if fields and is_array_input:
                 rows = []
                 for _, row in matched.iterrows():
                     obj = {f: _to_native(row[f]) for f in fields if f in row.index}
@@ -396,6 +406,93 @@ class RegelrechtServices:
                         params[input_name] = _to_native(matched.iloc[0][input_name])
                         break
 
+    # -- Cross-law pre-resolution -----------------------------------------------
+
+    def _pre_resolve_cross_law_inputs(
+        self, data: dict, params: dict[str, Any], reference_date: str, _depth: int = 0
+    ) -> None:
+        """Pre-resolve cross-law inputs (source.regulation) via recursive evaluation.
+
+        The Rust engine resolves cross-law references internally but can fail
+        when chains are deep or data sources are needed at intermediate steps.
+        This method resolves them in Python first and injects the results as
+        parameters so the engine finds them directly.
+        """
+        if _depth > 5:
+            return  # Guard against infinite recursion
+
+        for art in data.get("articles", []):
+            for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+                input_name = inp.get("name", "")
+                if input_name in params:
+                    continue
+                source = inp.get("source")
+                if not isinstance(source, dict) or not source.get("regulation"):
+                    continue
+
+                regulation = source["regulation"]
+                output_name = source.get("output", input_name)
+                source_params = source.get("parameters", {})
+
+                # Build parameters for the target law
+                target_params: dict[str, Any] = {}
+                for target_key, source_ref in source_params.items():
+                    if isinstance(source_ref, str) and source_ref.startswith("$"):
+                        var_name = source_ref[1:]
+                        if var_name in params:
+                            target_params[target_key] = params[var_name]
+                    else:
+                        target_params[target_key] = source_ref
+
+                # Find the service for the target regulation
+                target_service = source.get("service", "")
+
+                try:
+                    sub_result = self._evaluate_for_preresolution(
+                        target_service,
+                        regulation,
+                        target_params,
+                        reference_date,
+                        output_name,
+                        _depth + 1,
+                    )
+                    if sub_result is not None:
+                        params[input_name] = sub_result
+                except Exception:
+                    pass  # Leave unresolved; engine or defaults will handle it
+
+    def _evaluate_for_preresolution(
+        self,
+        service: str,
+        law: str,
+        parameters: dict[str, Any],
+        reference_date: str,
+        requested_output: str,
+        depth: int,
+    ) -> Any | None:
+        """Evaluate a cross-law reference for pre-resolution.
+
+        Uses the Rust engine directly with only the mapped parameters.
+        The engine resolves the target law's own data source inputs via
+        its internal DataSourceRegistry.
+        """
+        rule = self.resolver.find_rule(law, reference_date, service or None)
+        if not rule:
+            return None
+
+        import yaml as yaml_mod
+
+        data = yaml_mod.safe_load(Path(rule.path).read_text())
+        law_id = data.get("$id", law)
+        params = _to_native(dict(parameters))
+
+        try:
+            result = self._engine.evaluate(law_id, [requested_output], params, reference_date)
+            outputs = result.get("outputs", {})
+            return outputs.get(requested_output)
+        except Exception:
+            return None
+
     # -- Evaluation ------------------------------------------------------------
 
     def evaluate(
@@ -452,6 +549,13 @@ class RegelrechtServices:
 
         # Pre-resolve data source inputs that the engine can't resolve itself
         self._pre_resolve_data_sources(law_id, params, data)
+
+        # Pre-resolve cross-law inputs via recursive evaluation.
+        # The Rust engine's built-in cross-law resolution can fail silently
+        # (returning null) when chains are deep or data sources are involved.
+        # Each cross-law call delegates to the engine which uses its
+        # DataSourceRegistry for the target law's own inputs.
+        self._pre_resolve_cross_law_inputs(data, params, reference_date)
 
         # Fill defaults for any remaining unresolved source: {} inputs.
         # This prevents TypeMismatch errors when the engine encounters null
@@ -532,7 +636,13 @@ def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
     2. Unevaluated CONCAT operations in FOREACH body results
     3. Unresolved ``$variable`` references in FOREACH body results
     """
-    namespace = {**params, **outputs}
+    # Include definitions in namespace so $definition_name references resolve
+    definitions: dict = {}
+    for art in data.get("articles", []):
+        defs = art.get("machine_readable", {}).get("definitions", {})
+        if isinstance(defs, dict):
+            definitions.update(defs)
+    namespace = {**definitions, **params, **outputs}
 
     # Collect all actions for FOREACH-aware resolution
     actions: list[dict] = []
@@ -561,10 +671,35 @@ def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
             continue
 
         # 2. FOREACH with unevaluated body (CONCAT, $current refs, $variable refs)
+        #    Also handles FOREACH outputs that are empty because the collection
+        #    was null during engine evaluation but resolved by post-processing.
         if isinstance(value, dict) and value.get("operation") == "FOREACH":
             current_value = outputs.get(output_name)
             if current_value is None or not isinstance(current_value, list):
                 continue
+
+            # Check if the collection was post-processed and now has values
+            collection_ref = value.get("collection", "")
+            if isinstance(collection_ref, str) and collection_ref.startswith("$"):
+                coll_name = collection_ref[1:]
+                coll_value = outputs.get(coll_name)
+                if current_value == [] and isinstance(coll_value, list) and len(coll_value) > 0:
+                    # Re-evaluate the FOREACH with the resolved collection
+                    as_name = value.get("as", "current")
+                    body = value.get("body")
+                    resolved = []
+                    for element in coll_value:
+                        item_ns = {**namespace, **outputs, as_name: element}
+                        if isinstance(element, dict):
+                            item_ns.update({f"{as_name}.{k}": v for k, v in element.items()})
+                            item_ns.update(element)
+                        resolved_item = _resolve_value(body, item_ns)
+                        if isinstance(resolved_item, dict) and "operation" in resolved_item:
+                            resolved_item = _evaluate_simple_operation(resolved_item, item_ns)
+                        resolved.append(resolved_item)
+                    outputs[output_name] = resolved
+                    continue
+
             if not _needs_resolution(current_value):
                 continue
             # Get the FOREACH collection to use as element context
@@ -588,6 +723,40 @@ def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
     namespace = {**params, **outputs}
     for key, value in list(outputs.items()):
         outputs[key] = _resolve_value(value, namespace)
+
+
+def _evaluate_simple_operation(op: dict, namespace: dict) -> Any:
+    """Evaluate a simple operation dict in Python (IF/EQUALS).
+
+    Handles the subset of operations that appear in FOREACH body
+    expressions that need re-evaluation after post-processing.
+    """
+    operation = op.get("operation", "")
+    if operation == "IF":
+        for case in op.get("cases", []):
+            when = case.get("when", {})
+            if _eval_condition(when, namespace):
+                return _resolve_value(case.get("then"), namespace)
+        return _resolve_value(op.get("default"), namespace)
+    if operation == "EQUALS":
+        left = _resolve_value(op.get("subject"), namespace)
+        right = _resolve_value(op.get("value"), namespace)
+        return left == right
+    return op
+
+
+def _eval_condition(cond: dict, namespace: dict) -> bool:
+    """Evaluate a simple condition dict."""
+    operation = cond.get("operation", "")
+    subject = _resolve_value(cond.get("subject"), namespace)
+    value = _resolve_value(cond.get("value"), namespace)
+    if operation == "EQUALS":
+        return subject == value
+    if operation == "IN":
+        if isinstance(value, list):
+            return subject in value
+        return False
+    return False
 
 
 def _needs_resolution(value: Any) -> bool:
