@@ -453,6 +453,9 @@ class RegelrechtServices:
         # We fix these in Python as post-processing.
         _postprocess_outputs(outputs, params, data)
 
+        # Apply precision from type_spec to numeric outputs
+        _apply_output_precision(outputs, data)
+
         voldoet = outputs.pop("voldoet_aan_voorwaarden", None)
         req_met = bool(voldoet) if voldoet is not None else bool(outputs)
 
@@ -464,6 +467,34 @@ class RegelrechtServices:
             path=None,
             missing_required=not req_met and not outputs,
         )
+
+
+def _apply_output_precision(outputs: dict, data: dict) -> None:
+    """Apply precision from type_spec to numeric output values.
+
+    The Rust engine does not enforce ``type_spec.precision`` on computed
+    values. This post-processing step rounds floats to the specified
+    number of decimal places and converts to int when precision is 0.
+    """
+    import math
+
+    # Build output_name -> precision mapping
+    precision_map: dict[str, int] = {}
+    for art in data.get("articles", []):
+        for out in art.get("machine_readable", {}).get("execution", {}).get("output", []):
+            name = out.get("name", "")
+            ts = out.get("type_spec", {})
+            if name and "precision" in ts:
+                precision_map[name] = ts["precision"]
+
+    for name, prec in precision_map.items():
+        val = outputs.get(name)
+        if val is None or not isinstance(val, (int, float)):
+            continue
+        if prec == 0:
+            outputs[name] = int(math.floor(val)) if isinstance(val, float) else val
+        else:
+            outputs[name] = round(val, prec)
 
 
 def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
