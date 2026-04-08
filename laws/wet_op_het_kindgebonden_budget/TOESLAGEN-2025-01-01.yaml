@@ -105,18 +105,22 @@ articles:
           regulation: wet_brp
           output: heeft_partner
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: partner_bsn
         type: string
         source:
           regulation: wet_brp
           output: partner_bsn
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: aantal_kinderen
         type: number
         type_spec:
@@ -126,18 +130,24 @@ articles:
           regulation: algemene_kinderbijslagwet
           output: aantal_kinderen
           service: SVB
+          parameters:
+            bsn: $bsn
       - name: kinderen_leeftijden
         type: array
         source:
           regulation: algemene_kinderbijslagwet
           output: kinderen_leeftijden
           service: SVB
+          parameters:
+            bsn: $bsn
       - name: ontvangt_kinderbijslag
         type: boolean
         source:
           regulation: algemene_kinderbijslagwet
           output: ontvangt_kinderbijslag
           service: SVB
+          parameters:
+            bsn: $bsn
       - name: toetsingsinkomen
         type: amount
         type_spec:
@@ -148,6 +158,8 @@ articles:
           regulation: uwv_toetsingsinkomen
           output: toetsingsinkomen
           service: UWV
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -178,6 +190,8 @@ articles:
           regulation: belastingdienst_vermogen
           output: vermogen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $prev_january_first

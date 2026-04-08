@@ -146,7 +146,7 @@ articles:
             bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: leeftijd
         type: number
         type_spec:
@@ -161,7 +161,7 @@ articles:
             bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: pensioenkapitaal
         type: amount
         source_reference:

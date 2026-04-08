@@ -45,18 +45,22 @@ articles:
           regulation: wet_bag
           output: gebruiksdoel
           service: KADASTER
+          parameters:
+            adres: $adres
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: adres
         type: string
         source:
           regulation: handelsregisterwet/bedrijfsgegevens
           output: vestigingsadres
           service: KVK
+          parameters:
+            kvk_nummer: $kvk_nummer
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: jaarlijks_elektriciteitsverbruik_kwh
         type: number
         source_reference:

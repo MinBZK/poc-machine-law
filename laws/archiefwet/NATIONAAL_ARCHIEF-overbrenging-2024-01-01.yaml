@@ -55,7 +55,7 @@ articles:
           - operation: GREATER_THAN_OR_EQUAL
             subject:
               operation: AGE
-              reference_date: $calculation_date
+              reference_date: $referencedate
               date_of_birth: $aanmaakdatum
             value: $minimale_leeftijd_jaren
           - operation: OR

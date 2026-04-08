@@ -93,7 +93,7 @@ articles:
                 value: ''
               - operation: GREATER_THAN
                 subject: $current.datum_einde
-                value: $calculation_date
+                value: $referencedate
           body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 1

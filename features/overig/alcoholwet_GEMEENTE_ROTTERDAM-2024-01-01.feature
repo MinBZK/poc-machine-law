@@ -42,7 +42,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende SVH registraties gegevens:
       | bsn       | is_geregistreerd |
       | 999999990 | true             |
-    When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
+    When de alcoholwet/vergunning/rotterdam wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is voldaan aan de voorwaarden
     And is de output "heeft_recht_op_vergunning" waar
 
@@ -72,7 +72,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende SVH registraties gegevens:
       | bsn       | is_geregistreerd |
       | 999999990 | true             |
-    When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
+    When de alcoholwet/vergunning/rotterdam wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is voldaan aan de voorwaarden
     And is de output "heeft_recht_op_vergunning" waar
 
@@ -102,7 +102,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende SVH registraties gegevens:
       | bsn       | is_geregistreerd |
       | 999999990 | true             |
-    When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
+    When de alcoholwet/vergunning/rotterdam wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is voldaan aan de voorwaarden
     And is de output "heeft_recht_op_vergunning" waar
 
@@ -133,7 +133,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende RECHTSPRAAK curatele gegevens:
       | bsn       | is_onder_curatele |
       | 999999990 | false             |
-    When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
+    When de alcoholwet/vergunning/rotterdam wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_vergunning" onwaar
 
@@ -160,7 +160,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende RECHTSPRAAK curatele gegevens:
       | bsn       | is_onder_curatele |
       | 999999990 | false             |
-    When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
+    When de alcoholwet/vergunning/rotterdam wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_vergunning" onwaar
 
@@ -191,7 +191,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende RECHTSPRAAK curatele gegevens:
       | bsn       | is_onder_curatele |
       | 999999990 | true              |
-    When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
+    When de alcoholwet/vergunning/rotterdam wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_vergunning" onwaar
 
@@ -222,7 +222,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende RECHTSPRAAK curatele gegevens:
       | bsn       | is_onder_curatele |
       | 999999990 | false             |
-    When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
+    When de alcoholwet/vergunning/rotterdam wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_vergunning" onwaar
 
@@ -249,7 +249,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende RECHTSPRAAK curatele gegevens:
       | bsn       | is_onder_curatele |
       | 999999990 | false             |
-    When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
+    When de alcoholwet/vergunning/rotterdam wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_vergunning" onwaar
 
@@ -285,7 +285,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende RECHTSPRAAK curatele gegevens:
       | bsn       | is_onder_curatele |
       | 999999990 | false             |
-    When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
+    When de alcoholwet/vergunning/rotterdam wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_vergunning" onwaar
 
@@ -315,6 +315,6 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
     And de volgende RECHTSPRAAK curatele gegevens:
       | bsn       | is_onder_curatele |
       | 999999990 | false             |
-    When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
+    When de alcoholwet/vergunning/rotterdam wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_vergunning" onwaar

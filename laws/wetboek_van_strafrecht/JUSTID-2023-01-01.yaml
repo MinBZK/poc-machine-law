@@ -74,7 +74,7 @@ articles:
                 conditions:
                 - operation: LESS_THAN_OR_EQUAL
                   subject: $startdatum
-                  value: $calculation_date
+                  value: $referencedate
                 - operation: OR
                   conditions:
                   - operation: EQUALS
@@ -82,7 +82,7 @@ articles:
                     value: null
                   - operation: GREATER_THAN_OR_EQUAL
                     subject: $einddatum
-                    value: $calculation_date
+                    value: $referencedate
               combine: OR
           default: false
         legal_basis:

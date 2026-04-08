@@ -102,9 +102,11 @@ articles:
           regulation: wet_brp
           output: partner_bsn
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: partner_woonsituatie
         type: string
         source:

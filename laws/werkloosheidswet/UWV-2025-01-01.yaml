@@ -63,9 +63,11 @@ articles:
           regulation: wet_brp
           output: leeftijd
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: pensioenleeftijd
         type: number
         type_spec:
@@ -76,24 +78,32 @@ articles:
           regulation: algemene_ouderdomswet_gegevens
           output: pensioenleeftijd
           service: SVB
+          parameters:
+            bsn: $bsn
       - name: heeft_nederlandse_nationaliteit
         type: boolean
         source:
           regulation: wet_brp
           output: heeft_nederlandse_nationaliteit
           service: RvIG
+          parameters:
+            bsn: $bsn
       - name: verblijfsvergunning_type
         type: string
         source:
           regulation: vreemdelingenwet
           output: verblijfsvergunning_type
           service: IND
+          parameters:
+            bsn: $bsn
       - name: woont_in_nederland
         type: boolean
         source:
           regulation: wet_brp
           output: woont_in_nederland
           service: RvIG
+          parameters:
+            bsn: $bsn
       - name: gemiddeld_arbeidsuren_per_week
         type: number
         type_spec:
@@ -103,6 +113,8 @@ articles:
           regulation: uwv_werkgegevens
           output: gemiddeld_uren_per_week
           service: UWV
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: month
@@ -115,9 +127,11 @@ articles:
           regulation: uwv_werkgegevens
           output: huidige_uren_per_week
           service: UWV
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: gewerkte_weken_in_refperiode
         type: number
         type_spec:
@@ -128,6 +142,8 @@ articles:
           regulation: uwv_werkgegevens
           output: gewerkte_weken_36
           service: UWV
+          parameters:
+            bsn: $bsn
       - name: arbeidsverleden_jaren
         type: number
         type_spec:
@@ -137,6 +153,8 @@ articles:
           regulation: uwv_werkgegevens
           output: arbeidsverleden_jaren
           service: UWV
+          parameters:
+            bsn: $bsn
       - name: jaarloon
         type: amount
         type_spec:
@@ -147,6 +165,8 @@ articles:
           regulation: uwv_werkgegevens
           output: jaarloon
           service: UWV
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -156,18 +176,24 @@ articles:
           regulation: ziektewet
           output: heeft_ziektewet_uitkering
           service: UWV
+          parameters:
+            bsn: $bsn
       - name: ontvangt_wia
         type: boolean
         source:
           regulation: wet_werk_en_inkomen_naar_arbeidsvermogen
           output: heeft_wia_uitkering
           service: UWV
+          parameters:
+            bsn: $bsn
       - name: is_gedetineerd
         type: boolean
         source:
           regulation: penitentiaire_beginselenwet
           output: is_gedetineerd
           service: DJI
+          parameters:
+            bsn: $bsn
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

@@ -71,6 +71,8 @@ articles:
           regulation: wet_brp
           output: land_van_verblijf
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: continuous
@@ -80,6 +82,8 @@ articles:
           regulation: penitentiaire_beginselenwet
           output: is_gedetineerd
           service: DJI
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $prev_january_first

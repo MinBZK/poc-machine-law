@@ -159,6 +159,7 @@ def validate_variable_definitions(yaml_files: list[Path]) -> None:
 
         # calculation_date is implicitly defined
         referenced.discard("$calculation_date")
+        referenced.discard("$referencedate")
 
         undefined = {v.replace("$", "") for v in referenced} - defined
 
@@ -266,6 +267,7 @@ def main():
         defined = collect_defined_variables(data)
         referenced = find_variables_in_dict(data)
         referenced.discard("$calculation_date")
+        referenced.discard("$referencedate")
         undefined = {v.replace("$", "") for v in referenced} - defined
         if undefined:
             print(f"\nUndefined variables in {file_path}:")

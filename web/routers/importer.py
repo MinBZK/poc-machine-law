@@ -147,8 +147,9 @@ def validate_variable_definitions(
     defined = collect_defined_variables(yaml_data)
     referenced = find_variables_in_dict(yaml_data)
 
-    # calculation_date is implicitly defined
+    # calculation_date / referencedate is implicitly defined
     referenced.discard("$calculation_date")
+    referenced.discard("$referencedate")
 
     undefined = {v.replace("$", "") for v in referenced} - defined
 

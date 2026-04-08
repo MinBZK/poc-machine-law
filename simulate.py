@@ -1386,10 +1386,10 @@ class LawSimulator:
 
             # 4. Bijstand (social assistance)
             try:
-                bijstand_input, bijstand_defs = self._create_law_overrides("participatiewet/bijstand")
+                bijstand_input, bijstand_defs = self._create_law_overrides("participatiewet/bijstand/amsterdam")
                 bijstand = self.services.evaluate(
                     "GEMEENTE_AMSTERDAM",
-                    "participatiewet/bijstand",
+                    "participatiewet/bijstand/amsterdam",
                     {"BSN": person["bsn"]},
                     self.simulation_date,
                     overwrite_input=bijstand_input,

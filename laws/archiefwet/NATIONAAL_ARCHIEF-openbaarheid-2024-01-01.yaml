@@ -72,7 +72,7 @@ articles:
             - operation: GREATER_THAN_OR_EQUAL
               subject:
                 operation: AGE
-                reference_date: $calculation_date
+                reference_date: $referencedate
                 date_of_birth: $aanmaakdatum
               value: $maximale_beperking_jaren
             - operation: OR
@@ -103,7 +103,7 @@ articles:
             - operation: GREATER_THAN_OR_EQUAL
               subject:
                 operation: AGE
-                reference_date: $calculation_date
+                reference_date: $referencedate
                 date_of_birth: $overbrengdatum
               value: $beperking_termijn_jaren
         legal_basis:

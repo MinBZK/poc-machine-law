@@ -32,7 +32,7 @@ Feature: Bepalen recht op bijstand Amsterdam
     And de volgende GEMEENTE_AMSTERDAM werk_en_re_integratie gegevens:
       | bsn       | arbeidsvermogen | re_integratie_traject |
       | 999993653 | VOLLEDIG        | Werkstage             |
-    When de participatiewet/bijstand wordt uitgevoerd door GEMEENTE_AMSTERDAM
+    When de participatiewet/bijstand/amsterdam wordt uitgevoerd door GEMEENTE_AMSTERDAM
     Then is voldaan aan de voorwaarden
     And is het bijstandsuitkeringsbedrag "1089.00" euro
 
@@ -52,7 +52,7 @@ Feature: Bepalen recht op bijstand Amsterdam
     And de volgende GEMEENTE_AMSTERDAM werk_en_re_integratie gegevens:
       | bsn       | arbeidsvermogen | re_integratie_traject |
       | 999993653 | VOLLEDIG        | Werkstage             |
-    When de participatiewet/bijstand wordt uitgevoerd door GEMEENTE_AMSTERDAM
+    When de participatiewet/bijstand/amsterdam wordt uitgevoerd door GEMEENTE_AMSTERDAM
     Then is voldaan aan de voorwaarden
     And is het bijstandsuitkeringsbedrag "1089.00" euro
     And is de woonkostentoeslag "600.00" euro
@@ -76,7 +76,7 @@ Feature: Bepalen recht op bijstand Amsterdam
     And de volgende GEMEENTE_AMSTERDAM werk_en_re_integratie gegevens:
       | bsn       | arbeidsvermogen | re_integratie_traject |
       | 999993653 | VOLLEDIG        | Zelfstandigentraject  |
-    When de participatiewet/bijstand wordt uitgevoerd door GEMEENTE_AMSTERDAM
+    When de participatiewet/bijstand/amsterdam wordt uitgevoerd door GEMEENTE_AMSTERDAM
     Then is voldaan aan de voorwaarden
     And is het bijstandsuitkeringsbedrag "1089.69" euro
     And is het startkapitaal "2000.00" euro
@@ -94,7 +94,7 @@ Feature: Bepalen recht op bijstand Amsterdam
     And de volgende GEMEENTE_AMSTERDAM werk_en_re_integratie gegevens:
       | bsn       | arbeidsvermogen  | ontheffing_reden  | ontheffing_einddatum |
       | 999993653 | MEDISCH_VOLLEDIG | Chronische ziekte | 2026-01-01           |
-    When de participatiewet/bijstand wordt uitgevoerd door GEMEENTE_AMSTERDAM
+    When de participatiewet/bijstand/amsterdam wordt uitgevoerd door GEMEENTE_AMSTERDAM
     Then is voldaan aan de voorwaarden
     And is het bijstandsuitkeringsbedrag "1089.00" euro
 
@@ -114,5 +114,5 @@ Feature: Bepalen recht op bijstand Amsterdam
     And de volgende KVK inschrijvingen gegevens:
       | bsn       | rechtsvorm  | status | activiteit |
       | 999993653 | EENMANSZAAK | ACTIEF | Thuiszorg  |
-    When de participatiewet/bijstand wordt uitgevoerd door GEMEENTE_AMSTERDAM
+    When de participatiewet/bijstand/amsterdam wordt uitgevoerd door GEMEENTE_AMSTERDAM
     Then is niet voldaan aan de voorwaarden

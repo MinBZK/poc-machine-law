@@ -109,10 +109,10 @@ articles:
                 values: $valid_permit_statuses
               - operation: LESS_THAN_OR_EQUAL
                 subject: $vergunning_gegevens.ingangsdatum
-                value: $calculation_date
+                value: $referencedate
               - operation: GREATER_THAN_OR_EQUAL
                 subject: $vergunning_gegevens.einddatum
-                value: $calculation_date
+                value: $referencedate
             then: TIJDELIJK
         legal_basis:
           law: Vreemdelingenwet 2000

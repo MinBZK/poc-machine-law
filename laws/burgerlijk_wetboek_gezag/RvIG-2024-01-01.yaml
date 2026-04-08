@@ -105,7 +105,7 @@ articles:
             - operation: LESS_THAN
               subject:
                 operation: AGE
-                reference_date: $calculation_date
+                reference_date: $referencedate
                 date_of_birth: $current.geboortedatum_kind
               value: $meerderjarigheid_leeftijd
             - operation: OR
@@ -117,7 +117,7 @@ articles:
                 value: ''
               - operation: GREATER_THAN
                 subject: $current.datum_einde
-                value: $calculation_date
+                value: $referencedate
           body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 1

@@ -1,5 +1,5 @@
 $schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
-$id: wet_brp/terugmelding
+$id: wet_brp/terugmelding/toeslagen
 regulatory_layer: WET
 publication_date: '2023-05-15'
 valid_from: '2023-05-15'

@@ -62,6 +62,8 @@ articles:
           regulation: wet_brp
           output: leeftijd
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $prev_january_first
@@ -71,6 +73,8 @@ articles:
           regulation: wet_brp
           output: heeft_partner
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $prev_january_first
@@ -80,6 +84,8 @@ articles:
           regulation: zvw
           output: heeft_verzekering
           service: RVZ
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: month
@@ -89,6 +95,8 @@ articles:
           regulation: zvw
           output: heeft_verdragsverzekering
           service: RVZ
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: month
@@ -98,6 +106,8 @@ articles:
           regulation: penitentiaire_beginselenwet
           output: is_gedetineerd
           service: DJI
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $prev_january_first
@@ -107,6 +117,8 @@ articles:
           regulation: wet_forensische_zorg
           output: is_forensisch
           service: DJI
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $prev_january_first
@@ -120,6 +132,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: inkomen
           service: UWV
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -134,6 +148,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: vermogen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $prev_january_first
@@ -147,6 +163,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: gezamenlijk_vermogen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $prev_january_first
@@ -160,6 +178,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: partner_inkomen
           service: UWV
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year

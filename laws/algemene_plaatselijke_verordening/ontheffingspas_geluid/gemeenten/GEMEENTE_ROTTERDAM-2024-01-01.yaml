@@ -120,7 +120,7 @@ articles:
               - operation: COMBINE_DATETIME
                 date: $activiteitsdatum
                 time: $activiteitsstarttijd
-              - $calculation_date
+              - $referencedate
               unit: hours
             value: $min_aanvraagtermijn_uren
       - output: aantal_verleende_ontheffingen_dit_jaar
@@ -153,7 +153,7 @@ articles:
             - operation: COMBINE_DATETIME
               date: $activiteitsdatum
               time: $activiteitsstarttijd
-            - $calculation_date
+            - $referencedate
             unit: hours
           value: $min_aanvraagtermijn_uren
         legal_basis:

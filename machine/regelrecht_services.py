@@ -455,7 +455,7 @@ def _resolve_temporal_reference(input_spec: dict, reference_date: str) -> str:
         return calc_date.replace(month=1, day=1, year=calc_date.year - 1).isoformat()
     elif ref_name == "january_first":
         return calc_date.replace(month=1, day=1).isoformat()
-    elif ref_name in ("calculation_date", "year"):
+    elif ref_name in ("calculation_date", "referencedate", "year"):
         return reference_date
 
     return reference_date

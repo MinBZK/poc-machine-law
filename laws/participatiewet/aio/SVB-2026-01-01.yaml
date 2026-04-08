@@ -53,7 +53,7 @@ articles:
             bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: geboortedatum
         type: date
         source:
@@ -64,7 +64,7 @@ articles:
             bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: pensioenleeftijd
         type: number
         type_spec:
@@ -79,7 +79,7 @@ articles:
             geboortedatum: $geboortedatum
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: heeft_partner
         type: boolean
         source:
@@ -90,7 +90,7 @@ articles:
             bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: inkomen
         type: amount
         type_spec:
@@ -120,7 +120,7 @@ articles:
             bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: aow_uitkering
         type: amount
         type_spec:

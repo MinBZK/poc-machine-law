@@ -89,7 +89,7 @@ articles:
       - output: leeftijd
         value:
           operation: AGE
-          reference_date: $calculation_date
+          reference_date: $referencedate
           date_of_birth: $persoonsgegevens.geboortedatum
         legal_basis:
           law: Burgerlijk Wetboek Boek 1

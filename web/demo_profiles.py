@@ -48,9 +48,9 @@ DEMO_PROFILES: dict[str, dict] = {
         "graph_selected_laws": [],
         # Laws disabled for the portal/burger tab (feature flags)
         "disabled_laws": {
-            "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw"],
+            "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw", "zvw/werkgeversbijdrage"],
             "GEMEENTE_ROTTERDAM": [
-                "alcoholwet/vergunning",
+                "alcoholwet/vergunning/rotterdam",
                 "algemene_plaatselijke_verordening/exploitatievergunning",
                 "algemene_plaatselijke_verordening/terrassen",
                 "algemene_plaatselijke_verordening/ontheffingspas_geluid",
@@ -113,9 +113,9 @@ DEMO_PROFILES: dict[str, dict] = {
         "graph_selected_laws": [],
         # Laws disabled for the portal tab (feature flags)
         "disabled_laws": {
-            "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw"],
+            "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw", "zvw/werkgeversbijdrage"],
             "DUO": ["wet_studiefinanciering"],
-            "GEMEENTE_AMSTERDAM": ["participatiewet/bijstand"],
+            "GEMEENTE_AMSTERDAM": ["participatiewet/bijstand/amsterdam"],
             "KIESRAAD": ["kieswet"],
             "PENSIOENFONDS": ["pensioenwet"],
             "RVO": ["omgevingswet/werkgebonden_personenmobiliteit"],
@@ -140,7 +140,7 @@ DEMO_PROFILES: dict[str, dict] = {
                 "uwv_werkgegevens",
                 "wet_werk_en_inkomen_naar_arbeidsvermogen",
                 "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen",
-                "wet_inkomstenbelasting",
+                "wet_inkomstenbelasting/toetsingsinkomen",
             ],
         },
     },

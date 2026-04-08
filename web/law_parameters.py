@@ -332,7 +332,9 @@ def get_default_law_parameters_old(simulation_date: str = "2025-01-01") -> dict[
 
         # Bijstand
         try:
-            engine = services.services["GEMEENTE_AMSTERDAM"]._get_engine("participatiewet/bijstand", simulation_date)
+            engine = services.services["GEMEENTE_AMSTERDAM"]._get_engine(
+                "participatiewet/bijstand/amsterdam", simulation_date
+            )
             definitions = engine.definitions
             # Extract norms (in eurocents yearly, convert to euros monthly)
             norm_alleenstaand = definitions.get("NORM_ALLEENSTAAND", {})

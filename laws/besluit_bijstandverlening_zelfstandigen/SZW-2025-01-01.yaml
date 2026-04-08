@@ -93,7 +93,7 @@ articles:
             bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: geboortedatum
         type: date
         source:
@@ -104,7 +104,7 @@ articles:
             bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: pensioenleeftijd
         type: number
         type_spec:

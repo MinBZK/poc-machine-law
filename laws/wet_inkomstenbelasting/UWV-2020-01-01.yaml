@@ -1,5 +1,5 @@
 $schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
-$id: wet_inkomstenbelasting
+$id: wet_inkomstenbelasting/toetsingsinkomen
 regulatory_layer: WET
 publication_date: '2020-01-01'
 valid_from: '2020-01-01'
@@ -31,6 +31,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: box1_inkomen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -43,6 +45,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: box2_inkomen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -55,6 +59,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: box3_inkomen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -67,6 +73,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: buitenlands_inkomen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -79,6 +87,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: partner_box1_inkomen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -91,6 +101,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: partner_box2_inkomen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -103,6 +115,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: partner_box3_inkomen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -115,6 +129,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: partner_buitenlands_inkomen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year

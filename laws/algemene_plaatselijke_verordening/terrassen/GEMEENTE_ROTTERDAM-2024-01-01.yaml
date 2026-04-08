@@ -190,7 +190,7 @@ articles:
             kvk_nummer: $kvk_nummer
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: vestigingsadres
         type: string
         source:
@@ -201,7 +201,7 @@ articles:
             kvk_nummer: $kvk_nummer
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: bag_gebruiksdoel
         type: string
         source:
@@ -212,7 +212,7 @@ articles:
             adres: $vestigingsadres
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: schenkt_alcohol
         type: boolean
         source:
@@ -223,7 +223,7 @@ articles:
             kvk_nummer: $kvk_nummer
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: heeft_alcoholvergunning
         type: boolean
         source_reference:

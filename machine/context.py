@@ -479,7 +479,7 @@ class RuleContext:
             self.pop_path()
 
     def _resolve_date(self, path):
-        if path == "calculation_date":
+        if path in ("calculation_date", "referencedate"):
             return self.calculation_date
         if path == "january_first":
             calc_date = datetime.strptime(self.calculation_date, "%Y-%m-%d").date()

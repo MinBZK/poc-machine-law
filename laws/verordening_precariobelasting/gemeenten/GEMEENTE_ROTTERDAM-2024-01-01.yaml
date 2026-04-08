@@ -41,7 +41,7 @@ articles:
             kvk_nummer: $kvk_nummer
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: vergunde_oppervlakte
         type: number
         source:
@@ -52,7 +52,7 @@ articles:
             kvk_nummer: $kvk_nummer
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: vestigingsadres
         type: string
         source:
@@ -63,7 +63,7 @@ articles:
             kvk_nummer: $kvk_nummer
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: heeft_terras
         type: boolean
         source_reference:

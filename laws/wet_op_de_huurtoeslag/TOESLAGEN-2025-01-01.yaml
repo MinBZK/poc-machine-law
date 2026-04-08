@@ -89,27 +89,33 @@ articles:
           regulation: wet_brp
           output: huishoudleden
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: kinderen
         type: array
         source:
           regulation: wet_brp
           output: kinderen
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: partner_bsn
         type: string
         source:
           regulation: wet_brp
           output: partner_bsn
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: partner_adres
         type: string
         source:
@@ -120,43 +126,51 @@ articles:
             bsn: $partner_bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: leeftijd
         type: number
         source:
           regulation: wet_brp
           output: leeftijd
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: heeft_partner
         type: boolean
         source:
           regulation: wet_brp
           output: heeft_partner
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: huishoudgrootte
         type: number
         source:
           regulation: wet_brp
           output: huishoudgrootte
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: verblijfsadres
         type: string
         source:
           regulation: wet_brp
           output: verblijfsadres
           service: RvIG
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: inkomen
         type: amount
         type_spec:
@@ -167,6 +181,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: inkomen
           service: UWV
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -180,6 +196,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: partner_inkomen
           service: UWV
+          parameters:
+            bsn: $bsn
         temporal:
           type: period
           period_type: year
@@ -193,6 +211,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: vermogen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $prev_january_first
@@ -206,6 +226,8 @@ articles:
           regulation: wet_inkomstenbelasting
           output: gezamenlijk_vermogen
           service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
           reference: $prev_january_first

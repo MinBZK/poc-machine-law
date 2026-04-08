@@ -95,9 +95,11 @@ articles:
           regulation: wet_op_het_centraal_bureau_voor_de_statistiek
           output: levensverwachting_65
           service: CBS
+          parameters:
+            bsn: $bsn
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

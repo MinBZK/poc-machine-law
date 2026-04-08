@@ -1,5 +1,5 @@
 $schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
-$id: alcoholwet/vergunning
+$id: alcoholwet/vergunning/rotterdam
 regulatory_layer: WET
 publication_date: '2024-01-01'
 valid_from: '2024-01-01'
@@ -40,7 +40,7 @@ articles:
             bsn: $bsn_leidinggevende
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: is_onder_curatele_exploitant
         type: boolean
         source:
@@ -51,7 +51,7 @@ articles:
             bsn: $bsn_leidinggevende
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: bedrijf_status
         type: string
         source:
@@ -109,7 +109,7 @@ articles:
             beschikking_type: $bibob_beschikking_type
         temporal:
           type: point_in_time
-          reference: $calculation_date
+          reference: $referencedate
       - name: bsn_leidinggevende
         type: string
         source_reference:

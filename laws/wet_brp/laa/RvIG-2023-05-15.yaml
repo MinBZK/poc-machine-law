@@ -38,7 +38,7 @@ articles:
       - name: belastingdienst_twijfel
         type: boolean
         source:
-          regulation: wet_brp/terugmelding
+          regulation: wet_brp/terugmelding/belastingdienst
           output: heeft_gerede_twijfel_adres
           service: BELASTINGDIENST
           parameters:
@@ -47,7 +47,7 @@ articles:
       - name: toeslagen_twijfel
         type: boolean
         source:
-          regulation: wet_brp/terugmelding
+          regulation: wet_brp/terugmelding/toeslagen
           output: heeft_gerede_twijfel_adres
           service: TOESLAGEN
           parameters:
@@ -56,7 +56,7 @@ articles:
       - name: cjib_twijfel
         type: boolean
         source:
-          regulation: wet_brp/terugmelding
+          regulation: wet_brp/terugmelding/cjib
           output: heeft_gerede_twijfel_adres
           service: CJIB
           parameters:
