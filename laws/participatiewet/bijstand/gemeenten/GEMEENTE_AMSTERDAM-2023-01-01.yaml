@@ -168,12 +168,12 @@ articles:
               value: true
             - operation: IN
               subject: $postadres
-              values: $geldige_post_adressen
+              value: $geldige_post_adressen
           - operation: OR
             conditions:
             - operation: IN
               subject: $arbeidsvermogen.arbeidsvermogen
-              values: $volledige_ontheffing_redenen
+              value: $volledige_ontheffing_redenen
             - operation: NOT
               value:
                 operation: IS_NULL
@@ -247,7 +247,7 @@ articles:
                 value: false
               - operation: IN
                 subject: $postadres
-                values: $geldige_post_adressen
+                value: $geldige_post_adressen
             then: $woonkostentoeslag_bedrag
           default: 0
       - output: startkapitaal

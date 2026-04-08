@@ -289,7 +289,7 @@ articles:
             value: true
           - subject: $bag_gebruiksdoel
             operation: IN
-            values: $toegestane_gebruiksdoelen
+            value: $toegestane_gebruiksdoelen
           - operation: GREATER_THAN_OR_EQUAL
             subject: $obstakelvrije_ruimte
             value: $minimale_obstakelvrije_ruimte
@@ -298,7 +298,7 @@ articles:
             value: $beschikbare_oppervlakte
           - subject: $functie_oppervlak
             operation: IN
-            values: $toegestane_bgt_functies
+            value: $toegestane_bgt_functies
           - operation: LESS_THAN_OR_EQUAL
             subject: $gewenste_sluitingstijd_doordeweeks
             value: $max_sluitingstijd_doordeweeks
@@ -322,7 +322,7 @@ articles:
             value: true
           - operation: IN
             subject: $bag_gebruiksdoel
-            values: $toegestane_gebruiksdoelen
+            value: $toegestane_gebruiksdoelen
           - operation: GREATER_THAN_OR_EQUAL
             subject: $obstakelvrije_ruimte
             value: $minimale_obstakelvrije_ruimte
@@ -331,7 +331,7 @@ articles:
             value: $beschikbare_oppervlakte
           - operation: IN
             subject: $functie_oppervlak
-            values: $toegestane_bgt_functies
+            value: $toegestane_bgt_functies
           - operation: LESS_THAN_OR_EQUAL
             subject: $gewenste_sluitingstijd_doordeweeks
             value: $max_sluitingstijd_doordeweeks
@@ -371,7 +371,7 @@ articles:
           - when:
               operation: NOT_IN
               subject: $bag_gebruiksdoel
-              values: $toegestane_gebruiksdoelen
+              value: $toegestane_gebruiksdoelen
             then: Pand heeft geen horecagerelateerd gebruiksdoel
           - when:
               operation: LESS_THAN
@@ -386,7 +386,7 @@ articles:
           - when:
               operation: NOT_IN
               subject: $functie_oppervlak
-              values: $toegestane_bgt_functies
+              value: $toegestane_bgt_functies
             then: Locatie niet geschikt voor terras (verkeerde BGT-functie)
           - when:
               operation: GREATER_THAN

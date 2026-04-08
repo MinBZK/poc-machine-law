@@ -125,7 +125,7 @@ articles:
         value:
           operation: IN
           subject: $verblijfsobject.gebruiksdoel
-          values: $woon_gebruiksdoelen
+          value: $woon_gebruiksdoelen
         legal_basis:
           law: Wet basisregistratie adressen en gebouwen
           bwb_id: BWBR0023466

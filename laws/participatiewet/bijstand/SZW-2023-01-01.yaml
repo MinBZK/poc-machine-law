@@ -244,7 +244,7 @@ articles:
               value: true
             - operation: IN
               subject: $verblijfsvergunning_type
-              values: $geldige_verblijfsvergunningen
+              value: $geldige_verblijfsvergunningen
           - operation: NOT
             value:
               operation: IS_NULL
@@ -337,7 +337,7 @@ articles:
           - when:
               operation: IN
               subject: $huishoudleden
-              values: $kostendelersnorm_factoren
+              value: $kostendelersnorm_factoren
             then:
               operation: GET
               subject: $huishoudleden

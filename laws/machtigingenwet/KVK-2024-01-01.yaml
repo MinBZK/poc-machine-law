@@ -107,7 +107,7 @@ articles:
           filter:
             operation: IN
             subject: $current.functie
-            values: $bevoegde_functies
+            value: $bevoegde_functies
           body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 2

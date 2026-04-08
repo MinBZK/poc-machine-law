@@ -91,22 +91,22 @@ articles:
               conditions:
               - operation: IN
                 subject: $vergunning_gegevens.type
-                values: $permanent_types
+                value: $permanent_types
               - operation: IN
                 subject: $vergunning_gegevens.status
-                values: $valid_permit_statuses
+                value: $valid_permit_statuses
             then: PERMANENT
           - when:
               operation: IN
               subject: $eu_inschrijving.type
-              values: $eu_types
+              value: $eu_types
             then: EU
           - when:
               operation: AND
               conditions:
               - operation: IN
                 subject: $vergunning_gegevens.status
-                values: $valid_permit_statuses
+                value: $valid_permit_statuses
               - operation: LESS_THAN_OR_EQUAL
                 subject: $vergunning_gegevens.ingangsdatum
                 value: $referencedate

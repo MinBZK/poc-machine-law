@@ -96,10 +96,10 @@ articles:
           conditions:
           - operation: IN
             subject: $zorgtype
-            values: $forensische_zorgtypen
+            value: $forensische_zorgtypen
           - operation: IN
             subject: $juridische_titel
-            values: $geldige_juridische_titels
+            value: $geldige_juridische_titels
         legal_basis:
           law: Wet forensische zorg
           bwb_id: BWBR0040635

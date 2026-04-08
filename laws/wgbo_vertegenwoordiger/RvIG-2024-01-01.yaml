@@ -112,7 +112,7 @@ articles:
               value: true
             - operation: IN
               subject: $current.relatie_type
-              values: $wgbo_relatie_hierarchie
+              value: $wgbo_relatie_hierarchie
           body: $current
         legal_basis:
           law: Burgerlijk Wetboek Boek 7

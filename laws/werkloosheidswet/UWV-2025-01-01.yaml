@@ -274,7 +274,7 @@ articles:
               value: true
             - operation: IN
               subject: $verblijfsvergunning_type
-              values: $geldige_verblijfsvergunningen
+              value: $geldige_verblijfsvergunningen
           - subject: $woont_in_nederland
             operation: EQUALS
             value: true

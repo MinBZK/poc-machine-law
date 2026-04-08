@@ -127,7 +127,7 @@ articles:
               subject: $polis_status
           - operation: IN
             subject: $polis_status
-            values: $actieve_polis_statussen
+            value: $actieve_polis_statussen
         legal_basis:
           law: Zorgverzekeringswet
           bwb_id: BWBR0018450
@@ -145,7 +145,7 @@ articles:
               subject: $registratie
           - operation: IN
             subject: $verblijfsland
-            values: $geldige_verdragslanden
+            value: $geldige_verdragslanden
           - operation: EQUALS
             subject: $registratie
             value: ACTIEF

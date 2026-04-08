@@ -189,7 +189,7 @@ articles:
           - when:
               operation: IN
               subject: $partnerschap_type
-              values: $geldige_partnertypen
+              value: $geldige_partnertypen
             then: $partner_bsn
       - output: leeftijd
         value:
@@ -220,7 +220,7 @@ articles:
         value:
           operation: IN
           subject: $partnerschap_type
-          values: $geldige_partnertypen
+          value: $geldige_partnertypen
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -261,7 +261,7 @@ articles:
         value:
           operation: IN
           subject: $nationaliteit
-          values: $nederlandse_nationaliteiten
+          value: $nederlandse_nationaliteiten
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -288,7 +288,7 @@ articles:
         value:
           operation: IN
           subject: $adres.type
-          values: $vaste_adres_typen
+          value: $vaste_adres_typen
         legal_basis:
           law: Wet basisregistratie personen
           bwb_id: BWBR0033715
@@ -340,7 +340,7 @@ articles:
           - when:
               operation: IN
               subject: $adres.type
-              values: $post_adres_typen
+              value: $post_adres_typen
             then:
               operation: CONCAT
               values:

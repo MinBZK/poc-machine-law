@@ -65,18 +65,18 @@ articles:
             conditions:
             - operation: IN
               subject: $inschrijvingen.rechtsvorm
-              values: $ondernemersvormen
+              value: $ondernemersvormen
             - operation: IN
               subject: $inschrijvingen.status
-              values: $actieve_statussen
+              value: $actieve_statussen
           - operation: AND
             conditions:
             - operation: IN
               subject: $posities.functie
-              values: $ondernemers_posities
+              value: $ondernemers_posities
             - operation: IN
               subject: $posities.status
-              values: $actieve_statussen
+              value: $actieve_statussen
         legal_basis:
           law: Handelsregisterwet 2007
           bwb_id: BWBR0021777

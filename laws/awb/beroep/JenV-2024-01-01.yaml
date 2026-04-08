@@ -138,10 +138,10 @@ articles:
           conditions:
           - operation: NOT_IN
             subject: $wet.decision_type
-            values: $excluded_decision_types
+            value: $excluded_decision_types
           - operation: IN
             subject: $wet.legal_character
-            values: $required_legal_character
+            value: $required_legal_character
           - operation: OR
             conditions:
             - operation: EQUALS
@@ -181,12 +181,12 @@ articles:
           - when:
               operation: IN
               subject: $wet.decision_type
-              values: $excluded_decision_types
+              value: $excluded_decision_types
             then: tegen dit type besluit is geen beroep mogelijk
           - when:
               operation: NOT_IN
               subject: $wet.legal_character
-              values: $required_legal_character
+              value: $required_legal_character
             then: dit is geen besluit in de zin van de AWB
           - when:
               operation: AND
