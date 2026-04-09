@@ -649,17 +649,27 @@ class RegelrechtServices:
         # the remaining source: {} inputs. Filling defaults would override
         # correct values from the data sources.
 
-        try:
-            result = self._engine.evaluate(law_id, [requested_output], params, reference_date)
-            outputs = result.get("outputs", {})
-            val = outputs.get(requested_output)
-            if val is not None:
-                return val
-        except Exception:
-            pass
+        # Check if there are claims for the target law. Claims modify inputs
+        # (e.g., correcting geboortedatum), and the Rust engine doesn't know
+        # about them. Use the Python engine when claims exist.
+        bsn = params.get("bsn")
+        has_claims = False
+        if bsn:
+            claims = self.claim_manager.get_claim_by_bsn_service_law(bsn, service or "", law, approved=False)
+            has_claims = bool(claims)
+
+        if not has_claims:
+            try:
+                result = self._engine.evaluate(law_id, [requested_output], params, reference_date)
+                outputs = result.get("outputs", {})
+                val = outputs.get(requested_output)
+                if val is not None:
+                    return val
+            except Exception:
+                pass
 
         # Fallback to Python engine for laws the Rust engine can't handle
-        # (e.g., FOREACH over arrays of objects).
+        # (e.g., FOREACH over arrays of objects) or when claims exist.
         try:
             py_result = self._services.evaluate(
                 service=service or next((s for s in self._services.services if self._services.services[s]), ""),
