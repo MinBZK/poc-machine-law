@@ -1,11 +1,8 @@
-"""Services wrapping the regelrecht Rust engine (PyO3) and the Python engine.
+"""Services using the regelrecht Rust engine (PyO3).
 
-Law evaluation delegates to the Python engine which handles all law
-features correctly (FOREACH, cross-law references, source_ref_mapping
-field resolution, dot-notation projection on arrays).
-
-DataFrames are registered in both engines so the Rust engine stays
-primed for future use as its feature set catches up.
+All law evaluation goes through the Rust engine. DataFrames are
+registered as data sources. Pre-resolution handles field name mapping
+and cross-law chains. Post-processing handles dot-notation projection.
 """
 
 import json
@@ -15,11 +12,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
-try:
-    from regelrecht_engine import RegelrechtEngine
-except ImportError:
-    RegelrechtEngine = None  # PyO3 module not installed; engine features unavailable
+from regelrecht_engine import RegelrechtEngine
 
 from machine.service import RuleResult, Services
 
@@ -165,9 +158,8 @@ class RegelrechtServices:
         self._services = Services(reference_date)
         self.resolver = self._services.resolver
         self.root_reference_date = reference_date
-        self._engine = RegelrechtEngine() if RegelrechtEngine is not None else None
-        if self._engine is not None:
-            self._load_all_laws()
+        self._engine = RegelrechtEngine()
+        self._load_all_laws()
 
     def _load_all_laws(self) -> None:
         """Load all laws into the engine as-is. Cross-law sources (source.regulation)
@@ -218,8 +210,6 @@ class RegelrechtServices:
         old values persist. This method ensures consistency by rebuilding from
         the Python-side DataFrames before each evaluation.
         """
-        if self._engine is None:
-            return
         self._engine.clear_data_sources()
         all_sources: dict[str, pd.DataFrame] = {}
         for svc in self._services.services.values():
@@ -252,11 +242,10 @@ class RegelrechtServices:
                         record[alias_name] = record[source_field]
                 records.append(record)
 
-            if self._engine is not None:
-                try:
-                    self._engine.register_data_source(table, param_key, records)
-                except Exception:
-                    pass
+            try:
+                self._engine.register_data_source(table, param_key, records)
+            except Exception:
+                pass
 
             if table in _ARRAY_INPUT_TABLES:
                 self._register_array_data_source(table, key_field, records)
@@ -305,7 +294,6 @@ class RegelrechtServices:
                     record[alias_name] = record[source_field]
             records.append(record)
 
-        if self._engine is not None:
             try:
                 self._engine.register_data_source(table, param_key, records)
             except Exception as e:
@@ -337,8 +325,6 @@ class RegelrechtServices:
         for key, rows in grouped.items():
             array_records.append({param_key: key, table: rows})
 
-        if self._engine is None:
-            return
         try:
             self._engine.register_data_source(f"{table}_array", param_key, array_records)
         except Exception as e:
@@ -706,19 +692,7 @@ class RegelrechtServices:
             except Exception:
                 pass
 
-        # Fallback to Python engine for laws the Rust engine can't handle
-        # (e.g., FOREACH over arrays of objects) or when claims exist.
-        try:
-            py_result = self._services.evaluate(
-                service=service or next((s for s in self._services.services if self._services.services[s]), ""),
-                law=law,
-                parameters=parameters,
-                reference_date=reference_date,
-                requested_output=requested_output,
-            )
-            return py_result.output.get(requested_output)
-        except Exception:
-            return None
+        return None
 
     # -- Evaluation ------------------------------------------------------------
 
@@ -734,24 +708,7 @@ class RegelrechtServices:
         approved: bool = False,
         **kwargs,
     ) -> RuleResult:
-        """Evaluate a law using the Rust engine.
-
-        Falls back to the Python engine if the Rust engine is not available
-        (e.g., regelrecht_engine PyO3 module not installed).
-        """
-        # Fallback to Python engine if Rust engine is not available
-        if self._engine is None:
-            return self._services.evaluate(
-                service,
-                law=law,
-                parameters=parameters,
-                reference_date=reference_date,
-                overwrite_input=overwrite_input,
-                overwrite_definitions=overwrite_definitions,
-                requested_output=requested_output,
-                approved=approved,
-            )
-
+        """Evaluate a law using the Rust engine."""
         reference_date = reference_date or self.root_reference_date
         rule = self.resolver.find_rule(law, reference_date, service)
         if not rule:
