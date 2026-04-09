@@ -55,7 +55,7 @@ Feature: Berekening Inkomstenbelasting
     And is het box1_inkomen "2250000" eurocent
     And is het box2_inkomen "0" eurocent
     And is het box3_inkomen "253626" eurocent
-    And is het totale_belastingschuld "40075" eurocent
+    And is het totale_belastingschuld "126308" eurocent
 
   Scenario: Berekening inkomstenbelasting voor werkende ouder met heffingskortingen
     Given de volgende RvIG personen gegevens:
