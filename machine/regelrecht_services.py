@@ -242,11 +242,8 @@ class RegelrechtServices:
         records = []
         for _, row in df.iterrows():
             record = _to_native({col: row[col] for col in df.columns})
-            # If the DataFrame key differs from the parameter key, add an alias
-            # so the engine can look up by parameter name (e.g., bsn → bsn_curator)
             if param_key != key_field and param_key not in record and key_field in record:
                 record[param_key] = record[key_field]
-            # Inject synthetic object fields for multi-field inputs.
             # DON'T inject if the input name matches the table name - that means
             # it's an array-type input that should come from _register_array_data_source.
             # Also skip injection entirely for array input tables: the engine
