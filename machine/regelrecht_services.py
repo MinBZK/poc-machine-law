@@ -201,12 +201,16 @@ class RegelrechtServices:
             # Inject synthetic object fields for multi-field inputs.
             # DON'T inject if the input name matches the table name - that means
             # it's an array-type input that should come from _register_array_data_source.
-            for input_name, field_list in object_inputs.items():
-                if input_name == table:
-                    continue
-                obj = {f: record[f] for f in field_list if f in record}
-                if obj:
-                    record[input_name] = obj
+            # Also skip injection entirely for array input tables: the engine
+            # cannot handle object values in data source records and will error
+            # with "Type mismatch: expected number, string, or array, got object".
+            if table not in _ARRAY_INPUT_TABLES:
+                for input_name, field_list in object_inputs.items():
+                    if input_name == table:
+                        continue
+                    obj = {f: record[f] for f in field_list if f in record}
+                    if obj:
+                        record[input_name] = obj
             # Inject whole-row objects for inputs without explicit field lists.
             for input_name in _WHOLE_ROW_OBJECT_MAPPING.get(table, set()):
                 if input_name not in record:
@@ -318,6 +322,10 @@ class RegelrechtServices:
                         mask = pd.Series(False, index=df.index)
                         break
                     mask = mask & (df[col].astype(str) == str(param_val))
+                elif isinstance(ref, dict):
+                    # Complex operations (e.g., {operation: IN, values: ...})
+                    # Skip this criterion; match all rows for this column.
+                    pass
                 else:
                     mask = mask & (df[col] == ref)
 
@@ -461,6 +469,10 @@ class RegelrechtServices:
                             mask = pd.Series(False, index=df.index)
                             break
                         mask = mask & (df[col].astype(str) == str(param_val))
+                    elif isinstance(ref, dict):
+                        # Complex operations (e.g., {operation: IN, values: ...})
+                        # Skip this criterion; match all rows for this column.
+                        pass
                     else:
                         mask = mask & (df[col] == ref)
 
@@ -534,12 +546,20 @@ class RegelrechtServices:
                 # Find the service for the target regulation
                 target_service = source.get("service", "")
 
+                # Handle temporal references that adjust the reference date
+                # e.g. temporal.reference: $prev_january_first changes the date
+                # used for cross-law evaluation.
+                effective_date = reference_date
+                temporal = inp.get("temporal")
+                if isinstance(temporal, dict) and "reference" in temporal:
+                    effective_date = _resolve_temporal_reference(temporal["reference"], reference_date)
+
                 try:
                     sub_result = self._evaluate_for_preresolution(
                         target_service,
                         regulation,
                         target_params,
-                        reference_date,
+                        effective_date,
                         output_name,
                         _depth + 1,
                     )
@@ -587,7 +607,23 @@ class RegelrechtServices:
         try:
             result = self._engine.evaluate(law_id, [requested_output], params, reference_date)
             outputs = result.get("outputs", {})
-            return outputs.get(requested_output)
+            val = outputs.get(requested_output)
+            if val is not None:
+                return val
+        except Exception:
+            pass
+
+        # Fallback to Python engine for laws the Rust engine can't handle
+        # (e.g., FOREACH over arrays of objects).
+        try:
+            py_result = self._services.evaluate(
+                service=service or next((s for s in self._services.services if self._services.services[s]), ""),
+                law=law,
+                parameters=parameters,
+                reference_date=reference_date,
+                requested_output=requested_output,
+            )
+            return py_result.output.get(requested_output)
         except Exception:
             return None
 
@@ -623,6 +659,16 @@ class RegelrechtServices:
                 if isinstance(sv, dict):
                     params.update(_to_native(sv))
 
+        # Resolve claims (citizen-submitted data) and merge into params.
+        # This mirrors what the Python engine does in engine.py.
+        bsn = params.get("bsn")
+        if bsn:
+            claims = self.claim_manager.get_claim_by_bsn_service_law(bsn, service, law, approved=approved)
+            if claims:
+                for key, claim in claims.items():
+                    if key not in params:
+                        params[key] = _to_native(claim.new_value)
+
         import yaml as yaml_mod
 
         data = yaml_mod.safe_load(Path(rule.path).read_text())
@@ -654,6 +700,19 @@ class RegelrechtServices:
         # Each cross-law call delegates to the engine which uses its
         # DataSourceRegistry for the target law's own inputs.
         self._pre_resolve_cross_law_inputs(data, params, reference_date)
+
+        # Check for missing required source: {} inputs (claim-based data).
+        # These must be supplied by the citizen; return missing_required if absent.
+        missing = _find_missing_required_inputs(data, params)
+        if missing:
+            return RuleResult(
+                output={},
+                requirements_met=False,
+                input=params,
+                rulespec_uuid=rule.uuid,
+                path=None,
+                missing_required=True,
+            )
 
         # Fill defaults for any remaining unresolved source: {} inputs.
         # This prevents TypeMismatch errors when the engine encounters null
@@ -694,8 +753,34 @@ class RegelrechtServices:
             input=resolved,
             rulespec_uuid=rule.uuid,
             path=None,
-            missing_required=not req_met and not outputs,
+            missing_required=False,
         )
+
+
+def _resolve_temporal_reference(ref: str, reference_date: str) -> str:
+    """Resolve a temporal reference string to an actual date.
+
+    Supports:
+    - $prev_january_first  → January 1 of the previous year
+    - $january_first       → January 1 of the current year
+    - $referencedate       → the reference date itself
+    """
+    from datetime import datetime
+
+    if not isinstance(ref, str) or not ref.startswith("$"):
+        return reference_date
+    name = ref[1:]
+    try:
+        dt = datetime.strptime(reference_date, "%Y-%m-%d").date()
+    except (ValueError, TypeError):
+        return reference_date
+    if name == "prev_january_first":
+        return dt.replace(month=1, day=1, year=dt.year - 1).isoformat()
+    if name == "january_first":
+        return dt.replace(month=1, day=1).isoformat()
+    if name in ("referencedate", "calculation_date"):
+        return reference_date
+    return reference_date
 
 
 def _apply_output_precision(outputs: dict, data: dict) -> None:
@@ -976,6 +1061,22 @@ def _get_param_key_for_table(table: str, df_key_field: str) -> str:
     return df_key_field
 
 
+def _find_missing_required_inputs(data: dict, params: dict) -> list[str]:
+    """Find required source: {} inputs that are still unresolved.
+
+    Returns the list of missing input names. These are typically claim-based
+    inputs that must be supplied by the citizen before evaluation can proceed.
+    """
+    missing = []
+    for art in data.get("articles", []):
+        for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+            name = inp.get("name", "")
+            source = inp.get("source")
+            if name and inp.get("required") and source == {} and name not in params:
+                missing.append(name)
+    return missing
+
+
 def _fill_input_defaults(data: dict, params: dict) -> None:
     """Fill default values for unresolved source: {} inputs.
 
@@ -997,6 +1098,10 @@ def _fill_input_defaults(data: dict, params: dict) -> None:
             name = inp.get("name", "")
             source = inp.get("source")
             if name and name not in params and source == {}:
+                # Skip required claim inputs - they should remain unresolved
+                # so the engine correctly reports missing_required.
+                if inp.get("required"):
+                    continue
                 # Fill defaults ONLY for source: {} inputs (data source resolution).
                 # Cross-law inputs (source.regulation) should be resolved by the engine.
                 input_type = inp.get("type", "string")
