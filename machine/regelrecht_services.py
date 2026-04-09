@@ -804,8 +804,20 @@ class RegelrechtServices:
         # Apply precision from type_spec to numeric outputs
         _apply_output_precision(outputs, data)
 
-        voldoet = outputs.pop("voldoet_aan_voorwaarden", None)
-        req_met = bool(voldoet) if voldoet is not None else bool(outputs)
+        # Determine requirements_met from voldoet_aan_voorwaarden.
+        # The sentinel _MISSING distinguishes "not in outputs" from "in outputs but None".
+        _MISSING = object()
+        voldoet = outputs.pop("voldoet_aan_voorwaarden", _MISSING)
+        # When voldoet_aan_voorwaarden exists: only True means requirements met;
+        # None (engine couldn't evaluate) or False both mean not met.
+        # When absent: infer from whether outputs exist.
+        req_met = bool(outputs) if voldoet is _MISSING else voldoet is True
+
+        # When requirements are not met, clear all outputs.
+        # The Python engine skips action evaluation when requirements fail,
+        # so downstream outputs (e.g. is_gerechtigd) should not appear.
+        if not req_met and voldoet is not _MISSING:
+            outputs = {}
 
         return RuleResult(
             output=outputs,

@@ -388,7 +388,7 @@ class RulesEngine:
             )
             context.add_to_path(if_node)
 
-            result = 0
+            result = None
             conditions = operation.get("conditions", [])
             cases = operation.get("cases", [])
             default = operation.get("default")
