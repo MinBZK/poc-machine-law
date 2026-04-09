@@ -38,7 +38,7 @@ jobs:
           git clone --depth 1 --branch feat/foreach-implementation https://github.com/MinBZK/regelrecht.git /tmp/regelrecht
           cd /tmp/regelrecht/packages/engine
           maturin build --release --features python --out /tmp/wheels
-          pip install /tmp/wheels/regelrecht_engine-*.whl
+          uv pip install /tmp/wheels/regelrecht_engine-*.whl
 
       - name: Install system dependencies
         run: |

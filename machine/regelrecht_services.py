@@ -218,6 +218,8 @@ class RegelrechtServices:
         old values persist. This method ensures consistency by rebuilding from
         the Python-side DataFrames before each evaluation.
         """
+        if self._engine is None:
+            return
         self._engine.clear_data_sources()
         all_sources: dict[str, pd.DataFrame] = {}
         for svc in self._services.services.values():
@@ -250,10 +252,11 @@ class RegelrechtServices:
                         record[alias_name] = record[source_field]
                 records.append(record)
 
-            try:
-                self._engine.register_data_source(table, param_key, records)
-            except Exception:
-                pass
+            if self._engine is not None:
+                try:
+                    self._engine.register_data_source(table, param_key, records)
+                except Exception:
+                    pass
 
             if table in _ARRAY_INPUT_TABLES:
                 self._register_array_data_source(table, key_field, records)
@@ -302,11 +305,11 @@ class RegelrechtServices:
                     record[alias_name] = record[source_field]
             records.append(record)
 
-        try:
-            # Register with the parameter-side key so engine criteria match
-            self._engine.register_data_source(table, param_key, records)
-        except Exception as e:
-            logger.debug("Could not register data source %s: %s", table, e)
+        if self._engine is not None:
+            try:
+                self._engine.register_data_source(table, param_key, records)
+            except Exception as e:
+                logger.debug("Could not register data source %s: %s", table, e)
 
         # For tables that have array-type inputs (e.g., curatele_registraties),
         # also register a grouped version where all rows for the same key are
@@ -334,6 +337,8 @@ class RegelrechtServices:
         for key, rows in grouped.items():
             array_records.append({param_key: key, table: rows})
 
+        if self._engine is None:
+            return
         try:
             self._engine.register_data_source(f"{table}_array", param_key, array_records)
         except Exception as e:
@@ -731,11 +736,22 @@ class RegelrechtServices:
     ) -> RuleResult:
         """Evaluate a law using the Rust engine.
 
-        After evaluation, applies dot-notation projection for any outputs
-        the engine returned as None (e.g. ``$actieve_curatele.bsn_curandus``).
-        The engine computes FOREACH correctly but cannot yet project fields
-        from arrays, so we do that in Python as a post-processing step.
+        Falls back to the Python engine if the Rust engine is not available
+        (e.g., regelrecht_engine PyO3 module not installed).
         """
+        # Fallback to Python engine if Rust engine is not available
+        if self._engine is None:
+            return self._services.evaluate(
+                service,
+                law=law,
+                parameters=parameters,
+                reference_date=reference_date,
+                overwrite_input=overwrite_input,
+                overwrite_definitions=overwrite_definitions,
+                requested_output=requested_output,
+                approved=approved,
+            )
+
         reference_date = reference_date or self.root_reference_date
         rule = self.resolver.find_rule(law, reference_date, service)
         if not rule:
