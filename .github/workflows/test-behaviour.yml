@@ -36,9 +36,9 @@ jobs:
         run: |
           pip install maturin
           git clone --depth 1 --branch feat/foreach-implementation https://github.com/MinBZK/regelrecht.git /tmp/regelrecht
-          cd /tmp/regelrecht/packages/engine
-          maturin build --release --features python --out /tmp/wheels
-          uv pip install /tmp/wheels/regelrecht_engine-*.whl
+          (cd /tmp/regelrecht/packages/engine && maturin build --release --features python --out /tmp/wheels)
+          # Install into the project's uv-managed venv (created by `uv sync` above).
+          VIRTUAL_ENV="$GITHUB_WORKSPACE/.venv" uv pip install /tmp/wheels/regelrecht_engine-*.whl
 
       - name: Install system dependencies
         run: |
