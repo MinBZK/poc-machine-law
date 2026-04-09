@@ -29,6 +29,16 @@ jobs:
         run: |
           uv sync
 
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build and install regelrecht engine (PyO3)
+        run: |
+          uv pip install maturin
+          git clone --depth 1 --branch feat/foreach-implementation https://github.com/MinBZK/regelrecht.git /tmp/regelrecht
+          cd /tmp/regelrecht/packages/engine
+          maturin develop --features python
+
       - name: Install system dependencies
         run: |
           sudo apt-get update

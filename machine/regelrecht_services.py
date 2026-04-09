@@ -15,7 +15,11 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from regelrecht_engine import RegelrechtEngine
+
+try:
+    from regelrecht_engine import RegelrechtEngine
+except ImportError:
+    RegelrechtEngine = None  # PyO3 module not installed; engine features unavailable
 
 from machine.service import RuleResult, Services
 
@@ -161,8 +165,9 @@ class RegelrechtServices:
         self._services = Services(reference_date)
         self.resolver = self._services.resolver
         self.root_reference_date = reference_date
-        self._engine = RegelrechtEngine()
-        self._load_all_laws()
+        self._engine = RegelrechtEngine() if RegelrechtEngine is not None else None
+        if self._engine is not None:
+            self._load_all_laws()
 
     def _load_all_laws(self) -> None:
         """Load all laws into the engine as-is. Cross-law sources (source.regulation)
