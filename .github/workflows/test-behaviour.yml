@@ -37,7 +37,8 @@ jobs:
           pip install maturin
           git clone --depth 1 --branch feat/foreach-implementation https://github.com/MinBZK/regelrecht.git /tmp/regelrecht
           cd /tmp/regelrecht/packages/engine
-          maturin develop --features python
+          maturin build --release --features python --out /tmp/wheels
+          pip install /tmp/wheels/regelrecht_engine-*.whl
 
       - name: Install system dependencies
         run: |
