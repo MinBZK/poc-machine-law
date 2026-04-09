@@ -30,6 +30,18 @@ def _param_val_to_str(val: Any) -> str:
     return str(val)
 
 
+def _df_col_matches(df: pd.DataFrame, col: str, target: str) -> pd.Series:
+    """Compare a DataFrame column against a target string, handling dicts/lists.
+
+    DataFrame columns may contain dict/list objects (from parse_value in test steps).
+    Python's str() for dicts uses single quotes, but JSON uses double quotes. This
+    function serializes both sides consistently so the comparison works for
+    object-valued columns.
+    """
+    col_values = df[col].apply(lambda v: json.dumps(v) if isinstance(v, (dict, list)) else str(v))
+    return col_values == target
+
+
 def _resolve_param_ref(ref: str, params: dict[str, Any]) -> Any | None:
     """Resolve a $-prefixed parameter reference, supporting dot notation.
 
@@ -391,7 +403,7 @@ class RegelrechtServices:
                     if param_val is None:
                         mask = pd.Series(False, index=df.index)
                         break
-                    mask = mask & (df[col].astype(str) == _param_val_to_str(param_val))
+                    mask = mask & _df_col_matches(df, col, _param_val_to_str(param_val))
                 elif isinstance(ref, dict):
                     # Complex operations (e.g., {operation: IN, values: ...})
                     # Skip this criterion; match all rows for this column.
@@ -423,6 +435,8 @@ class RegelrechtServices:
                     params[input_name] = obj
             elif field in matched.columns:
                 val = _to_native(matched.iloc[0][field])
+                # Parse JSON strings for array/object inputs stored as JSON in DataFrames
+                val = _maybe_parse_json(val)
                 params[input_name] = val
             elif field == input_name and field not in matched.columns:
                 # Object input without explicit fields list in mapping:
@@ -537,7 +551,7 @@ class RegelrechtServices:
                         if param_val is None:
                             mask = pd.Series(False, index=df.index)
                             break
-                        mask = mask & (df[col].astype(str) == _param_val_to_str(param_val))
+                        mask = mask & _df_col_matches(df, col, _param_val_to_str(param_val))
                     elif isinstance(ref, dict):
                         # Complex operations (e.g., {operation: IN, values: ...})
                         # Skip this criterion; match all rows for this column.
@@ -569,6 +583,8 @@ class RegelrechtServices:
                         resolved_any = True
                 elif field in matched.columns:
                     val = _to_native(matched.iloc[0][field])
+                    # Parse JSON strings for array/object inputs stored as JSON in DataFrames
+                    val = _maybe_parse_json(val)
                     params[input_name] = val
                     resolved_any = True
             if not resolved_any:
@@ -652,7 +668,15 @@ class RegelrechtServices:
         using source_ref_mapping.json, then delegates to the engine.
         Cross-law inputs of the target law are recursively pre-resolved.
         """
-        rule = self.resolver.find_rule(law, reference_date, service or None)
+        try:
+            rule = self.resolver.find_rule(law, reference_date, service or None)
+        except ValueError:
+            # Service-specific lookup failed; retry without service constraint.
+            # E.g. wet_inkomstenbelasting with service=UWV finds BELASTINGDIENST version.
+            try:
+                rule = self.resolver.find_rule(law, reference_date, None)
+            except ValueError:
+                return None
         if not rule:
             return None
 
@@ -675,24 +699,45 @@ class RegelrechtServices:
 
         # Check if there are claims for the target law. Claims modify inputs
         # (e.g., correcting geboortedatum), and the Rust engine doesn't know
-        # about them. Use the Python engine when claims exist.
+        # about them. Merge claim values into params before engine evaluation.
         bsn = params.get("bsn")
-        has_claims = False
         if bsn:
             claims = self.claim_manager.get_claim_by_bsn_service_law(bsn, service or "", law, approved=False)
-            has_claims = bool(claims)
+            if claims:
+                for key, claim in claims.items():
+                    params[key] = _to_native(claim.new_value)
 
-        if not has_claims:
-            try:
-                result = self._engine.evaluate(law_id, [requested_output], params, reference_date)
-                outputs = result.get("outputs", {})
-                val = outputs.get(requested_output)
-                if val is not None:
-                    return val
-            except Exception:
-                pass
+        try:
+            result = self._engine.evaluate(law_id, [requested_output], params, reference_date)
+            outputs = result.get("outputs", {})
+            val = outputs.get(requested_output)
+            if val is not None:
+                return val
+        except Exception:
+            pass
 
-        return None
+        # Engine returned None for the requested output. Try Python-side
+        # action evaluation as fallback. This handles patterns the Rust
+        # engine doesn't support yet, such as $array.field in IN operations.
+        fallback = _evaluate_action_in_python(data, params, requested_output, reference_date)
+
+        # Apply output precision from type_spec (the engine does this for its
+        # own outputs, but the Python fallback doesn't).
+        if fallback is not None and isinstance(fallback, (int, float)):
+            import math
+
+            for art in data.get("articles", []):
+                for out in art.get("machine_readable", {}).get("execution", {}).get("output", []):
+                    if out.get("name") == requested_output:
+                        prec = out.get("type_spec", {}).get("precision")
+                        if prec is not None:
+                            if prec == 0:
+                                fallback = int(math.floor(fallback)) if isinstance(fallback, float) else fallback
+                            else:
+                                fallback = round(fallback, prec)
+                        break
+
+        return fallback
 
     # -- Evaluation ------------------------------------------------------------
 
@@ -833,6 +878,276 @@ class RegelrechtServices:
             path=None,
             missing_required=False,
         )
+
+
+def _evaluate_action_in_python(data: dict, params: dict, requested_output: str, reference_date: str = "") -> Any | None:
+    """Evaluate a single output action in Python.
+
+    Used as a fallback when the Rust engine returns None for a requested output.
+    Handles patterns the engine doesn't support, such as ``$array.field`` in
+    IN operations combined with AND/OR conditions.
+    """
+    # Collect definitions + params as a namespace for resolution
+    definitions: dict = {}
+    for art in data.get("articles", []):
+        defs = art.get("machine_readable", {}).get("definitions", {})
+        if isinstance(defs, dict):
+            definitions.update(defs)
+    namespace = {**definitions, **params}
+    # Make reference_date available for SUBTRACT_DATE fallback
+    namespace["_reference_date"] = reference_date
+
+    for art in data.get("articles", []):
+        for action in art.get("machine_readable", {}).get("execution", {}).get("actions", []):
+            if action.get("output") != requested_output:
+                continue
+            value = action.get("value")
+            if isinstance(value, dict) and "operation" in value:
+                result = _eval_operation(value, namespace)
+                return result
+            if isinstance(value, str) and value.startswith("$"):
+                return _resolve_ref(value, namespace)
+            return value
+    return None
+
+
+def _resolve_ref(ref: str, namespace: dict) -> Any | None:
+    """Resolve a $-prefixed reference, supporting dot notation on arrays/objects."""
+    if not isinstance(ref, str) or not ref.startswith("$"):
+        return ref
+    name = ref[1:]
+    if "." in name:
+        var_name, _, field_name = name.partition(".")
+        source = namespace.get(var_name)
+        if isinstance(source, list):
+            # For a single-element array, return the scalar value
+            values = [item.get(field_name) if isinstance(item, dict) else None for item in source]
+            return values[0] if len(values) == 1 else values
+        if isinstance(source, dict):
+            return source.get(field_name)
+        return None
+    return namespace.get(name)
+
+
+def _eval_operation(op: dict, namespace: dict) -> Any | None:
+    """Recursively evaluate an operation dict in Python."""
+    operation = op.get("operation", "")
+
+    if operation == "OR":
+        return any(_eval_operation(cond, namespace) for cond in op.get("conditions", []))
+
+    if operation == "AND":
+        return all(_eval_operation(cond, namespace) for cond in op.get("conditions", []))
+
+    if operation == "NOT":
+        val = (
+            _eval_operation(op.get("condition", {}), namespace)
+            if isinstance(op.get("condition"), dict)
+            else op.get("condition")
+        )
+        return not val
+
+    if operation == "IN":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        value = _resolve_op_value(op.get("value"), namespace)
+        if isinstance(value, list):
+            return subject in value
+        return False
+
+    if operation == "NOT_IN":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        value = _resolve_op_value(op.get("value"), namespace)
+        if isinstance(value, list):
+            return subject not in value
+        return True
+
+    if operation == "EQUALS":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        value = _resolve_op_value(op.get("value"), namespace)
+        return subject == value
+
+    if operation == "NOT_EQUALS":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        value = _resolve_op_value(op.get("value"), namespace)
+        return subject != value
+
+    if operation == "GREATER_THAN":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        value = _resolve_op_value(op.get("value"), namespace)
+        try:
+            return subject > value
+        except TypeError:
+            return False
+
+    if operation == "LESS_THAN":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        value = _resolve_op_value(op.get("value"), namespace)
+        try:
+            return subject < value
+        except TypeError:
+            return False
+
+    if operation == "GREATER_THAN_EQUAL":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        value = _resolve_op_value(op.get("value"), namespace)
+        try:
+            return subject >= value
+        except TypeError:
+            return False
+
+    if operation == "LESS_THAN_EQUAL":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        value = _resolve_op_value(op.get("value"), namespace)
+        try:
+            return subject <= value
+        except TypeError:
+            return False
+
+    if operation == "IF":
+        for case in op.get("cases", []):
+            when = case.get("when", {})
+            if isinstance(when, dict) and "operation" in when and _eval_operation(when, namespace):
+                then_val = case.get("then")
+                if isinstance(then_val, dict) and "operation" in then_val:
+                    return _eval_operation(then_val, namespace)
+                return _resolve_op_value(then_val, namespace)
+        default = op.get("default")
+        if isinstance(default, dict) and "operation" in default:
+            return _eval_operation(default, namespace)
+        return _resolve_op_value(default, namespace)
+
+    if operation == "ADD":
+        vals = [_resolve_op_value(v, namespace) for v in op.get("values", [])]
+        vals = [v for v in vals if v is not None]
+        try:
+            return sum(vals) if vals else 0
+        except TypeError:
+            return None
+
+    if operation == "SUBTRACT":
+        vals = [_resolve_op_value(v, namespace) for v in op.get("values", [])]
+        if len(vals) == 2 and vals[0] is not None and vals[1] is not None:
+            try:
+                return vals[0] - vals[1]
+            except TypeError:
+                return None
+        return None
+
+    if operation == "MULTIPLY":
+        vals = [_resolve_op_value(v, namespace) for v in op.get("values", [])]
+        if any(v is None for v in vals):
+            return None
+        try:
+            result = 1
+            for v in vals:
+                result *= v
+            return result
+        except TypeError:
+            return None
+
+    if operation == "DIVIDE":
+        vals = [_resolve_op_value(v, namespace) for v in op.get("values", [])]
+        if len(vals) == 2 and vals[0] is not None and vals[1] is not None and vals[1] != 0:
+            try:
+                return vals[0] / vals[1]
+            except TypeError:
+                return None
+        return None
+
+    if operation == "MIN":
+        vals = [_resolve_op_value(v, namespace) for v in op.get("values", [])]
+        vals = [v for v in vals if v is not None]
+        try:
+            return min(vals) if vals else None
+        except TypeError:
+            return None
+
+    if operation == "MAX":
+        vals = [_resolve_op_value(v, namespace) for v in op.get("values", [])]
+        vals = [v for v in vals if v is not None]
+        try:
+            return max(vals) if vals else None
+        except TypeError:
+            return None
+
+    if operation == "SUBTRACT_DATE":
+        from datetime import datetime
+
+        vals = [_resolve_op_value(v, namespace) for v in op.get("values", [])]
+        unit = op.get("unit", "days")
+        ref_date = namespace.get("_reference_date", "")
+        if len(vals) == 2:
+            # Use reference_date as fallback for empty/null dates (active employment)
+            d1_str = str(vals[0])[:10] if vals[0] else ref_date
+            d2_str = str(vals[1])[:10] if vals[1] else ref_date
+            if d1_str and d2_str:
+                try:
+                    d1 = datetime.strptime(d1_str, "%Y-%m-%d").date()
+                    d2 = datetime.strptime(d2_str, "%Y-%m-%d").date()
+                    delta = (d1 - d2).days
+                    if unit == "years":
+                        return delta / 365.25
+                    return delta  # default: days
+                except (ValueError, TypeError):
+                    return None
+        return None
+
+    if operation == "FOREACH":
+        collection_ref = op.get("collection", "")
+        collection = _resolve_op_value(collection_ref, namespace) if isinstance(collection_ref, str) else collection_ref
+        if not isinstance(collection, list):
+            return []
+        as_name = op.get("as", "current")
+        body = op.get("body")
+        combine = op.get("combine")
+        results = []
+        for element in collection:
+            item_ns = dict(namespace)
+            item_ns[as_name] = element
+            if isinstance(element, dict):
+                item_ns.update(element)
+                item_ns.update({f"{as_name}.{k}": v for k, v in element.items()})
+            resolved = _resolve_op_value(body, item_ns)
+            results.append(resolved)
+        if combine == "ADD":
+            nums = [v for v in results if isinstance(v, (int, float))]
+            return sum(nums) if nums else 0
+        return results
+
+    if operation == "IS_NULL":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        return subject is None or subject == ""
+
+    if operation == "EXISTS":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        return subject is not None and subject != ""
+
+    if operation == "GREATER_THAN_OR_EQUAL":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        value = _resolve_op_value(op.get("value"), namespace)
+        try:
+            return subject >= value
+        except TypeError:
+            return False
+
+    if operation == "LESS_THAN_OR_EQUAL":
+        subject = _resolve_op_value(op.get("subject"), namespace)
+        value = _resolve_op_value(op.get("value"), namespace)
+        try:
+            return subject <= value
+        except TypeError:
+            return False
+
+    return None
+
+
+def _resolve_op_value(val: Any, namespace: dict) -> Any:
+    """Resolve an operation value: $-refs, nested operations, or literal."""
+    if isinstance(val, str) and val.startswith("$"):
+        return _resolve_ref(val, namespace)
+    if isinstance(val, dict) and "operation" in val:
+        return _eval_operation(val, namespace)
+    return val
 
 
 def _resolve_temporal_reference(ref: str, reference_date: str) -> str:
@@ -1156,11 +1471,17 @@ def _find_missing_required_inputs(data: dict, params: dict) -> list[str]:
 
 
 def _fill_input_defaults(data: dict, params: dict) -> None:
-    """Fill default values for unresolved source: {} inputs.
+    """Fill default values for unresolved inputs.
 
     Prevents TypeMismatch errors when the engine encounters null values
     in arithmetic operations. Uses type-appropriate defaults:
     number/amount → 0, boolean → False, string → "", array → [], object → {}.
+
+    Fills defaults for both ``source: {}`` inputs (data source resolution)
+    and ``source.regulation`` inputs (cross-law references) that remained
+    unresolved after pre-resolution. Without this, missing boolean inputs
+    like ``is_gedetineerd`` cause the engine to treat them as null, which
+    breaks condition evaluation.
     """
     _TYPE_DEFAULTS = {
         "number": 0,
@@ -1175,15 +1496,39 @@ def _fill_input_defaults(data: dict, params: dict) -> None:
         for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
             name = inp.get("name", "")
             source = inp.get("source")
-            if name and name not in params and source == {}:
+            if name and name not in params:
                 # Skip required claim inputs - they should remain unresolved
                 # so the engine correctly reports missing_required.
                 if inp.get("required"):
                     continue
-                # Fill defaults ONLY for source: {} inputs (data source resolution).
-                # Cross-law inputs (source.regulation) should be resolved by the engine.
-                input_type = inp.get("type", "string")
-                params[name] = _TYPE_DEFAULTS.get(input_type, "")
+                # Fill defaults for source: {} inputs (data source resolution)
+                # and cross-law inputs (source.regulation) that remained unresolved.
+                is_data_source = source == {}
+                is_cross_law = isinstance(source, dict) and source.get("regulation")
+                if is_data_source or is_cross_law:
+                    input_type = inp.get("type", "string")
+                    # Don't fill string/date defaults for cross-law inputs.
+                    # The engine's IS_NULL check treats "" as non-null, so
+                    # filling "" would break conditions like partner_bsn IS_NULL.
+                    # Leave them absent so the engine treats them as null.
+                    if is_cross_law and input_type in ("string", "date"):
+                        continue
+                    params[name] = _TYPE_DEFAULTS.get(input_type, "")
+
+
+def _maybe_parse_json(val: Any) -> Any:
+    """Parse a string as JSON if it looks like a JSON array or object.
+
+    DataFrame columns sometimes store complex values as JSON strings
+    (e.g. kinderen: '[{"bsn": "111111111"}]'). When these are used as
+    array or object inputs, they need to be parsed into native Python types.
+    """
+    if isinstance(val, str) and val and val[0] in ("[", "{"):
+        try:
+            return json.loads(val)
+        except (json.JSONDecodeError, ValueError):
+            pass
+    return val
 
 
 def _to_native(obj: Any) -> Any:
