@@ -16,7 +16,7 @@ from machine.law_parameter_config import (
     create_overrides,
     find_law_config_by_technical_name,
 )
-from machine.service import Services
+from machine.regelrecht_services import RegelrechtServices
 
 # Create a logger for this module
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ POPULATIONS_DIR = Path("data/populations")
 class LawSimulator:
     def __init__(self, simulation_date="2025-03-01", law_parameters=None) -> None:
         self.simulation_date = simulation_date
-        self.services = Services(simulation_date)
+        self.services = RegelrechtServices(simulation_date)
 
         # Initialize the law parameter registry with our Services instance
         # This prevents eventsourcing conflicts in subprocess contexts

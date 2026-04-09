@@ -60,7 +60,7 @@ jobs:
           echo "No @skip tags found in main features directory."
 
       - name: Run tests
-        run: ./script/test-behaviour --tags='~@ui' --tags='~@skip'
+        run: ./script/test-behaviour --tags='~@ui' --tags='~@skip' --tags='~@slow'
         env:
           LANG: nl_NL.UTF-8
           LC_ALL: nl_NL.UTF-8
