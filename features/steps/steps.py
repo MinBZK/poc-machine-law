@@ -149,7 +149,13 @@ def step_impl(context, service, table):
 
     data = []
     for row in context.table:
-        processed_row = {k: v if k in STRING_FIELDS else parse_value(v) for k, v in row.items()}
+        processed_row = {}
+        for k, v in row.items():
+            if k in STRING_FIELDS:
+                # Convert "null" and empty strings to None for nullable fields
+                processed_row[k] = None if v in ("null", "") else v
+            else:
+                processed_row[k] = parse_value(v)
         data.append(processed_row)
 
     df = pd.DataFrame(data)
