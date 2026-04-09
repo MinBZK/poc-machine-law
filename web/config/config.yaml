@@ -4,4 +4,3 @@ engines:
     description: regelrecht Rust engine (default)
     type: regelrecht
     default: true
-    domain: bin/evaluate-v0.2.0

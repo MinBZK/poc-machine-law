@@ -271,11 +271,8 @@ class MachineFactory:
         if engine.type != "regelrecht":
             raise ValueError(f"Unknown engine type: {engine.type}. Only 'regelrecht' is supported.")
 
-        binary_path = engine.domain  # Reuse domain field for binary path
-        logger.info(
-            f"[MachineFactory] Creating RegelrechtMachineService for engine: {engine_id}, binary: {binary_path}"
-        )
-        return RegelrechtMachineService(binary_path=binary_path, services=services)
+        logger.info(f"[MachineFactory] Creating RegelrechtMachineService for engine: {engine_id}")
+        return RegelrechtMachineService(services=services)
 
 
 class CaseManagerFactory:

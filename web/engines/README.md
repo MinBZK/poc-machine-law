@@ -15,8 +15,9 @@ engines:
     description: regelrecht Rust engine (default)
     type: regelrecht
     default: true
-    domain: bin/evaluate-v0.2.0
 ```
+
+The engine runs in-process via PyO3 (no external binary).
 
 ### Using the Interfaces
 
