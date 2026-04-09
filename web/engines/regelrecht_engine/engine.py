@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import subprocess
+from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
 
@@ -10,12 +11,23 @@ import pandas as pd
 import yaml
 from fastapi import HTTPException
 
-from machine.context import TypeSpec
 from machine.profile_loader import get_project_root, load_profiles_from_yaml
-from machine.service import Services
+from machine.regelrecht_services import RegelrechtServices
 from machine.utils import RuleResolver
 
 from ..engine_interface import EngineInterface, PathNode, RuleResult
+
+
+@dataclass
+class TypeSpec:
+    """Output type specification with optional precision/unit/range constraints."""
+
+    type: str | None = None
+    unit: str | None = None
+    precision: int | None = None
+    min: float | None = None
+    max: float | None = None
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +42,12 @@ class RegelrechtMachineService(EngineInterface):
     translates between the web engine interface and the CLI protocol.
     """
 
-    def __init__(self, binary_path: str | None = None, services: Services | None = None):
+    def __init__(self, binary_path: str | None = None, services: RegelrechtServices | None = None):
         self.binary_path = binary_path or os.environ.get("REGELRECHT_BINARY", DEFAULT_BINARY_PATH)
         self.services = services
         self.resolver = services.resolver if services else RuleResolver()
 
-    def get_services(self) -> Services | None:
+    def get_services(self) -> RegelrechtServices | None:
         return self.services
 
     def get_profile_data(self, bsn: str, effective_date: date | None = None) -> dict[str, Any]:

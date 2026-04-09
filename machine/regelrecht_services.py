@@ -167,7 +167,7 @@ class RegelrechtServices:
     """Drop-in replacement for Services using the regelrecht Rust engine."""
 
     def __init__(self, reference_date: str) -> None:
-        self._services = Services(reference_date)
+        self._services = Services(reference_date, rules_engine=self)
         self.resolver = self._services.resolver
         self.root_reference_date = reference_date
         self._engine = RegelrechtEngine()
@@ -212,7 +212,10 @@ class RegelrechtServices:
         return self._services.get_law(service, law, reference_date)
 
     def apply_rules(self, event):
-        return self._services.apply_rules(event)
+        # Schema v0.5.1 uses hooks/overrides (RFC-007) instead of the legacy
+        # `applies` mechanism. The case processor still calls this on Decided
+        # events, but there is nothing to do here for v0.5.1 laws.
+        return None
 
     def _sync_engine_data_sources(self) -> None:
         """Clear and re-register all data sources in the Rust engine.

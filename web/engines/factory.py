@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 
 from machine.profile_loader import get_project_root, load_profiles_from_yaml
-from machine.service import Services
+from machine.regelrecht_services import RegelrechtServices
 from web.config_loader import ConfigLoader
 
 from .case_manager_interface import CaseManagerInterface
@@ -19,11 +19,12 @@ logger = logging.getLogger(__name__)
 
 config_loader = ConfigLoader()
 
-# Configure the Python Services instance (used by regelrecht for fallback/case management)
-services = Services(datetime.today().strftime("%Y-%m-%d"))
+# RegelrechtServices wraps Services and uses the Rust engine via PyO3.
+# The same instance is shared by case/claim managers and the web machine adapter.
+services = RegelrechtServices(datetime.today().strftime("%Y-%m-%d"))
 
 
-def _initialize_profiles(services_instance: Services) -> None:
+def _initialize_profiles(services_instance: RegelrechtServices) -> None:
     """
     Load all profiles from YAML and initialize them into the services instance.
 
@@ -128,7 +129,7 @@ def _initialize_profiles(services_instance: Services) -> None:
 _initialize_profiles(services)
 
 
-def _seed_historical_cases(services_instance: Services) -> None:
+def _seed_historical_cases(services_instance: RegelrechtServices) -> None:
     """
     Seed historical cases from profiles.yaml into the CaseManager.
 
