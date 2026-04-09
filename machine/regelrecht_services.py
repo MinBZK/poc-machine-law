@@ -19,6 +19,36 @@ from regelrecht_engine import RegelrechtEngine
 
 from machine.service import RuleResult, Services
 
+
+def _param_val_to_str(val: Any) -> str:
+    """Convert a parameter value to string for DataFrame column comparison.
+
+    When the value is a dict or list, serialize as JSON so it matches
+    JSON strings stored in DataFrame columns. Uses default json.dumps
+    format (no sorted keys) to match the storage format from feature files.
+    For scalar values, use plain str() conversion.
+    """
+    if isinstance(val, (dict, list)):
+        return json.dumps(val)
+    return str(val)
+
+
+def _resolve_param_ref(ref: str, params: dict[str, Any]) -> Any | None:
+    """Resolve a $-prefixed parameter reference, supporting dot notation.
+
+    - ``$bsn`` → ``params["bsn"]``
+    - ``$adres.postcode`` → ``params["adres"]["postcode"]`` (when adres is a dict)
+    """
+    name = ref[1:] if ref.startswith("$") else ref
+    if "." in name:
+        var_name, _, field_name = name.partition(".")
+        obj = params.get(var_name)
+        if isinstance(obj, dict):
+            return obj.get(field_name)
+        return None
+    return params.get(name)
+
+
 logger = logging.getLogger(__name__)
 LAWS_DIR = Path("laws")
 _SOURCE_REF_MAPPING_PATH = Path(__file__).parent / "source_ref_mapping.json"
@@ -361,12 +391,11 @@ class RegelrechtServices:
                     mask = pd.Series(False, index=df.index)
                     break
                 if isinstance(ref, str) and ref.startswith("$"):
-                    param_name = ref[1:]
-                    param_val = params.get(param_name)
+                    param_val = _resolve_param_ref(ref, params)
                     if param_val is None:
                         mask = pd.Series(False, index=df.index)
                         break
-                    mask = mask & (df[col].astype(str) == str(param_val))
+                    mask = mask & (df[col].astype(str) == _param_val_to_str(param_val))
                 elif isinstance(ref, dict):
                     # Complex operations (e.g., {operation: IN, values: ...})
                     # Skip this criterion; match all rows for this column.
@@ -508,12 +537,11 @@ class RegelrechtServices:
                         mask = pd.Series(False, index=df.index)
                         break
                     if isinstance(ref, str) and ref.startswith("$"):
-                        param_name = ref[1:]
-                        param_val = params.get(param_name)
+                        param_val = _resolve_param_ref(ref, params)
                         if param_val is None:
                             mask = pd.Series(False, index=df.index)
                             break
-                        mask = mask & (df[col].astype(str) == str(param_val))
+                        mask = mask & (df[col].astype(str) == _param_val_to_str(param_val))
                     elif isinstance(ref, dict):
                         # Complex operations (e.g., {operation: IN, values: ...})
                         # Skip this criterion; match all rows for this column.
