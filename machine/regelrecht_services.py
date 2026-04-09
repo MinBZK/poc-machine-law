@@ -175,6 +175,54 @@ class RegelrechtServices:
     def apply_rules(self, event):
         return self._services.apply_rules(event)
 
+    def _sync_engine_data_sources(self) -> None:
+        """Clear and re-register all data sources in the Rust engine.
+
+        The engine's register_data_source accumulates rather than replaces,
+        so when DataFrames are updated (e.g., scenario overrides background data),
+        old values persist. This method ensures consistency by rebuilding from
+        the Python-side DataFrames before each evaluation.
+        """
+        self._engine.clear_data_sources()
+        all_sources: dict[str, pd.DataFrame] = {}
+        for svc in self._services.services.values():
+            all_sources.update(svc.source_dataframes)
+
+        for table, df in all_sources.items():
+            if df.empty:
+                continue
+            key_field = _pick_key_field_for_table(table, df)
+            param_key = _get_param_key_for_table(table, key_field)
+            object_inputs = _OBJECT_FIELD_MAPPING.get(table, {})
+
+            records = []
+            for _, row in df.iterrows():
+                record = _to_native({col: row[col] for col in df.columns})
+                if param_key != key_field and param_key not in record and key_field in record:
+                    record[param_key] = record[key_field]
+                if table not in _ARRAY_INPUT_TABLES:
+                    for input_name, field_list in object_inputs.items():
+                        if input_name == table:
+                            continue
+                        obj = {f: record[f] for f in field_list if f in record}
+                        if obj:
+                            record[input_name] = obj
+                for input_name in _WHOLE_ROW_OBJECT_MAPPING.get(table, set()):
+                    if input_name not in record:
+                        record[input_name] = dict(record)
+                for alias_name, source_field in _FIELD_ALIAS_MAPPING.get(table, {}).items():
+                    if alias_name not in record and source_field in record:
+                        record[alias_name] = record[source_field]
+                records.append(record)
+
+            try:
+                self._engine.register_data_source(table, param_key, records)
+            except Exception:
+                pass
+
+            if table in _ARRAY_INPUT_TABLES:
+                self._register_array_data_source(table, key_field, records)
+
     # -- Data sources ----------------------------------------------------------
 
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
@@ -652,6 +700,11 @@ class RegelrechtServices:
         rule = self.resolver.find_rule(law, reference_date, service)
         if not rule:
             raise ValueError(f"No rule found for {law}")
+
+        # Sync engine data sources: clear stale registrations and re-register
+        # all current DataFrames from the Python side. This ensures the engine
+        # sees the latest data when DataFrames are updated between evaluations.
+        self._sync_engine_data_sources()
 
         params = _to_native(dict(parameters))
         if overwrite_input:
