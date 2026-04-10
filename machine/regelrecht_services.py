@@ -58,7 +58,9 @@ def _resolve_param_ref(ref: str, params: dict[str, Any]) -> Any | None:
     return params.get(name)
 
 
-logger = logging.getLogger(__name__)
+from machine.logging_config import IndentLogger
+
+logger = IndentLogger(logging.getLogger("rules_engine"))
 LAWS_DIR = Path("laws")
 _SOURCE_REF_MAPPING_PATH = Path(__file__).parent / "source_ref_mapping.json"
 
@@ -762,125 +764,183 @@ class RegelrechtServices:
         if not rule:
             raise ValueError(f"No rule found for {law}")
 
-        # Sync engine data sources: clear stale registrations and re-register
-        # all current DataFrames from the Python side. This ensures the engine
-        # sees the latest data when DataFrames are updated between evaluations.
-        self._sync_engine_data_sources()
+        with logger.indent_block(f"{service}: {law} ({reference_date})", double_line=True):
+            # Sync engine data sources
+            self._sync_engine_data_sources()
 
-        params = _to_native(dict(parameters))
-        if overwrite_input:
-            for sv in overwrite_input.values():
-                if isinstance(sv, dict):
-                    params.update(_to_native(sv))
+            params = _to_native(dict(parameters))
+            if overwrite_input:
+                for sv in overwrite_input.values():
+                    if isinstance(sv, dict):
+                        params.update(_to_native(sv))
 
-        # Resolve claims (citizen-submitted data) and merge into params.
-        # This mirrors what the Python engine does in engine.py.
-        bsn = params.get("bsn")
-        if bsn:
-            claims = self.claim_manager.get_claim_by_bsn_service_law(bsn, service, law, approved=approved)
-            if claims:
-                for key, claim in claims.items():
-                    if key not in params:
-                        params[key] = _to_native(claim.new_value)
+            # Track where each input value came from for the path tree
+            input_sources: dict[str, str] = {}  # name → resolve_type
 
-        import yaml as yaml_mod
+            # Resolve claims (citizen-submitted data) and merge into params.
+            bsn = params.get("bsn")
+            if bsn:
+                claims = self.claim_manager.get_claim_by_bsn_service_law(bsn, service, law, approved=approved)
+                if claims:
+                    for key, claim in claims.items():
+                        if key not in params:
+                            params[key] = _to_native(claim.new_value)
+                            input_sources[key] = "CLAIM"
+                            logger.debug("Claim: %s = %s", key, params[key])
 
-        data = yaml_mod.safe_load(Path(rule.path).read_text())
-        law_id = data.get("$id", law)
-        output_names = []
-        for art in data.get("articles", []):
-            for o in art.get("machine_readable", {}).get("execution", {}).get("output", []):
-                name = o.get("name")
-                if name and name not in output_names:
-                    output_names.append(name)
-        if requested_output:
-            output_names = [requested_output]
-        if not output_names:
+            import yaml as yaml_mod
+
+            data = yaml_mod.safe_load(Path(rule.path).read_text())
+            law_id = data.get("$id", law)
+            output_names = []
+            for art in data.get("articles", []):
+                for o in art.get("machine_readable", {}).get("execution", {}).get("output", []):
+                    name = o.get("name")
+                    if name and name not in output_names:
+                        output_names.append(name)
+            if requested_output:
+                output_names = [requested_output]
+            if not output_names:
+                logger.debug("No output fields found")
+                return RuleResult(
+                    output={},
+                    requirements_met=False,
+                    input=params,
+                    rulespec_uuid=rule.uuid,
+                    path=None,
+                    missing_required=True,
+                )
+
+            # Collect input specs from YAML for path tree building
+            input_specs: list[dict[str, Any]] = []
+            for art in data.get("articles", []):
+                for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+                    input_specs.append(inp)
+
+            # Pre-resolve data source inputs
+            with logger.indent_block("Resolving data sources"):
+                params_before = set(params.keys())
+                self._pre_resolve_data_sources(law_id, params, data)
+                for k in set(params.keys()) - params_before:
+                    input_sources[k] = "SOURCE"
+                    logger.debug("Source: %s = %s", k, params[k])
+
+            # Pre-resolve cross-law inputs
+            with logger.indent_block("Resolving cross-law inputs"):
+                params_before = set(params.keys())
+                self._pre_resolve_cross_law_inputs(data, params, reference_date)
+                for k in set(params.keys()) - params_before:
+                    input_sources[k] = "SERVICE"
+                    logger.debug("Cross-law: %s = %s", k, params[k])
+
+            # Mark remaining params as NONE (directly supplied)
+            for k in params:
+                if k not in input_sources:
+                    input_sources[k] = "NONE"
+
+            # Check for missing required source: {} inputs.
+            missing = _find_missing_required_inputs(data, params)
+            if missing:
+                logger.debug("Missing required inputs: %s", missing)
+                return RuleResult(
+                    output={},
+                    requirements_met=False,
+                    input=params,
+                    rulespec_uuid=rule.uuid,
+                    path=_build_input_path(input_specs, params, input_sources),
+                    missing_required=True,
+                )
+
+            # Fill defaults for remaining unresolved source: {} inputs.
+            _fill_input_defaults(data, params)
+
+            # Evaluate
+            try:
+                with logger.indent_block("Engine evaluate"):
+                    result = self._engine.evaluate(law_id, output_names, params, reference_date)
+            except Exception as e:
+                logger.warning("Engine error for %s: %s", law, e)
+                return RuleResult(
+                    output={},
+                    requirements_met=False,
+                    input=params,
+                    rulespec_uuid=rule.uuid,
+                    path=_build_input_path(input_specs, params, input_sources),
+                    missing_required=True,
+                )
+
+            outputs = dict(result.get("outputs", {}))
+
+            # Post-process
+            _postprocess_outputs(outputs, params, data)
+            _apply_output_precision(outputs, data)
+
+            # Determine requirements_met from voldoet_aan_voorwaarden.
+            _MISSING = object()
+            voldoet = outputs.pop("voldoet_aan_voorwaarden", _MISSING)
+            req_met = bool(outputs) if voldoet is _MISSING else voldoet is True
+
+            if not req_met and voldoet is not _MISSING:
+                outputs = {}
+
+            for name, val in outputs.items():
+                logger.debug("Output: %s = %s", name, val)
+            logger.debug("Requirements met: %s", req_met)
+
+            # Use params as resolved input (engine doesn't track this)
+            resolved_input = {k: v for k, v in params.items() if k in input_sources}
+
             return RuleResult(
-                output={},
-                requirements_met=False,
-                input=params,
+                output=outputs,
+                requirements_met=req_met,
+                input=resolved_input,
                 rulespec_uuid=rule.uuid,
-                path=None,
-                missing_required=True,
+                path=_build_input_path(input_specs, params, input_sources),
+                missing_required=False,
             )
 
-        # Pre-resolve data source inputs that the engine can't resolve itself
-        self._pre_resolve_data_sources(law_id, params, data)
 
-        # Pre-resolve cross-law inputs via recursive evaluation.
-        # The Rust engine's built-in cross-law resolution can fail silently
-        # (returning null) when chains are deep or data sources are involved.
-        # Each cross-law call delegates to the engine which uses its
-        # DataSourceRegistry for the target law's own inputs.
-        self._pre_resolve_cross_law_inputs(data, params, reference_date)
+def _build_input_path(
+    input_specs: list[dict[str, Any]],
+    params: dict[str, Any],
+    input_sources: dict[str, str],
+) -> dict[str, Any]:
+    """Build a path info dict from YAML input specs and resolved params.
 
-        # Check for missing required source: {} inputs (claim-based data).
-        # These must be supplied by the citizen; return missing_required if absent.
-        missing = _find_missing_required_inputs(data, params)
-        if missing:
-            return RuleResult(
-                output={},
-                requirements_met=False,
-                input=params,
-                rulespec_uuid=rule.uuid,
-                path=None,
-                missing_required=True,
-            )
+    Returns a dict that the web adapter converts to PathNode objects.
+    Keys are input names, values have ``result``, ``required``,
+    ``resolve_type``, and ``details``.
+    """
+    path: dict[str, Any] = {}
+    for spec in input_specs:
+        name = spec.get("name")
+        if not name:
+            continue
+        source = spec.get("source", {})
+        required = spec.get("required", False)
+        value = params.get(name)
+        resolve_type = input_sources.get(name, "NONE")
 
-        # Fill defaults for any remaining unresolved source: {} inputs.
-        # This prevents TypeMismatch errors when the engine encounters null
-        # in numeric operations (e.g., ADD(1500000, Null) → TypeMismatch).
-        _fill_input_defaults(data, params)
+        # Cross-law inputs show as SERVICE with law details
+        regulation = source.get("regulation")
+        if regulation:
+            resolve_type = "SERVICE"
 
-        try:
-            result = self._engine.evaluate(law_id, output_names, params, reference_date)
-        except Exception as e:
-            logger.warning("Engine error for %s: %s", law, e)
-            return RuleResult(
-                output={},
-                requirements_met=False,
-                input=params,
-                rulespec_uuid=rule.uuid,
-                path=None,
-                missing_required=True,
-            )
-
-        outputs = dict(result.get("outputs", {}))
-        resolved = dict(result.get("resolved_inputs", {}))
-
-        # Post-process: the engine handles FOREACH correctly but cannot yet
-        # perform dot-notation projection on arrays, evaluate CONCAT inside
-        # FOREACH bodies, or resolve $variable references in FOREACH bodies.
-        # We fix these in Python as post-processing.
-        _postprocess_outputs(outputs, params, data)
-
-        # Apply precision from type_spec to numeric outputs
-        _apply_output_precision(outputs, data)
-
-        # Determine requirements_met from voldoet_aan_voorwaarden.
-        # The sentinel _MISSING distinguishes "not in outputs" from "in outputs but None".
-        _MISSING = object()
-        voldoet = outputs.pop("voldoet_aan_voorwaarden", _MISSING)
-        # When voldoet_aan_voorwaarden exists: only True means requirements met;
-        # None (engine couldn't evaluate) or False both mean not met.
-        # When absent: infer from whether outputs exist.
-        req_met = bool(outputs) if voldoet is _MISSING else voldoet is True
-
-        # When requirements are not met, clear all outputs.
-        # The Python engine skips action evaluation when requirements fail,
-        # so downstream outputs (e.g. is_gerechtigd) should not appear.
-        if not req_met and voldoet is not _MISSING:
-            outputs = {}
-
-        return RuleResult(
-            output=outputs,
-            requirements_met=req_met,
-            input=resolved,
-            rulespec_uuid=rule.uuid,
-            path=None,
-            missing_required=False,
-        )
+        entry: dict[str, Any] = {
+            "result": value,
+            "required": required,
+            "resolve_type": resolve_type,
+            "details": {
+                "path": f"${name}",
+                "type": spec.get("type"),
+                "type_spec": spec.get("type_spec"),
+            },
+        }
+        if regulation:
+            entry["details"]["service"] = source.get("service")
+            entry["details"]["law"] = regulation
+        path[name] = entry
+    return path
 
 
 def _evaluate_action_in_python(data: dict, params: dict, requested_output: str, reference_date: str = "") -> Any | None:

@@ -82,12 +82,56 @@ class RegelrechtMachineService(EngineInterface):
             approved=approved,
         )
 
+        # Build PathNode tree from the path info dict returned by RegelrechtServices
+        root = PathNode(type="root", name="evaluation", result=None)
+        path_info = result.path or {}
+        for input_name, info in path_info.items():
+            resolve_type = info.get("resolve_type", "NONE")
+            details = info.get("details", {})
+            regulation = details.get("law")
+
+            if regulation:
+                # Cross-law dependency: wrap in a service_evaluation node
+                svc_node = PathNode(
+                    type="service_evaluation",
+                    name=input_name,
+                    result=info.get("result"),
+                    required=info.get("required", False),
+                    details={
+                        "path": details.get("path", f"${input_name}"),
+                        "service": details.get("service"),
+                        "law": regulation,
+                    },
+                    children=[
+                        PathNode(
+                            type="resolve",
+                            name=input_name,
+                            result=info.get("result"),
+                            resolve_type="SERVICE",
+                            required=info.get("required", False),
+                            details=details,
+                        )
+                    ],
+                )
+                root.children.append(svc_node)
+            else:
+                root.children.append(
+                    PathNode(
+                        type="resolve",
+                        name=input_name,
+                        result=info.get("result"),
+                        resolve_type=resolve_type,
+                        required=info.get("required", False),
+                        details=details,
+                    )
+                )
+
         return RuleResult(
             output=dict(result.output),
             requirements_met=result.requirements_met,
             input=dict(result.input),
             rulespec_uuid=result.rulespec_uuid,
-            path=PathNode(type="root", name="evaluation", result=None),
+            path=root,
             missing_required=result.missing_required,
         )
 
