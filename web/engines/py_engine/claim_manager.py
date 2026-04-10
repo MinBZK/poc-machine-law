@@ -1,7 +1,7 @@
 from typing import Any
 from uuid import UUID
 
-from machine.service import Services
+from machine.regelrecht_services import RegelrechtServices
 
 from ..claim_manager_interface import ClaimManagerInterface
 from ..models import Claim
@@ -12,7 +12,7 @@ class ClaimManager(ClaimManagerInterface):
     Implementation of ClaimManagerInterface that uses the embedded Python machine.service library.
     """
 
-    def __init__(self, services: Services):
+    def __init__(self, services: RegelrechtServices):
         self.claim_manager = services.claim_manager
 
     def get_claims_by_bsn(self, bsn: str, approved: bool = False, include_rejected: bool = False) -> list[Claim]:

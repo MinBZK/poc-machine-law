@@ -6,7 +6,7 @@ from typing import Any
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 
-from machine.service import Services
+from machine.regelrecht_services import RegelrechtServices
 
 
 @dataclass
@@ -224,16 +224,11 @@ class EngineInterface(ABC):
         reset the engine data.
         """
 
-    def get_services(self) -> Services | None:
-        """
-        Get the underlying Services instance.
+    def get_services(self) -> RegelrechtServices | None:
+        """Return the underlying RegelrechtServices instance, if any.
 
-        This method allows access to the underlying Services for features
-        that need direct access to service providers (e.g., delegation).
-
-        Returns:
-            Services instance if available (internal Python engine),
-            None if not available.
+        Used by features like delegation that need direct access to the
+        underlying law engine and registered data sources.
         """
         return None
 

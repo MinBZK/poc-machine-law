@@ -11,11 +11,6 @@ import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 
-from machine.law_parameter_config import (
-    _ensure_registry_initialized,
-    create_overrides,
-    find_law_config_by_technical_name,
-)
 from machine.regelrecht_services import RegelrechtServices
 
 # Create a logger for this module
@@ -27,24 +22,12 @@ POPULATIONS_DIR = Path("data/populations")
 
 
 class LawSimulator:
-    def __init__(self, simulation_date="2025-03-01", law_parameters=None) -> None:
+    def __init__(self, simulation_date="2025-03-01") -> None:
         self.simulation_date = simulation_date
         self.services = RegelrechtServices(simulation_date)
 
-        # Initialize the law parameter registry with our Services instance
-        # This prevents eventsourcing conflicts in subprocess contexts
-        _ensure_registry_initialized(services=self.services)
-
         self.results = []
         self.used_bsns = set()  # Track used BSNs
-        self.law_parameters = law_parameters or {}
-
-        # DEBUG: Log received law parameters
-        if self.law_parameters:
-            logger.info(f"Received law_parameters with keys: {list(self.law_parameters.keys())}")
-            for law_name, params in self.law_parameters.items():
-                if params:
-                    logger.info(f"  {law_name}: {len(params)} parameters")
 
         # CBS demographic data for more realistic simulation
         self.age_distribution = {
@@ -1341,14 +1324,8 @@ class LawSimulator:
         # Evaluate all relevant laws
         try:
             # 1. Zorgtoeslag (healthcare subsidy)
-            zorgtoeslag_input, zorgtoeslag_defs = self._create_law_overrides("zorgtoeslagwet")
             zorgtoeslag = self.services.evaluate(
-                "TOESLAGEN",
-                "zorgtoeslagwet",
-                {"BSN": person["bsn"]},
-                self.simulation_date,
-                overwrite_input=zorgtoeslag_input,
-                overwrite_definitions=zorgtoeslag_defs,
+                "TOESLAGEN", "zorgtoeslagwet", {"BSN": person["bsn"]}, self.simulation_date
             )
 
             # Also evaluate 2024 version for comparison if simulating in 2025
@@ -1356,12 +1333,7 @@ class LawSimulator:
             if self.simulation_date.startswith("2025"):
                 try:
                     zorgtoeslag_2024 = self.services.evaluate(
-                        "TOESLAGEN",
-                        "zorgtoeslagwet",
-                        {"BSN": person["bsn"]},
-                        "2024-12-31",
-                        overwrite_input=zorgtoeslag_input,
-                        overwrite_definitions=zorgtoeslag_defs,
+                        "TOESLAGEN", "zorgtoeslagwet", {"BSN": person["bsn"]}, "2024-12-31"
                     )
                 except Exception:
                     pass
@@ -1371,14 +1343,8 @@ class LawSimulator:
 
             # 3. Huurtoeslag (rent subsidy)
             try:
-                huurtoeslag_input, huurtoeslag_defs = self._create_law_overrides("wet_op_de_huurtoeslag")
                 huurtoeslag = self.services.evaluate(
-                    "TOESLAGEN",
-                    "wet_op_de_huurtoeslag",
-                    {"BSN": person["bsn"]},
-                    self.simulation_date,
-                    overwrite_input=huurtoeslag_input,
-                    overwrite_definitions=huurtoeslag_defs,
+                    "TOESLAGEN", "wet_op_de_huurtoeslag", {"BSN": person["bsn"]}, self.simulation_date
                 )
             except Exception as e:
                 logger.debug(f"Error evaluating huurtoeslag for BSN {person['bsn']}: {e}")
@@ -1386,14 +1352,11 @@ class LawSimulator:
 
             # 4. Bijstand (social assistance)
             try:
-                bijstand_input, bijstand_defs = self._create_law_overrides("participatiewet/bijstand/amsterdam")
                 bijstand = self.services.evaluate(
                     "GEMEENTE_AMSTERDAM",
                     "participatiewet/bijstand/amsterdam",
                     {"BSN": person["bsn"]},
                     self.simulation_date,
-                    overwrite_input=bijstand_input,
-                    overwrite_definitions=bijstand_defs,
                 )
             except Exception:
                 bijstand = None
@@ -1403,14 +1366,8 @@ class LawSimulator:
             kinderopvangtoeslag = None
             if person["has_children"] and any(child["age"] < 12 for child in person.get("children_data", [])):
                 try:
-                    kinderopvang_input, kinderopvang_defs = self._create_law_overrides("wet_kinderopvang")
                     kinderopvangtoeslag = self.services.evaluate(
-                        "TOESLAGEN",
-                        "wet_kinderopvang",
-                        {"BSN": person["bsn"]},
-                        self.simulation_date,
-                        overwrite_input=kinderopvang_input,
-                        overwrite_definitions=kinderopvang_defs,
+                        "TOESLAGEN", "wet_kinderopvang", {"BSN": person["bsn"]}, self.simulation_date
                     )
                 except Exception as e:
                     logger.debug(f"Error evaluating kinderopvangtoeslag for BSN {person['bsn']}: {e}")
@@ -1420,16 +1377,8 @@ class LawSimulator:
             kindgebonden_budget = None
             if person["has_children"]:
                 try:
-                    kindgebonden_budget_input, kindgebonden_budget_defs = self._create_law_overrides(
-                        "wet_op_het_kindgebonden_budget"
-                    )
                     kindgebonden_budget = self.services.evaluate(
-                        "TOESLAGEN",
-                        "wet_op_het_kindgebonden_budget",
-                        {"BSN": person["bsn"]},
-                        self.simulation_date,
-                        overwrite_input=kindgebonden_budget_input,
-                        overwrite_definitions=kindgebonden_budget_defs,
+                        "TOESLAGEN", "wet_op_het_kindgebonden_budget", {"BSN": person["bsn"]}, self.simulation_date
                     )
                 except Exception as e:
                     logger.debug(f"Error evaluating kindgebonden budget for BSN {person['bsn']}: {e}")
@@ -1438,14 +1387,8 @@ class LawSimulator:
             # 7. WW-uitkering (unemployment benefit)
             ww_uitkering = None
             try:
-                ww_input, ww_defs = self._create_law_overrides("werkloosheidswet")
                 ww_uitkering = self.services.evaluate(
-                    "UWV",
-                    "werkloosheidswet",
-                    {"BSN": person["bsn"]},
-                    self.simulation_date,
-                    overwrite_input=ww_input,
-                    overwrite_definitions=ww_defs,
+                    "UWV", "werkloosheidswet", {"BSN": person["bsn"]}, self.simulation_date
                 )
             except Exception as e:
                 import traceback
@@ -1455,25 +1398,11 @@ class LawSimulator:
                 ww_uitkering = None
 
             # 8. Kiesrecht (voting rights)
-            kiesrecht_input, kiesrecht_defs = self._create_law_overrides("kieswet")
-            kiesrecht = self.services.evaluate(
-                "KIESRAAD",
-                "kieswet",
-                {"BSN": person["bsn"]},
-                self.simulation_date,
-                overwrite_input=kiesrecht_input,
-                overwrite_definitions=kiesrecht_defs,
-            )
+            kiesrecht = self.services.evaluate("KIESRAAD", "kieswet", {"BSN": person["bsn"]}, self.simulation_date)
 
             # 9. Inkomstenbelasting (income tax)
-            ib_overwrite_input, ib_overwrite_definitions = self._create_law_overrides("wet_inkomstenbelasting")
             inkomstenbelasting = self.services.evaluate(
-                "BELASTINGDIENST",
-                "wet_inkomstenbelasting",
-                {"BSN": person["bsn"]},
-                self.simulation_date,
-                overwrite_input=ib_overwrite_input,
-                overwrite_definitions=ib_overwrite_definitions,
+                "BELASTINGDIENST", "wet_inkomstenbelasting", {"BSN": person["bsn"]}, self.simulation_date
             )
         except Exception:
             return None
@@ -1562,47 +1491,6 @@ class LawSimulator:
         }
 
         self.results.append(result)
-
-    def _create_law_overrides(self, law_name):
-        """
-        Create override dicts for a specific law based on UI parameters.
-
-        Uses the law_parameter_config registry to map UI parameters to engine overrides.
-        This eliminates hardcoded law-specific logic.
-
-        Args:
-            law_name: Technical law name (e.g., "wet_inkomstenbelasting")
-
-        Returns:
-            Tuple of (overwrite_input, overwrite_definitions):
-            - overwrite_input: Dict for input overrides {service: {field: value}}
-            - overwrite_definitions: Dict for definition overrides {field: value}
-        """
-        # Find law config by technical name
-        config = find_law_config_by_technical_name(law_name)
-        if not config:
-            logger.debug(f"No config found for technical law name: {law_name}")
-            return {}, {}
-
-        # Check if we have UI parameters for this law
-        ui_law_name = config.ui_name
-        logger.debug(f"Looking for UI law name '{ui_law_name}' (from technical name '{law_name}') in law_parameters")
-        logger.debug(f"Available law_parameters keys: {list(self.law_parameters.keys())}")
-
-        if ui_law_name not in self.law_parameters:
-            logger.debug(f"No parameters found for UI law name: {ui_law_name}")
-            return {}, {}
-
-        logger.info(f"Found {len(self.law_parameters[ui_law_name])} parameters for {ui_law_name}")
-
-        # Create overrides using registry
-        overwrite_input, overwrite_definitions = create_overrides(ui_law_name, self.law_parameters[ui_law_name])
-
-        # Log info about definition overrides if present
-        if overwrite_definitions:
-            logger.info(f"Applying definition overrides for {law_name}: {list(overwrite_definitions.keys())}")
-
-        return overwrite_input, overwrite_definitions
 
     def create_population(self, num_people=1000, save=True, population_params=None):
         """Create a new population and optionally save it."""
