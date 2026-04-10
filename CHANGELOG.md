@@ -2,6 +2,47 @@
 
 <!-- version list -->
 
+## v1.12.2 (2026-04-10)
+
+### Bug Fixes
+
+- Refit graph view when container becomes visible
+  ([#433](https://github.com/MinBZK/poc-machine-law/pull/433),
+  [`e1348f5`](https://github.com/MinBZK/poc-machine-law/commit/e1348f5e2494452fd19c2068dfaa15f484146ccd))
+
+### Chores
+
+- Sync VERSION file to 1.12.1
+  ([`7604110`](https://github.com/MinBZK/poc-machine-law/commit/7604110556d46e2bfea80d0806be466c7ecc212b))
+
+- **deps**: Bump docker/login-action from 3 to 4 in the actions group
+  ([#397](https://github.com/MinBZK/poc-machine-law/pull/397),
+  [`14239a6`](https://github.com/MinBZK/poc-machine-law/commit/14239a6edb4601c9fb6697de13e68b33f8de225f))
+
+- **deps**: Bump golang.org/x/text ([#406](https://github.com/MinBZK/poc-machine-law/pull/406),
+  [`b037477`](https://github.com/MinBZK/poc-machine-law/commit/b0374775028581c30de9d0e07ade1f70a9be499e))
+
+- **deps**: Bump the go-deps group across 1 directory with 2 updates
+  ([#414](https://github.com/MinBZK/poc-machine-law/pull/414),
+  [`581ea83`](https://github.com/MinBZK/poc-machine-law/commit/581ea83a0616aa9d075261339431584c5dc6854e))
+
+- **deps**: Bump the go-deps group across 1 directory with 6 updates
+  ([#413](https://github.com/MinBZK/poc-machine-law/pull/413),
+  [`d047506`](https://github.com/MinBZK/poc-machine-law/commit/d04750661bd1cc919d95ba31e0207a2f2d86f211))
+
+- **deps**: Bump the npm-minor-patch group across 1 directory with 12 updates
+  ([#417](https://github.com/MinBZK/poc-machine-law/pull/417),
+  [`987f5bb`](https://github.com/MinBZK/poc-machine-law/commit/987f5bb21ed4ff57e740faf0d65dedb49700177e))
+
+- **deps-dev**: Bump the npm-minor-patch group across 1 directory with 11 updates
+  ([#416](https://github.com/MinBZK/poc-machine-law/pull/416),
+  [`0909cd4`](https://github.com/MinBZK/poc-machine-law/commit/0909cd48ac9081624dab6b8d7ea447ad71561bc7))
+
+- **deps-dev**: Bump the npm-minor-patch group across 1 directory with 11 updates
+  ([#415](https://github.com/MinBZK/poc-machine-law/pull/415),
+  [`8e9395d`](https://github.com/MinBZK/poc-machine-law/commit/8e9395dadbf026cd46b8e704e00dfec51e78d263))
+
+
 ## v1.12.1 (2026-03-10)
 
 ### Bug Fixes
