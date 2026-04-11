@@ -623,13 +623,18 @@ class RegelrechtServices:
                 output_name = source.get("output", input_name)
                 source_params = source.get("parameters", {})
 
-                # Build parameters for the target law
+                # Build parameters for the target law.
+                # Parameter refs like $bsn must match case-insensitively
+                # because the web UI passes BSN (upper) while YAML uses $bsn.
+                params_lower = {k.lower(): v for k, v in params.items()}
                 target_params: dict[str, Any] = {}
                 for target_key, source_ref in source_params.items():
                     if isinstance(source_ref, str) and source_ref.startswith("$"):
                         var_name = source_ref[1:]
                         if var_name in params:
                             target_params[target_key] = params[var_name]
+                        elif var_name.lower() in params_lower:
+                            target_params[target_key] = params_lower[var_name.lower()]
                     else:
                         target_params[target_key] = source_ref
 
@@ -655,8 +660,10 @@ class RegelrechtServices:
                     )
                     if sub_result is not None:
                         params[input_name] = sub_result
-                except Exception:
-                    pass  # Leave unresolved; engine or defaults will handle it
+                    else:
+                        logger.debug("Cross-law %s returned None for %s", regulation, output_name)
+                except Exception as exc:
+                    logger.debug("Cross-law %s failed for %s: %s", regulation, input_name, exc)
 
     def _evaluate_for_preresolution(
         self,
@@ -676,8 +683,6 @@ class RegelrechtServices:
         try:
             rule = self.resolver.find_rule(law, reference_date, service or None)
         except ValueError:
-            # Service-specific lookup failed; retry without service constraint.
-            # E.g. wet_inkomstenbelasting with service=UWV finds BELASTINGDIENST version.
             try:
                 rule = self.resolver.find_rule(law, reference_date, None)
             except ValueError:
@@ -691,35 +696,36 @@ class RegelrechtServices:
         law_id = data.get("$id", law)
         params = _to_native(dict(parameters))
 
-        # Only use Phase 1 of data source pre-resolution (mapped inputs).
-        # Phase 2 fallback can contaminate inputs by matching wrong tables.
-        self._pre_resolve_data_sources_phase1_only(law_id, params, data)
+        with logger.indent_block(f"{service or '?'}: {law} ({reference_date}) → {requested_output}"):
+            self._pre_resolve_data_sources_phase1_only(law_id, params, data)
 
-        # Recursively pre-resolve cross-law inputs of the target law
-        self._pre_resolve_cross_law_inputs(data, params, reference_date, depth)
+            # Log resolved data sources
+            for art in data.get("articles", []):
+                for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+                    inp_name = inp.get("name", "")
+                    src = inp.get("source")
+                    if isinstance(src, dict) and not src.get("regulation") and inp_name in params:
+                        logger.debug("Source: %s = %s", inp_name, params[inp_name])
 
-        # DON'T fill defaults here - the engine's DataSourceRegistry handles
-        # the remaining source: {} inputs. Filling defaults would override
-        # correct values from the data sources.
+            self._pre_resolve_cross_law_inputs(data, params, reference_date, depth)
 
-        # Check if there are claims for the target law. Claims modify inputs
-        # (e.g., correcting geboortedatum), and the Rust engine doesn't know
-        # about them. Merge claim values into params before engine evaluation.
-        bsn = params.get("bsn")
-        if bsn:
-            claims = self.claim_manager.get_claim_by_bsn_service_law(bsn, service or "", law, approved=False)
-            if claims:
-                for key, claim in claims.items():
-                    params[key] = _to_native(claim.new_value)
+            bsn = params.get("bsn")
+            if bsn:
+                claims = self.claim_manager.get_claim_by_bsn_service_law(bsn, service or "", law, approved=False)
+                if claims:
+                    for key, claim in claims.items():
+                        params[key] = _to_native(claim.new_value)
+                        logger.debug("Claim: %s = %s", key, params[key])
 
-        try:
-            result = self._engine.evaluate(law_id, [requested_output], params, reference_date)
-            outputs = result.get("outputs", {})
-            val = outputs.get(requested_output)
-            if val is not None:
-                return val
-        except Exception:
-            pass
+            try:
+                result = self._engine.evaluate(law_id, [requested_output], params, reference_date)
+                outputs = result.get("outputs", {})
+                val = outputs.get(requested_output)
+                if val is not None:
+                    logger.debug("Result: %s = %s", requested_output, val)
+                    return val
+            except Exception as exc:
+                logger.debug("Engine error: %s", exc)
 
         # Engine returned None for the requested output. Try Python-side
         # action evaluation as fallback. This handles patterns the Rust
