@@ -24,9 +24,9 @@ if _SOURCE_REF_MAPPING_PATH.exists():
     with open(_SOURCE_REF_MAPPING_PATH) as _f:
         _SOURCE_REF_MAPPING = json.load(_f)
 
-# TODO: remove v0.5.0→flat conversion code below once the Python engine fallback
-# (machine/regelrecht_services.py → RulesEngine) reads v0.5.1 YAML natively.
-# Until then, load_yaml_cached flattens article-based YAML so the old engine works.
+# The v0.5.0→flat conversion below is used by get_rule_spec() to provide
+# rule properties (input/output/definitions) in the flat format that web
+# routes and templates expect. The Rust engine reads v0.5.1 YAML natively.
 
 # Mapping from v0.5.0 regulatory_layer to v0.1.x law_type (used by _flatten_v050)
 REGULATORY_LAYER_TO_LAW_TYPE = {

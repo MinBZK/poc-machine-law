@@ -718,9 +718,13 @@ class RegelrechtServices:
                         logger.debug("Claim: %s = %s", key, params[key])
 
             try:
-                result = self._engine.evaluate(law_id, [requested_output], params, reference_date)
+                result = self._engine.evaluate_with_trace(law_id, [requested_output], params, reference_date)
                 outputs = result.get("outputs", {})
                 val = outputs.get(requested_output)
+                # Log the sub-evaluation trace
+                trace_json = result.get("trace")
+                if trace_json:
+                    _log_trace(json.loads(trace_json))
                 if val is not None:
                     logger.debug("Result: %s = %s", requested_output, val)
                     return val
