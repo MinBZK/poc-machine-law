@@ -780,9 +780,6 @@ class RegelrechtServices:
                     if isinstance(sv, dict):
                         params.update(_to_native(sv))
 
-            # Track where each input value came from for the path tree
-            input_sources: dict[str, str] = {}  # name → resolve_type
-
             # Resolve claims (citizen-submitted data) and merge into params.
             bsn = params.get("bsn")
             if bsn:
@@ -791,7 +788,6 @@ class RegelrechtServices:
                     for key, claim in claims.items():
                         if key not in params:
                             params[key] = _to_native(claim.new_value)
-                            input_sources[key] = "CLAIM"
                             logger.debug("Claim: %s = %s", key, params[key])
 
             import yaml as yaml_mod
@@ -817,32 +813,13 @@ class RegelrechtServices:
                     missing_required=True,
                 )
 
-            # Collect input specs from YAML for path tree building
-            input_specs: list[dict[str, Any]] = []
-            for art in data.get("articles", []):
-                for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
-                    input_specs.append(inp)
-
             # Pre-resolve data source inputs
             with logger.indent_block("Resolving data sources"):
-                params_before = set(params.keys())
                 self._pre_resolve_data_sources(law_id, params, data)
-                for k in set(params.keys()) - params_before:
-                    input_sources[k] = "SOURCE"
-                    logger.debug("Source: %s = %s", k, params[k])
 
             # Pre-resolve cross-law inputs
             with logger.indent_block("Resolving cross-law inputs"):
-                params_before = set(params.keys())
                 self._pre_resolve_cross_law_inputs(data, params, reference_date)
-                for k in set(params.keys()) - params_before:
-                    input_sources[k] = "SERVICE"
-                    logger.debug("Cross-law: %s = %s", k, params[k])
-
-            # Mark remaining params as NONE (directly supplied)
-            for k in params:
-                if k not in input_sources:
-                    input_sources[k] = "NONE"
 
             # Check for missing required source: {} inputs.
             missing = _find_missing_required_inputs(data, params)
@@ -853,17 +830,18 @@ class RegelrechtServices:
                     requirements_met=False,
                     input=params,
                     rulespec_uuid=rule.uuid,
-                    path=_build_input_path(input_specs, params, input_sources),
+                    path=None,
                     missing_required=True,
                 )
 
             # Fill defaults for remaining unresolved source: {} inputs.
             _fill_input_defaults(data, params)
 
-            # Evaluate
+            # Evaluate with trace — the Rust engine records every step
+            trace_json = None
             try:
-                with logger.indent_block("Engine evaluate"):
-                    result = self._engine.evaluate(law_id, output_names, params, reference_date)
+                result = self._engine.evaluate_with_trace(law_id, output_names, params, reference_date)
+                trace_json = result.get("trace")
             except Exception as e:
                 logger.warning("Engine error for %s: %s", law, e)
                 return RuleResult(
@@ -871,7 +849,7 @@ class RegelrechtServices:
                     requirements_met=False,
                     input=params,
                     rulespec_uuid=rule.uuid,
-                    path=_build_input_path(input_specs, params, input_sources),
+                    path=None,
                     missing_required=True,
                 )
 
@@ -889,64 +867,48 @@ class RegelrechtServices:
             if not req_met and voldoet is not _MISSING:
                 outputs = {}
 
+            # Log the Rust engine trace tree as DEBUG output
+            if trace_json:
+                _log_trace(json.loads(trace_json))
+
             for name, val in outputs.items():
                 logger.debug("Output: %s = %s", name, val)
             logger.debug("Requirements met: %s", req_met)
 
-            # Use params as resolved input (engine doesn't track this)
-            resolved_input = {k: v for k, v in params.items() if k in input_sources}
-
             return RuleResult(
                 output=outputs,
                 requirements_met=req_met,
-                input=resolved_input,
+                input=params,
                 rulespec_uuid=rule.uuid,
-                path=_build_input_path(input_specs, params, input_sources),
+                path=json.loads(trace_json) if trace_json else None,
                 missing_required=False,
             )
 
 
-def _build_input_path(
-    input_specs: list[dict[str, Any]],
-    params: dict[str, Any],
-    input_sources: dict[str, str],
-) -> dict[str, Any]:
-    """Build a path info dict from YAML input specs and resolved params.
+def _log_trace(node: dict, depth: int = 0) -> None:
+    """Recursively log a Rust engine trace tree via the IndentLogger."""
+    name = node.get("name", "?")
+    ntype = node.get("node_type", "?")
+    result = node.get("result")
+    rtype = node.get("resolve_type")
+    msg = node.get("message")
 
-    Returns a dict that the web adapter converts to PathNode objects.
-    Keys are input names, values have ``result``, ``required``,
-    ``resolve_type``, and ``details``.
-    """
-    path: dict[str, Any] = {}
-    for spec in input_specs:
-        name = spec.get("name")
-        if not name:
-            continue
-        source = spec.get("source", {})
-        required = spec.get("required", False)
-        value = params.get(name)
-        resolve_type = input_sources.get(name, "NONE")
+    label = f"{ntype}: {name}"
+    if rtype:
+        label += f" [{rtype}]"
+    if result is not None:
+        label += f" = {result}"
+    if msg and msg != name:
+        label += f" ({msg})"
 
-        # Cross-law inputs show as SERVICE with law details
-        regulation = source.get("regulation")
-        if regulation:
-            resolve_type = "SERVICE"
+    if depth == 0:
+        logger.debug(label)
+    else:
+        logger.debug(label)
 
-        entry: dict[str, Any] = {
-            "result": value,
-            "required": required,
-            "resolve_type": resolve_type,
-            "details": {
-                "path": f"${name}",
-                "type": spec.get("type"),
-                "type_spec": spec.get("type_spec"),
-            },
-        }
-        if regulation:
-            entry["details"]["service"] = source.get("service")
-            entry["details"]["law"] = regulation
-        path[name] = entry
-    return path
+    for child in node.get("children", []):
+        with logger.indent_block(None):
+            _log_trace(child, depth + 1)
 
 
 def _evaluate_action_in_python(data: dict, params: dict, requested_output: str, reference_date: str = "") -> Any | None:

@@ -82,49 +82,13 @@ class RegelrechtMachineService(EngineInterface):
             approved=approved,
         )
 
-        # Build PathNode tree from the path info dict returned by RegelrechtServices
-        root = PathNode(type="root", name="evaluation", result=None)
-        path_info = result.path or {}
-        for input_name, info in path_info.items():
-            resolve_type = info.get("resolve_type", "NONE")
-            details = info.get("details", {})
-            regulation = details.get("law")
-
-            if regulation:
-                # Cross-law dependency: wrap in a service_evaluation node
-                svc_node = PathNode(
-                    type="service_evaluation",
-                    name=input_name,
-                    result=info.get("result"),
-                    required=info.get("required", False),
-                    details={
-                        "path": details.get("path", f"${input_name}"),
-                        "service": details.get("service"),
-                        "law": regulation,
-                    },
-                    children=[
-                        PathNode(
-                            type="resolve",
-                            name=input_name,
-                            result=info.get("result"),
-                            resolve_type="SERVICE",
-                            required=info.get("required", False),
-                            details=details,
-                        )
-                    ],
-                )
-                root.children.append(svc_node)
-            else:
-                root.children.append(
-                    PathNode(
-                        type="resolve",
-                        name=input_name,
-                        result=info.get("result"),
-                        resolve_type=resolve_type,
-                        required=info.get("required", False),
-                        details=details,
-                    )
-                )
+        # Convert the Rust engine trace tree to a web PathNode tree.
+        # The trace is a nested dict with node_type/name/result/resolve_type/children.
+        root = (
+            _rust_trace_to_pathnode(result.path)
+            if result.path
+            else PathNode(type="root", name="evaluation", result=None)
+        )
 
         return RuleResult(
             output=dict(result.output),
@@ -157,3 +121,35 @@ class RegelrechtMachineService(EngineInterface):
         import sys
 
         os.execl(sys.executable, sys.executable, *sys.argv)
+
+
+def _rust_trace_to_pathnode(trace: dict) -> PathNode:
+    """Convert a Rust engine trace dict to a web PathNode tree."""
+    node_type = trace.get("node_type", "root")
+    name = trace.get("name", "")
+    result_val = trace.get("result")
+    resolve_type = trace.get("resolve_type")
+    message = trace.get("message")
+
+    web_type = node_type
+    if node_type == "resolve":
+        web_type = "resolve"
+    elif node_type == "article":
+        web_type = "root"
+    elif node_type in ("action", "operation"):
+        web_type = "resolve"
+
+    children = [_rust_trace_to_pathnode(c) for c in trace.get("children", [])]
+
+    details: dict[str, Any] = {"path": f"${name}"}
+    if message:
+        details["message"] = message
+
+    return PathNode(
+        type=web_type,
+        name=name,
+        result=result_val,
+        resolve_type=resolve_type or "NONE",
+        details=details,
+        children=children,
+    )
