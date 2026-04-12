@@ -50,6 +50,11 @@ class FeatureFlags:
         ("CJIB", "wet_brp/terugmelding/cjib"): False,
         ("TOESLAGEN", "wet_brp/terugmelding/toeslagen"): False,
         ("RvIG", "wet_brp/laa"): False,
+        # AWB bezwaar/beroep are procedural laws that only apply when there
+        # is an existing decision to object to. They belong under a per-case
+        # action, not in the citizen's "which rights do I have" dashboard.
+        ("JenV", "awb/bezwaar"): False,
+        ("JenV", "awb/beroep"): False,
         # Data source helpers / internal sub-laws consumed by other laws
         ("BELASTINGDIENST", "belastingdienst_vermogen"): False,
         ("KVK", "handelsregisterwet/bedrijfsgegevens"): False,
