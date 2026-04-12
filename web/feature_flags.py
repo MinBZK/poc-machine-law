@@ -55,6 +55,17 @@ class FeatureFlags:
         # action, not in the citizen's "which rights do I have" dashboard.
         ("JenV", "awb/bezwaar"): False,
         ("JenV", "awb/beroep"): False,
+        # Status/infra laws that only produce 'heeft X: ja/nee' outputs.
+        # They're consumed as cross-law inputs by other laws and don't
+        # add anything on a citizen dashboard by themselves.
+        ("UWV", "wet_werk_en_inkomen_naar_arbeidsvermogen"): False,
+        ("UWV", "ziektewet"): False,
+        ("RVZ", "zvw"): False,
+        # Archiefwet governs government records management, not citizen
+        # rights — it has no place in the "which rights do I have" dashboard.
+        ("NATIONAAL_ARCHIEF", "archiefwet/openbaarheid"): False,
+        ("NATIONAAL_ARCHIEF", "archiefwet/overbrenging"): False,
+        ("NATIONAAL_ARCHIEF", "archiefwet/vernietiging"): False,
         # Data source helpers / internal sub-laws consumed by other laws
         ("BELASTINGDIENST", "belastingdienst_vermogen"): False,
         ("KVK", "handelsregisterwet/bedrijfsgegevens"): False,
