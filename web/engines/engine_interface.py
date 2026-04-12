@@ -1,12 +1,33 @@
+import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 
 from machine.regelrecht_services import RegelrechtServices
+
+
+def _load_dashboard_primary_outputs() -> dict[str, str]:
+    """Load the ``(service/law) -> primary output`` map used for dashboard sorting.
+
+    Laws in this map rank by the value of their declared primary output
+    only. Laws not in the map fall back to the sum of all numeric outputs.
+    The map lives in ``web/config/dashboard_outputs.json`` so it can be
+    edited without touching engine YAMLs.
+    """
+    path = Path(__file__).resolve().parent.parent / "config" / "dashboard_outputs.json"
+    try:
+        data = json.loads(path.read_text())
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    return {k: v for k, v in data.items() if not k.startswith("_")}
+
+
+_DASHBOARD_PRIMARY_OUTPUTS = _load_dashboard_primary_outputs()
 
 
 @dataclass
@@ -277,55 +298,62 @@ class EngineInterface(ABC):
                 # Run the law for this person and get results
                 result = self.evaluate(service=service, law=law, parameters={"BSN": bsn}, reference_date=current_date)
 
-                # Extract financial impact from result outputs.
+                # Extract the primary output value as the ranking impact.
                 #
-                # The v0.5.1 YAML schema dropped `citizen_relevance`, so we can
-                # no longer rely on that hint to pick a primary output. We score
-                # every numeric output, sum their yearly-normalized absolute
-                # amounts, and use that as the impact. Boolean True outputs add
-                # a baseline eligibility weight so "you qualify" tiles still
-                # outrank purely informational ones.
+                # Laws listed in web/config/dashboard_outputs.json declare which
+                # output represents the "real" result for the citizen; we use
+                # that value as the score. Laws not in the map fall back to the
+                # sum of all numeric outputs (less precise but usually OK).
                 impact_value = 0
-                if result and result.output and rule_spec:
-                    output_definitions = {}
-                    for output_def in rule_spec.get("properties", {}).get("output", []):
-                        output_name = output_def.get("name")
-                        if output_name:
-                            output_definitions[output_name] = output_def
+                if result and result.output:
+                    key = f"{service}/{law}"
+                    primary_name = _DASHBOARD_PRIMARY_OUTPUTS.get(key)
 
-                    numeric_total = 0.0
-                    has_positive_bool = False
+                    output_definitions: dict[str, dict] = {}
+                    if rule_spec:
+                        for output_def in rule_spec.get("properties", {}).get("output", []):
+                            output_name = output_def.get("name")
+                            if output_name:
+                                output_definitions[output_name] = output_def
 
-                    for output_name, output_data in result.output.items():
-                        # Skip internal bookkeeping outputs
-                        if output_name in ("voldoet_aan_voorwaarden",):
-                            continue
-                        output_def = output_definitions.get(output_name) or {}
+                    def _score(name: str, data: Any) -> float:
+                        """Score a single output value for dashboard ranking."""
+                        output_def = output_definitions.get(name) or {}
                         output_type = output_def.get("type", "")
-                        # Infer type when missing from the spec
                         if not output_type:
-                            if isinstance(output_data, bool):
+                            if isinstance(data, bool):
                                 output_type = "boolean"
-                            elif isinstance(output_data, (int, float)):
+                            elif isinstance(data, (int, float)):
                                 output_type = "amount"
+                        if output_type in ("amount", "number") and isinstance(data, (int, float)):
+                            value = float(data)
+                            temporal = output_def.get("temporal", {})
+                            if temporal.get("type") == "period" and temporal.get("period_type") == "month":
+                                value *= 12
+                            return abs(value)
+                        if output_type == "boolean" and data is True:
+                            return 50000.0
+                        return 0.0
 
-                        try:
-                            if output_type in ("amount", "number") and isinstance(output_data, (int, float)):
-                                numeric_value = float(output_data)
-                                # Normalize monthly amounts to yearly
-                                temporal = output_def.get("temporal", {})
-                                if temporal.get("type") == "period" and temporal.get("period_type") == "month":
-                                    numeric_value *= 12
-                                numeric_total += abs(numeric_value)
-                            elif output_type == "boolean" and output_data is True:
+                    if primary_name and primary_name in result.output:
+                        # Explicit primary output — use its value directly.
+                        impact_value = _score(primary_name, result.output[primary_name])
+                    else:
+                        # Fallback: sum every numeric output we can score.
+                        total = 0.0
+                        has_positive_bool = False
+                        for name, data in result.output.items():
+                            if name in ("voldoet_aan_voorwaarden",):
+                                continue
+                            score = _score(name, data)
+                            if score == 50000.0:
                                 has_positive_bool = True
-                        except (ValueError, TypeError):
-                            continue
-
-                    if numeric_total > 0:
-                        impact_value = numeric_total
-                    elif has_positive_bool:
-                        impact_value = 50000
+                            else:
+                                total += score
+                        if total > 0:
+                            impact_value = total
+                        elif has_positive_bool:
+                            impact_value = 50000
 
                 # Missing-required laws get a mid-range score so they stay
                 # visible but don't push all working laws off the top.
