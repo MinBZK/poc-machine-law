@@ -45,6 +45,25 @@ class FeatureFlags:
         ("AWB", "algemene_wet_bestuursrecht"): False,
         ("RVO", "omgevingswet/werkgebonden_personenmobiliteit/gegevens"): False,
         ("RvIG", "wet_brp"): False,
+        # Terugmelding infrastructure (not citizen-facing)
+        ("BELASTINGDIENST", "wet_brp/terugmelding/belastingdienst"): False,
+        ("CJIB", "wet_brp/terugmelding/cjib"): False,
+        ("TOESLAGEN", "wet_brp/terugmelding/toeslagen"): False,
+        ("RvIG", "wet_brp/laa"): False,
+        # Data source helpers / internal sub-laws consumed by other laws
+        ("BELASTINGDIENST", "belastingdienst_vermogen"): False,
+        ("KVK", "handelsregisterwet/bedrijfsgegevens"): False,
+        ("SVB", "algemene_ouderdomswet_gegevens"): False,
+        ("SVB", "algemene_ouderdomswet/leeftijdsbepaling"): False,
+        ("UWV", "uwv_werkgegevens"): False,
+        ("UWV", "uwv_toetsingsinkomen"): False,
+        ("UWV", "wet_inkomstenbelasting/toetsingsinkomen"): False,
+        ("UWV", "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen"): False,
+        (
+            "VWS",
+            "zorgtoeslagwet/regelingen/regeling_vaststelling_standaardpremie_en_bestuursrechtelijke_premies",
+        ): False,
+        ("CBS", "wet_op_het_centraal_bureau_voor_de_statistiek"): False,
     }
 
     @classmethod
