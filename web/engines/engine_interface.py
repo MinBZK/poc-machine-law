@@ -277,59 +277,60 @@ class EngineInterface(ABC):
                 # Run the law for this person and get results
                 result = self.evaluate(service=service, law=law, parameters={"BSN": bsn}, reference_date=current_date)
 
-                # Extract financial impact from result based on citizen_relevance
+                # Extract financial impact from result outputs.
+                #
+                # The v0.5.1 YAML schema dropped `citizen_relevance`, so we can
+                # no longer rely on that hint to pick a primary output. We score
+                # every numeric output, sum their yearly-normalized absolute
+                # amounts, and use that as the impact. Boolean True outputs add
+                # a baseline eligibility weight so "you qualify" tiles still
+                # outrank purely informational ones.
                 impact_value = 0
                 if result and result.output and rule_spec:
-                    # Create mapping of output names to their output definitions
                     output_definitions = {}
                     for output_def in rule_spec.get("properties", {}).get("output", []):
                         output_name = output_def.get("name")
                         if output_name:
                             output_definitions[output_name] = output_def
 
-                    # Track all primary numeric outputs to potentially sum them
-                    primary_numeric_outputs = []
+                    numeric_total = 0.0
+                    has_positive_bool = False
 
-                    # Process outputs according to their relevance
                     for output_name, output_data in result.output.items():
-                        # Get the output definition if available
-                        output_def = output_definitions.get(output_name)
-
-                        # Skip if no definition found or not marked as primary
-                        if not output_def or output_def.get("citizen_relevance") != "primary":
+                        # Skip internal bookkeeping outputs
+                        if output_name in ("voldoet_aan_voorwaarden",):
                             continue
+                        output_def = output_definitions.get(output_name) or {}
+                        output_type = output_def.get("type", "")
+                        # Infer type when missing from the spec
+                        if not output_type:
+                            if isinstance(output_data, bool):
+                                output_type = "boolean"
+                            elif isinstance(output_data, (int, float)):
+                                output_type = "amount"
 
                         try:
-                            # Use the type from the definition instead of inferring
-                            output_type = output_def.get("type", "")
-
-                            # Handle numeric types (amount, number)
-                            if output_type in ["amount", "number"]:
+                            if output_type in ("amount", "number") and isinstance(output_data, (int, float)):
                                 numeric_value = float(output_data)
-
-                                # Normalize to yearly values based on temporal definition
+                                # Normalize monthly amounts to yearly
                                 temporal = output_def.get("temporal", {})
                                 if temporal.get("type") == "period" and temporal.get("period_type") == "month":
-                                    # If monthly, multiply by 12 to get yearly equivalent
                                     numeric_value *= 12
-
-                                primary_numeric_outputs.append(abs(numeric_value))
-
-                            # Handle boolean types with standard importance for eligibility
+                                numeric_total += abs(numeric_value)
                             elif output_type == "boolean" and output_data is True:
-                                impact_value = max(impact_value, 50000)  # Assign importance to eligibility
-
+                                has_positive_bool = True
                         except (ValueError, TypeError):
-                            # If not convertible to number, skip
-                            print(f"Skipping non-numeric output {output_name}: {output_data}")
+                            continue
 
-                    # If we have multiple primary numeric outputs, sum them
-                    if len(primary_numeric_outputs) > 0:
-                        impact_value = max(impact_value, sum(primary_numeric_outputs))
+                    if numeric_total > 0:
+                        impact_value = numeric_total
+                    elif has_positive_bool:
+                        impact_value = 50000
 
-                # Assign importance to missing required value
+                # Missing-required laws get a mid-range score so they stay
+                # visible but don't push all working laws off the top.
                 if result.missing_required:
-                    impact_value = max(impact_value, 100000)
+                    impact_value = max(impact_value, 10000)
 
                 # Store in cache
                 self._impact_cache[cache_key] = impact_value
