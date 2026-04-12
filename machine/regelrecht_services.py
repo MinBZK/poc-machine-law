@@ -641,7 +641,12 @@ class RegelrechtServices:
                     missing_required=True,
                 )
 
-            # Fill defaults for remaining unresolved source: {} inputs.
+            # Fill defaults for unresolved inputs.
+            # The Rust engine type-defaults data source inputs natively
+            # (regelrecht commit 39998b6), but edge cases remain for:
+            # (a) data source inputs whose registered source returned null
+            #     for a non-primitive field, and (b) cross-law inputs whose
+            #     sub-evaluation returned null. Fill those Python-side.
             _fill_input_defaults(data, params)
 
             # Evaluate with trace — the Rust engine records every step
@@ -785,6 +790,43 @@ def _postprocess_outputs(outputs: dict, params: dict) -> None:
             break
 
 
+def _fill_input_defaults(data: dict, params: dict) -> None:
+    """Type-default optional inputs that remained unresolved.
+
+    The Rust engine does most of this natively (regelrecht commit 39998b6),
+    but a few corner cases (cross-law nulls, data source non-matches
+    involving object/array types) still need a Python pre-fill to avoid
+    TypeMismatch on downstream arithmetic. Required inputs are left alone
+    so the engine can still report ``missing_required``.
+    """
+    _TYPE_DEFAULTS: dict[str, Any] = {
+        "number": 0,
+        "amount": 0,
+        "boolean": False,
+        "string": "",
+        "date": "2000-01-01",
+        "array": [],
+        "object": {},
+    }
+    for art in data.get("articles", []):
+        for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+            name = inp.get("name", "")
+            if not name or name in params or inp.get("required"):
+                continue
+            source = inp.get("source")
+            if not isinstance(source, dict):
+                continue
+            is_cross_law = bool(source.get("regulation"))
+            is_data_source = source == {} or any(k in source for k in ("table", "field", "fields", "select_on"))
+            if not (is_cross_law or is_data_source):
+                continue
+            input_type = inp.get("type", "string")
+            # Leave string/date cross-law nulls intact so IS_NULL checks work.
+            if is_cross_law and input_type in ("string", "date"):
+                continue
+            params[name] = _TYPE_DEFAULTS.get(input_type, "")
+
+
 def _find_missing_required_inputs(data: dict, params: dict) -> list[str]:
     """Find required source: {} or source: {source_type: claim} inputs that are unresolved.
 
@@ -836,58 +878,6 @@ def _build_input_mapping_from_yaml(data: dict) -> dict[str, dict]:
                 entry["select_on"] = source["select_on"]
             result[name] = entry
     return result
-
-
-def _fill_input_defaults(data: dict, params: dict) -> None:
-    """Fill default values for unresolved inputs.
-
-    Prevents TypeMismatch errors when the engine encounters null values
-    in arithmetic operations. Uses type-appropriate defaults:
-    number/amount → 0, boolean → False, string → "", array → [], object → {}.
-
-    Fills defaults for both ``source: {}`` inputs (data source resolution)
-    and ``source.regulation`` inputs (cross-law references) that remained
-    unresolved after pre-resolution. Without this, missing boolean inputs
-    like ``is_gedetineerd`` cause the engine to treat them as null, which
-    breaks condition evaluation.
-    """
-    _TYPE_DEFAULTS = {
-        "number": 0,
-        "amount": 0,
-        "boolean": False,
-        "string": "",
-        "date": "2000-01-01",
-        "array": [],
-        "object": {},
-    }
-    for art in data.get("articles", []):
-        for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
-            name = inp.get("name", "")
-            source = inp.get("source")
-            if name and name not in params:
-                # Skip required claim inputs - they should remain unresolved
-                # so the engine correctly reports missing_required.
-                if inp.get("required"):
-                    continue
-                # Fill defaults for source: {} inputs (data source resolution)
-                # and cross-law inputs (source.regulation) that remained unresolved.
-                # Native source metadata (table/field/select_on) also counts as
-                # data source — when the table isn't registered the engine would
-                # otherwise leave the input unresolved and downstream arithmetic
-                # would misbehave (e.g. MAX(inkomen - null, 0) collapsing to 0).
-                is_data_source = source == {} or (
-                    isinstance(source, dict) and any(k in source for k in ("table", "field", "fields", "select_on"))
-                )
-                is_cross_law = isinstance(source, dict) and source.get("regulation")
-                if is_data_source or is_cross_law:
-                    input_type = inp.get("type", "string")
-                    # Don't fill string/date defaults for cross-law inputs.
-                    # The engine's IS_NULL check treats "" as non-null, so
-                    # filling "" would break conditions like partner_bsn IS_NULL.
-                    # Leave them absent so the engine treats them as null.
-                    if is_cross_law and input_type in ("string", "date"):
-                        continue
-                    params[name] = _TYPE_DEFAULTS.get(input_type, "")
 
 
 def _maybe_parse_json(val: Any) -> Any:
