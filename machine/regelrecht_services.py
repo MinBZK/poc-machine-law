@@ -662,7 +662,7 @@ class RegelrechtServices:
             outputs = dict(result.get("outputs", {}))
 
             # Post-process
-            _postprocess_outputs(outputs, params, data)
+            _postprocess_outputs(outputs, params)
             _apply_output_precision(outputs, data)
 
             # Determine requirements_met from voldoet_aan_voorwaarden.
@@ -795,28 +795,9 @@ def _apply_output_precision(outputs: dict, data: dict) -> None:
             outputs[name] = round(val, prec)
 
 
-def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
-    """Fix engine outputs that require Python-side post-processing.
-
-    Handles three cases the Rust engine doesn't support yet:
-    1. Dot-notation projection: ``$actieve_curatele.bsn_curandus``
-    2. Unevaluated CONCAT operations in FOREACH body results
-    3. Unresolved ``$variable`` references in FOREACH body results
-    """
-    # Include definitions in namespace so $definition_name references resolve
-    definitions: dict = {}
-    for art in data.get("articles", []):
-        defs = art.get("machine_readable", {}).get("definitions", {})
-        if isinstance(defs, dict):
-            definitions.update(defs)
-    namespace = {**definitions, **params, **outputs}
-
-    # Collect all actions for FOREACH-aware resolution
-    actions: list[dict] = []
-    for art in data.get("articles", []):
-        actions.extend(art.get("machine_readable", {}).get("execution", {}).get("actions", []))
-
-    # Final pass: resolve any remaining $variable strings or CONCAT operations
+def _postprocess_outputs(outputs: dict, params: dict) -> None:
+    """Resolve any remaining $variable strings or unevaluated CONCAT operations
+    in engine outputs (e.g. inside FOREACH body results)."""
     namespace = {**params, **outputs}
     for key, value in list(outputs.items()):
         outputs[key] = _resolve_value(value, namespace)
