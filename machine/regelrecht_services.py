@@ -1238,8 +1238,6 @@ def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
                             item_ns.update({f"{as_name}.{k}": v for k, v in element.items()})
                             item_ns.update(element)
                         resolved_item = _resolve_value(body, item_ns)
-                        if isinstance(resolved_item, dict) and "operation" in resolved_item:
-                            resolved_item = _evaluate_simple_operation(resolved_item, item_ns)
                         resolved.append(resolved_item)
                     outputs[output_name] = resolved
                     continue
@@ -1267,40 +1265,6 @@ def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
     namespace = {**params, **outputs}
     for key, value in list(outputs.items()):
         outputs[key] = _resolve_value(value, namespace)
-
-
-def _evaluate_simple_operation(op: dict, namespace: dict) -> Any:
-    """Evaluate a simple operation dict in Python (IF/EQUALS).
-
-    Handles the subset of operations that appear in FOREACH body
-    expressions that need re-evaluation after post-processing.
-    """
-    operation = op.get("operation", "")
-    if operation == "IF":
-        for case in op.get("cases", []):
-            when = case.get("when", {})
-            if _eval_condition(when, namespace):
-                return _resolve_value(case.get("then"), namespace)
-        return _resolve_value(op.get("default"), namespace)
-    if operation == "EQUALS":
-        left = _resolve_value(op.get("subject"), namespace)
-        right = _resolve_value(op.get("value"), namespace)
-        return left == right
-    return op
-
-
-def _eval_condition(cond: dict, namespace: dict) -> bool:
-    """Evaluate a simple condition dict."""
-    operation = cond.get("operation", "")
-    subject = _resolve_value(cond.get("subject"), namespace)
-    value = _resolve_value(cond.get("value"), namespace)
-    if operation == "EQUALS":
-        return subject == value
-    if operation == "IN":
-        if isinstance(value, list):
-            return subject in value
-        return False
-    return False
 
 
 def _needs_resolution(value: Any) -> bool:
