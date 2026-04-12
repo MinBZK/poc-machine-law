@@ -1242,40 +1242,12 @@ def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
                     outputs[output_name] = resolved
                     continue
 
-            if not _needs_resolution(current_value):
-                continue
-            # Get the FOREACH collection to use as element context
-            collection_ref = value.get("collection", "")
-            as_name = value.get("as", "current")
-            collection = []
-            if isinstance(collection_ref, str) and collection_ref.startswith("$"):
-                collection = outputs.get(collection_ref[1:], []) or []
-            # Resolve each element against its corresponding collection item
-            resolved = []
-            for i, item in enumerate(current_value):
-                element = collection[i] if i < len(collection) and isinstance(collection, list) else {}
-                item_ns = {**namespace, as_name: element}
-                if isinstance(element, dict):
-                    # Also make $current.field accessible as top-level in namespace
-                    item_ns.update({f"{as_name}.{k}": v for k, v in element.items()})
-                resolved.append(_resolve_value(item, item_ns))
-            outputs[output_name] = resolved
+            continue
 
     # 3. Final pass: resolve any remaining $variable strings
     namespace = {**params, **outputs}
     for key, value in list(outputs.items()):
         outputs[key] = _resolve_value(value, namespace)
-
-
-def _needs_resolution(value: Any) -> bool:
-    """Check if a value contains unevaluated operations or $references."""
-    if isinstance(value, dict) and "operation" in value:
-        return True
-    if isinstance(value, str) and value.startswith("$"):
-        return True
-    if isinstance(value, list):
-        return any(_needs_resolution(item) for item in value)
-    return False
 
 
 def _resolve_value(value: Any, namespace: dict) -> Any:
