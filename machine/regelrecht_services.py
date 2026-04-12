@@ -1214,36 +1214,6 @@ def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
                 outputs[output_name] = source.get(field_name)
             continue
 
-        # 2. FOREACH with unevaluated body (CONCAT, $current refs, $variable refs)
-        #    Also handles FOREACH outputs that are empty because the collection
-        #    was null during engine evaluation but resolved by post-processing.
-        if isinstance(value, dict) and value.get("operation") == "FOREACH":
-            current_value = outputs.get(output_name)
-            if current_value is None or not isinstance(current_value, list):
-                continue
-
-            # Check if the collection was post-processed and now has values
-            collection_ref = value.get("collection", "")
-            if isinstance(collection_ref, str) and collection_ref.startswith("$"):
-                coll_name = collection_ref[1:]
-                coll_value = outputs.get(coll_name)
-                if current_value == [] and isinstance(coll_value, list) and len(coll_value) > 0:
-                    # Re-evaluate the FOREACH with the resolved collection
-                    as_name = value.get("as", "current")
-                    body = value.get("body")
-                    resolved = []
-                    for element in coll_value:
-                        item_ns = {**namespace, **outputs, as_name: element}
-                        if isinstance(element, dict):
-                            item_ns.update({f"{as_name}.{k}": v for k, v in element.items()})
-                            item_ns.update(element)
-                        resolved_item = _resolve_value(body, item_ns)
-                        resolved.append(resolved_item)
-                    outputs[output_name] = resolved
-                    continue
-
-            continue
-
     # 3. Final pass: resolve any remaining $variable strings
     namespace = {**params, **outputs}
     for key, value in list(outputs.items()):
