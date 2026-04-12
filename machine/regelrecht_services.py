@@ -355,13 +355,13 @@ class RegelrechtServices:
         The Rust engine resolves data source inputs by looking up the input
         name in the DataSourceRegistry. When the DataFrame column name differs
         from the law input name (e.g. input ``advies_mate_van_gevaar`` vs column
-        ``mate_van_gevaar``), the engine cannot find it. This method uses
-        ``source_ref_mapping.json`` to bridge the gap: it looks up the correct
-        table and column, queries the Python-side DataFrames, and injects the
+        ``mate_van_gevaar``), the engine cannot find it. This method reads the
+        inline ``source: {table, field, select_on, fields}`` metadata from the
+        YAML and uses it to query the Python-side DataFrames, injecting the
         resolved values as parameters so the engine finds them directly.
 
-        Additionally, for ``source: {}`` inputs with no mapping entry, it scans
-        all DataFrames for a matching column name (fallback resolution).
+        Additionally, for ``source: {}`` inputs with no inline metadata, it
+        scans all DataFrames for a matching column name (fallback resolution).
         """
         # Gather all service DataFrames
         all_sources: dict[str, pd.DataFrame] = {}
@@ -377,8 +377,8 @@ class RegelrechtServices:
                 if iname:
                     input_types[iname] = itype
 
-        # Phase 1: resolve inputs via source_ref_mapping (precise matching)
-        input_mapping = _LAW_INPUT_MAPPING.get(law_id, {})
+        # Phase 1: resolve inputs via inline YAML source metadata
+        input_mapping = _build_input_mapping_from_yaml(data)
         for input_name, entry in input_mapping.items():
             if input_name in params:
                 continue
@@ -523,7 +523,7 @@ class RegelrechtServices:
                 if iname:
                     input_types[iname] = itype
 
-        input_mapping = _LAW_INPUT_MAPPING.get(law_id, {})
+        input_mapping = _build_input_mapping_from_yaml(data)
         # Multi-pass: some inputs depend on others (e.g., partner_geboortedatum
         # needs partner_bsn). Two passes handles one level of dependency.
         for _pass in range(2):
@@ -591,6 +591,13 @@ class RegelrechtServices:
                     # Parse JSON strings for array/object inputs stored as JSON in DataFrames
                     val = _maybe_parse_json(val)
                     params[input_name] = val
+                    resolved_any = True
+                elif input_types.get(input_name) == "object":
+                    # Object input without fields list and no matching column:
+                    # compose object from the entire matched row.
+                    row = matched.iloc[0]
+                    obj = _to_native({col: row[col] for col in matched.columns})
+                    params[input_name] = obj
                     resolved_any = True
             if not resolved_any:
                 break
@@ -717,6 +724,8 @@ class RegelrechtServices:
                         params[key] = _to_native(claim.new_value)
                         logger.debug("Claim: %s = %s", key, params[key])
 
+            _fill_input_defaults(data, params)
+
             try:
                 result = self._engine.evaluate_with_trace(law_id, [requested_output], params, reference_date)
                 outputs = result.get("outputs", {})
@@ -726,6 +735,7 @@ class RegelrechtServices:
                 if trace_json:
                     _log_trace(json.loads(trace_json))
                 if val is not None:
+                    val = _round_to_output_precision(data, requested_output, val)
                     logger.debug("Result: %s = %s", requested_output, val)
                     return val
             except Exception as exc:
@@ -735,23 +745,8 @@ class RegelrechtServices:
         # action evaluation as fallback. This handles patterns the Rust
         # engine doesn't support yet, such as $array.field in IN operations.
         fallback = _evaluate_action_in_python(data, params, requested_output, reference_date)
-
-        # Apply output precision from type_spec (the engine does this for its
-        # own outputs, but the Python fallback doesn't).
-        if fallback is not None and isinstance(fallback, (int, float)):
-            import math
-
-            for art in data.get("articles", []):
-                for out in art.get("machine_readable", {}).get("execution", {}).get("output", []):
-                    if out.get("name") == requested_output:
-                        prec = out.get("type_spec", {}).get("precision")
-                        if prec is not None:
-                            if prec == 0:
-                                fallback = int(math.floor(fallback)) if isinstance(fallback, float) else fallback
-                            else:
-                                fallback = round(fallback, prec)
-                        break
-
+        if fallback is not None:
+            fallback = _round_to_output_precision(data, requested_output, fallback)
         return fallback
 
     # -- Evaluation ------------------------------------------------------------
@@ -817,13 +812,19 @@ class RegelrechtServices:
                     missing_required=True,
                 )
 
-            # Pre-resolve data source inputs
+            # Pre-resolve data source inputs first (most inputs use direct $bsn).
             with logger.indent_block("Resolving data sources"):
                 self._pre_resolve_data_sources(law_id, params, data)
 
-            # Pre-resolve cross-law inputs
+            # Pre-resolve cross-law inputs (some need data source values).
             with logger.indent_block("Resolving cross-law inputs"):
                 self._pre_resolve_cross_law_inputs(data, params, reference_date)
+
+            # Second pass for data sources that depend on cross-law outputs in
+            # their select_on criteria (e.g. precariobelasting's $vestigingsadres
+            # is a cross-law output used as a select_on filter).
+            with logger.indent_block("Resolving data sources (pass 2)"):
+                self._pre_resolve_data_sources(law_id, params, data)
 
             # Check for missing required source: {} inputs.
             missing = _find_missing_required_inputs(data, params)
@@ -1211,6 +1212,30 @@ def _resolve_temporal_reference(ref: str, reference_date: str) -> str:
     return reference_date
 
 
+def _round_to_output_precision(data: dict, output_name: str, value: Any) -> Any:
+    """Round ``value`` to the ``type_spec.precision`` of ``output_name`` in ``data``.
+
+    The Rust engine does not enforce ``type_spec.precision``, so cross-law
+    results that flow into a calling law would otherwise carry floating-point
+    noise (e.g. ``13.00205`` where the UWV YAML declares ``precision: 2``).
+    """
+    if not isinstance(value, (int, float)):
+        return value
+    import math
+
+    for art in data.get("articles", []):
+        for out in art.get("machine_readable", {}).get("execution", {}).get("output", []):
+            if out.get("name") == output_name:
+                ts = out.get("type_spec") or {}
+                prec = ts.get("precision")
+                if prec is None:
+                    return value
+                if prec == 0:
+                    return int(math.floor(value)) if isinstance(value, float) else value
+                return round(value, prec)
+    return value
+
+
 def _apply_output_precision(outputs: dict, data: dict) -> None:
     """Apply precision from type_spec to numeric output values.
 
@@ -1490,7 +1515,7 @@ def _get_param_key_for_table(table: str, df_key_field: str) -> str:
 
 
 def _find_missing_required_inputs(data: dict, params: dict) -> list[str]:
-    """Find required source: {} inputs that are still unresolved.
+    """Find required source: {} or source: {source_type: claim} inputs that are unresolved.
 
     Returns the list of missing input names. These are typically claim-based
     inputs that must be supplied by the citizen before evaluation can proceed.
@@ -1500,9 +1525,46 @@ def _find_missing_required_inputs(data: dict, params: dict) -> list[str]:
         for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
             name = inp.get("name", "")
             source = inp.get("source")
-            if name and inp.get("required") and source == {} and name not in params:
+            if not (name and inp.get("required") and name not in params):
+                continue
+            # Original v0.5.1 form: empty source: {}
+            if source == {}:
+                missing.append(name)
+                continue
+            # Migrated form: source: {source_type: claim}
+            if isinstance(source, dict) and source.get("source_type") == "claim":
                 missing.append(name)
     return missing
+
+
+def _build_input_mapping_from_yaml(data: dict) -> dict[str, dict]:
+    """Build per-law input→{table, field, select_on, fields} mapping from YAML.
+
+    Reads the inline source metadata on each input in the law's articles.
+    Only inputs with ``source.table`` (or an empty ``source: {}``) are included.
+    Cross-law (``source.regulation``) and claim (``source.source_type``) inputs
+    are skipped.
+    """
+    result: dict[str, dict] = {}
+    for art in data.get("articles", []):
+        for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+            name = inp.get("name", "")
+            source = inp.get("source")
+            if not name or not isinstance(source, dict):
+                continue
+            if source.get("regulation") or source.get("source_type") == "claim":
+                continue
+            if not source.get("table"):
+                continue
+            entry: dict = {"table": source["table"]}
+            if "field" in source:
+                entry["field"] = source["field"]
+            if "fields" in source:
+                entry["fields"] = source["fields"]
+            if "select_on" in source:
+                entry["select_on"] = source["select_on"]
+            result[name] = entry
+    return result
 
 
 def _fill_input_defaults(data: dict, params: dict) -> None:
@@ -1538,7 +1600,13 @@ def _fill_input_defaults(data: dict, params: dict) -> None:
                     continue
                 # Fill defaults for source: {} inputs (data source resolution)
                 # and cross-law inputs (source.regulation) that remained unresolved.
-                is_data_source = source == {}
+                # Native source metadata (table/field/select_on) also counts as
+                # data source — when the table isn't registered the engine would
+                # otherwise leave the input unresolved and downstream arithmetic
+                # would misbehave (e.g. MAX(inkomen - null, 0) collapsing to 0).
+                is_data_source = source == {} or (
+                    isinstance(source, dict) and any(k in source for k in ("table", "field", "fields", "select_on"))
+                )
                 is_cross_law = isinstance(source, dict) and source.get("regulation")
                 if is_data_source or is_cross_law:
                     input_type = inp.get("type", "string")

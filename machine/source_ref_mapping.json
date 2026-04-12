@@ -140,7 +140,7 @@
     "select_on": [
       {
         "name": "bsn",
-        "value": "$bsn_exploitant"
+        "value": "$bsn_eigenaar"
       }
     ]
   },
@@ -201,7 +201,7 @@
     "select_on": [
       {
         "name": "bsn",
-        "value": "$bsn_exploitant"
+        "value": "$bsn_eigenaar"
       }
     ]
   },
@@ -241,7 +241,7 @@
       },
       {
         "name": "schenkt_alcohol",
-        "value": "$verstrekt_alcohol"
+        "value": "$schenkt_alcohol"
       }
     ]
   },
