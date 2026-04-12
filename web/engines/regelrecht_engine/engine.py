@@ -7,9 +7,11 @@ adapter is a thin shim that bridges the web EngineInterface contract.
 
 import logging
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
+import yaml
 from fastapi import HTTPException
 
 from machine.profile_loader import get_project_root, load_profiles_from_yaml
@@ -82,10 +84,13 @@ class RegelrechtMachineService(EngineInterface):
             approved=approved,
         )
 
-        # Convert the Rust engine trace tree to a web PathNode tree.
-        # The trace is a nested dict with node_type/name/result/resolve_type/children.
+        # Convert the Rust engine trace tree to a web PathNode tree. Pass
+        # the YAML input specs so the converter can label each resolve with
+        # its semantic source (SERVICE for cross-law, SOURCE for data source,
+        # CLAIM for claim-store).
+        input_specs = _collect_input_specs(rule.path)
         root = (
-            _rust_trace_to_pathnode(result.path)
+            _rust_trace_to_pathnode(result.path, input_specs)
             if result.path
             else PathNode(type="root", name="evaluation", result=None)
         )
@@ -123,44 +128,90 @@ class RegelrechtMachineService(EngineInterface):
         os.execl(sys.executable, sys.executable, *sys.argv)
 
 
-def _rust_trace_to_pathnode(trace: dict) -> PathNode:
+def _collect_input_specs(yaml_path: str) -> dict[str, dict[str, Any]]:
+    """Return ``{input_name: spec}`` for every input declared by the law."""
+    try:
+        data = yaml.safe_load(Path(yaml_path).read_text())
+    except Exception as exc:
+        logger.warning("Could not read YAML for input specs %s: %s", yaml_path, exc)
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    specs: dict[str, dict[str, Any]] = {}
+    for article in data.get("articles", []):
+        execution = article.get("machine_readable", {}).get("execution", {})
+        for inp in execution.get("input", []):
+            name = inp.get("name")
+            if name:
+                specs[name] = inp
+    return specs
+
+
+def _classify_input(spec: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    """Classify a YAML input spec into ``(resolve_type, details)``.
+
+    ``resolve_type`` is one of ``SERVICE`` (cross-law reference), ``SOURCE``
+    (data source lookup), ``CLAIM`` (citizen-supplied), or ``NONE`` (direct
+    parameter). The ``details`` dict carries the metadata the render_path
+    template needs (type, type_spec, and for cross-law refs the source law).
+    """
+    details: dict[str, Any] = {
+        "type": spec.get("type"),
+        "type_spec": spec.get("type_spec"),
+    }
+    source = spec.get("source")
+    if not isinstance(source, dict):
+        return "NONE", details
+    if source.get("regulation"):
+        details["service"] = source.get("service")
+        details["law"] = source.get("regulation")
+        return "SERVICE", details
+    if source.get("source_type") == "claim":
+        return "CLAIM", details
+    if any(k in source for k in ("table", "field", "fields", "select_on")):
+        details["table"] = source.get("table")
+        return "SOURCE", details
+    return "NONE", details
+
+
+def _rust_trace_to_pathnode(trace: dict, input_specs: dict[str, dict[str, Any]]) -> PathNode:
     """Convert a Rust engine trace tree into a web PathNode tree.
 
     The Rust trace contains every operation (AND, IF, SUBTRACT, ...) as
-    nested nodes, but the dashboard template ``render_path`` is meant to
-    show only the law's *resolved inputs* — the data that flowed IN from
-    cross-law references, data sources, parameters, and claims. We walk
-    the tree, collect unique top-level input resolves, and discard the
-    operation internals.
+    nested nodes. The dashboard template ``render_path`` only wants the
+    law's *resolved inputs* — the values that flowed in from cross-law
+    references, data sources, and claims. We walk the trace to collect
+    each declared input's resolved value, then classify it by its YAML
+    source block so the UI can label the origin.
     """
     root = PathNode(type="root", name="evaluation", result=None)
-    seen: set[str] = set()
+    resolved_values: dict[str, Any] = {}
 
     def _walk(node: dict) -> None:
         if not isinstance(node, dict):
             return
-        node_type = node.get("node_type")
-        if node_type == "resolve":
+        if node.get("node_type") == "resolve":
             name = node.get("name", "")
-            resolve_type = node.get("resolve_type")
-            # Only surface top-level variable resolves that represent real
-            # citizen data (PARAMETER = input value, SERVICE = cross-law
-            # result, DATASOURCE = record lookup, CLAIM = submitted by
-            # citizen). DEFINITION nodes are internal law constants and
-            # operation-internal resolves have no resolve_type — hide both.
-            if resolve_type and resolve_type != "DEFINITION" and name and name not in seen and not name.startswith("$"):
-                seen.add(name)
-                root.children.append(
-                    PathNode(
-                        type="resolve",
-                        name=name,
-                        result=node.get("result"),
-                        resolve_type=resolve_type,
-                        details={"path": f"${name}", "message": node.get("message") or ""},
-                    )
-                )
+            if name in input_specs and name not in resolved_values:
+                resolved_values[name] = node.get("result")
         for child in node.get("children", []):
             _walk(child)
 
     _walk(trace)
+
+    for name, spec in input_specs.items():
+        if name not in resolved_values:
+            continue
+        resolve_type, details = _classify_input(spec)
+        details["path"] = f"${name}"
+        root.children.append(
+            PathNode(
+                type="resolve",
+                name=name,
+                result=resolved_values[name],
+                resolve_type=resolve_type,
+                required=bool(spec.get("required", False)),
+                details=details,
+            )
+        )
     return root
