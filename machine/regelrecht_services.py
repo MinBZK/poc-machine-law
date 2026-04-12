@@ -457,7 +457,9 @@ class RegelrechtServices:
 
                 # Handle temporal references that adjust the reference date
                 # e.g. temporal.reference: $prev_january_first changes the date
-                # used for cross-law evaluation.
+                # used for cross-law evaluation. The Rust engine has the same
+                # logic for its native cross-law path; this handles our Python
+                # pre-resolution path which still exists.
                 effective_date = reference_date
                 temporal = inp.get("temporal")
                 if isinstance(temporal, dict) and "reference" in temporal:
@@ -542,7 +544,6 @@ class RegelrechtServices:
                 if trace_json:
                     _log_trace(json.loads(trace_json))
                 if val is not None:
-                    val = _round_to_output_precision(data, requested_output, val)
                     logger.debug("Result: %s = %s", requested_output, val)
                     return val
             except Exception as exc:
@@ -661,9 +662,11 @@ class RegelrechtServices:
 
             outputs = dict(result.get("outputs", {}))
 
-            # Post-process
+            # Resolve any remaining $var strings in list-shaped outputs. The
+            # Rust engine resolves scalars and FOREACH bodies, but some
+            # LIST-constructed outputs (e.g. delegatie subject_ids) can still
+            # carry unresolved $variable references.
             _postprocess_outputs(outputs, params)
-            _apply_output_precision(outputs, data)
 
             # Determine requirements_met from voldoet_aan_voorwaarden.
             _MISSING = object()
@@ -718,119 +721,68 @@ def _log_trace(node: dict, depth: int = 0) -> None:
 
 
 def _resolve_temporal_reference(ref: str, reference_date: str) -> str:
-    """Resolve a temporal reference string to an actual date.
+    """Resolve a ``$prev_january_first``-style temporal reference to a date.
 
-    Supports:
-    - $prev_january_first  → January 1 of the previous year
-    - $january_first       → January 1 of the current year
-    - $referencedate       → the reference date itself
+    Used by the Python pre-resolution path for cross-law inputs whose
+    ``temporal.reference`` demands a shifted evaluation date. The Rust
+    engine has its own equivalent for its native cross-law path.
     """
-    from datetime import datetime
+    from datetime import datetime as _dt
 
     if not isinstance(ref, str) or not ref.startswith("$"):
         return reference_date
     name = ref[1:]
     try:
-        dt = datetime.strptime(reference_date, "%Y-%m-%d").date()
+        dt = _dt.strptime(reference_date, "%Y-%m-%d").date()
     except (ValueError, TypeError):
         return reference_date
     if name == "prev_january_first":
         return dt.replace(month=1, day=1, year=dt.year - 1).isoformat()
     if name == "january_first":
         return dt.replace(month=1, day=1).isoformat()
-    if name in ("referencedate", "calculation_date"):
-        return reference_date
     return reference_date
 
 
-def _round_to_output_precision(data: dict, output_name: str, value: Any) -> Any:
-    """Round ``value`` to the ``type_spec.precision`` of ``output_name`` in ``data``.
-
-    The Rust engine does not enforce ``type_spec.precision``, so cross-law
-    results that flow into a calling law would otherwise carry floating-point
-    noise (e.g. ``13.00205`` where the UWV YAML declares ``precision: 2``).
-    """
-    if not isinstance(value, (int, float)):
-        return value
-    import math
-
-    for art in data.get("articles", []):
-        for out in art.get("machine_readable", {}).get("execution", {}).get("output", []):
-            if out.get("name") == output_name:
-                ts = out.get("type_spec") or {}
-                prec = ts.get("precision")
-                if prec is None:
-                    return value
-                if prec == 0:
-                    return int(math.floor(value)) if isinstance(value, float) else value
-                return round(value, prec)
-    return value
-
-
-def _apply_output_precision(outputs: dict, data: dict) -> None:
-    """Apply precision from type_spec to numeric output values.
-
-    The Rust engine does not enforce ``type_spec.precision`` on computed
-    values. This post-processing step rounds floats to the specified
-    number of decimal places and converts to int when precision is 0.
-    """
-    import math
-
-    # Build output_name -> precision mapping
-    precision_map: dict[str, int] = {}
-    for art in data.get("articles", []):
-        for out in art.get("machine_readable", {}).get("execution", {}).get("output", []):
-            name = out.get("name", "")
-            ts = out.get("type_spec", {})
-            if name and "precision" in ts:
-                precision_map[name] = ts["precision"]
-
-    for name, prec in precision_map.items():
-        val = outputs.get(name)
-        if val is None or not isinstance(val, (int, float)):
-            continue
-        if prec == 0:
-            outputs[name] = int(math.floor(val)) if isinstance(val, float) else val
-        else:
-            outputs[name] = round(val, prec)
-
-
 def _postprocess_outputs(outputs: dict, params: dict) -> None:
-    """Resolve any remaining $variable strings or unevaluated CONCAT operations
-    in engine outputs (e.g. inside FOREACH body results)."""
-    namespace = {**params, **outputs}
-    for key, value in list(outputs.items()):
-        outputs[key] = _resolve_value(value, namespace)
+    """Resolve remaining ``$variable`` strings in engine outputs.
 
-
-def _resolve_value(value: Any, namespace: dict) -> Any:
-    """Recursively resolve unevaluated engine output values.
-
-    Handles:
-    - ``{'operation': 'CONCAT', 'values': [...]}`` dicts
-    - ``$variable`` string references
-    - Lists containing any of the above
+    The Rust engine resolves most scalars and FOREACH bodies natively, but
+    some LIST-constructed outputs still carry unresolved ``$var`` entries
+    that reference either a parameter or a sibling output (e.g. delegatie
+    ``permissions: ['$base_permissions']`` referencing the ``base_permissions``
+    output). This walks the output dict and substitutes from both scopes,
+    iterating until no more substitutions happen (for chains of references).
     """
-    if isinstance(value, list):
-        return [_resolve_value(item, namespace) for item in value]
-    if isinstance(value, dict) and value.get("operation") == "CONCAT":
-        parts = []
-        for v in value.get("values", []):
-            resolved = _resolve_value(v, namespace)
-            parts.append(str(resolved) if resolved is not None else "")
-        return "".join(parts)
-    if isinstance(value, str) and value.startswith("$"):
-        ref = value[1:]
-        if "." in ref:
-            var_name, _, field_name = ref.partition(".")
-            source = namespace.get(var_name)
-            if isinstance(source, dict):
-                return source.get(field_name, value)
-            if isinstance(source, list):
-                return [item.get(field_name) if isinstance(item, dict) else None for item in source]
-        elif ref in namespace:
-            return namespace[ref]
-    return value
+
+    def _ns() -> dict:
+        return {**params, **outputs}
+
+    def _resolve(v: Any, ns: dict) -> Any:
+        if isinstance(v, list):
+            return [_resolve(item, ns) for item in v]
+        if isinstance(v, dict):
+            return {k: _resolve(val, ns) for k, val in v.items()}
+        if isinstance(v, str) and v.startswith("$"):
+            name = v[1:]
+            if "." in name:
+                var, _, field = name.partition(".")
+                obj = ns.get(var)
+                if isinstance(obj, dict):
+                    return obj.get(field, v)
+            return ns.get(name, v)
+        return v
+
+    # Iterate because a resolved value may itself reference another output.
+    for _ in range(5):
+        changed = False
+        ns = _ns()
+        for key in list(outputs.keys()):
+            new = _resolve(outputs[key], ns)
+            if new != outputs[key]:
+                outputs[key] = new
+                changed = True
+        if not changed:
+            break
 
 
 def _find_missing_required_inputs(data: dict, params: dict) -> list[str]:
