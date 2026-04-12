@@ -222,10 +222,9 @@ class RegelrechtServices:
     def _sync_engine_data_sources(self) -> None:
         """Clear and re-register all data sources in the Rust engine.
 
-        The engine's register_data_source accumulates rather than replaces,
-        so when DataFrames are updated (e.g., scenario overrides background data),
-        old values persist. This method ensures consistency by rebuilding from
-        the Python-side DataFrames before each evaluation.
+        Rebuilds engine data sources from the Python-side DataFrames before
+        each evaluation. The engine reads inline source metadata
+        (table/field/select_on/fields) from YAML to resolve inputs natively.
         """
         self._engine.clear_data_sources()
         all_sources: dict[str, pd.DataFrame] = {}
@@ -233,119 +232,28 @@ class RegelrechtServices:
             all_sources.update(svc.source_dataframes)
 
         for table, df in all_sources.items():
-            if df.empty:
-                continue
-            key_field = _pick_key_field_for_table(table, df)
-            param_key = _get_param_key_for_table(table, key_field)
-            object_inputs = _OBJECT_FIELD_MAPPING.get(table, {})
+            self._register_dataframe(table, df)
 
-            records = []
-            for _, row in df.iterrows():
-                record = _to_native({col: row[col] for col in df.columns})
-                if param_key != key_field and param_key not in record and key_field in record:
-                    record[param_key] = record[key_field]
-                if table not in _ARRAY_INPUT_TABLES:
-                    for input_name, field_list in object_inputs.items():
-                        if input_name == table:
-                            continue
-                        obj = {f: record[f] for f in field_list if f in record}
-                        if obj:
-                            record[input_name] = obj
-                for input_name in _WHOLE_ROW_OBJECT_MAPPING.get(table, set()):
-                    if input_name not in record:
-                        record[input_name] = dict(record)
-                for alias_name, source_field in _FIELD_ALIAS_MAPPING.get(table, {}).items():
-                    if alias_name not in record and source_field in record:
-                        record[alias_name] = record[source_field]
-                records.append(record)
-
-            try:
-                self._engine.register_data_source(table, param_key, records)
-            except Exception:
-                pass
-
-            if table in _ARRAY_INPUT_TABLES:
-                self._register_array_data_source(table, key_field, records)
+    def _register_dataframe(self, table: str, df: pd.DataFrame) -> None:
+        """Register a DataFrame as a record-set data source on the engine."""
+        if df.empty:
+            return
+        records = [_to_native({col: row[col] for col in df.columns}) for _, row in df.iterrows()]
+        try:
+            self._engine.register_record_set_source(
+                name=table,
+                records=records,
+                select_on=list(df.columns),
+            )
+        except Exception as e:
+            logger.debug("Could not register data source %s: %s", table, e)
 
     # -- Data sources ----------------------------------------------------------
 
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
-        """Register DataFrame in both Services and the Rust engine.
-
-        Uses source_ref_mapping.json to determine the correct key field per table
-        and to create synthetic object/array fields for multi-field inputs.
-        """
+        """Register DataFrame in both Services and the Rust engine."""
         self._services.set_source_dataframe(service, table, df)
-        if df.empty:
-            return
-
-        key_field = _pick_key_field_for_table(table, df)
-        param_key = _get_param_key_for_table(table, key_field)
-        object_inputs = _OBJECT_FIELD_MAPPING.get(table, {})
-
-        records = []
-        for _, row in df.iterrows():
-            record = _to_native({col: row[col] for col in df.columns})
-            if param_key != key_field and param_key not in record and key_field in record:
-                record[param_key] = record[key_field]
-            # DON'T inject if the input name matches the table name - that means
-            # it's an array-type input that should come from _register_array_data_source.
-            # Also skip injection entirely for array input tables: the engine
-            # cannot handle object values in data source records and will error
-            # with "Type mismatch: expected number, string, or array, got object".
-            if table not in _ARRAY_INPUT_TABLES:
-                for input_name, field_list in object_inputs.items():
-                    if input_name == table:
-                        continue
-                    obj = {f: record[f] for f in field_list if f in record}
-                    if obj:
-                        record[input_name] = obj
-            # Inject whole-row objects for inputs without explicit field lists.
-            for input_name in _WHOLE_ROW_OBJECT_MAPPING.get(table, set()):
-                if input_name not in record:
-                    record[input_name] = dict(record)
-            # Add field aliases so the engine can look up by input name
-            # when the DataFrame column has a different name.
-            for alias_name, source_field in _FIELD_ALIAS_MAPPING.get(table, {}).items():
-                if alias_name not in record and source_field in record:
-                    record[alias_name] = record[source_field]
-            records.append(record)
-
-            try:
-                self._engine.register_data_source(table, param_key, records)
-            except Exception as e:
-                logger.debug("Could not register data source %s: %s", table, e)
-
-        # For tables that have array-type inputs (e.g., curatele_registraties),
-        # also register a grouped version where all rows for the same key are
-        # collected into an array under the table name as field.
-        if table in _ARRAY_INPUT_TABLES:
-            self._register_array_data_source(table, key_field, records)
-
-    def _register_array_data_source(self, table: str, key_field: str, records: list) -> None:
-        """Group records by key and register as array-valued data source.
-
-        The key_field in the data source must match the parameter name that the
-        law uses (e.g., 'bsn'), not the DataFrame column name (e.g., 'bsn_curator').
-        We use source_ref_mapping.json to find the parameter name from the select_on
-        value reference (e.g., '$bsn' → 'bsn').
-        """
-        # Determine the parameter-side key name from the mapping
-        param_key = _get_param_key_for_table(table, key_field)
-
-        grouped: dict[str, list] = {}
-        for record in records:
-            key = str(record.get(key_field, ""))
-            grouped.setdefault(key, []).append(record)
-
-        array_records = []
-        for key, rows in grouped.items():
-            array_records.append({param_key: key, table: rows})
-
-        try:
-            self._engine.register_data_source(f"{table}_array", param_key, array_records)
-        except Exception as e:
-            logger.debug("Could not register array data source %s: %s", table, e)
+        self._register_dataframe(table, df)
 
     # -- Data source pre-resolution ---------------------------------------------
 
