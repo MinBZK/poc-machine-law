@@ -222,15 +222,18 @@ articles:
       - name: huurprijs
         type: amount
         required: true
-        source: {}
+        source:
+          source_type: claim
       - name: servicekosten
         type: amount
         required: true
-        source: {}
+        source:
+          source_type: claim
       - name: subsidiabele_servicekosten
         type: amount
         required: true
-        source: {}
+        source:
+          source_type: claim
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

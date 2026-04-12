@@ -45,10 +45,31 @@ articles:
       input:
       - name: wet
         type: object
-        source: {}
+        source:
+          table: laws
+          select_on:
+          - name: uuid
+            value: $zaak.rulespec_uuid
+          fields:
+          - decision_type
+          - name
+          - valid_from
+          - legal_character
+          - bezwaartermijn_weken
+          - beslistermijn_weken
+          - verdagingstermijn_weken
+          source_type: laws
       - name: gebeurtenissen
         type: object
-        source: {}
+        source:
+          table: events
+          select_on:
+          - name: case_id
+            value: $zaak.id
+          fields:
+          - case_id
+          - event_type
+          source_type: events
       output:
       - name: bezwaar_mogelijk
         type: boolean

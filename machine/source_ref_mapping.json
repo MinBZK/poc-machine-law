@@ -8,7 +8,7 @@
       }
     ]
   },
-  "alcoholwet/vergunning/rotterdam:bsn_leidinggevende": {
+  "alcoholwet/vergunning/rotterdam:bsn": {
     "table": "leidinggevenden",
     "field": "bsn",
     "select_on": [
@@ -38,7 +38,7 @@
       }
     ]
   },
-  "alcoholwet/vergunning/rotterdam:heeft_actieve_alcoholwetvergunning": {
+  "alcoholwet/vergunning/rotterdam:heeft_alcoholvergunning": {
     "table": "vergunningen",
     "field": "heeft_alcoholvergunning",
     "select_on": [
@@ -62,7 +62,7 @@
       "ontvangt_kinderbijslag"
     ]
   },
-  "algemene_nabestaandenwet:was_partner_verzekerd": {
+  "algemene_nabestaandenwet:partner_verzekerd": {
     "table": "anw_dossiers",
     "field": "partner_verzekerd",
     "select_on": [
@@ -82,7 +82,7 @@
       }
     ]
   },
-  "algemene_nabestaandenwet:arbeidsongeschiktheidspercentage": {
+  "algemene_nabestaandenwet:ao_percentage": {
     "table": "anw_dossiers",
     "field": "ao_percentage",
     "select_on": [
@@ -102,7 +102,7 @@
       }
     ]
   },
-  "algemene_ouderdomswet:woonachtige_verzekerde_jaren": {
+  "algemene_ouderdomswet:woonperiodes": {
     "table": "verzekerde_tijdvakken",
     "field": "woonperiodes",
     "select_on": [
@@ -124,7 +124,7 @@
       "pensioenleeftijd"
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:bsn_exploitant": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:bsn_eigenaar": {
     "table": "exploitatie_inschrijvingen",
     "field": "bsn_eigenaar",
     "select_on": [
@@ -134,7 +134,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:heeft_geldige_vog_exploitant": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:heeft_geldige_vog": {
     "table": "personen_vog",
     "field": "heeft_geldige_vog",
     "select_on": [
@@ -144,7 +144,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:verstrekt_alcohol": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:schenkt_alcohol": {
     "table": "vestigingen",
     "field": "schenkt_alcohol",
     "select_on": [
@@ -169,7 +169,7 @@
       "ontwikkelruimte"
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:categorie_toegestaan_in_gebied": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:categorie_toegestaan": {
     "table": "horecagebiedsplannen",
     "field": "categorie_toegestaan",
     "select_on": [
@@ -195,7 +195,7 @@
       "handhavingsacties"
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:eerder_ingetrokken_wegens_slecht_levensgedrag": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:ingetrokken_slecht_levensgedrag": {
     "table": "vergunningen_historie",
     "field": "ingetrokken_slecht_levensgedrag",
     "select_on": [
@@ -221,7 +221,7 @@
       "heeft_svh_diploma"
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:alle_beheerders_hebben_vog": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:alle_hebben_vog": {
     "table": "beheerders",
     "field": "alle_hebben_vog",
     "select_on": [
@@ -231,7 +231,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:alle_beheerders_voldoen_leeftijdseis": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:alle_voldoen_leeftijd": {
     "table": "beheerders",
     "field": "alle_voldoen_leeftijd",
     "select_on": [
@@ -245,7 +245,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:geen_beheerder_onder_curatele": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:geen_onder_curatele": {
     "table": "beheerders",
     "field": "geen_onder_curatele",
     "select_on": [
@@ -255,7 +255,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:leidinggevende_heeft_svh_diploma": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:heeft_svh_diploma": {
     "table": "beheerders",
     "field": "heeft_svh_diploma",
     "select_on": [
@@ -265,7 +265,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:heeft_goedgekeurde_vergunning": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:heeft_exploitatievergunning": {
     "table": "vergunningen",
     "field": "heeft_exploitatievergunning",
     "select_on": [
@@ -275,7 +275,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:vergunde_categorie": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:categorie": {
     "table": "vergunningen",
     "field": "categorie",
     "select_on": [
@@ -285,7 +285,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/exploitatievergunning:omgevingsplan_horeca_toegestaan": {
+  "algemene_plaatselijke_verordening/exploitatievergunning:horeca_toegestaan": {
     "table": "omgevingsplan_toetsingen",
     "field": "horeca_toegestaan",
     "select_on": [
@@ -320,7 +320,7 @@
     ],
     "source_type": "cases"
   },
-  "algemene_plaatselijke_verordening/ontheffingspas_geluid:heeft_geluidsklachten": {
+  "algemene_plaatselijke_verordening/ontheffingspas_geluid:heeft_actieve_klachten": {
     "table": "geluidsklachten",
     "field": "heeft_actieve_klachten",
     "select_on": [
@@ -341,7 +341,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/terrassen:bgt_oppervlakte_beschikbaar": {
+  "algemene_plaatselijke_verordening/terrassen:beschikbare_oppervlakte": {
     "table": "bgt_terraslocaties",
     "field": "beschikbare_oppervlakte",
     "select_on": [
@@ -355,7 +355,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/terrassen:bgt_functie_oppervlak": {
+  "algemene_plaatselijke_verordening/terrassen:functie_oppervlak": {
     "table": "bgt_terraslocaties",
     "field": "functie_oppervlak",
     "select_on": [
@@ -369,7 +369,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/terrassen:locatie_op_openbare_weg": {
+  "algemene_plaatselijke_verordening/terrassen:is_openbare_weg": {
     "table": "bgt_terraslocaties",
     "field": "is_openbare_weg",
     "select_on": [
@@ -399,7 +399,7 @@
       "toegestane_locaties"
     ]
   },
-  "algemene_plaatselijke_verordening/terrassen:maximale_sluitingstijd_doordeweeks": {
+  "algemene_plaatselijke_verordening/terrassen:max_sluitingstijd_doordeweeks": {
     "table": "terrassenbeleid",
     "field": "max_sluitingstijd_doordeweeks",
     "select_on": [
@@ -413,7 +413,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/terrassen:maximale_sluitingstijd_weekend": {
+  "algemene_plaatselijke_verordening/terrassen:max_sluitingstijd_weekend": {
     "table": "terrassenbeleid",
     "field": "max_sluitingstijd_weekend",
     "select_on": [
@@ -427,7 +427,7 @@
       }
     ]
   },
-  "algemene_plaatselijke_verordening/terrassen:precario_tarief_per_m2": {
+  "algemene_plaatselijke_verordening/terrassen:tarief_per_m2": {
     "table": "precario_tarieven",
     "field": "tarief_per_m2",
     "select_on": [
@@ -940,7 +940,7 @@
       "datum_uitschrijving"
     ]
   },
-  "omgevingswet/energiebesparing/informatieplicht:jaarlijks_elektriciteitsverbruik_kwh": {
+  "omgevingswet/energiebesparing/informatieplicht:elektriciteit_kwh": {
     "table": "rvo_energiegegevens",
     "field": "elektriciteit_kwh",
     "select_on": [
@@ -951,7 +951,7 @@
     ],
     "source_type": "RVO"
   },
-  "omgevingswet/energiebesparing/informatieplicht:jaarlijks_gasverbruik_m3": {
+  "omgevingswet/energiebesparing/informatieplicht:gasverbruik_m3": {
     "table": "rvo_energiegegevens",
     "field": "gasverbruik_m3",
     "select_on": [
@@ -1065,7 +1065,7 @@
       "re_integratie_traject"
     ]
   },
-  "penitentiaire_beginselenwet:detentiestatus": {
+  "penitentiaire_beginselenwet:status": {
     "table": "detenties",
     "field": "status",
     "select_on": [
@@ -1183,7 +1183,7 @@
       }
     ]
   },
-  "verordening_precariobelasting:locatie_op_openbare_weg": {
+  "verordening_precariobelasting:is_openbare_weg": {
     "table": "bgt_terraslocaties",
     "field": "is_openbare_weg",
     "select_on": [
@@ -1288,7 +1288,7 @@
     ],
     "source_type": "NVWA"
   },
-  "wet_adviescollege_ict_toetsing:project_kosten": {
+  "wet_adviescollege_ict_toetsing:totale_kosten": {
     "table": "ict_projecten",
     "field": "totale_kosten",
     "select_on": [
@@ -1466,7 +1466,7 @@
       }
     ]
   },
-  "wet_brp:land_van_verblijf": {
+  "wet_brp:land_verblijf": {
     "table": "personen",
     "field": "land_verblijf",
     "select_on": [
@@ -1502,7 +1502,7 @@
       "type"
     ]
   },
-  "wet_brp:huishouden": {
+  "wet_brp:medebewoners": {
     "table": "bewoners",
     "field": "medebewoners",
     "select_on": [
@@ -1545,7 +1545,7 @@
       "woonplaats"
     ]
   },
-  "wet_brp/terugmelding/belastingdienst:langdurig_buitenland": {
+  "wet_brp/terugmelding/belastingdienst:langdurig_afwezig": {
     "table": "belasting_verblijf",
     "field": "langdurig_afwezig",
     "select_on": [
@@ -1555,7 +1555,7 @@
       }
     ]
   },
-  "wet_brp/terugmelding/cjib:post_onbestelbaar": {
+  "wet_brp/terugmelding/cjib:onbestelbaar_retour": {
     "table": "cjib_post",
     "field": "onbestelbaar_retour",
     "select_on": [
@@ -1614,7 +1614,7 @@
       }
     ]
   },
-  "wet_forensische_zorg:juridische_grondslag": {
+  "wet_forensische_zorg:juridische_titel": {
     "table": "forensische_zorg",
     "field": "juridische_titel",
     "select_on": [
@@ -1624,7 +1624,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box1_dienstbetrekking": {
+  "wet_inkomstenbelasting:loon_uit_dienstbetrekking": {
     "table": "box1",
     "field": "loon_uit_dienstbetrekking",
     "select_on": [
@@ -1634,7 +1634,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box1_uitkeringen": {
+  "wet_inkomstenbelasting:uitkeringen_en_pensioenen": {
     "table": "box1",
     "field": "uitkeringen_en_pensioenen",
     "select_on": [
@@ -1644,7 +1644,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box1_onderneming": {
+  "wet_inkomstenbelasting:winst_uit_onderneming": {
     "table": "box1",
     "field": "winst_uit_onderneming",
     "select_on": [
@@ -1654,7 +1654,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box1_overige_werkzaamheden": {
+  "wet_inkomstenbelasting:resultaat_overige_werkzaamheden": {
     "table": "box1",
     "field": "resultaat_overige_werkzaamheden",
     "select_on": [
@@ -1664,7 +1664,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box1_eigen_woning": {
+  "wet_inkomstenbelasting:eigen_woning": {
     "table": "box1",
     "field": "eigen_woning",
     "select_on": [
@@ -1674,7 +1674,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box2_dividend": {
+  "wet_inkomstenbelasting:reguliere_voordelen": {
     "table": "box2",
     "field": "reguliere_voordelen",
     "select_on": [
@@ -1684,7 +1684,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box2_aandelen": {
+  "wet_inkomstenbelasting:vervreemdingsvoordelen": {
     "table": "box2",
     "field": "vervreemdingsvoordelen",
     "select_on": [
@@ -1694,7 +1694,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box3_sparen": {
+  "wet_inkomstenbelasting:spaargeld": {
     "table": "box3",
     "field": "spaargeld",
     "select_on": [
@@ -1704,7 +1704,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box3_beleggen": {
+  "wet_inkomstenbelasting:beleggingen": {
     "table": "box3",
     "field": "beleggingen",
     "select_on": [
@@ -1714,7 +1714,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box3_onroerend_goed": {
+  "wet_inkomstenbelasting:onroerend_goed": {
     "table": "box3",
     "field": "onroerend_goed",
     "select_on": [
@@ -1724,7 +1724,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:box3_schulden": {
+  "wet_inkomstenbelasting:schulden": {
     "table": "box3",
     "field": "schulden",
     "select_on": [
@@ -1744,7 +1744,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box1_dienstbetrekking": {
+  "wet_inkomstenbelasting:partner_loon_uit_dienstbetrekking": {
     "table": "box1",
     "field": "loon_uit_dienstbetrekking",
     "select_on": [
@@ -1754,7 +1754,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box1_uitkeringen": {
+  "wet_inkomstenbelasting:partner_uitkeringen_en_pensioenen": {
     "table": "box1",
     "field": "uitkeringen_en_pensioenen",
     "select_on": [
@@ -1764,7 +1764,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box1_onderneming": {
+  "wet_inkomstenbelasting:partner_winst_uit_onderneming": {
     "table": "box1",
     "field": "winst_uit_onderneming",
     "select_on": [
@@ -1774,7 +1774,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box1_overige_werkzaamheden": {
+  "wet_inkomstenbelasting:partner_resultaat_overige_werkzaamheden": {
     "table": "box1",
     "field": "resultaat_overige_werkzaamheden",
     "select_on": [
@@ -1784,7 +1784,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box1_eigen_woning": {
+  "wet_inkomstenbelasting:partner_eigen_woning": {
     "table": "box1",
     "field": "eigen_woning",
     "select_on": [
@@ -1794,7 +1794,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box2_dividend": {
+  "wet_inkomstenbelasting:partner_reguliere_voordelen": {
     "table": "box2",
     "field": "reguliere_voordelen",
     "select_on": [
@@ -1804,7 +1804,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box2_aandelen": {
+  "wet_inkomstenbelasting:partner_vervreemdingsvoordelen": {
     "table": "box2",
     "field": "vervreemdingsvoordelen",
     "select_on": [
@@ -1814,7 +1814,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box3_sparen": {
+  "wet_inkomstenbelasting:partner_spaargeld": {
     "table": "box3",
     "field": "spaargeld",
     "select_on": [
@@ -1824,7 +1824,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box3_beleggen": {
+  "wet_inkomstenbelasting:partner_beleggingen": {
     "table": "box3",
     "field": "beleggingen",
     "select_on": [
@@ -1834,7 +1834,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box3_onroerend_goed": {
+  "wet_inkomstenbelasting:partner_onroerend_goed": {
     "table": "box3",
     "field": "onroerend_goed",
     "select_on": [
@@ -1844,7 +1844,7 @@
       }
     ]
   },
-  "wet_inkomstenbelasting:partner_box3_schulden": {
+  "wet_inkomstenbelasting:partner_schulden": {
     "table": "box3",
     "field": "schulden",
     "select_on": [
@@ -1892,7 +1892,7 @@
   "wet_op_de_huurtoeslag:subsidiabele_servicekosten": {
     "source_type": "claim"
   },
-  "wet_op_het_centraal_bureau_voor_de_statistiek:levensverwachting_gegevens": {
+  "wet_op_het_centraal_bureau_voor_de_statistiek:verwachting_65": {
     "table": "levensverwachting",
     "field": "verwachting_65",
     "select_on": [
@@ -1935,7 +1935,7 @@
       "end_date"
     ]
   },
-  "wet_studiefinanciering:opleiding_type": {
+  "wet_studiefinanciering:onderwijstype": {
     "table": "inschrijvingen",
     "field": "onderwijstype",
     "select_on": [
@@ -1945,7 +1945,7 @@
       }
     ]
   },
-  "wet_studiefinanciering:studerend_gezin": {
+  "wet_studiefinanciering:aantal_studerend_gezin": {
     "table": "studiefinanciering",
     "field": "aantal_studerend_gezin",
     "select_on": [
@@ -1955,7 +1955,7 @@
       }
     ]
   },
-  "wet_studiefinanciering:partner_opleiding_type": {
+  "wet_studiefinanciering:partner_onderwijstype": {
     "table": "inschrijvingen",
     "field": "onderwijstype",
     "select_on": [
@@ -1965,7 +1965,7 @@
       }
     ]
   },
-  "wet_studiefinanciering:partner_studerend_gezin": {
+  "wet_studiefinanciering:partner_aantal_studerend_gezin": {
     "table": "studiefinanciering",
     "field": "aantal_studerend_gezin",
     "select_on": [
@@ -2034,7 +2034,7 @@
       "heeft_ziektewet_uitkering"
     ]
   },
-  "zvw:verzekeringspolis": {
+  "zvw:polis_status": {
     "table": "verzekeringen",
     "field": "polis_status",
     "select_on": [
@@ -2044,7 +2044,7 @@
       }
     ]
   },
-  "zvw:verdragsinschrijving": {
+  "zvw:registratie": {
     "table": "verdragsverzekeringen",
     "field": "registratie",
     "select_on": [

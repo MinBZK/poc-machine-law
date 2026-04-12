@@ -36,7 +36,18 @@ articles:
       input:
       - name: wsnp_registraties
         type: array
-        source: {}
+        source:
+          table: wsnp_registraties
+          select_on:
+          - name: bsn_bewindvoerder
+            value: $bsn
+          fields:
+          - bsn_saniet
+          - naam_saniet
+          - insolventie_nummer
+          - datum_uitspraak
+          - datum_einde
+          - status
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

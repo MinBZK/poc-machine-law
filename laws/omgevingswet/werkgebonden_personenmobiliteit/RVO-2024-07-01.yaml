@@ -57,10 +57,22 @@ articles:
       input:
       - name: aantal_werknemers
         type: number
-        source: {}
+        source:
+          table: wpm_gegevens
+          field: aantal_werknemers
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: RVO
       - name: verstrekt_mobiliteitsvergoeding
         type: boolean
-        source: {}
+        source:
+          table: wpm_gegevens
+          field: verstrekt_mobiliteitsvergoeding
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: RVO
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

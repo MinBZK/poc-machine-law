@@ -32,15 +32,46 @@ articles:
       input:
       - name: wet
         type: object
-        source: {}
+        source:
+          table: laws
+          select_on:
+          - name: uuid
+            value: $zaak.rulespec_uuid
+          fields:
+          - decision_type
+          - name
+          - valid_from
+          - legal_character
+          - voorbereidingsprocedure
+          - beroepstermijn_weken
+          - competent_court
+          source_type: laws
       - name: adres
         type: object
       - name: jurisdictie
         type: object
-        source: {}
+        source:
+          table: jurisdicties
+          select_on:
+          - name: gemeente
+            value: $adres
+          fields:
+          - gemeente
+          - arrondissement
+          - rechtbank
+          source_type: reference_data
       - name: gebeurtenissen
         type: object
-        source: {}
+        source:
+          table: events
+          select_on:
+          - name: case_id
+            value: $zaak.id
+          fields:
+          - case_id
+          - event_type
+          - approved
+          source_type: events
       output:
       - name: beroep_mogelijk
         type: boolean

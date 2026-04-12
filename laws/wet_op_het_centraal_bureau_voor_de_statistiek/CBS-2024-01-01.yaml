@@ -32,7 +32,12 @@ articles:
       input:
       - name: verwachting_65
         type: number
-        source: {}
+        source:
+          table: levensverwachting
+          field: verwachting_65
+          select_on:
+          - name: jaar
+            value: $year
       output:
       - name: levensverwachting_65
         type: number

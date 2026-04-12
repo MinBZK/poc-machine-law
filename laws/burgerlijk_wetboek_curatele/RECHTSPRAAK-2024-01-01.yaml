@@ -43,7 +43,17 @@ articles:
       input:
       - name: curatele_registraties
         type: array
-        source: {}
+        source:
+          table: curatele_registraties
+          select_on:
+          - name: bsn_curator
+            value: $bsn
+          fields:
+          - bsn_curandus
+          - naam_curandus
+          - datum_ingang
+          - datum_einde
+          - status
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

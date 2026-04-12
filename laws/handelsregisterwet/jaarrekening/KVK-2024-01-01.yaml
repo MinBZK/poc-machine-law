@@ -77,10 +77,22 @@ articles:
       input:
       - name: rechtsvorm
         type: string
-        source: {}
+        source:
+          table: organisaties
+          field: rechtsvorm
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: KVK
       - name: laatste_boekjaar_einde
         type: date
-        source: {}
+        source:
+          table: jaarrekeningen
+          field: laatste_boekjaar_einde
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: KVK
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

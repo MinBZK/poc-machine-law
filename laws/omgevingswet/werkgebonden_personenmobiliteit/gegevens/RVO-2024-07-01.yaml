@@ -39,19 +39,49 @@ articles:
       input:
       - name: woon_werk_auto_benzine
         type: number
-        source: {}
+        source:
+          table: wpm_reisgegevens
+          field: woon_werk_auto_benzine
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: RVO
       - name: woon_werk_auto_diesel
         type: number
-        source: {}
+        source:
+          table: wpm_reisgegevens
+          field: woon_werk_auto_diesel
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: RVO
       - name: zakelijk_auto_benzine
         type: number
-        source: {}
+        source:
+          table: wpm_reisgegevens
+          field: zakelijk_auto_benzine
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: RVO
       - name: zakelijk_auto_diesel
         type: number
-        source: {}
+        source:
+          table: wpm_reisgegevens
+          field: zakelijk_auto_diesel
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: RVO
       - name: woon_werk_openbaar_vervoer
         type: number
-        source: {}
+        source:
+          table: wpm_reisgegevens
+          field: woon_werk_openbaar_vervoer
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: RVO
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

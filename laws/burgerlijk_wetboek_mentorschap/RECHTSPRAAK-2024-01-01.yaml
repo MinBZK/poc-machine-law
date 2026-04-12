@@ -47,7 +47,17 @@ articles:
       input:
       - name: mentorschap_registraties
         type: array
-        source: {}
+        source:
+          table: mentorschap_registraties
+          select_on:
+          - name: bsn_mentor
+            value: $bsn
+          fields:
+          - bsn_betrokkene
+          - naam_betrokkene
+          - datum_ingang
+          - datum_einde
+          - status
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

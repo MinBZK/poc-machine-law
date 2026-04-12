@@ -62,13 +62,31 @@ articles:
           reference: $referencedate
       - name: elektriciteit_kwh
         type: number
-        source: {}
+        source:
+          table: rvo_energiegegevens
+          field: elektriciteit_kwh
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: RVO
       - name: gasverbruik_m3
         type: number
-        source: {}
+        source:
+          table: rvo_energiegegevens
+          field: gasverbruik_m3
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: RVO
       - name: is_woonfunctie
         type: boolean
-        source: {}
+        source:
+          table: rvo_energiegegevens
+          field: is_woonfunctie
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: RVO
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

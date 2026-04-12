@@ -40,7 +40,11 @@ articles:
       input:
       - name: registratie
         type: object
-        source: {}
+        source:
+          table: registraties
+          select_on:
+          - name: bsn
+            value: $bsn
       output:
       - name: is_geregistreerd
         type: boolean

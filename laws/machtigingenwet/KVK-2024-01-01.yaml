@@ -71,7 +71,20 @@ articles:
       input:
       - name: functionarissen
         type: array
-        source: {}
+        source:
+          table: functionarissen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - kvk_nummer
+          - functie
+          - bevoegdheid
+          - handelsnaam
+          - rechtsvorm
+          - status
+          - datum_inschrijving
+          - datum_uitschrijving
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

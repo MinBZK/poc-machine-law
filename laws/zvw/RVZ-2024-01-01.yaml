@@ -105,10 +105,20 @@ articles:
           reference: $prev_january_first
       - name: polis_status
         type: object
-        source: {}
+        source:
+          table: verzekeringen
+          field: polis_status
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: registratie
         type: object
-        source: {}
+        source:
+          table: verdragsverzekeringen
+          field: registratie
+          select_on:
+          - name: bsn
+            value: $bsn
       output:
       - name: heeft_verzekering
         type: boolean

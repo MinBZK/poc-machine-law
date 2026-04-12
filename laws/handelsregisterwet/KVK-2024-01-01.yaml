@@ -47,10 +47,27 @@ articles:
       input:
       - name: inschrijvingen
         type: array
-        source: {}
+        source:
+          table: inschrijvingen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - kvk_nummer
+          - rechtsvorm
+          - status
+          - activiteit
       - name: posities
         type: array
-        source: {}
+        source:
+          table: functionarissen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - kvk_nummer
+          - functie
+          - status
       output:
       - name: is_actieve_ondernemer
         type: boolean

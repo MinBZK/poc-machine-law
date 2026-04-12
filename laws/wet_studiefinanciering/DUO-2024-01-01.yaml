@@ -139,16 +139,36 @@ articles:
           period_type: year
       - name: onderwijstype
         type: string
-        source: {}
+        source:
+          table: inschrijvingen
+          field: onderwijstype
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: aantal_studerend_gezin
         type: number
-        source: {}
+        source:
+          table: studiefinanciering
+          field: aantal_studerend_gezin
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: partner_onderwijstype
         type: string
-        source: {}
+        source:
+          table: inschrijvingen
+          field: onderwijstype
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_aantal_studerend_gezin
         type: number
-        source: {}
+        source:
+          table: studiefinanciering
+          field: aantal_studerend_gezin
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       output:
       - name: studiefinanciering
         type: amount

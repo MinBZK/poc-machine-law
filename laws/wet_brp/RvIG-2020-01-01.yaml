@@ -92,37 +92,99 @@ articles:
       input:
       - name: geboortedatum
         type: date
-        source: {}
+        source:
+          table: personen
+          field: geboortedatum
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: partner_geboortedatum
         type: date
-        source: {}
+        source:
+          table: personen
+          field: geboortedatum
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partnerschap_type
         type: object
-        source: {}
+        source:
+          table: relaties
+          field: partnerschap_type
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: partner_bsn
         type: string
-        source: {}
+        source:
+          table: relaties
+          field: partner_bsn
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: kinderen_gegevens
         type: array
-        source: {}
+        source:
+          table: relaties
+          field: kinderen
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: verblijfsadres
         type: object
-        source: {}
+        source:
+          table: personen
+          field: verblijfsadres
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: ouder_adressen
         type: array
-        source: {}
+        source:
+          table: relaties
+          field: ouder_adressen
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: land_verblijf
         type: string
-        source: {}
+        source:
+          table: personen
+          field: land_verblijf
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: nationaliteit
         type: string
-        source: {}
+        source:
+          table: personen
+          field: nationaliteit
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: adres
         type: object
-        source: {}
+        source:
+          table: verblijfplaats
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - straat
+          - huisnummer
+          - postcode
+          - woonplaats
+          - type
       - name: medebewoners
         type: array
-        source: {}
+        source:
+          table: bewoners
+          field: medebewoners
+          select_on:
+          - name: postcode
+            value: $adres.postcode
+          - name: huisnummer
+            value: $adres.huisnummer
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

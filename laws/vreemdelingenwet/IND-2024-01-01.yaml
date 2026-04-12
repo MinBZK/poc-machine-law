@@ -74,10 +74,26 @@ articles:
       input:
       - name: vergunning_gegevens
         type: object
-        source: {}
+        source:
+          table: verblijfsvergunningen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - type
+          - status
+          - ingangsdatum
+          - einddatum
       - name: eu_inschrijving
         type: object
-        source: {}
+        source:
+          table: eu_registraties
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - type
+          - ingangsdatum
       output:
       - name: verblijfsvergunning_type
         type: string

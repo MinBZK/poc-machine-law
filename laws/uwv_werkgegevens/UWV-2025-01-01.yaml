@@ -118,7 +118,17 @@ articles:
       input:
       - name: werkgegevens
         type: object
-        source: {}
+        source:
+          table: uwv_werkgegevens
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - gemiddeld_uren_per_week
+          - huidige_uren_per_week
+          - gewerkte_weken_36
+          - arbeidsverleden_jaren
+          - jaarloon
       output:
       - name: gemiddeld_uren_per_week
         type: number

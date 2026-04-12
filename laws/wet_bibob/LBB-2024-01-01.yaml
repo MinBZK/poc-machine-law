@@ -76,22 +76,52 @@ articles:
       input:
       - name: advies_uitgebracht
         type: boolean
-        source: {}
+        source:
+          table: bibob_adviezen
+          field: advies_uitgebracht
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       - name: advies_mate_van_gevaar
         type: string
-        source: {}
+        source:
+          table: bibob_adviezen
+          field: mate_van_gevaar
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       - name: advies_datum
         type: date
-        source: {}
+        source:
+          table: bibob_adviezen
+          field: advies_datum
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       - name: relatie_tot_strafbare_feiten
         type: boolean
-        source: {}
+        source:
+          table: bibob_adviezen
+          field: relatie_strafbare_feiten
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       - name: financieringsrisico
         type: boolean
-        source: {}
+        source:
+          table: bibob_adviezen
+          field: financieringsrisico
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       - name: voorschriften_geadviseerd
         type: boolean
-        source: {}
+        source:
+          table: bibob_adviezen
+          field: voorschriften_geadviseerd
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       output:
       - name: advies_uitgebracht
         type: boolean

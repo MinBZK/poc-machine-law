@@ -36,10 +36,20 @@ articles:
       input:
       - name: status
         type: string
-        source: {}
+        source:
+          table: detenties
+          field: status
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: inrichting_type
         type: string
-        source: {}
+        source:
+          table: detenties
+          field: inrichting_type
+          select_on:
+          - name: bsn
+            value: $bsn
       output:
       - name: is_gedetineerd
         type: boolean

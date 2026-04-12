@@ -37,7 +37,15 @@ articles:
       input:
       - name: kinderen_data
         type: object
-        source: {}
+        source:
+          table: algemene_kinderbijslagwet
+          select_on:
+          - name: ouder_bsn
+            value: $bsn
+          fields:
+          - aantal_kinderen
+          - kinderen_leeftijden
+          - ontvangt_kinderbijslag
       output:
       - name: ontvangt_kinderbijslag
         type: boolean

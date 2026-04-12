@@ -67,10 +67,21 @@ articles:
           reference: $referencedate
       - name: heeft_terras
         type: boolean
-        source: {}
+        source:
+          table: vestigingen
+          field: heeft_terras
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       - name: is_openbare_weg
         type: boolean
-        source: {}
+        source:
+          table: bgt_terraslocaties
+          field: is_openbare_weg
+          select_on:
+          - name: adres
+            value: $vestigingsadres
+          source_type: GEMEENTE_ROTTERDAM
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

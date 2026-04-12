@@ -52,10 +52,20 @@ articles:
       input:
       - name: onbestelbaar_retour
         type: boolean
-        source: {}
+        source:
+          table: cjib_post
+          field: onbestelbaar_retour
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: aantal_onbestelbaar
         type: number
-        source: {}
+        source:
+          table: cjib_post
+          field: aantal_onbestelbaar
+          select_on:
+          - name: bsn
+            value: $bsn
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

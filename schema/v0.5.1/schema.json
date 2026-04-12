@@ -540,6 +540,53 @@
                 "endpoint": {
                   "type": "string",
                   "description": "Endpoint to call on the delegated regulation"
+                },
+                "service": {
+                  "type": "string",
+                  "description": "Service code that owns the source regulation (e.g., `RvIG`, `BELASTINGDIENST`). Used for routing in the engine."
+                },
+                "table": {
+                  "type": "string",
+                  "description": "Name of the data source table to read from (used for native data sources resolved by the engine)."
+                },
+                "field": {
+                  "type": "string",
+                  "description": "Name of the column in `table` to project as this input's value. Mutually exclusive with `fields` (which produces an object input)."
+                },
+                "fields": {
+                  "type": "array",
+                  "description": "List of column names from `table` to bundle into a single object input. Use this for inputs of type object that combine multiple columns.",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "select_on": {
+                  "type": "array",
+                  "description": "Filter criteria applied to `table` before projecting `field` or `fields`. Each entry is a {name, value} pair where value may be a literal or a $variable reference resolved against the law's parameters/context.",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Column name in `table` to filter on."
+                      },
+                      "value": {
+                        "description": "Filter value: a literal, or a `$variable` reference resolved at evaluation time."
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "source_type": {
+                  "type": "string",
+                  "description": "Optional kind of native source: `claim` (claim store), `cases` (case store), `events` (event store), `laws` (laws registry), `reference_data`, or a service code (e.g. `KVK`, `RVO`, `NVWA`, `AWB`, `ACICT`, `GEMEENTE_ROTTERDAM`)."
                 }
               },
               "additionalProperties": false

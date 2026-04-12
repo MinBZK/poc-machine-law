@@ -82,10 +82,20 @@ articles:
       input:
       - name: zorgtype
         type: string
-        source: {}
+        source:
+          table: forensische_zorg
+          field: zorgtype
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: juridische_titel
         type: string
-        source: {}
+        source:
+          table: forensische_zorg
+          field: juridische_titel
+          select_on:
+          - name: bsn
+            value: $bsn
       output:
       - name: is_forensisch
         type: boolean

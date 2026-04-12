@@ -96,15 +96,18 @@ articles:
       - name: kinderopvang_kvk
         type: string
         required: true
-        source: {}
+        source:
+          source_type: claim
       - name: aangegeven_uren
         type: array
         required: true
-        source: {}
+        source:
+          source_type: claim
       - name: verwachte_partner_uren
         type: number
         required: true
-        source: {}
+        source:
+          source_type: claim
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

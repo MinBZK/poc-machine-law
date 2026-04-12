@@ -147,7 +147,17 @@ articles:
             bsn: $bsn
       - name: bbz_aanvraag
         type: object
-        source: {}
+        source:
+          table: bbz_aanvraag
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - type_zelfstandige
+          - bedrijf_levensvatbaar
+          - jaren_ondernemerschap
+          - uren_per_week
+          - beeindigingsdatum
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

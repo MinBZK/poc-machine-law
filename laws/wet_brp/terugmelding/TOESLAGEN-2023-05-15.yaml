@@ -51,10 +51,27 @@ articles:
       input:
       - name: toeslag_adres
         type: object
-        source: {}
+        source:
+          table: toeslagen_adressen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - postcode
+          - huisnummer
+          - straat
+          - woonplaats
       - name: toeslagen_onderzoek
         type: object
-        source: {}
+        source:
+          table: toeslagen_adresonderzoek
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - onderzoek_datum
+          - onderzoek_uitkomst
+          - adres_geverifieerd
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

@@ -45,10 +45,22 @@ articles:
       input:
       - name: is_levensmiddelenbedrijf
         type: boolean
-        source: {}
+        source:
+          table: nvwa_registratie
+          field: is_levensmiddelenbedrijf
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: NVWA
       - name: heeft_actief_incident
         type: boolean
-        source: {}
+        source:
+          table: nvwa_meldplicht
+          field: heeft_actief_incident
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: NVWA
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

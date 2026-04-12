@@ -118,7 +118,13 @@ articles:
       input:
       - name: inkomensgegevens
         type: object
-        source: {}
+        source:
+          table: uwv_toetsingsinkomen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - toetsingsinkomen
       output:
       - name: toetsingsinkomen
         type: amount

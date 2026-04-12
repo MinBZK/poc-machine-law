@@ -238,28 +238,85 @@ articles:
           reference: $referencedate
       - name: heeft_alcoholvergunning
         type: boolean
-        source: {}
+        source:
+          table: vergunningen
+          field: heeft_alcoholvergunning
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       - name: beschikbare_oppervlakte
         type: number
-        source: {}
+        source:
+          table: bgt_terraslocaties
+          field: beschikbare_oppervlakte
+          select_on:
+          - name: adres
+            value: $vestigingsadres
+          - name: locatie
+            value: $terras_locatie
       - name: functie_oppervlak
         type: string
-        source: {}
+        source:
+          table: bgt_terraslocaties
+          field: functie_oppervlak
+          select_on:
+          - name: adres
+            value: $vestigingsadres
+          - name: locatie
+            value: $terras_locatie
       - name: is_openbare_weg
         type: boolean
-        source: {}
+        source:
+          table: bgt_terraslocaties
+          field: is_openbare_weg
+          select_on:
+          - name: adres
+            value: $vestigingsadres
+          - name: locatie
+            value: $terras_locatie
       - name: terrassenbeleid_gebied
         type: object
-        source: {}
+        source:
+          table: terrassenbeleid
+          select_on:
+          - name: adres
+            value: $vestigingsadres
+          fields:
+          - gebied
+          - max_oppervlakte
+          - max_sluitingstijd
+          - seizoensregels
+          - toegestane_locaties
       - name: max_sluitingstijd_doordeweeks
         type: number
-        source: {}
+        source:
+          table: terrassenbeleid
+          field: max_sluitingstijd_doordeweeks
+          select_on:
+          - name: adres
+            value: $vestigingsadres
+          - name: seizoen
+            value: $seizoen
       - name: max_sluitingstijd_weekend
         type: number
-        source: {}
+        source:
+          table: terrassenbeleid
+          field: max_sluitingstijd_weekend
+          select_on:
+          - name: adres
+            value: $vestigingsadres
+          - name: seizoen
+            value: $seizoen
       - name: tarief_per_m2
         type: number
-        source: {}
+        source:
+          table: precario_tarieven
+          field: tarief_per_m2
+          select_on:
+          - name: adres
+            value: $vestigingsadres
+          - name: gebruik
+            value: terras
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

@@ -127,7 +127,13 @@ articles:
       input:
       - name: zw_uitkering
         type: object
-        source: {}
+        source:
+          table: ziektewet
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - heeft_ziektewet_uitkering
       output:
       - name: heeft_ziektewet_uitkering
         type: boolean

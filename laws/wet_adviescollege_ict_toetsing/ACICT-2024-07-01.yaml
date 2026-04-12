@@ -45,13 +45,31 @@ articles:
       input:
       - name: totale_kosten
         type: number
-        source: {}
+        source:
+          table: ict_projecten
+          field: totale_kosten
+          select_on:
+          - name: project_id
+            value: $project_id
+          source_type: ACICT
       - name: organisatie_type
         type: string
-        source: {}
+        source:
+          table: ict_projecten
+          field: organisatie_type
+          select_on:
+          - name: project_id
+            value: $project_id
+          source_type: ACICT
       - name: project_type
         type: string
-        source: {}
+        source:
+          table: ict_projecten
+          field: project_type
+          select_on:
+          - name: project_id
+            value: $project_id
+          source_type: ACICT
       output:
       - name: adviesplicht
         type: boolean

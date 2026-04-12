@@ -68,7 +68,12 @@ articles:
           reference: $verkiezingsdatum
       - name: verkiezingsdatum
         type: date
-        source: {}
+        source:
+          table: verkiezingen
+          field: verkiezingsdatum
+          select_on:
+          - name: type
+            value: TWEEDE_KAMER
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

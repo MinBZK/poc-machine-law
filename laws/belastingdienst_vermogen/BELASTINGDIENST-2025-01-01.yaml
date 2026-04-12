@@ -36,7 +36,13 @@ articles:
       input:
       - name: vermogensgegevens
         type: object
-        source: {}
+        source:
+          table: belastingdienst_vermogen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - vermogen
       output:
       - name: vermogen
         type: amount

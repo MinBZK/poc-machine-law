@@ -73,7 +73,17 @@ articles:
       input:
       - name: familie_relaties
         type: array
-        source: {}
+        source:
+          table: wgbo_familie_relaties
+          select_on:
+          - name: bsn_familielid
+            value: $bsn
+          fields:
+          - bsn_patient
+          - naam_patient
+          - relatie_type
+          - is_wilsonbekwaam
+          - datum_wilsonbekwaamheid
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

@@ -52,7 +52,20 @@ articles:
       input:
       - name: gezag_relaties
         type: array
-        source: {}
+        source:
+          table: gezag_relaties
+          select_on:
+          - name: bsn_gezagdrager
+            value: $bsn
+          fields:
+          - bsn_kind
+          - naam_kind
+          - geboortedatum_kind
+          - type_gezag
+          - datum_ingang
+          - datum_einde
+          - status
+          - heeft_handlichting
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

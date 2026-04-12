@@ -106,16 +106,36 @@ articles:
           period_type: year
       - name: partner_verzekerd
         type: boolean
-        source: {}
+        source:
+          table: anw_dossiers
+          field: partner_verzekerd
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: overlijdensdatum_partner
         type: date
-        source: {}
+        source:
+          table: anw_dossiers
+          field: overlijdensdatum_partner
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: ao_percentage
         type: number
-        source: {}
+        source:
+          table: anw_dossiers
+          field: ao_percentage
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: heeft_kinderen_onder_18
         type: boolean
-        source: {}
+        source:
+          table: anw_dossiers
+          field: heeft_kinderen_onder_18
+          select_on:
+          - name: bsn
+            value: $bsn
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

@@ -49,37 +49,103 @@ articles:
       input:
       - name: is_orgaan_van_rechtspersoon
         type: boolean
-        source: {}
+        source:
+          table: organisaties
+          field: is_orgaan_van_rechtspersoon
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       - name: publiekrechtelijke_rechtspersoon_type
         type: string
-        source: {}
+        source:
+          table: organisaties
+          field: publiekrechtelijke_rechtspersoon_type
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       - name: heeft_publiekrechtelijke_bevoegdheid
         type: boolean
-        source: {}
+        source:
+          table: organisaties
+          field: heeft_publiekrechtelijke_bevoegdheid
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       - name: bevoegdheid_bij_of_krachtens_wet
         type: boolean
-        source: {}
+        source:
+          table: organisaties
+          field: bevoegdheid_bij_of_krachtens_wet
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       - name: overheidsfinanciering_percentage
         type: number
-        source: {}
+        source:
+          table: organisaties
+          field: overheidsfinanciering_percentage
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       - name: criteria_door_overheid_bepaald
         type: boolean
-        source: {}
+        source:
+          table: organisaties
+          field: criteria_door_overheid_bepaald
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       - name: is_uitsluitend_financiele_uitkering
         type: boolean
-        source: {}
+        source:
+          table: organisaties
+          field: is_uitsluitend_financiele_uitkering
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       - name: is_volksvertegenwoordigend_orgaan
         type: boolean
-        source: {}
+        source:
+          table: organisaties
+          field: is_volksvertegenwoordigend_orgaan
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       - name: is_rechterlijk_orgaan
         type: boolean
-        source: {}
+        source:
+          table: organisaties
+          field: is_rechterlijk_orgaan
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       - name: is_ombudsman
         type: boolean
-        source: {}
+        source:
+          table: organisaties
+          field: is_ombudsman
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       - name: is_algemene_rekenkamer
         type: boolean
-        source: {}
+        source:
+          table: organisaties
+          field: is_algemene_rekenkamer
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
       output:
       - name: is_bestuursorgaan
         type: boolean

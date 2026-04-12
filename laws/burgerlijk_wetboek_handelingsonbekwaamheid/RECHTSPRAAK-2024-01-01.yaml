@@ -53,7 +53,18 @@ articles:
       input:
       - name: curatele_als_curandus
         type: array
-        source: {}
+        source:
+          table: curatele_registraties
+          select_on:
+          - name: bsn_curandus
+            value: $bsn
+          fields:
+          - bsn_curator
+          - bsn_curandus
+          - naam_curandus
+          - datum_ingang
+          - datum_einde
+          - status
       output:
       - name: is_onder_curatele
         type: boolean

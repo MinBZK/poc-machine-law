@@ -185,7 +185,12 @@ articles:
           reference: $referencedate
       - name: woonperiodes
         type: number
-        source: {}
+        source:
+          table: verzekerde_tijdvakken
+          field: woonperiodes
+          select_on:
+          - name: bsn
+            value: $bsn
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

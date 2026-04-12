@@ -113,16 +113,36 @@ articles:
           reference: $referencedate
       - name: bsn
         type: string
-        source: {}
+        source:
+          table: leidinggevenden
+          field: bsn
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       - name: vloeroppervlakte_horecalokaliteit
         type: number
-        source: {}
+        source:
+          table: inrichtingen
+          field: vloeroppervlakte_horecalokaliteit
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       - name: type_bedrijf
         type: string
-        source: {}
+        source:
+          table: inrichtingen
+          field: type_bedrijf
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       - name: heeft_alcoholvergunning
         type: boolean
-        source: {}
+        source:
+          table: vergunningen
+          field: heeft_alcoholvergunning
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

@@ -70,7 +70,16 @@ articles:
       input:
       - name: verblijfsobject
         type: object
-        source: {}
+        source:
+          table: bag_verblijfsobjecten
+          select_on:
+          - name: adres
+            value: $adres
+          fields:
+          - gebruiksdoel
+          - oppervlakte
+          - status
+          - bouwjaar
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

@@ -283,22 +283,52 @@ articles:
           reference: $referencedate
       - name: pensioenkapitaal
         type: amount
-        source: {}
+        source:
+          table: pensioen_deelnemers
+          field: pensioenkapitaal
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: pensioenjaren
         type: number
-        source: {}
+        source:
+          table: pensioen_deelnemers
+          field: pensioenjaren
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: type_regeling
         type: string
-        source: {}
+        source:
+          table: pensioen_deelnemers
+          field: type_regeling
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: franchise
         type: amount
-        source: {}
+        source:
+          table: pensioen_deelnemers
+          field: franchise
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: pensioengevend_loon
         type: amount
-        source: {}
+        source:
+          table: pensioen_deelnemers
+          field: pensioengevend_loon
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: pensioen_leeftijd_fonds
         type: number
-        source: {}
+        source:
+          table: pensioen_deelnemers
+          field: pensioenleeftijd
+          select_on:
+          - name: bsn
+            value: $bsn
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

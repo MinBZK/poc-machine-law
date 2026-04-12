@@ -53,10 +53,28 @@ articles:
             kvk_nummer: $kvk_nummer
       - name: verleende_ontheffingen_dit_jaar
         type: array
-        source: {}
+        source:
+          select_on:
+          - name: law
+            value: algemene_plaatselijke_verordening/ontheffingspas_geluid
+          - name: status
+            value: DECIDED
+          - name: approved
+            value: true
+          - name: kvk_nummer
+            value: $kvk_nummer
+          - name: year
+            value: $year
+          source_type: cases
       - name: heeft_actieve_klachten
         type: boolean
-        source: {}
+        source:
+          table: geluidsklachten
+          field: heeft_actieve_klachten
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: GEMEENTE_ROTTERDAM
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

@@ -129,7 +129,16 @@ articles:
             bsn: $bsn
       - name: arbeidsvermogen
         type: object
-        source: {}
+        source:
+          table: werk_en_re_integratie
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - arbeidsvermogen
+          - ontheffing_reden
+          - ontheffing_einddatum
+          - re_integratie_traject
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

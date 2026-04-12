@@ -76,7 +76,14 @@ articles:
             adres: $adres
       - name: aantal_bewoners
         type: number
-        source: {}
+        source:
+          table: brp_adressen
+          field: aantal_bewoners
+          select_on:
+          - name: postcode
+            value: $adres.postcode
+          - name: huisnummer
+            value: $adres.huisnummer
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

@@ -93,16 +93,40 @@ articles:
       input:
       - name: sbi_code
         type: string
-        source: {}
+        source:
+          table: organisaties
+          field: sbi_code
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: KVK
       - name: is_geregistreerd_nvwa
         type: boolean
-        source: {}
+        source:
+          table: nvwa_registratie
+          field: is_geregistreerd_nvwa
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: NVWA
       - name: heeft_haccp_systeem
         type: boolean
-        source: {}
+        source:
+          table: nvwa_registratie
+          field: heeft_haccp_systeem
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: NVWA
       - name: type_haccp_systeem
         type: string
-        source: {}
+        source:
+          table: nvwa_registratie
+          field: type_haccp_systeem
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: NVWA
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

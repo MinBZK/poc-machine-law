@@ -109,79 +109,204 @@ articles:
             bsn: $bsn
       - name: loon_uit_dienstbetrekking
         type: amount
-        source: {}
+        source:
+          table: box1
+          field: loon_uit_dienstbetrekking
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: uitkeringen_en_pensioenen
         type: amount
-        source: {}
+        source:
+          table: box1
+          field: uitkeringen_en_pensioenen
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: winst_uit_onderneming
         type: amount
-        source: {}
+        source:
+          table: box1
+          field: winst_uit_onderneming
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: resultaat_overige_werkzaamheden
         type: amount
-        source: {}
+        source:
+          table: box1
+          field: resultaat_overige_werkzaamheden
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: eigen_woning
         type: amount
-        source: {}
+        source:
+          table: box1
+          field: eigen_woning
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: reguliere_voordelen
         type: amount
-        source: {}
+        source:
+          table: box2
+          field: reguliere_voordelen
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: vervreemdingsvoordelen
         type: amount
-        source: {}
+        source:
+          table: box2
+          field: vervreemdingsvoordelen
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: spaargeld
         type: amount
-        source: {}
+        source:
+          table: box3
+          field: spaargeld
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: beleggingen
         type: amount
-        source: {}
+        source:
+          table: box3
+          field: beleggingen
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: onroerend_goed
         type: amount
-        source: {}
+        source:
+          table: box3
+          field: onroerend_goed
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: schulden
         type: amount
-        source: {}
+        source:
+          table: box3
+          field: schulden
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: persoonsgebonden_aftrek
         type: amount
-        source: {}
+        source:
+          table: aftrekposten
+          field: persoonsgebonden_aftrek
+          select_on:
+          - name: bsn
+            value: $bsn
       - name: partner_loon_uit_dienstbetrekking
         type: amount
-        source: {}
+        source:
+          table: box1
+          field: loon_uit_dienstbetrekking
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_uitkeringen_en_pensioenen
         type: amount
-        source: {}
+        source:
+          table: box1
+          field: uitkeringen_en_pensioenen
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_winst_uit_onderneming
         type: amount
-        source: {}
+        source:
+          table: box1
+          field: winst_uit_onderneming
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_resultaat_overige_werkzaamheden
         type: amount
-        source: {}
+        source:
+          table: box1
+          field: resultaat_overige_werkzaamheden
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_eigen_woning
         type: amount
-        source: {}
+        source:
+          table: box1
+          field: eigen_woning
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_reguliere_voordelen
         type: amount
-        source: {}
+        source:
+          table: box2
+          field: reguliere_voordelen
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_vervreemdingsvoordelen
         type: amount
-        source: {}
+        source:
+          table: box2
+          field: vervreemdingsvoordelen
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_spaargeld
         type: amount
-        source: {}
+        source:
+          table: box3
+          field: spaargeld
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_beleggingen
         type: amount
-        source: {}
+        source:
+          table: box3
+          field: beleggingen
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_onroerend_goed
         type: amount
-        source: {}
+        source:
+          table: box3
+          field: onroerend_goed
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_schulden
         type: amount
-        source: {}
+        source:
+          table: box3
+          field: schulden
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: partner_buitenlands_inkomen
         type: amount
-        source: {}
+        source:
+          table: buitenlands
+          field: inkomen
+          select_on:
+          - name: bsn
+            value: $partner_bsn
       - name: buitenlands_inkomen
         type: amount
-        source: {}
+        source:
+          table: buitenlands
+          field: inkomen
+          select_on:
+          - name: bsn
+            value: $bsn
       output:
       - name: totale_belastingschuld
         type: amount

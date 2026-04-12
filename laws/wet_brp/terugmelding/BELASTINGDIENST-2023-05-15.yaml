@@ -51,10 +51,24 @@ articles:
       input:
       - name: belasting_adres
         type: object
-        source: {}
+        source:
+          table: belasting_adressen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - postcode
+          - huisnummer
+          - straat
+          - woonplaats
       - name: langdurig_afwezig
         type: boolean
-        source: {}
+        source:
+          table: belasting_verblijf
+          field: langdurig_afwezig
+          select_on:
+          - name: bsn
+            value: $bsn
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

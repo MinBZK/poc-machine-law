@@ -42,7 +42,15 @@ articles:
       input:
       - name: persoonsgegevens
         type: object
-        source: {}
+        source:
+          table: personen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - geboortedatum
+          - heeft_handlichting
+          - handlichting_gebieden
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

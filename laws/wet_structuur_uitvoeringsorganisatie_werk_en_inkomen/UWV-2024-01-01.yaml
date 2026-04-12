@@ -90,10 +90,28 @@ articles:
       input:
       - name: dienstverbandperiodes
         type: array
-        source: {}
+        source:
+          table: dienstverbanden
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - start_date
+          - end_date
       - name: uitkeringsperiodes
         type: array
-        source: {}
+        source:
+          table: uitkeringen
+          select_on:
+          - name: bsn
+            value: $bsn
+          - name: type
+            value:
+              operation: IN
+              values: $geldige_uitkering_typen
+          fields:
+          - start_date
+          - end_date
       output:
       - name: verzekerde_jaren
         type: number

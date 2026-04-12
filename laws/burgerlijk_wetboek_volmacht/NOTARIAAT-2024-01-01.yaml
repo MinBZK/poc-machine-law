@@ -38,7 +38,19 @@ articles:
       input:
       - name: volmacht_registraties
         type: array
-        source: {}
+        source:
+          table: volmacht_registraties
+          select_on:
+          - name: bsn_gevolmachtigde
+            value: $bsn
+          fields:
+          - bsn_volmachtgever
+          - naam_volmachtgever
+          - volmacht_type
+          - datum_ingang
+          - datum_einde
+          - status
+          - is_herroepen
       output:
       - name: voldoet_aan_voorwaarden
         type: boolean

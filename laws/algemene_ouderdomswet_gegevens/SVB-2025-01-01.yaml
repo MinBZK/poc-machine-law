@@ -58,7 +58,13 @@ articles:
       input:
       - name: pensioengegevens
         type: object
-        source: {}
+        source:
+          table: algemene_ouderdomswet_gegevens
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - pensioenleeftijd
       output:
       - name: pensioenleeftijd
         type: number

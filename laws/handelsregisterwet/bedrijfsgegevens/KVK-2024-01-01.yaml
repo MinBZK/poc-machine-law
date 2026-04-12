@@ -29,7 +29,19 @@ articles:
       input:
       - name: organisatie_gegevens
         type: object
-        source: {}
+        source:
+          table: organisaties
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          fields:
+          - kvk_nummer
+          - rechtsvorm
+          - status
+          - aantal_werknemers
+          - datum_telling
+          - datum_aanvang
+          - vestigingsadres
       output:
       - name: aantal_werknemers
         type: number

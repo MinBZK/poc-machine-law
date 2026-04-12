@@ -34,7 +34,15 @@ articles:
       input:
       - name: wia_uitkering_status
         type: object
-        source: {}
+        source:
+          table: wia_uitkeringen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - status
+          - start_datum
+          - eind_datum
       output:
       - name: heeft_wia_uitkering
         type: boolean
