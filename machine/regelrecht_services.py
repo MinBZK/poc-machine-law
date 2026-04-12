@@ -917,28 +917,7 @@ def _postprocess_outputs(outputs: dict, params: dict, data: dict) -> None:
     for art in data.get("articles", []):
         actions.extend(art.get("machine_readable", {}).get("execution", {}).get("actions", []))
 
-    for action in actions:
-        value = action.get("value")
-        output_name = action.get("output")
-        if not output_name:
-            continue
-
-        # 1. Dot-notation projection on arrays/objects
-        if isinstance(value, str) and value.startswith("$") and "." in value:
-            if outputs.get(output_name) is not None:
-                continue
-            ref = value[1:]
-            var_name, _, field_name = ref.partition(".")
-            source = outputs.get(var_name)
-            if source is None:
-                continue
-            if isinstance(source, list):
-                outputs[output_name] = [item.get(field_name) if isinstance(item, dict) else None for item in source]
-            elif isinstance(source, dict):
-                outputs[output_name] = source.get(field_name)
-            continue
-
-    # 3. Final pass: resolve any remaining $variable strings
+    # Final pass: resolve any remaining $variable strings or CONCAT operations
     namespace = {**params, **outputs}
     for key, value in list(outputs.items()):
         outputs[key] = _resolve_value(value, namespace)
