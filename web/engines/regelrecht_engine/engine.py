@@ -124,32 +124,43 @@ class RegelrechtMachineService(EngineInterface):
 
 
 def _rust_trace_to_pathnode(trace: dict) -> PathNode:
-    """Convert a Rust engine trace dict to a web PathNode tree."""
-    node_type = trace.get("node_type", "root")
-    name = trace.get("name", "")
-    result_val = trace.get("result")
-    resolve_type = trace.get("resolve_type")
-    message = trace.get("message")
+    """Convert a Rust engine trace tree into a web PathNode tree.
 
-    web_type = node_type
-    if node_type == "resolve":
-        web_type = "resolve"
-    elif node_type == "article":
-        web_type = "root"
-    elif node_type in ("action", "operation"):
-        web_type = "resolve"
+    The Rust trace contains every operation (AND, IF, SUBTRACT, ...) as
+    nested nodes, but the dashboard template ``render_path`` is meant to
+    show only the law's *resolved inputs* — the data that flowed IN from
+    cross-law references, data sources, parameters, and claims. We walk
+    the tree, collect unique top-level input resolves, and discard the
+    operation internals.
+    """
+    root = PathNode(type="root", name="evaluation", result=None)
+    seen: set[str] = set()
 
-    children = [_rust_trace_to_pathnode(c) for c in trace.get("children", [])]
+    def _walk(node: dict) -> None:
+        if not isinstance(node, dict):
+            return
+        node_type = node.get("node_type")
+        if node_type == "resolve":
+            name = node.get("name", "")
+            resolve_type = node.get("resolve_type")
+            # Only surface top-level variable resolves that represent real
+            # citizen data (PARAMETER = input value, SERVICE = cross-law
+            # result, DATASOURCE = record lookup, CLAIM = submitted by
+            # citizen). DEFINITION nodes are internal law constants and
+            # operation-internal resolves have no resolve_type — hide both.
+            if resolve_type and resolve_type != "DEFINITION" and name and name not in seen and not name.startswith("$"):
+                seen.add(name)
+                root.children.append(
+                    PathNode(
+                        type="resolve",
+                        name=name,
+                        result=node.get("result"),
+                        resolve_type=resolve_type,
+                        details={"path": f"${name}", "message": node.get("message") or ""},
+                    )
+                )
+        for child in node.get("children", []):
+            _walk(child)
 
-    details: dict[str, Any] = {"path": f"${name}"}
-    if message:
-        details["message"] = message
-
-    return PathNode(
-        type=web_type,
-        name=name,
-        result=result_val,
-        resolve_type=resolve_type or "NONE",
-        details=details,
-        children=children,
-    )
+    _walk(trace)
+    return root
