@@ -41,10 +41,15 @@ AVAILABLE_BUSINESS_LAWS: dict[str, dict] = {
     "alcoholwet": {"label": "Alcoholwet", "group": "Vergunningen"},
     "haccp": {"label": "HACCP Voedselveiligheid", "group": "Verplichtingen"},
     "energie_informatieplicht": {"label": "Informatieplicht Energiebesparing", "group": "Verplichtingen"},
-    "precariobelasting": {"label": "Precariobelasting", "group": "Belastingen"},
+    "precariobelasting": {"label": "Precariobelasting", "group": "Belastingen & Heffingen"},
+    "accijns": {"label": "Accijns alcohol", "group": "Belastingen & Heffingen"},
+    "zvw_werkgeversbijdrage": {"label": "ZVW werkgeversbijdrage", "group": "Belastingen & Heffingen"},
 }
 
 DEFAULT_SELECTED_BUSINESS_LAWS = ["alcoholwet", "haccp", "energie_informatieplicht", "precariobelasting"]
+
+# Business laws that produce monetary amounts (not just eligibility)
+BUSINESS_PAYMENT_LAWS = {"precariobelasting", "accijns", "zvw_werkgeversbijdrage"}
 
 
 def _build_feature_law_map(selected_laws: list[str]) -> dict[str, list[str]]:
@@ -76,6 +81,16 @@ def _build_feature_law_map(selected_laws: list[str]) -> dict[str, list[str]]:
         "heeft_actief_incident": ["nvwa_meldplicht"],
         "terras_oppervlakte": ["precariobelasting"],
         "has_terrace": ["precariobelasting"],
+        # Accijns features (Wet op de accijns)
+        "produceert_alcohol": ["accijns"],  # art. 1 lid 2: uitslag tot verbruik als belastbaar feit
+        "type_alcohol_product": [
+            "accijns"
+        ],  # art. 1 lid 1: accijnscategorie bepaalt tariefregime (bier/wijn/tussenproduct/overig)
+        "alcoholpercentage": ["accijns"],  # art. 7, 10, 11d, 13: alcoholgehalte bepaalt tarief
+        "hoeveelheid_hectoliter": ["accijns"],  # art. 7 e.v.: accijns berekend per hectoliter
+        # ZVW werkgeversbijdrage features (Zorgverzekeringswet)
+        "aantal_werknemers": ["zvw_werkgeversbijdrage"],  # art. 41 lid 1: bijdrage per werknemer
+        "bruto_loon_per_werknemer": ["zvw_werkgeversbijdrage"],  # art. 42 lid 1 jo. 43: bijdrage over loon
     }
     # Filter to only selected laws
     result = {}
@@ -338,13 +353,16 @@ def run_train_tree(params: dict, selected_laws: list[str]) -> dict:
     all_laws_dict = {**AVAILABLE_LAWS, **AVAILABLE_BUSINESS_LAWS}
     law_labels = {k: all_laws_dict[k]["label"] for k in selected_laws if k in all_laws_dict}
     is_business = _is_business_profile(params, selected_laws)
+    # Business laws with amounts should use amount analysis, not eligibility-only
+    has_payment_laws = any(law in BUSINESS_PAYMENT_LAWS for law in selected_laws)
+    eligibility_only = is_business and not has_payment_laws
     law_analysis = analyze_per_law(
-        model, synthesis_df, selected_laws, feature_law_map, law_labels, eligibility_only=is_business
+        model, synthesis_df, selected_laws, feature_law_map, law_labels, eligibility_only=eligibility_only
     )
 
     # Extract tree structure for visualization
-    # For business (eligibility-only), use eligibility tree since amount tree trains on constant 0
-    if is_business:
+    # Use amount tree when payment laws are selected, eligibility tree otherwise
+    if eligibility_only:
         vis_tree = model._eligibility_tree
     else:
         vis_tree = model._amount_tree if model._amount_tree is not None else model._eligibility_tree
@@ -393,9 +411,9 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
 
     is_business = _is_business_profile(params, selected_laws)
     if is_business:
-        primary_feature = "vloeroppervlakte"
-        rounding_bracket = 10.0  # nearest 10m²
-        rounding_amount = 5.0
+        primary_feature = "jaaromzet"
+        rounding_bracket = 50000.0  # nearest EUR 50k revenue
+        rounding_amount = 50.0
     else:
         primary_feature = "income"
         rounding_bracket = 1000.0  # nearest EUR 1000
@@ -499,8 +517,16 @@ def run_train_parametric(params: dict, selected_laws: list[str]) -> dict:
     learner = ParametricLearner(constraints=constraints)
     model = learner.train(synthesis_df, selected_laws)
 
-    # Generate YAML
-    yaml_config = ParametricYAMLConfig()
+    # Generate YAML with appropriate config for citizen/business
+    if model.template.cost_mode:
+        yaml_config = ParametricYAMLConfig(
+            service_name="BELASTINGDIENST",
+            law_name="geharmoniseerde_kostenregeling_parametrisch",
+            law_display_name="Geharmoniseerde Kostenregeling (Parametrische formule)",
+            description="Geharmoniseerde kostenregeling voor ondernemers op basis van vereenvoudigde formules per wet",
+        )
+    else:
+        yaml_config = ParametricYAMLConfig()
     generator = ParametricYAMLGenerator(config=yaml_config)
     yaml_spec = generator.generate(model)
     yaml_string = generator.to_yaml_string(yaml_spec)
@@ -531,6 +557,7 @@ def run_train_parametric(params: dict, selected_laws: list[str]) -> dict:
     return {
         "status": "success",
         "method": "parametric",
+        "cost_mode": model.template.cost_mode,
         "metrics": {
             "eligibility_accuracy": model.metrics["eligibility_accuracy"],
             "amount_r2": model.metrics["amount_r2"],
@@ -555,14 +582,14 @@ def _generate_bracket_explanation(model, selected_laws: list[str]) -> str:
     is_business = model.primary_feature != "income"
 
     if is_business:
-        title = "# Geharmoniseerde Nalevingskosten — Staffelmodel"
-        intro = f"Deze kostenregeling combineert **{laws_text}** in een oppervlakteafhankelijke staffel."
+        title = "# Geharmoniseerde Kostenregeling — Staffelmodel"
+        intro = f"Deze kostenregeling combineert **{laws_text}** in een omzetafhankelijke staffel."
         how_it_works = [
-            "Uw nalevingskosten worden bepaald door de vloeroppervlakte en bedrijfssituatie.",
-            "Binnen elke oppervlakteband worden de kosten vloeiend berekend (lineaire interpolatie),",
+            "Uw totale kosten worden bepaald door de jaaromzet en bedrijfssituatie.",
+            "Binnen elke omzetband worden de kosten vloeiend berekend (lineaire interpolatie),",
             "zodat er geen harde grenzen ('cliff effects') zijn.",
         ]
-        bracket_title = "## Oppervlakteschijven"
+        bracket_title = "## Omzetschijven"
         header = "| Van | Tot | Kosten ondergrens | Kosten bovengrens |"
         separator = "|-----|-----|-------------------|-------------------|"
         footer = "*Het uiteindelijke bedrag is minimaal EUR 0.*"
@@ -620,21 +647,38 @@ def _generate_parametric_explanation(model, selected_laws: list[str]) -> str:
     law_names = [all_laws_dict.get(l, {}).get("label", l) for l in selected_laws]
     laws_text = ", ".join(law_names[:-1]) + " en " + law_names[-1] if len(law_names) > 1 else law_names[0]
 
-    lines = [
-        "# Geharmoniseerde Toeslag — Vereenvoudigde formule",
-        "",
-        f"Uw toeslag combineert **{laws_text}** en bestaat uit {len(model.template.components)} onderdeel(en):",
-        "",
-        "---",
-        "",
-    ]
+    is_cost = model.template.cost_mode
+
+    if is_cost:
+        lines = [
+            "# Geharmoniseerde Kostenregeling — Vereenvoudigde formule",
+            "",
+            f"Uw totale kosten combineren **{laws_text}** in {len(model.template.components)} onderdeel(en):",
+            "",
+            "---",
+            "",
+        ]
+    else:
+        lines = [
+            "# Geharmoniseerde Toeslag — Vereenvoudigde formule",
+            "",
+            f"Uw toeslag combineert **{laws_text}** en bestaat uit {len(model.template.components)} onderdeel(en):",
+            "",
+            "---",
+            "",
+        ]
 
     for i, comp in enumerate(model.template.components, 1):
-        label = {**AVAILABLE_LAWS, **AVAILABLE_BUSINESS_LAWS}.get(comp.name, {}).get("label", comp.name)
+        label = all_laws_dict.get(comp.name, {}).get("label", comp.name)
         lines.append(f"## {i}. {label}-component")
         lines.append("")
 
-        if comp.has_partner_variant:
+        if is_cost:
+            lines.append(f"- Vaste kosten: EUR {comp.base_single:.2f}/jaar")
+            lines.append(f"- Variabele kosten: {comp.rate_single:.4%} van omzet boven EUR {comp.threshold_single:,.0f}")
+            lines.append("")
+            lines.append("*Formule: vaste kosten + tarief x max(EUR 0, jaaromzet - drempelomzet)*")
+        elif comp.has_partner_variant:
             lines.append("**Alleenstaand:**")
             lines.append(f"- Basisbedrag: EUR {comp.base_single:.2f}/maand")
             lines.append(f"- Afbouw: {comp.rate_single:.1%} van inkomen boven EUR {comp.threshold_single:,.0f}")
@@ -642,23 +686,20 @@ def _generate_parametric_explanation(model, selected_laws: list[str]) -> str:
             lines.append("**Met partner:**")
             lines.append(f"- Basisbedrag: EUR {comp.base_partner:.2f}/maand")
             lines.append(f"- Afbouw: {comp.rate_partner:.1%} van inkomen boven EUR {comp.threshold_partner:,.0f}")
+            lines.append("")
+            lines.append("*Formule: max(EUR 0, basisbedrag - afbouw% x max(EUR 0, inkomen - drempelinkomen))*")
         else:
             lines.append(f"- Basisbedrag: EUR {comp.base_single:.2f}/maand")
             lines.append(f"- Afbouw: {comp.rate_single:.1%} van inkomen boven EUR {comp.threshold_single:,.0f}")
+            lines.append("")
+            lines.append("*Formule: max(EUR 0, basisbedrag - afbouw% x max(EUR 0, inkomen - drempelinkomen))*")
 
         lines.append("")
-        lines.append("*Formule: max(EUR 0, basisbedrag - afbouw% x max(EUR 0, inkomen - drempelinkomen))*")
-        lines.append("")
 
-    lines.extend(
-        [
-            "---",
-            "",
-            "## Totaal",
-            "",
-            "Uw toeslag = som van alle componenten (minimaal EUR 0/maand)",
-        ]
-    )
+    if is_cost:
+        lines.extend(["---", "", "## Totaal", "", "Uw totale kosten = som van alle kostencomponenten"])
+    else:
+        lines.extend(["---", "", "## Totaal", "", "Uw toeslag = som van alle componenten (minimaal EUR 0/maand)"])
 
     return "\n".join(lines)
 
@@ -784,42 +825,73 @@ def generate_explanation(model, selected_laws: list[str] | None = None) -> str:
     else:
         law_text = "**zorgtoeslag**, **huurtoeslag** en **kindgebonden budget**"
 
-    lines = [
-        "# Geharmoniseerde Toeslag",
-        "",
-        f"Deze toeslag combineert {law_text} in één vereenvoudigde regeling.",
-        "",
-        "---",
-        "",
-        "## Wie komt in aanmerking?",
-        "",
-        f"U komt in aanmerking als u voldoet aan een van de volgende {num_rules} situaties:",
-        "",
-    ]
+    is_cost = selected_laws and any(law in BUSINESS_PAYMENT_LAWS for law in selected_laws)
 
+    if is_cost:
+        lines = [
+            "# Geharmoniseerde Kostenregeling",
+            "",
+            f"Deze kostenregeling combineert {law_text} in één vereenvoudigde regeling.",
+            "",
+            "---",
+            "",
+            "## Wie is belastingplichtig?",
+            "",
+            f"U bent belastingplichtig als u voldoet aan een van de volgende {num_rules} situaties:",
+            "",
+        ]
+    else:
+        lines = [
+            "# Geharmoniseerde Toeslag",
+            "",
+            f"Deze toeslag combineert {law_text} in één vereenvoudigde regeling.",
+            "",
+            "---",
+            "",
+            "## Wie komt in aanmerking?",
+            "",
+            f"U komt in aanmerking als u voldoet aan een van de volgende {num_rules} situaties:",
+            "",
+        ]
+
+    unit = "bedrijven" if is_cost else "personen"
     for i, rule in enumerate(model.eligibility_rules, 1):
         confidence_pct = f"{rule.confidence:.0%}"
         lines.append(f"### Situatie {i}")
         lines.append("")
-        lines.append(f"*Geldt voor {rule.samples} personen (zekerheid: {confidence_pct})*")
+        lines.append(f"*Geldt voor {rule.samples} {unit} (zekerheid: {confidence_pct})*")
         lines.append("")
 
         for condition in rule.conditions:
             lines.append(f"- {_format_condition_nl(condition, feature_nl)}")
         lines.append("")
 
-    lines.extend(
-        [
-            "---",
-            "",
-            "## Hoe wordt het bedrag berekend?",
-            "",
-            "Het maandelijkse toeslagbedrag wordt berekend op basis van uw persoonlijke situatie. "
-            f"Er zijn {num_formulas} berekeningsgroep(en).",
-            "",
-        ]
-    )
+    if is_cost:
+        lines.extend(
+            [
+                "---",
+                "",
+                "## Hoe worden de kosten berekend?",
+                "",
+                "Het jaarlijkse kostenbedrag wordt berekend op basis van uw bedrijfssituatie. "
+                f"Er zijn {num_formulas} berekeningsgroep(en).",
+                "",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "---",
+                "",
+                "## Hoe wordt het bedrag berekend?",
+                "",
+                "Het maandelijkse toeslagbedrag wordt berekend op basis van uw persoonlijke situatie. "
+                f"Er zijn {num_formulas} berekeningsgroep(en).",
+                "",
+            ]
+        )
 
+    period = "per jaar" if is_cost else "per maand"
     for i, formula in enumerate(model.amount_formulas, 1):
         lines.append(f"### Groep {i}")
         lines.append("")
@@ -830,7 +902,7 @@ def generate_explanation(model, selected_laws: list[str] | None = None) -> str:
                 lines.append(f"- {_format_condition_nl(cond, feature_nl)}")
             lines.append("")
 
-        lines.append(f"**Basisbedrag**: EUR {formula.intercept:.2f} per maand")
+        lines.append(f"**Basisbedrag**: EUR {formula.intercept:.2f} {period}")
         lines.append("")
 
         adjustments = []
@@ -846,14 +918,14 @@ def generate_explanation(model, selected_laws: list[str] | None = None) -> str:
             lines.extend(adjustments)
             lines.append("")
 
-        lines.append(f"*Verklaarde waarde (R²): {formula.r2_score:.2f} — gebaseerd op {formula.samples} personen*")
+        lines.append(f"*Verklaarde waarde (R²): {formula.r2_score:.2f} — gebaseerd op {formula.samples} {unit}*")
         lines.append("")
 
     lines.extend(
         [
             "---",
             "",
-            "*Het uiteindelijke bedrag is minimaal EUR 0 per maand.*",
+            f"*Het uiteindelijke bedrag is minimaal EUR 0 {period}.*",
         ]
     )
 
