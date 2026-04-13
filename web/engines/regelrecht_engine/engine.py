@@ -84,10 +84,10 @@ class RegelrechtMachineService(EngineInterface):
             approved=approved,
         )
 
-        # Convert the Rust engine trace tree to a web PathNode tree. Pass
-        # the YAML input specs so the converter can label each resolve with
-        # its semantic source (SERVICE for cross-law, SOURCE for data source,
-        # CLAIM for claim-store).
+        # Convert the Rust engine trace tree to a web PathNode tree. The
+        # trace already contains nested cross-law evaluations with their
+        # own resolve nodes, so we walk the tree and classify each resolve
+        # by the YAML source of the law it belongs to.
         input_specs = _collect_input_specs(rule.path)
         root = (
             _rust_trace_to_pathnode(result.path, input_specs)

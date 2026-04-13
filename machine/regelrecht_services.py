@@ -12,9 +12,26 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+import yaml
 from regelrecht_engine import RegelrechtEngine
 
 from machine.service import RuleResult, Services
+
+# Cache YAML law specs by path. Cross-law pre-resolution can re-enter the same
+# laws dozens of times per evaluation; without the cache each re-entry re-parses
+# a ~35ms YAML file and a single dashboard evaluation takes 500ms instead of the
+# 40μs the Rust engine actually needs.
+_LAW_YAML_CACHE: dict[str, dict] = {}
+
+
+def _load_law_yaml(path: str) -> dict:
+    """Load a law YAML file, cached by absolute path."""
+    cached = _LAW_YAML_CACHE.get(path)
+    if cached is not None:
+        return cached
+    data = yaml.safe_load(Path(path).read_text()) or {}
+    _LAW_YAML_CACHE[path] = data
+    return data
 
 
 def _param_val_to_str(val: Any) -> str:
@@ -33,13 +50,26 @@ def _param_val_to_str(val: Any) -> str:
 def _df_col_matches(df: pd.DataFrame, col: str, target: str) -> pd.Series:
     """Compare a DataFrame column against a target string, handling dicts/lists.
 
-    DataFrame columns may contain dict/list objects (from parse_value in test steps).
-    Python's str() for dicts uses single quotes, but JSON uses double quotes. This
-    function serializes both sides consistently so the comparison works for
-    object-valued columns.
+    DataFrame columns may contain dict/list objects (from parse_value in test
+    steps). Python's str() for dicts uses single quotes, but JSON uses double
+    quotes. For object-valued columns we JSON-serialize each row so the
+    comparison works. For scalar columns we compare the column as string,
+    which is orders of magnitude faster than a per-row .apply().
     """
-    col_values = df[col].apply(lambda v: json.dumps(v) if isinstance(v, (dict, list)) else str(v))
-    return col_values == target
+    series = df[col]
+    if len(series) == 0:
+        return series == target  # empty bool series
+    # Sample the first non-null value: if it's dict/list, fall back to the
+    # slow JSON-serialize path. Otherwise a vectorised astype(str) is enough.
+    sample = None
+    for v in series:
+        if v is not None:
+            sample = v
+            break
+    if isinstance(sample, (dict, list)):
+        col_values = series.apply(lambda v: json.dumps(v) if isinstance(v, (dict, list)) else str(v))
+        return col_values == target
+    return series.astype(str) == target
 
 
 def _resolve_param_ref(ref: str, params: dict[str, Any]) -> Any | None:
@@ -506,9 +536,7 @@ class RegelrechtServices:
         if not rule:
             return None
 
-        import yaml as yaml_mod
-
-        data = yaml_mod.safe_load(Path(rule.path).read_text())
+        data = _load_law_yaml(rule.path)
         law_id = data.get("$id", law)
         params = _to_native(dict(parameters))
 
@@ -591,9 +619,7 @@ class RegelrechtServices:
                             params[key] = _to_native(claim.new_value)
                             logger.debug("Claim: %s = %s", key, params[key])
 
-            import yaml as yaml_mod
-
-            data = yaml_mod.safe_load(Path(rule.path).read_text())
+            data = _load_law_yaml(rule.path)
             law_id = data.get("$id", law)
             output_names = []
             for art in data.get("articles", []):
@@ -700,7 +726,15 @@ class RegelrechtServices:
 
 
 def _log_trace(node: dict, depth: int = 0) -> None:
-    """Recursively log a Rust engine trace tree via the IndentLogger."""
+    """Recursively log a Rust engine trace tree via the IndentLogger.
+
+    Early-exits when the underlying logger is not at DEBUG level — walking
+    a multi-thousand-node trace and formatting strings we'll throw away is
+    one of the biggest time sinks in the Python wrapper (300ms+ per eval).
+    """
+    if not logger._logger.isEnabledFor(logging.DEBUG):
+        return
+
     name = node.get("name", "?")
     ntype = node.get("node_type", "?")
     result = node.get("result")
@@ -715,10 +749,7 @@ def _log_trace(node: dict, depth: int = 0) -> None:
     if msg and msg != name:
         label += f" ({msg})"
 
-    if depth == 0:
-        logger.debug(label)
-    else:
-        logger.debug(label)
+    logger.debug(label)
 
     for child in node.get("children", []):
         with logger.indent_block(None):
