@@ -164,16 +164,18 @@ class RegelrechtServices:
             self._register_dataframe(table, df)
 
     def _register_dataframe(self, table: str, df: pd.DataFrame) -> None:
-        """Register a DataFrame as a record-set data source on the engine."""
+        """Register a DataFrame as a record-set data source on the engine.
+
+        The engine reads the law's YAML ``source.select_on`` to determine
+        which columns to filter on per query — we don't need to constrain
+        that at registration time. We only pass the raw records and let
+        the engine pick the right criteria from the YAML spec.
+        """
         if df.empty:
             return
         records = [_to_native({col: row[col] for col in df.columns}) for _, row in df.iterrows()]
         try:
-            self._engine.register_record_set_source(
-                name=table,
-                records=records,
-                select_on=list(df.columns),
-            )
+            self._engine.register_record_set_source(name=table, records=records)
         except Exception as e:
             logger.debug("Could not register data source %s: %s", table, e)
 
@@ -604,6 +606,10 @@ class RegelrechtServices:
             self._sync_engine_data_sources()
 
             params = _to_native(dict(parameters))
+            # Normalise BSN → bsn so YAML select_on ($bsn) can resolve
+            # whether the caller passed BSN (web UI convention) or bsn.
+            if "BSN" in params and "bsn" not in params:
+                params["bsn"] = params.pop("BSN")
             if overwrite_input:
                 for sv in overwrite_input.values():
                     if isinstance(sv, dict):
@@ -640,19 +646,11 @@ class RegelrechtServices:
                     missing_required=True,
                 )
 
-            # Pre-resolve data source inputs first (most inputs use direct $bsn).
-            with logger.indent_block("Resolving data sources"):
-                self._pre_resolve_data_sources(law_id, params, data)
-
-            # Pre-resolve cross-law inputs (some need data source values).
-            with logger.indent_block("Resolving cross-law inputs"):
-                self._pre_resolve_cross_law_inputs(data, params, reference_date)
-
-            # Second pass for data sources that depend on cross-law outputs in
-            # their select_on criteria (e.g. precariobelasting's $vestigingsadres
-            # is a cross-law output used as a select_on filter).
-            with logger.indent_block("Resolving data sources (pass 2)"):
-                self._pre_resolve_data_sources(law_id, params, data)
+            # Cross-law and data source resolution run natively in the
+            # Rust engine (RecordSetDataSource + resolve_external_input
+            # _internal). The engine's trace contains nested cross-law
+            # evaluations which feed the dashboard's "Gebruikte gegevens"
+            # hierarchical view.
 
             # Check for missing required source: {} inputs.
             missing = _find_missing_required_inputs(data, params)
@@ -667,13 +665,10 @@ class RegelrechtServices:
                     missing_required=True,
                 )
 
-            # Fill defaults for unresolved inputs.
-            # The Rust engine type-defaults data source inputs natively
-            # (regelrecht commit 39998b6), but edge cases remain for:
-            # (a) data source inputs whose registered source returned null
-            #     for a non-primitive field, and (b) cross-law inputs whose
-            #     sub-evaluation returned null. Fill those Python-side.
-            _fill_input_defaults(data, params)
+            # Type defaults for unresolved inputs are handled natively by
+            # the Rust engine (regelrecht 39998b6). Pre-filling them
+            # Python-side would short-circuit the engine's native
+            # cross-law resolution.
 
             # Evaluate with trace — the Rust engine records every step
             trace_json = None
