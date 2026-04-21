@@ -9,6 +9,7 @@ from starlette.responses import RedirectResponse
 from explain.llm_factory import LLMFactory
 from machine.utils import RuleResolver
 from web.config_loader import ConfigLoader
+from web.demo.translations import get_lang, get_translations
 from web.demo_profiles import DemoProfiles
 from web.dependencies import (
     get_case_manager,
@@ -125,6 +126,8 @@ async def reset(request: Request):
 @router.get("/control")
 async def control(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Show a button to reset the state of the application"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     providers, current_provider = get_llm_providers(request)
     feature_flags = FeatureFlags.get_all()
 
@@ -153,6 +156,8 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
             "demo_mode": is_demo_mode(request),
             "demo_profiles": DemoProfiles.get_all_profiles(),
             "active_profile": DemoProfiles.get_active_profile_name(),
+            "t": t,
+            "lang": lang,
         },
     )
 
@@ -210,6 +215,9 @@ async def post_set_demo_profile(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+    lang = get_lang(request)
+    t = get_translations(lang)
+
     if source == "demo":
         response = templates.TemplateResponse(
             "demo/partials/demo_profile_selector.html",
@@ -217,6 +225,8 @@ async def post_set_demo_profile(
                 "request": request,
                 "demo_profiles": DemoProfiles.get_all_profiles(),
                 "active_profile": DemoProfiles.get_active_profile_name(),
+                "t": t,
+                "lang": lang,
             },
         )
         response.headers["HX-Trigger"] = "profile-switched"
@@ -228,6 +238,8 @@ async def post_set_demo_profile(
             "request": request,
             "demo_profiles": DemoProfiles.get_all_profiles(),
             "active_profile": DemoProfiles.get_active_profile_name(),
+            "t": t,
+            "lang": lang,
         },
     )
 
@@ -308,24 +320,33 @@ async def post_set_feature_flag(
                 "delegation": FeatureFlags.get_law_flags(delegation_laws),
             }
 
+            lang = get_lang(request)
+            t = get_translations(lang)
+
             # Return only the law feature flags partial
             return templates.TemplateResponse(
                 "/admin/partials/law_feature_flags.html",
-                {"request": request, "law_flags": law_flags, "open_section": open_section},
+                {"request": request, "law_flags": law_flags, "open_section": open_section, "t": t, "lang": lang},
             )
         elif source == "demo":
             # Return demo-specific partial for feature flags
+            lang = get_lang(request)
+            t = get_translations(lang)
             feature_flags = FeatureFlags.get_all()
             return templates.TemplateResponse(
-                "demo/partials/feature_flags.html", {"request": request, "feature_flags": feature_flags}
+                "demo/partials/feature_flags.html",
+                {"request": request, "feature_flags": feature_flags, "t": t, "lang": lang},
             )
         else:
             # Regular feature flag from admin
+            lang = get_lang(request)
+            t = get_translations(lang)
             feature_flags = FeatureFlags.get_all()
 
             # Return only the feature flags partial
             return templates.TemplateResponse(
-                "/admin/partials/feature_flags.html", {"request": request, "feature_flags": feature_flags}
+                "/admin/partials/feature_flags.html",
+                {"request": request, "feature_flags": feature_flags, "t": t, "lang": lang},
             )
     except Exception as e:
         import traceback
@@ -349,6 +370,9 @@ async def admin_dashboard(
     case_manager: CaseManagerInterface = Depends(get_case_manager),
 ):
     """Main admin dashboard view"""
+    lang = get_lang(request)
+    t = get_translations(lang)
+
     all_laws = rule_resolver.get_service_laws()
     available_services = list(all_laws.keys())
 
@@ -371,6 +395,8 @@ async def admin_dashboard(
             "service_laws": service_laws,
             "service_cases": service_cases,
             "demo_mode": is_demo_mode(request),
+            "t": t,
+            "lang": lang,
         },
     )
 
@@ -479,15 +505,19 @@ async def complete_review(
                 },
             }
 
+            lang = get_lang(request)
+            t = get_translations(lang)
             return templates.TemplateResponse(
                 "admin/partials/event_detail.html",
-                {"request": request, "event": decision_event, "is_first": True},
+                {"request": request, "event": decision_event, "is_first": True, "t": t, "lang": lang},
             )
 
         # Return updated card for HTMX swap if not detail page
+        lang = get_lang(request)
+        t = get_translations(lang)
         return templates.TemplateResponse(
             "admin/partials/case_card.html",
-            {"request": request, "case": updated_case, "status": updated_case.status},
+            {"request": request, "case": updated_case, "status": updated_case.status, "t": t, "lang": lang},
         )
 
     except ValueError as e:
@@ -505,6 +535,8 @@ async def view_case(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """View details of a specific case"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     try:
         case = case_manager.get_case_by_id(case_id)
     except AggregateNotFoundError:
@@ -532,5 +564,7 @@ async def view_case(
             "person_name": person_name,
             "current_engine_id": get_engine_id(),
             "demo_mode": is_demo_mode(request),
+            "t": t,
+            "lang": lang,
         },
     )

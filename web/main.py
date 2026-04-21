@@ -12,6 +12,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 sys.path.append(str(Path(__file__).parent.parent))
 
+from web.demo.translations import get_lang, get_translations
 from web.demo_profiles import DemoProfiles, get_demo_bsn
 from web.dependencies import (
     STATIC_DIR,
@@ -139,6 +140,9 @@ async def root(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Render the main dashboard page"""
+    lang = get_lang(request)
+    t = get_translations(lang)
+
     if bsn is None:
         bsn = get_demo_bsn()
 
@@ -217,10 +221,16 @@ async def root(
             "error.html",
             {
                 "request": request,
-                "error_title": "Verbindingsfout",
-                "error_message": f"Kan geen verbinding maken met de server: {error_message}",
-                "error_details": "Controleer of de backend service actief is en probeer het opnieuw.",
+                "error_title": t.get("portal_connection_error", "Verbindingsfout"),
+                "error_message": t.get(
+                    "portal_connection_error_msg", "Kan geen verbinding maken met de server: {detail}"
+                ).format(detail=error_message),
+                "error_details": t.get(
+                    "portal_connection_error_hint", "Controleer of de backend service actief is en probeer het opnieuw."
+                ),
                 "bsn": bsn,
+                "t": t,
+                "lang": lang,
             },
             status_code=500,
         )
@@ -236,10 +246,16 @@ async def root(
             "error.html",
             {
                 "request": request,
-                "error_title": "Onverwachte fout",
-                "error_message": f"Er is een onverwachte fout opgetreden: {str(e)}",
-                "error_details": "Probeer het later opnieuw of neem contact op met de beheerder.",
+                "error_title": t.get("portal_unexpected_error", "Onverwachte fout"),
+                "error_message": t.get(
+                    "portal_unexpected_error_msg", "Er is een onverwachte fout opgetreden: {detail}"
+                ).format(detail=str(e)),
+                "error_details": t.get(
+                    "portal_unexpected_error_hint", "Probeer het later opnieuw of neem contact op met de beheerder."
+                ),
                 "bsn": bsn,
+                "t": t,
+                "lang": lang,
             },
             status_code=500,
         )
@@ -326,6 +342,8 @@ async def root(
             "business_profile": business_profile,
             "demo_mode": is_demo_mode(request),
             "active_profile_config": DemoProfiles.get_active_profile(),
+            "t": t,
+            "lang": lang,
         },
     )
 

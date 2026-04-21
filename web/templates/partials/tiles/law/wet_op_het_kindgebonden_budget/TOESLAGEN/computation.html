@@ -1,20 +1,26 @@
 <div>
     {% if result.kindgebonden_budget_jaar %}
-        <h4 class="text-sm font-medium text-gray-600 mb-2">Uw kindgebonden budget is waarschijnlijk</h4>
+        <h4 class="text-sm font-medium text-gray-600 mb-2">
+            {{ t.comp_your_kindgebonden if t else 'Uw kindgebonden budget is waarschijnlijk' }}
+        </h4>
         <div class="flex items-baseline">
             <span class="text-4xl font-bold text-emerald-600">{{ (result.kindgebonden_budget_jaar / 100) | format_currency }}</span>
-            <span class="ml-2 text-gray-600">per jaar</span>
+            <span class="ml-2 text-gray-600">{{ t.comp_per_year if t else 'per jaar' }}</span>
             <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=explanation"
                     hx-target="#shared-application-panel"
                     hx-swap="innerHTML"
                     class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
-                waarom?
+                {{ t.tile_why if t else 'waarom?' }}
             </button>
         </div>
         {% if result.alo_kop_bedrag and result.alo_kop_bedrag > 0 %}
-            <p class="text-sm text-purple-700 mt-2">Inclusief ALO-kop: {{ (result.alo_kop_bedrag / 100) | format_currency }}</p>
+            <p class="text-sm text-purple-700 mt-2">
+                {{ t.comp_incl_alo_kop if t else 'Inclusief ALO-kop:' }} {{ (result.alo_kop_bedrag / 100) | format_currency }}
+            </p>
         {% endif %}
     {% else %}
-        <h4 class="text-sm font-medium text-gray-500 mb-1">U krijgt waarschijnlijk geen kindgebonden budget.</h4>
+        <h4 class="text-sm font-medium text-gray-500 mb-1">
+            {{ t.comp_no_kindgebonden if t else 'U krijgt waarschijnlijk geen kindgebonden budget.' }}
+        </h4>
     {% endif %}
 </div>

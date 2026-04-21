@@ -8,15 +8,19 @@
                 hx-target="#shared-application-panel"
                 hx-swap="innerHTML"
                 class="w-full px-6 py-3 bg-orange-600 text-white text-center rounded-md hover:bg-orange-700 transition-colors cursor-pointer">
-            Bekijk aanslag
+            {{ t.prec_view_assessment if t else 'Bekijk aanslag' }}
         </button>
     {% else %}
         {% include "partials/tiles/components/minor_blocked_message.html" %}
     {% endif %}
 {% endblock %}
 {% block submitted_status %}
-    <p class="text-sm text-gray-600 text-center">Uw gegevens zijn verwerkt door Gemeente Rotterdam.</p>
+    <p class="text-sm text-gray-600 text-center">
+        {{ t.prec_submitted if t else 'Uw gegevens zijn verwerkt door Gemeente Rotterdam.' }}
+    </p>
 {% endblock %}
 {% block approved_status %}
-    <p class="text-sm text-green-600 text-center">De aanslag precariobelasting is vastgesteld.</p>
+    <p class="text-sm text-green-600 text-center">
+        {{ t.prec_approved if t else 'De aanslag precariobelasting is vastgesteld.' }}
+    </p>
 {% endblock %}

@@ -5,7 +5,9 @@
         {# Top navigation bar #}
         <div class="bg-white shadow">
             <div class="px-6 py-4 flex items-center">
-                <h1 class="text-2xl font-bold">Zaaksysteem - {{ current_service|replace('_', ' ') |title }}</h1>
+                <h1 class="text-2xl font-bold">
+                    {{ t.admin_case_system if t else 'Zaaksysteem' }} - {{ current_service|replace('_', ' ') |title }}
+                </h1>
                 <div class="-mt-2 ml-3">{{ org_logo(current_service) }}</div>
                 <div class="flex-grow"></div>
                 <div class="flex items-center space-x-4">
@@ -40,16 +42,16 @@
                                     <div class="bg-gray-50 p-2 rounded-t border border-gray-200">
                                         <h4 class="font-medium">
                                             {% if status == 'SUBMITTED' %}
-                                                Ingediend
+                                                {{ t.admin_submitted if t else 'Ingediend' }}
                                             {% elif status == 'DECIDED' %}
-                                                Besloten
+                                                {{ t.admin_decided if t else 'Besloten' }}
                                             {% elif status == 'IN_REVIEW' %}
-                                                In behandeling
+                                                {{ t.admin_in_review if t else 'In behandeling' }}
                                             {% elif status == 'OBJECTED' %}
-                                                Onder bezwaar
+                                                {{ t.admin_objected if t else 'Onder bezwaar' }}
                                             {% endif %}
                                         </h4>
-                                        <div class="text-sm text-gray-600">{{ service_cases[law][status]|length }} cases</div>
+                                        <div class="text-sm text-gray-600">{{ service_cases[law][status]|length }} {{ t.admin_cases if t else 'cases' }}</div>
                                     </div>
                                     <div class="lane bg-white p-2 min-h-64 border-x border-b border-gray-200 rounded-b"
                                          data-status="{{ status }}">
