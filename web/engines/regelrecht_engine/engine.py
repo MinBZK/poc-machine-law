@@ -177,41 +177,171 @@ def _classify_input(spec: dict[str, Any]) -> tuple[str, dict[str, Any]]:
 def _rust_trace_to_pathnode(trace: dict, input_specs: dict[str, dict[str, Any]]) -> PathNode:
     """Convert a Rust engine trace tree into a web PathNode tree.
 
-    The Rust trace contains every operation (AND, IF, SUBTRACT, ...) as
-    nested nodes. The dashboard template ``render_path`` only wants the
-    law's *resolved inputs* — the values that flowed in from cross-law
-    references, data sources, and claims. We walk the trace to collect
-    each declared input's resolved value, then classify it by its YAML
-    source block so the UI can label the origin.
+    The Rust trace already contains every cross-law resolution as a
+    nested ``cross_law_reference`` node whose children expose the inputs
+    that the referenced law resolved. This mirrors the hierarchical
+    "Gebruikte gegevens" layout the dashboard wants, so the mapping is
+    one-to-one:
+
+    - Each input declared on the current article becomes a ``resolve``
+      or ``service_evaluation`` PathNode on the root.
+    - If the input is a cross-law reference, we locate the matching
+      ``cross_law_reference`` trace node by ``{regulation}#{output}``
+      and recurse into it: its own resolved inputs become nested
+      children on the parent node.
+    - Data-source / direct inputs stay as single ``resolve`` leaves.
     """
     root = PathNode(type="root", name="evaluation", result=None)
-    resolved_values: dict[str, Any] = {}
 
-    def _walk(node: dict) -> None:
+    # Build a lookup of cross_law_reference nodes in the trace keyed by
+    # "{regulation}#{output}" so we can attach nested traces to inputs.
+    cross_law_nodes: dict[str, list[dict]] = {}
+    resolve_nodes: dict[str, Any] = {}
+
+    def _index(node: dict, in_crosslaw: str | None) -> None:
         if not isinstance(node, dict):
             return
-        if node.get("node_type") == "resolve":
-            name = node.get("name", "")
-            if name in input_specs and name not in resolved_values:
-                resolved_values[name] = node.get("result")
+        nt = node.get("node_type")
+        name = node.get("name", "")
+        if nt == "cross_law_reference":
+            cross_law_nodes.setdefault(name, []).append(node)
+            for child in node.get("children", []):
+                _index(child, name)
+            return
+        if nt == "resolve" and in_crosslaw is None and name not in resolve_nodes:
+            resolve_nodes[name] = node.get("result")
         for child in node.get("children", []):
-            _walk(child)
+            _index(child, in_crosslaw)
 
-    _walk(trace)
+    _index(trace, None)
 
     for name, spec in input_specs.items():
-        if name not in resolved_values:
-            continue
         resolve_type, details = _classify_input(spec)
         details["path"] = f"${name}"
-        root.children.append(
-            PathNode(
-                type="resolve",
+        required = bool(spec.get("required", False))
+
+        if resolve_type == "SERVICE":
+            source = spec.get("source") or {}
+            regulation = source.get("regulation")
+            output = source.get("output", name)
+            key = f"{regulation}#{output}"
+            cross_nodes = cross_law_nodes.get(key) or []
+            cross_node = cross_nodes[0] if cross_nodes else None
+            result = cross_node.get("result") if cross_node else resolve_nodes.get(name)
+            node = PathNode(
+                type="service_evaluation",
                 name=name,
-                result=resolved_values[name],
+                result=result,
                 resolve_type=resolve_type,
-                required=bool(spec.get("required", False)),
+                required=required,
                 details=details,
             )
-        )
+            if cross_node:
+                node.children = _crosslaw_children_as_pathnodes(cross_node, regulation)
+            root.children.append(node)
+        else:
+            if name not in resolve_nodes:
+                continue
+            root.children.append(
+                PathNode(
+                    type="resolve",
+                    name=name,
+                    result=resolve_nodes[name],
+                    resolve_type=resolve_type,
+                    required=required,
+                    details=details,
+                )
+            )
     return root
+
+
+def _crosslaw_children_as_pathnodes(cross_node: dict, regulation: str) -> list[PathNode]:
+    """Return the resolved inputs of a cross_law_reference as PathNodes.
+
+    Nested cross_law_reference children recurse so the dashboard shows
+    the full depth (wet_brp → wet_inkomstenbelasting → ...).
+    """
+    # Load the referenced law YAML once so we can classify each input.
+    nested_specs = _input_specs_for_law(regulation)
+    children: list[PathNode] = []
+    seen: set[str] = set()
+
+    for child in cross_node.get("children", []):
+        if not isinstance(child, dict):
+            continue
+        nt = child.get("node_type")
+        cname = child.get("name", "")
+
+        if nt == "resolve":
+            if cname in seen:
+                continue
+            seen.add(cname)
+            spec = nested_specs.get(cname, {})
+            resolve_type, details = _classify_input(spec) if spec else ("NONE", {"type": None, "type_spec": None})
+            details["path"] = f"${cname}"
+            children.append(
+                PathNode(
+                    type="resolve",
+                    name=cname,
+                    result=child.get("result"),
+                    resolve_type=resolve_type,
+                    required=bool(spec.get("required", False)) if spec else False,
+                    details=details,
+                )
+            )
+        elif nt == "cross_law_reference":
+            # Cross-law ref within cross-law: find the input name on the
+            # outer law whose source.regulation+output matches this key.
+            reg, _, out = cname.partition("#")
+            nested_input_name = _find_input_for_crosslaw(nested_specs, reg, out) or out
+            if nested_input_name in seen:
+                continue
+            seen.add(nested_input_name)
+            spec = nested_specs.get(nested_input_name, {})
+            resolve_type, details = _classify_input(spec) if spec else ("SERVICE", {"type": None, "type_spec": None})
+            details["path"] = f"${nested_input_name}"
+            node = PathNode(
+                type="service_evaluation",
+                name=nested_input_name,
+                result=child.get("result"),
+                resolve_type="SERVICE",
+                required=bool(spec.get("required", False)) if spec else False,
+                details=details,
+            )
+            node.children = _crosslaw_children_as_pathnodes(child, reg)
+            children.append(node)
+
+    return children
+
+
+def _find_input_for_crosslaw(specs: dict[str, dict[str, Any]], regulation: str, output: str) -> str | None:
+    """Find the outer input whose ``source`` matches ``regulation#output``."""
+    for name, spec in specs.items():
+        source = spec.get("source") or {}
+        if source.get("regulation") == regulation and source.get("output", name) == output:
+            return name
+    return None
+
+
+_INPUT_SPEC_CACHE: dict[str, dict[str, dict[str, Any]]] = {}
+
+
+def _input_specs_for_law(law_id: str) -> dict[str, dict[str, Any]]:
+    """Return cached input specs for a law identified by its ``$id``."""
+    if law_id in _INPUT_SPEC_CACHE:
+        return _INPUT_SPEC_CACHE[law_id]
+
+    from machine.utils import RuleResolver
+
+    specs: dict[str, dict[str, Any]] = {}
+    try:
+        resolver = RuleResolver()
+        rules = [r for r in resolver.rules if r.law == law_id]
+        if rules:
+            latest = max(rules, key=lambda r: r.valid_from)
+            specs = _collect_input_specs(latest.path)
+    except Exception as exc:
+        logger.debug("Could not load input specs for %s: %s", law_id, exc)
+
+    _INPUT_SPEC_CACHE[law_id] = specs
+    return specs
