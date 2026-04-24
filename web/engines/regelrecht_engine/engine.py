@@ -237,7 +237,7 @@ def _rust_trace_to_pathnode(trace: dict, input_specs: dict[str, dict[str, Any]])
                 details=details,
             )
             if cross_node:
-                node.children = _crosslaw_children_as_pathnodes(cross_node, regulation)
+                node.children = _crosslaw_children_as_pathnodes(cross_node, regulation, output)
             root.children.append(node)
         else:
             if name not in resolve_nodes:
@@ -255,72 +255,104 @@ def _rust_trace_to_pathnode(trace: dict, input_specs: dict[str, dict[str, Any]])
     return root
 
 
-def _crosslaw_children_as_pathnodes(cross_node: dict, regulation: str) -> list[PathNode]:
-    """Return the resolved inputs of a cross_law_reference as PathNodes.
+def _crosslaw_children_as_pathnodes(cross_node: dict, regulation: str, output: str) -> list[PathNode]:
+    """Return the "break-down" children for a cross-law service.
 
-    Nested cross_law_reference children recurse so the dashboard shows
-    the full depth (wet_brp → wet_inkomstenbelasting → ...).
+    The prod dashboard shows, under a cross-law expansion, only the
+    *component outputs* that make up the requested output — not every
+    internal input or downstream cross-law the referenced law happens
+    to consume. For ``wet_inkomstenbelasting#inkomen`` that means
+    ``box1_inkomen``, ``box2_inkomen``, ``box3_inkomen``,
+    ``buitenlands_inkomen``, etc., because these are the outputs whose
+    sum is the parent ``inkomen``.
+
+    The Rust trace exposes these as ``action`` nodes with a distinct
+    output name. We surface the action nodes, skip the main output
+    itself (it's already the parent), and drop raw ``resolve`` /
+    nested ``cross_law_reference`` nodes.
     """
-    # Load the referenced law YAML once so we can classify each input.
     nested_specs = _input_specs_for_law(regulation)
+    # Load the referenced law's own output declarations so we can
+    # classify each action output as amount / boolean / etc.
+    nested_outputs = _output_specs_for_law(regulation)
+
     children: list[PathNode] = []
     seen: set[str] = set()
 
-    for child in cross_node.get("children", []):
-        if not isinstance(child, dict):
-            continue
-        nt = child.get("node_type")
-        cname = child.get("name", "")
-
-        if nt == "resolve":
-            if cname in seen:
-                continue
-            seen.add(cname)
-            spec = nested_specs.get(cname, {})
-            resolve_type, details = _classify_input(spec) if spec else ("NONE", {"type": None, "type_spec": None})
-            details["path"] = f"${cname}"
+    def _walk_actions(node: dict) -> None:
+        if not isinstance(node, dict):
+            return
+        nt = node.get("node_type")
+        name = node.get("name", "")
+        if nt == "action" and name and name != output and name not in seen:
+            seen.add(name)
+            out_spec = nested_outputs.get(name, {})
+            details = {
+                "type": out_spec.get("type"),
+                "type_spec": out_spec.get("type_spec"),
+                "path": f"${name}",
+            }
             children.append(
                 PathNode(
                     type="resolve",
-                    name=cname,
-                    result=child.get("result"),
-                    resolve_type=resolve_type,
-                    required=bool(spec.get("required", False)) if spec else False,
+                    name=name,
+                    result=node.get("result"),
+                    resolve_type="NONE",
+                    required=False,
                     details=details,
                 )
             )
-        elif nt == "cross_law_reference":
-            # Cross-law ref within cross-law: find the input name on the
-            # outer law whose source.regulation+output matches this key.
-            reg, _, out = cname.partition("#")
-            nested_input_name = _find_input_for_crosslaw(nested_specs, reg, out) or out
-            if nested_input_name in seen:
-                continue
-            seen.add(nested_input_name)
-            spec = nested_specs.get(nested_input_name, {})
-            resolve_type, details = _classify_input(spec) if spec else ("SERVICE", {"type": None, "type_spec": None})
-            details["path"] = f"${nested_input_name}"
-            node = PathNode(
-                type="service_evaluation",
-                name=nested_input_name,
-                result=child.get("result"),
-                resolve_type="SERVICE",
-                required=bool(spec.get("required", False)) if spec else False,
-                details=details,
-            )
-            node.children = _crosslaw_children_as_pathnodes(child, reg)
-            children.append(node)
+            return  # don't descend into the action's own operation tree
+        # Skip nested cross-law bodies so we stay at a single level of
+        # breakdown; the outermost cross_node is still walked.
+        if nt == "cross_law_reference" and node is not cross_node:
+            return
+        for child in node.get("children", []):
+            _walk_actions(child)
 
+    # Also fall back to nested input name matching for cases where the
+    # referenced law doesn't compute its result through discrete
+    # actions (e.g. single-expression laws).
+    _walk_actions(cross_node)
+    # Preserve YAML declaration order when available.
+    if nested_outputs:
+        order = {name: i for i, name in enumerate(nested_outputs)}
+        children.sort(key=lambda n: order.get(n.name, len(order)))
+    # Consume nested_specs reference to keep the helper's contract
+    # stable — future callers may want to classify extra nodes.
+    _ = nested_specs
     return children
 
 
-def _find_input_for_crosslaw(specs: dict[str, dict[str, Any]], regulation: str, output: str) -> str | None:
-    """Find the outer input whose ``source`` matches ``regulation#output``."""
-    for name, spec in specs.items():
-        source = spec.get("source") or {}
-        if source.get("regulation") == regulation and source.get("output", name) == output:
-            return name
-    return None
+def _output_specs_for_law(law_id: str) -> dict[str, dict[str, Any]]:
+    """Return ``{output_name: spec}`` for a law identified by ``$id``."""
+    if law_id in _OUTPUT_SPEC_CACHE:
+        return _OUTPUT_SPEC_CACHE[law_id]
+
+    from machine.utils import RuleResolver
+
+    specs: dict[str, dict[str, Any]] = {}
+    try:
+        resolver = RuleResolver()
+        rules = [r for r in resolver.rules if r.law == law_id]
+        if rules:
+            latest = max(rules, key=lambda r: r.valid_from)
+            data = yaml.safe_load(Path(latest.path).read_text())
+            if isinstance(data, dict):
+                for article in data.get("articles", []):
+                    execution = article.get("machine_readable", {}).get("execution", {})
+                    for out in execution.get("output", []):
+                        name = out.get("name")
+                        if name:
+                            specs[name] = out
+    except Exception as exc:
+        logger.debug("Could not load output specs for %s: %s", law_id, exc)
+
+    _OUTPUT_SPEC_CACHE[law_id] = specs
+    return specs
+
+
+_OUTPUT_SPEC_CACHE: dict[str, dict[str, dict[str, Any]]] = {}
 
 
 _INPUT_SPEC_CACHE: dict[str, dict[str, dict[str, Any]]] = {}
