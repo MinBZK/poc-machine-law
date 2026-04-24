@@ -120,15 +120,21 @@ def _compute_changed_values(
 def get_tile_template(service: str, law: str) -> str:
     """
     Get the appropriate tile template for the service and law.
-    Falls back to a generic template if no specific template exists.
-    """
-    specific_template = f"partials/tiles/law/{law}/{service}.html"
 
-    try:
-        templates.get_template(specific_template)
-        return specific_template
-    except TemplateNotFound:
-        return "partials/tiles/fallback_tile.html"
+    Tries the full path first, then walks up each segment of the law
+    id so a template at `participatiewet/bijstand/{service}.html` also
+    serves `participatiewet/bijstand/amsterdam`. Returns the generic
+    fallback when nothing matches.
+    """
+    segments = law.split("/")
+    for i in range(len(segments), 0, -1):
+        candidate = f"partials/tiles/law/{'/'.join(segments[:i])}/{service}.html"
+        try:
+            templates.get_template(candidate)
+            return candidate
+        except TemplateNotFound:
+            continue
+    return "partials/tiles/fallback_tile.html"
 
 
 def evaluate_law(
