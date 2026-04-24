@@ -139,7 +139,7 @@ class PythonMachineService(EngineInterface):
         Get laws discoverable by citizens using the embedded Python machine.service library.
 
         Args:
-            discoverable_by: The type of entity discovering laws (CITIZEN, BUSINESS, DELEGATION_PROVIDER)
+            discoverable_by: The type of entity discovering laws (CITIZEN, BUSINESS, REPRESENTATION_PROVIDER)
             filter_disabled: If True, filter out laws disabled via feature flags. Set to False for admin UI.
 
         Returns:

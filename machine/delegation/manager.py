@@ -3,7 +3,7 @@
 This module provides the DelegationManager class which determines what entities
 a user can act on behalf of by evaluating delegation provider laws via the RulesEngine.
 
-The DelegationManager discovers and evaluates all laws with discoverable: "DELEGATION_PROVIDER"
+The DelegationManager discovers and evaluates all laws with discoverable: "REPRESENTATION_PROVIDER"
 and uses a standard interface to parse the results into Delegation objects.
 """
 
@@ -48,7 +48,7 @@ class DelegationManager:
     def get_delegations_for_user(self, bsn: str, reference_date: date | None = None) -> list[Delegation]:
         """Get all delegations available for a user.
 
-        This method discovers all DELEGATION_PROVIDER laws and evaluates each one
+        This method discovers all REPRESENTATION_PROVIDER laws and evaluates each one
         to find all entities the user can act on behalf of. This includes:
         - SELF delegation (from minderjarigheid law) representing the user acting as themselves
         - BUSINESS delegations (from machtigingenwet) for businesses the user can represent
@@ -67,7 +67,7 @@ class DelegationManager:
         delegations: list[Delegation] = []
 
         # Discover and evaluate all delegation provider laws
-        delegation_laws = self.services.get_discoverable_service_laws("DELEGATION_PROVIDER")
+        delegation_laws = self.services.get_discoverable_service_laws("REPRESENTATION_PROVIDER")
 
         for service, laws in delegation_laws.items():
             for law in laws:
@@ -105,6 +105,7 @@ class DelegationManager:
                 subject_type="SELF",
                 subject_name="Mezelf",
                 delegation_type="EIGEN_ZAKEN",
+                legal_category="BEVOEGDHEID",
                 permissions=ordered_permissions,
                 valid_from=None,
                 valid_until=None,
@@ -135,6 +136,13 @@ class DelegationManager:
         """
         delegations: list[Delegation] = []
 
+        # Look up legal_category from the RuleSpec
+        try:
+            rule_spec = self.services.resolver.find_rule(law, reference_date.strftime("%Y-%m-%d"), service)
+            legal_category = rule_spec.legal_category if rule_spec else ""
+        except Exception:
+            legal_category = ""
+
         try:
             result = self.services.evaluate(
                 service=service,
@@ -164,6 +172,7 @@ class DelegationManager:
                     subject_type=subject_types[i],
                     subject_name=subject_names[i],
                     delegation_type=delegation_types[i],
+                    legal_category=legal_category,
                     permissions=list(permissions[i]) if permissions[i] else [],
                     valid_from=self._parse_date(valid_from_dates[i]),
                     valid_until=self._parse_date(valid_until_dates[i]),
@@ -298,6 +307,7 @@ class DelegationManager:
                     subject_type=delegation.subject_type,
                     subject_name=delegation.subject_name,
                     delegation_type=delegation.delegation_type,
+                    legal_category=delegation.legal_category,
                     permissions=delegation.permissions,
                 )
 
