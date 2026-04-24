@@ -94,6 +94,24 @@ logger = IndentLogger(logging.getLogger("rules_engine"))
 LAWS_DIR = Path("laws")
 
 
+from contextlib import contextmanager
+
+
+@contextmanager
+def _restore_on_exit(services: "RegelrechtServices"):
+    """Yield then roll back any data-source mutations made during the body.
+
+    Used around ``evaluate`` to guarantee that claim-driven patches to
+    registered DataFrames don't leak across evaluations.
+    """
+    try:
+        yield
+    finally:
+        if services._patched_source_backups:
+            services._restore_patched_data_sources()
+            services._sync_engine_data_sources()
+
+
 class RegelrechtServices:
     """Drop-in replacement for Services using the regelrecht Rust engine."""
 
@@ -102,6 +120,7 @@ class RegelrechtServices:
         self.resolver = self._services.resolver
         self.root_reference_date = reference_date
         self._engine = RegelrechtEngine()
+        self._patched_source_backups: dict[tuple[str, str], pd.DataFrame] = {}
         self._load_all_laws()
 
     def _load_all_laws(self) -> None:
@@ -186,6 +205,19 @@ class RegelrechtServices:
         self._services.set_source_dataframe(service, table, df)
         self._register_dataframe(table, df)
 
+    def _restore_patched_data_sources(self) -> None:
+        """Undo dataframe mutations made by the previous claim patching.
+
+        Called from ``evaluate`` at teardown so claim-driven row edits
+        never leak into the next evaluation (different BSN, different
+        approval mode, next request on a long-running web server).
+        """
+        for (service, table), df in list(self._patched_source_backups.items()):
+            svc = self._services.services.get(service)
+            if svc is not None and table in svc.source_dataframes:
+                svc.source_dataframes[table] = df
+        self._patched_source_backups.clear()
+
     def _apply_claims_to_data_sources(self, bsn: str, reference_date: str, approved: bool) -> bool:
         """Mutate registered DataFrames so cross-law lookups see claim values.
 
@@ -236,6 +268,12 @@ class RegelrechtServices:
             mask = df["bsn"].astype(str) == str(bsn)
             if not mask.any():
                 continue
+            # Back up the original row once so evaluate()'s teardown
+            # can roll back. Without this the mutation leaks into
+            # subsequent evaluations.
+            backup_key = (claim.service, table)
+            if backup_key not in self._patched_source_backups:
+                self._patched_source_backups[backup_key] = df
             new_df = df.copy()
             new_df.loc[mask, field] = _to_native(claim.new_value)
             svc.source_dataframes[table] = new_df
@@ -269,7 +307,7 @@ class RegelrechtServices:
         if not rule:
             raise ValueError(f"No rule found for {law}")
 
-        with logger.indent_block(f"{service}: {law} ({reference_date})", double_line=True):
+        with _restore_on_exit(self), logger.indent_block(f"{service}: {law} ({reference_date})", double_line=True):
             # Sync engine data sources
             self._sync_engine_data_sources()
 
