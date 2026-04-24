@@ -45,6 +45,41 @@ class FeatureFlags:
         ("AWB", "algemene_wet_bestuursrecht"): False,
         ("RVO", "omgevingswet/werkgebonden_personenmobiliteit/gegevens"): False,
         ("RvIG", "wet_brp"): False,
+        # Terugmelding infrastructure (not citizen-facing)
+        ("BELASTINGDIENST", "wet_brp/terugmelding/belastingdienst"): False,
+        ("CJIB", "wet_brp/terugmelding/cjib"): False,
+        ("TOESLAGEN", "wet_brp/terugmelding/toeslagen"): False,
+        ("RvIG", "wet_brp/laa"): False,
+        # AWB bezwaar/beroep are procedural laws that only apply when there
+        # is an existing decision to object to. They belong under a per-case
+        # action, not in the citizen's "which rights do I have" dashboard.
+        ("JenV", "awb/bezwaar"): False,
+        ("JenV", "awb/beroep"): False,
+        # Status/infra laws that only produce 'heeft X: ja/nee' outputs.
+        # They're consumed as cross-law inputs by other laws and don't
+        # add anything on a citizen dashboard by themselves.
+        ("UWV", "wet_werk_en_inkomen_naar_arbeidsvermogen"): False,
+        ("UWV", "ziektewet"): False,
+        ("RVZ", "zvw"): False,
+        # Archiefwet governs government records management, not citizen
+        # rights — it has no place in the "which rights do I have" dashboard.
+        ("NATIONAAL_ARCHIEF", "archiefwet/openbaarheid"): False,
+        ("NATIONAAL_ARCHIEF", "archiefwet/overbrenging"): False,
+        ("NATIONAAL_ARCHIEF", "archiefwet/vernietiging"): False,
+        # Data source helpers / internal sub-laws consumed by other laws
+        ("BELASTINGDIENST", "belastingdienst_vermogen"): False,
+        ("KVK", "handelsregisterwet/bedrijfsgegevens"): False,
+        ("SVB", "algemene_ouderdomswet_gegevens"): False,
+        ("SVB", "algemene_ouderdomswet/leeftijdsbepaling"): False,
+        ("UWV", "uwv_werkgegevens"): False,
+        ("UWV", "uwv_toetsingsinkomen"): False,
+        ("UWV", "wet_inkomstenbelasting/toetsingsinkomen"): False,
+        ("UWV", "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen"): False,
+        (
+            "VWS",
+            "zorgtoeslagwet/regelingen/regeling_vaststelling_standaardpremie_en_bestuursrechtelijke_premies",
+        ): False,
+        ("CBS", "wet_op_het_centraal_bureau_voor_de_statistiek"): False,
     }
 
     @classmethod

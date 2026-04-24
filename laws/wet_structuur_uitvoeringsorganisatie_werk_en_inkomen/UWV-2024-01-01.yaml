@@ -1,181 +1,172 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
-uuid: c19a458e-3f5e-4d99-a7c3-67a4288aaa07
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
+$id: wet_structuur_uitvoeringsorganisatie_werk_en_inkomen
+regulatory_layer: WET
+publication_date: '2024-01-01'
+valid_from: '2024-01-01'
 name: Bepalen verzekerde jaren 2025
-law: wet_structuur_uitvoeringsorganisatie_werk_en_inkomen
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "TOEKENNING"
-valid_from: 2024-01-01
-service: "UWV"
-legal_basis:
-  law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
-  bwb_id: "BWBR0013060"
-  article: "33"
-  url: "https://wetten.overheid.nl/BWBR0013060/2024-01-01#Hoofdstuk4_Paragraaf4.2_Artikel33"
-  juriconnect: "jci1.3:c:BWBR0013060&artikel=33&z=2024-01-01&g=2024-01-01"
-  explanation: "Artikel 33 Wet SUWI bepaalt de gegevensuitwisseling tussen uitvoeringsorganen voor de uitvoering van sociale verzekeringswetten"
-description: >
-  Regels voor het bepalen van verzekerde jaren voor de AOW op basis van werk- en
-  uitkeringsperiodes volgens de Wet SUWI. Dit omvat periodes van werk in Nederland,
-  grensarbeid, detachering en periodes van uitkeringen zoals WW, WIA, etc.
-
-references:
-  - law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
-    article: "33"
-    url: "https://wetten.overheid.nl/BWBR0013060/2024-01-01#Hoofdstuk4_Paragraaf4.2_Artikel33"
-
-properties:
-  parameters:
-    - name: "BSN"
-      description: "BSN van de persoon"
-      type: "string"
-      required: true
-      legal_basis:
-        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
-        bwb_id: "BWBR0013060"
-        article: "62"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0013060/2024-01-01#Hoofdstuk5_Paragraaf5.4_Artikel62"
-        juriconnect: "jci1.3:c:BWBR0013060&artikel=62&lid=1&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 62 lid 1 Wet SUWI bepaalt dat het BSN wordt gebruikt voor gegevensverwerking"
-
-  sources:
-    - name: "DIENSTVERBANDPERIODES"
-      description: "Periodes van werk in Nederland en verzekerde buitenlandse arbeid"
-      type: "array"
-      legal_basis:
-        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
-        bwb_id: "BWBR0013060"
-        article: "54"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0013060/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel54"
-        juriconnect: "jci1.3:c:BWBR0013060&artikel=54&lid=1&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 54 lid 1 Wet SUWI bepaalt dat UWV gegevens verwerkt over arbeidsverleden voor de uitvoering van sociale verzekeringen"
-      temporal:
-        type: "period"
-        period_type: "continuous"
-      source_reference:
-        table: "dienstverbanden"
-        fields: ["start_date", "end_date"]
-        select_on:
-          - name: "bsn"
-            description: "Burgerservicenummer van de persoon"
-            type: "string"
-            value: "$BSN"
-
-    - name: "UITKERINGSPERIODES"
-      description: "Periodes van uitkeringen die meetellen voor de AOW"
-      type: "array"
-      legal_basis:
-        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
-        bwb_id: "BWBR0013060"
-        article: "54"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0013060/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel54"
-        juriconnect: "jci1.3:c:BWBR0013060&artikel=54&lid=1&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 54 lid 1 Wet SUWI bepaalt dat UWV gegevens verwerkt over uitkeringsperiodes voor de uitvoering van sociale verzekeringen"
-      temporal:
-        type: "period"
-        period_type: "continuous"
-      source_reference:
-        table: "uitkeringen"
-        fields: ["start_date", "end_date"]
-        select_on:
-          - name: "bsn"
-            description: "Burgerservicenummer van de persoon"
-            type: "string"
-            value: "$BSN"
-          - name: "type"
-            description: "Uitkerkingen die meetellen"
-            type: "string"
+bwb_id: BWBR0013060
+url: https://wetten.overheid.nl/BWBR0013060/2024-01-01
+service: UWV
+uuid: c19a458e-3f5e-4d99-a7c3-67a4288aaa07
+articles:
+- number: '33'
+  text: "1 Het Uitvoeringsinstituut werknemersverzekeringen draagt zorg voor de inrichting\
+    \ en adequate werking van de polisadministratie.\n2 De polisadministratie heeft\
+    \ tot doel:\n  a. van de werknemer gegevens over zijn arbeidsverhouding en uitkeringsverhouding\
+    \ – daaronder begrepen duur, loon en premies werknemersverzekeringen – vast te\
+    \ leggen ten behoeve van de werknemersverzekeringen en de uitvoering van taken\
+    \ die bij of krachtens enige andere wet dan bedoeld in artikel 30, eerste lid,\
+    \ aan het Uitvoeringsinstituut werknemersverzekeringen zijn opgedragen;\n  b.\
+    \ besluiten over recht op uitkering of verstrekking te baseren op gegevens als\
+    \ bedoeld in onderdeel a met het oog waarop de werknemer wordt geïnformeerd over\
+    \ die gegevens en het al dan niet verzekerd zijn voor de werknemersverzekeringen;\n\
+    \  c. de verwerking van gegevens van de persoon die vrijwillig verzekerd is voor\
+    \ de Ziektewet, de Wet werk en inkomen naar arbeidsvermogen, Werkloosheidswet\
+    \ en Wet op de arbeidsongeschiktheidsverzekering waarbij de onderdelen a en b\
+    \ van overeenkomstige toepassing zijn;\n  d. de verwerking van gegevens van de\
+    \ werknemer over genoten loon in de zin van de Wet op de loonbelasting 1964, ingehouden\
+    \ loonbelasting, premie volksverzekeringen in de zin van de Wet financiering sociale\
+    \ verzekeringen, inkomensafhankelijke bijdrage als bedoeld in de Zorgverzekeringswet,\
+    \ alsmede andere gegevens van belang voor de heffing van de inkomstenbelasting\
+    \ ten behoeve van de uitvoering van de taken van de Belastingdienst;\n  e. de\
+    \ verwerking van overige gegevens van de werknemers van belang voor statistische\
+    \ doeleinden op het gebied van arbeid en lonen ten behoeve van het Centraal bureau\
+    \ voor de statistiek.\n3 Het Uitvoeringsinstituut werknemersverzekeringen is de\
+    \ verwerkingsverantwoordelijke voorzover het betreft de verwerking van de gegevens,\
+    \ bedoeld in het tweede lid, onderdelen a, b en c, en de verwerker voorzover het\
+    \ betreft de verwerking van de gegevens, bedoeld in het tweede lid, onderdelen\
+    \ d en e.\n4 De verwerkingsverantwoordelijke voor de verwerking van de gegevens,\
+    \ bedoeld in het tweede lid, d en e, zijn respectievelijk Onze Minister van Financiën\
+    \ en het Centraal bureau voor de statistiek.\n5 De Belastingdienst verstrekt aan\
+    \ het Uitvoeringsinstituut werknemersverzekeringen, in het kader van zijn taak\
+    \ bedoeld in het eerste lid, alle gegevens en inlichtingen, die verkregen zijn\
+    \ bij de uitvoering van de heffing van loonbelasting en van de artikelen 58, tweede\
+    \ lid, en 59 van de Wet financiering sociale verzekeringen, voorzover die gegevens\
+    \ en inlichtingen noodzakelijk zijn voor de verwerking van gegevens in de polisadministratie.\n\
+    6 De basisregistratie personen wordt ter verificatie geraadpleegd voor de verwerking\
+    \ van gegevens door het Uitvoeringsinstituut werknemersverzekeringen op grond\
+    \ van dit artikel.\n7 Het Uitvoeringsinstituut werknemersverzekeringen verstrekt\
+    \ aan de Belastingdienst alle gegevens en inlichtingen, die noodzakelijk zijn\
+    \ ten behoeve van de uitvoering van de taken van de Belastingdienst.\n8 De gegevens,\
+    \ bedoeld in het tweede lid, onderdeel e, kunnen door het Uitvoeringsinstituut\
+    \ werknemersverzekeringen, de Sociale verzekeringsbank en de colleges van burgemeester\
+    \ en wethouders tevens verwerkt worden voor de uitvoering van de taken, bedoeld\
+    \ in artikel 62.\n9 Het Uitvoeringsinstituut werknemersverzekeringen verstrekt\
+    \ Onze Minister en bestuursorganen als bedoeld in de artikelen, 62, 72 en 73,\
+    \ zevende lid, gegevens die op grond van het tweede lid, onderdelen a tot en met\
+    \ c, verwerkt worden in de polisadministratie, tenzij de gegevens, bedoeld in\
+    \ het tweede lid, onderdeel e, tevens verwerkt kunnen worden op grond van het\
+    \ achtste lid.\n10 Gegevens als bedoeld in het tweede lid, onderdeel e, over lonen\
+    \ kunnen voor de uitvoering van de pensioenregelingen of beroepspensioenregelingen\
+    \ tevens verwerkt worden door de pensioenuitvoerders en beroepspensioenfondsen,\
+    \ genoemd in artikel 73, eerste lid, onderdeel a, en voor regelingen inzake vervroegd\
+    \ uittreden op grond van een algemeen verbindend voorschrift door de stichtingen,\
+    \ genoemd in artikel 73, eerste lid, onderdeel b. Artikel 73, eerste en vijfde\
+    \ lid, is van overeenkomstige toepassing.\n11 Bij of krachtens algemene maatregel\
+    \ van bestuur worden nadere regels gesteld, in ieder geval over de inrichting,\
+    \ de gegevensset en de wijze van verkrijging van de gegevens van de polisadministratie.\
+    \ Tevens worden regels gesteld over het elektronische gegevensverkeer, de daarbij\
+    \ te gebruiken elektronische infrastructuur en de eisen die aan de gegevensverstrekking\
+    \ uit de polisadministratie worden gesteld."
+  url: https://wetten.overheid.nl/BWBR0013060/2024-01-01#Artikel33
+  machine_readable:
+    definitions:
+      geldige_uitkering_typen:
+      - WW
+      - WIA
+      - WAO
+      - ZW
+      - WAZO
+      dagen_per_jaar: 365.25
+      uren_per_dag: 8
+    execution:
+      produces:
+        legal_character: BESCHIKKING
+        decision_type: TOEKENNING
+      parameters:
+      - name: bsn
+        type: string
+        required: true
+      input:
+      - name: dienstverbandperiodes
+        type: array
+        source:
+          table: dienstverbanden
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - start_date
+          - end_date
+      - name: uitkeringsperiodes
+        type: array
+        source:
+          table: uitkeringen
+          select_on:
+          - name: bsn
+            value: $bsn
+          - name: type
             value:
               operation: IN
-              values: "$GELDIGE_UITKERING_TYPEN"
-
-  output:
-    - name: "verzekerde_jaren"
-      description: "Aantal verzekerde jaren voor AOW-opbouw op basis van werk en uitkeringen"
-      type: "number"
-      legal_basis:
-        law: "Algemene Ouderdomswet"
-        bwb_id: "BWBR0002221"
-        article: "13"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel13"
-        juriconnect: "jci1.3:c:BWBR0002221&artikel=13&lid=1&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 13 lid 1 AOW bepaalt dat verzekerde jaren meetellen voor de opbouw van het ouderdomspensioen"
-      type_spec:
-        precision: 2
-        min: 0
-        max: 50
-      temporal:
-        type: "period"
-        period_type: "continuous"
-
-    - name: "gewerkte_uren"
-      description: "Totaal gewerkte uren per jaar"
-      type: "number"
-      legal_basis:
-        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
-        bwb_id: "BWBR0013060"
-        article: "54"
-        url: "https://wetten.overheid.nl/BWBR0013060/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel54"
-        juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 54 Wet SUWI bepaalt dat UWV arbeidsgegevens verwerkt waaronder gewerkte uren"
-      type_spec:
-        min: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-
-  definitions:
-    GELDIGE_UITKERING_TYPEN:
-      - "WW"
-      - "WIA"
-      - "WAO"
-      - "ZW"
-      - "WAZO"
-    DAGEN_PER_JAAR: 365.25
-    UREN_PER_DAG: 8
-
-actions:
-  - output: "verzekerde_jaren"
-    operation: DIVIDE
-    values:
-      - operation: ADD
-        values:
-          # Add up employment periodss
-          - operation: FOREACH
-            combine: ADD
-            subject: "$DIENSTVERBANDPERIODES"
-            value:
-              - operation: SUBTRACT_DATE
-                unit: "days"
-                values:
-                  - "$end_date"
-                  - "$start_date"
-          # Add up benefit periods
-          - operation: FOREACH
-            combine: ADD
-            subject: "$UITKERINGSPERIODES"
-            value:
-              - operation: SUBTRACT_DATE
-                unit: "days"
-                values:
-                  - "$end_date"
-                  - "$start_date"
-      - "$DAGEN_PER_JAAR"
-
-  - output: "gewerkte_uren"
-    operation: MULTIPLY
-    values:
-      - operation: FOREACH
-        combine: ADD
-        subject: "$DIENSTVERBANDPERIODES"
+              values: $geldige_uitkering_typen
+          fields:
+          - start_date
+          - end_date
+      output:
+      - name: verzekerde_jaren
+        type: number
+        type_spec:
+          precision: 2
+          min: 0
+          max: 50
+      - name: gewerkte_uren
+        type: number
+        type_spec:
+          min: 0
+      actions:
+      - output: verzekerde_jaren
         value:
-          - operation: SUBTRACT_DATE
-            unit: "days"
+          operation: DIVIDE
+          values:
+          - operation: ADD
             values:
-              - "$end_date"
-              - "$start_date"
-      - "$UREN_PER_DAG"
+            - operation: FOREACH
+              collection: $dienstverbandperiodes
+              body:
+                operation: SUBTRACT_DATE
+                unit: days
+                values:
+                - $end_date
+                - $start_date
+              combine: ADD
+            - operation: FOREACH
+              collection: $uitkeringsperiodes
+              body:
+                operation: SUBTRACT_DATE
+                unit: days
+                values:
+                - $end_date
+                - $start_date
+              combine: ADD
+          - $dagen_per_jaar
+      - output: gewerkte_uren
+        value:
+          operation: MULTIPLY
+          values:
+          - operation: FOREACH
+            collection: $dienstverbandperiodes
+            body:
+              operation: SUBTRACT_DATE
+              unit: days
+              values:
+              - $end_date
+              - $start_date
+            combine: ADD
+          - $uren_per_dag
+    untranslatables:
+    - construct: iteratie over variabel aantal dienstverband- en uitkeringsperiodes
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal periodes is dynamisch
+        en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal periodes tot
+        een vast maximum
+      accepted: true

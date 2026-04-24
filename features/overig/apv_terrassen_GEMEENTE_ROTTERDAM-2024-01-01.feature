@@ -1,4 +1,3 @@
-@skip-go
 Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
   Als horecaondernemer in Rotterdam
   Wil ik weten of ik een terrasvergunning kan krijgen
@@ -77,7 +76,7 @@ Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
     # (15 m² beschikbaar via BGT), voetpad, 2.5m obstakelvrij, sluitingstijden binnen limiet.
     # Verwachting: Terrasvergunning wordt verleend (artikel 2:30b)
     When de algemene_plaatselijke_verordening/terrassen wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | TERRAS_LOCATIE | TERRAS_OPPERVLAKTE | OBSTAKELVRIJE_RUIMTE | SEIZOEN  | GEWENSTE_OPENINGSTIJD | GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS | GEWENSTE_SLUITINGSTIJD_WEEKEND |
+      | terras_locatie | terras_oppervlakte | obstakelvrije_ruimte | seizoen  | gewenste_openingstijd | gewenste_sluitingstijd_doordeweeks | gewenste_sluitingstijd_weekend |
       | voor          | 10                 | 2.5                  | jaarrond | 8                     | 23                                 | 24                             |
     Then is voldaan aan de voorwaarden
     And is de output "heeft_recht_op_terrasvergunning" waar
@@ -91,7 +90,7 @@ Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
     # Casus: Obstakelvrije ruimte is precies het minimum van 1.8 meter (GREATER_OR_EQUAL).
     # Verwachting: Terrasvergunning wordt verleend (grenswaarde is voldoende)
     When de algemene_plaatselijke_verordening/terrassen wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | TERRAS_LOCATIE | TERRAS_OPPERVLAKTE | OBSTAKELVRIJE_RUIMTE | SEIZOEN  | GEWENSTE_OPENINGSTIJD | GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS | GEWENSTE_SLUITINGSTIJD_WEEKEND |
+      | terras_locatie | terras_oppervlakte | obstakelvrije_ruimte | seizoen  | gewenste_openingstijd | gewenste_sluitingstijd_doordeweeks | gewenste_sluitingstijd_weekend |
       | voor          | 10                 | 1.8                  | jaarrond | 8                     | 23                                 | 24                             |
     Then is voldaan aan de voorwaarden
     And is de output "heeft_recht_op_terrasvergunning" waar
@@ -107,7 +106,7 @@ Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
       | kvk_nummer | heeft_exploitatievergunning | heeft_alcoholvergunning | categorie   |
       | 85234567   | false                       | true                    | middelzwaar |
     When de algemene_plaatselijke_verordening/terrassen wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | TERRAS_LOCATIE | TERRAS_OPPERVLAKTE | OBSTAKELVRIJE_RUIMTE | SEIZOEN  | GEWENSTE_OPENINGSTIJD | GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS | GEWENSTE_SLUITINGSTIJD_WEEKEND |
+      | terras_locatie | terras_oppervlakte | obstakelvrije_ruimte | seizoen  | gewenste_openingstijd | gewenste_sluitingstijd_doordeweeks | gewenste_sluitingstijd_weekend |
       | voor          | 10                 | 2.5                  | jaarrond | 8                     | 23                                 | 24                             |
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_terrasvergunning" onwaar
@@ -117,7 +116,7 @@ Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
     # Artikel 2:30b lid 3: minimaal 1.8 meter obstakelvrije ruimte voor voetgangers.
     # Verwachting: Terrasvergunning wordt GEWEIGERD
     When de algemene_plaatselijke_verordening/terrassen wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | TERRAS_LOCATIE | TERRAS_OPPERVLAKTE | OBSTAKELVRIJE_RUIMTE | SEIZOEN  | GEWENSTE_OPENINGSTIJD | GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS | GEWENSTE_SLUITINGSTIJD_WEEKEND |
+      | terras_locatie | terras_oppervlakte | obstakelvrije_ruimte | seizoen  | gewenste_openingstijd | gewenste_sluitingstijd_doordeweeks | gewenste_sluitingstijd_weekend |
       | voor          | 10                 | 1.5                  | jaarrond | 8                     | 23                                 | 24                             |
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_terrasvergunning" onwaar
@@ -126,7 +125,7 @@ Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
     # Casus: 20 m² gevraagd terwijl slechts 15 m² beschikbaar is via BGT.
     # Verwachting: Terrasvergunning wordt GEWEIGERD
     When de algemene_plaatselijke_verordening/terrassen wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | TERRAS_LOCATIE | TERRAS_OPPERVLAKTE | OBSTAKELVRIJE_RUIMTE | SEIZOEN  | GEWENSTE_OPENINGSTIJD | GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS | GEWENSTE_SLUITINGSTIJD_WEEKEND |
+      | terras_locatie | terras_oppervlakte | obstakelvrije_ruimte | seizoen  | gewenste_openingstijd | gewenste_sluitingstijd_doordeweeks | gewenste_sluitingstijd_weekend |
       | voor          | 20                 | 2.5                  | jaarrond | 8                     | 23                                 | 24                             |
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_terrasvergunning" onwaar
@@ -139,7 +138,7 @@ Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
       | adres                 | locatie | beschikbare_oppervlakte | functie_oppervlak | is_openbare_weg |
       | Witte de Withstraat 1 | voor    | 15                      | rijbaan           | true            |
     When de algemene_plaatselijke_verordening/terrassen wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | TERRAS_LOCATIE | TERRAS_OPPERVLAKTE | OBSTAKELVRIJE_RUIMTE | SEIZOEN  | GEWENSTE_OPENINGSTIJD | GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS | GEWENSTE_SLUITINGSTIJD_WEEKEND |
+      | terras_locatie | terras_oppervlakte | obstakelvrije_ruimte | seizoen  | gewenste_openingstijd | gewenste_sluitingstijd_doordeweeks | gewenste_sluitingstijd_weekend |
       | voor          | 10                 | 2.5                  | jaarrond | 8                     | 23                                 | 24                             |
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_terrasvergunning" onwaar
@@ -152,7 +151,7 @@ Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
       | adres                 | seizoen  | max_sluitingstijd_doordeweeks | max_sluitingstijd_weekend |
       | Witte de Withstraat 1 | jaarrond | 24                            | 23                        |
     When de algemene_plaatselijke_verordening/terrassen wordt uitgevoerd door GEMEENTE_ROTTERDAM met
-      | TERRAS_LOCATIE | TERRAS_OPPERVLAKTE | OBSTAKELVRIJE_RUIMTE | SEIZOEN  | GEWENSTE_OPENINGSTIJD | GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS | GEWENSTE_SLUITINGSTIJD_WEEKEND |
+      | terras_locatie | terras_oppervlakte | obstakelvrije_ruimte | seizoen  | gewenste_openingstijd | gewenste_sluitingstijd_doordeweeks | gewenste_sluitingstijd_weekend |
       | voor          | 10                 | 2.5                  | jaarrond | 8                     | 23                                 | 24                             |
     Then is niet voldaan aan de voorwaarden
     And is de output "heeft_recht_op_terrasvergunning" onwaar

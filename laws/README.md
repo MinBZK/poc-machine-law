@@ -23,5 +23,5 @@ Each law definition includes:
 
 ## Schema
 
-Law definitions follow the schema defined in the `/schema` directory (v0.1.7).
+Law definitions follow the schema defined in the `/schema` directory (v0.5.1).
 Use `/script/validate.py` to validate law YAML files against the schema.

@@ -1,376 +1,259 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
-uuid: 54ba9cdb-61ff-4735-a650-8ccee6ef0bb8
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
+$id: wgbo_vertegenwoordiger
+regulatory_layer: WET
+publication_date: '2024-01-01'
+valid_from: '2024-01-01'
 name: Bepalen WGBO-vertegenwoordiger voor wilsonbekwame patienten
-law: wgbo_vertegenwoordiger
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "ANDERE_HANDELING"
-valid_from: 2024-01-01
-service: "RvIG"
-discoverable: "DELEGATION_PROVIDER"
-legal_basis:
-  law: "Burgerlijk Wetboek Boek 7"
-  bwb_id: "BWBR0005290"
-  article: "465"
-  paragraph: "3"
-  url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-  juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01"
-  explanation: >
-    Artikel 7:465 lid 3 BW bepaalt de hierarchie van vertegenwoordigers voor
-    wilsonbekwame patienten: (1) curator of mentor, (2) schriftelijke gemachtigde,
-    (3) echtgenoot/partner, (4) ouder/kind/broer/zus.
-description: >
-  Bepaalt of een persoon als vertegenwoordiger mag optreden voor wilsonbekwame
-  patienten bij medische behandelingen op basis van de WGBO (Wet op de geneeskundige
-  behandelingsovereenkomst). De wet hanteert een strikte hierarchie: curator/mentor
-  gaat voor gemachtigde, die gaat voor familie. Dit register bevat alleen de
-  familie-gebaseerde vertegenwoordiging (niveau 3 en 4); curator/mentor en volmacht
-  worden door andere wetten afgehandeld.
+bwb_id: BWBR0005290
+url: https://wetten.overheid.nl/BWBR0005290/2024-01-01
+service: RvIG
+uuid: 54ba9cdb-61ff-4735-a650-8ccee6ef0bb8
+discoverable: DELEGATION_PROVIDER
+articles:
+- number: '465'
+  text: '1 De verplichtingen die voor de hulpverlener uit deze afdeling jegens de
+    patiënt voortvloeien worden, indien de patiënt de leeftijd van twaalf jaren nog
+    niet heeft bereikt, door de hulpverlener nagekomen jegens de ouders die het gezag
+    over de patiënt uitoefenen dan wel jegens zijn voogd.
 
-references:
-  - law: "Burgerlijk Wetboek Boek 7"
-    article: "465"
-    url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-  - law: "Burgerlijk Wetboek Boek 7"
-    article: "466"
-    url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel466"
-  - law: "Burgerlijk Wetboek Boek 7"
-    article: "450"
-    url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel450"
+    2 Hetzelfde geldt indien de patiënt de leeftijd van twaalf jaren heeft bereikt,
+    maar niet in staat kan worden geacht tot een redelijke waardering van zijn belangen
+    ter zake, tenzij zodanige patiënt meerderjarig is en onder curatele staat of ten
+    behoeve van hem het mentorschap is ingesteld, in welke gevallen nakoming jegens
+    de curator of de mentor geschiedt.
 
-properties:
-  parameters:
-    - name: "BSN"
-      description: "BSN van de persoon wiens WGBO-vertegenwoordigingsbevoegdheden worden opgezocht"
-      type: "string"
-      required: true
-      legal_basis:
-        law: "Wet basisregistratie personen"
-        bwb_id: "BWBR0033715"
-        article: "2.7"
-        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
-        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01"
-        explanation: "BSN identificeert de potentiele vertegenwoordiger in de BRP"
+    3 Indien een meerderjarige patiënt die niet in staat kan worden geacht tot een
+    redelijke waardering van zijn belangen ter zake, niet onder curatele staat of
+    ten behoeve van hem niet het mentorschap is ingesteld, worden de verplichtingen
+    die voor de hulpverlener uit deze afdeling jegens de patiënt voortvloeien, door
+    de hulpverlener nagekomen jegens de persoon die daartoe door de patiënt schriftelijk
+    is gemachtigd in zijn plaats op te treden. Ontbreekt zodanige persoon, of treedt
+    deze niet op, dan worden de verplichtingen nagekomen jegens de echtgenoot, de
+    geregistreerde partner of andere levensgezel van de patiënt, tenzij deze persoon
+    dat niet wenst, dan wel, indien ook zodanige persoon ontbreekt, jegens een ouder,
+    kind, broer, zus, grootouder of kleinkind van de patiënt, tenzij deze persoon
+    dat niet wenst.
 
-  sources:
-    - name: "FAMILIE_RELATIES"
-      description: "Familierelataties uit de BRP voor WGBO-vertegenwoordiging"
-      type: "array"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 7"
-        bwb_id: "BWBR0005290"
-        article: "465"
-        paragraph: "3"
-        url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-        juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01"
-        explanation: >
-          Art. 7:465 lid 3 BW: familieleden (partner, ouder, kind, broer/zus) kunnen
-          optreden als vertegenwoordiger voor wilsonbekwame patienten.
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        table: "wgbo_familie_relaties"
-        fields: ["bsn_patient", "naam_patient", "relatie_type", "is_wilsonbekwaam", "datum_wilsonbekwaamheid"]
-        select_on:
-          - name: "bsn_familielid"
-            description: "BSN nummer van het familielid (potentiele vertegenwoordiger)"
-            type: "string"
-            value: "$BSN"
+    4 De hulpverlener komt zijn verplichtingen na jegens de in de leden 1 en 2 bedoelde
+    wettelijke vertegenwoordigers van de patiënt en de in lid 3 bedoelde personen,
+    tenzij die nakoming niet verenigbaar is met de zorg van een goed hulpverlener.
 
-  output:
-    - name: "heeft_delegaties"
-      description: "Of de persoon delegaties heeft als WGBO-vertegenwoordiger"
-      type: "boolean"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 7"
-        bwb_id: "BWBR0005290"
-        article: "465"
-        paragraph: "3"
-        url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-        juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01"
-        explanation: >
-          Art. 7:465 lid 3 BW: familieleden kunnen optreden als vertegenwoordiger.
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
+    5 De persoon jegens wie de hulpverlener krachtens de leden 2 of 3 gehouden is
+    de uit deze afdeling jegens de patiënt voortvloeiende verplichtingen na te komen,
+    betracht de zorg van een goed vertegenwoordiger. Deze persoon is gehouden de patiënt
+    zoveel mogelijk bij de vervulling van zijn taak te betrekken.
 
-    - name: "subject_ids"
-      description: "BSN nummers van wilsonbekwame patienten waarvoor vertegenwoordiging mogelijk is"
-      type: "array"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 7"
-        bwb_id: "BWBR0005290"
-        article: "465"
-        url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-        juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-        explanation: "BSN nummers van wilsonbekwame patienten uit BRP"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
+    6 Verzet de patiënt zich tegen een verrichting van ingrijpende aard waarvoor een
+    persoon als bedoeld in de leden 2 of 3 toestemming heeft gegeven, dan kan de verrichting
+    slechts worden uitgevoerd indien zij kennelijk nodig is teneinde ernstig nadeel
+    voor de patiënt te voorkomen.'
+  url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Artikel465
+  machine_readable:
+    definitions:
+      wgbo_relatie_hierarchie:
+      - ECHTGENOOT
+      - GEREGISTREERD_PARTNER
+      - LEVENSGEZEL
+      - OUDER
+      - KIND
+      - BROER
+      - ZUS
+      wgbo_vertegenwoordiger_rechten:
+      - LEZEN
+      - CLAIMS_INDIENEN
+      - BESLUITEN_ONTVANGEN
+    execution:
+      produces:
+        legal_character: BESCHIKKING
+        decision_type: ANDERE_HANDELING
+      parameters:
+      - name: bsn
+        type: string
+        required: true
+      input:
+      - name: familie_relaties
+        type: array
+        source:
+          table: wgbo_familie_relaties
+          select_on:
+          - name: bsn_familielid
+            value: $bsn
+          fields:
+          - bsn_patient
+          - naam_patient
+          - relatie_type
+          - is_wilsonbekwaam
+          - datum_wilsonbekwaamheid
+      output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
+      - name: heeft_delegaties
+        type: boolean
+      - name: subject_ids
+        type: array
+      - name: subject_names
+        type: array
+      - name: subject_types
+        type: array
+      - name: delegation_types
+        type: array
+      - name: permissions
+        type: array
+      - name: valid_from_dates
+        type: array
+      - name: valid_until_dates
+        type: array
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: EXISTS
+          subject: $familie_relaties
+      - output: wgbo_vertegenwoordigingen
+        value:
+          operation: FOREACH
+          collection: $familie_relaties
+          filter:
+            operation: AND
+            conditions:
+            - operation: EQUALS
+              subject: $current.is_wilsonbekwaam
+              value: true
+            - operation: IN
+              subject: $current.relatie_type
+              value: $wgbo_relatie_hierarchie
+          body: $current
+          as: current
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 7
+          bwb_id: BWBR0005290
+          article: '465'
+          paragraph: '3'
+          url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465
+          juriconnect: jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01
+          explanation: 'Art. 7:465 lid 3 BW: familieleden kunnen optreden als vertegenwoordiger
+            voor wilsonbekwame patienten. Alleen relevante relaties geven bevoegdheid.
 
-    - name: "subject_names"
-      description: "Namen van wilsonbekwame patienten"
-      type: "array"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 7"
-        bwb_id: "BWBR0005290"
-        article: "465"
-        url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-        juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-        explanation: "Namen van patienten uit BRP"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
+            '
+      - output: heeft_delegaties
+        value:
+          operation: EXISTS
+          subject: $wgbo_vertegenwoordigingen
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 7
+          bwb_id: BWBR0005290
+          article: '465'
+          url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465
+          juriconnect: jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01
+          explanation: 'Art. 7:465 BW bepaalt dat familieleden kunnen vertegenwoordigen.
 
-    - name: "subject_types"
-      description: "Types van de subjecten (altijd CITIZEN)"
-      type: "array"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 7"
-        bwb_id: "BWBR0005290"
-        article: "465"
-        url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-        juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-        explanation: "Patienten zijn natuurlijke personen"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
+            '
+      - output: subject_ids
+        value: $wgbo_vertegenwoordigingen.bsn_patient
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 7
+          bwb_id: BWBR0005290
+          article: '465'
+          url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465
+          juriconnect: jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01
+          explanation: BSN nummers van wilsonbekwame patienten
+      - output: subject_names
+        value: $wgbo_vertegenwoordigingen.naam_patient
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 7
+          bwb_id: BWBR0005290
+          article: '465'
+          url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465
+          juriconnect: jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01
+          explanation: Namen van wilsonbekwame patienten
+      - output: subject_types
+        value:
+          operation: FOREACH
+          collection: $wgbo_vertegenwoordigingen
+          body: CITIZEN
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 7
+          bwb_id: BWBR0005290
+          article: '465'
+          url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465
+          juriconnect: jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01
+          explanation: Patienten zijn natuurlijke personen, altijd CITIZEN
+      - output: delegation_types
+        value:
+          operation: FOREACH
+          collection: $wgbo_vertegenwoordigingen
+          body:
+            operation: IF
+            cases:
+            - when:
+                operation: IN
+                subject: $current.relatie_type
+                values:
+                - ECHTGENOOT
+                - GEREGISTREERD_PARTNER
+                - LEVENSGEZEL
+              then: WGBO_VERTEGENWOORDIGER_PARTNER
+            - when:
+                operation: EQUALS
+                subject: $current.relatie_type
+                value: OUDER
+              then: WGBO_VERTEGENWOORDIGER_OUDER
+            - when:
+                operation: EQUALS
+                subject: $current.relatie_type
+                value: KIND
+              then: WGBO_VERTEGENWOORDIGER_KIND
+            default: WGBO_VERTEGENWOORDIGER_SIBLING
+          as: current
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 7
+          bwb_id: BWBR0005290
+          article: '465'
+          paragraph: '3'
+          url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465
+          juriconnect: jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01
+          explanation: Type gebaseerd op familierelatie conform hierarchie Art. 7:465
+            lid 3 BW
+      - output: permissions
+        value:
+          operation: FOREACH
+          collection: $wgbo_vertegenwoordigingen
+          body: $wgbo_vertegenwoordiger_rechten
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 7
+          bwb_id: BWBR0005290
+          article: '465'
+          paragraph: '3'
+          url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465
+          juriconnect: jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01
+          explanation: 'Art. 7:465 lid 3 BW: vertegenwoordiger neemt beslissingen
+            over medische behandeling namens wilsonbekwame patient.
 
-    - name: "delegation_types"
-      description: "Type delegatie (WGBO_VERTEGENWOORDIGER_PARTNER, _OUDER, _KIND, _SIBLING)"
-      type: "array"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 7"
-        bwb_id: "BWBR0005290"
-        article: "465"
-        paragraph: "3"
-        url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-        juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01"
-        explanation: "Type gebaseerd op familierelatie conform hierarchie"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-
-    - name: "permissions"
-      description: "Rechten per patient (medische beslissingen)"
-      type: "array"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 7"
-        bwb_id: "BWBR0005290"
-        article: "465"
-        paragraph: "3"
-        url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-        juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01"
-        explanation: >
-          Art. 7:465 lid 3 BW: vertegenwoordiger neemt beslissingen over medische
-          behandeling namens wilsonbekwame patient.
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-
-    - name: "valid_from_dates"
-      description: "Startdatum van vertegenwoordiging (datum wilsonbekwaamheid)"
-      type: "array"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 7"
-        bwb_id: "BWBR0005290"
-        article: "465"
-        url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-        juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-        explanation: "Vertegenwoordiging start bij vaststelling wilsonbekwaamheid"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-
-    - name: "valid_until_dates"
-      description: "Einddatum van vertegenwoordiging (null = doorlopend)"
-      type: "array"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 7"
-        bwb_id: "BWBR0005290"
-        article: "465"
-        url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-        juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-        explanation: "Vertegenwoordiging eindigt bij herstel wilsbekwaamheid of overlijden"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-
-  definitions:
-    # Art. 7:465 lid 3 BW: hierarchie van vertegenwoordigers
-    # Partner gaat voor ouder/kind/sibling
-    WGBO_RELATIE_HIERARCHIE:
-      - "ECHTGENOOT"
-      - "GEREGISTREERD_PARTNER"
-      - "LEVENSGEZEL"
-      - "OUDER"
-      - "KIND"
-      - "BROER"
-      - "ZUS"
-
-    # Vertegenwoordiger krijgt volledige rechten voor medische beslissingen
-    WGBO_VERTEGENWOORDIGER_RECHTEN:
-      - "LEZEN"
-      - "CLAIMS_INDIENEN"
-      - "BESLUITEN_ONTVANGEN"
-
-requirements:
-  - operation: EXISTS
-    subject: "$FAMILIE_RELATIES"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 7"
-      bwb_id: "BWBR0005290"
-      article: "465"
-      url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-      juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-      explanation: "Persoon moet familielid zijn van een wilsonbekwame patient"
-
-actions:
-  # Stap 1: Filter op wilsonbekwame patienten met relevante familierelaties
-  - output: "wgbo_vertegenwoordigingen"
-    operation: FOREACH
-    subject: "$FAMILIE_RELATIES"
-    where:
-      operation: AND
-      values:
-        - operation: EQUALS
-          subject: "$current.is_wilsonbekwaam"
-          value: true
-        - operation: IN
-          subject: "$current.relatie_type"
-          values: "$WGBO_RELATIE_HIERARCHIE"
-    value: "$current"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 7"
-      bwb_id: "BWBR0005290"
-      article: "465"
-      paragraph: "3"
-      url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-      juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01"
-      explanation: >
-        Art. 7:465 lid 3 BW: familieleden kunnen optreden als vertegenwoordiger
-        voor wilsonbekwame patienten. Alleen relevante relaties geven bevoegdheid.
-
-  # heeft_delegaties: boolean indicating if person has any delegations
-  - output: "heeft_delegaties"
-    operation: EXISTS
-    subject: "$wgbo_vertegenwoordigingen"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 7"
-      bwb_id: "BWBR0005290"
-      article: "465"
-      url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-      juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-      explanation: >
-        Art. 7:465 BW bepaalt dat familieleden kunnen vertegenwoordigen.
-
-  # subject_ids: BSN numbers of patients
-  - output: "subject_ids"
-    subject: "$wgbo_vertegenwoordigingen.bsn_patient"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 7"
-      bwb_id: "BWBR0005290"
-      article: "465"
-      url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-      juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-      explanation: "BSN nummers van wilsonbekwame patienten"
-
-  # subject_names: names of patients
-  - output: "subject_names"
-    subject: "$wgbo_vertegenwoordigingen.naam_patient"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 7"
-      bwb_id: "BWBR0005290"
-      article: "465"
-      url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-      juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-      explanation: "Namen van wilsonbekwame patienten"
-
-  # subject_types: constant "CITIZEN" for each patient
-  - output: "subject_types"
-    operation: FOREACH
-    subject: "$wgbo_vertegenwoordigingen"
-    value: "CITIZEN"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 7"
-      bwb_id: "BWBR0005290"
-      article: "465"
-      url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-      juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-      explanation: "Patienten zijn natuurlijke personen, altijd CITIZEN"
-
-  # delegation_types: based on family relationship
-  - output: "delegation_types"
-    operation: FOREACH
-    subject: "$wgbo_vertegenwoordigingen"
-    value:
-      operation: IF
-      conditions:
-        - test:
-            operation: IN
-            subject: "$current.relatie_type"
-            values:
-              - "ECHTGENOOT"
-              - "GEREGISTREERD_PARTNER"
-              - "LEVENSGEZEL"
-          then: "WGBO_VERTEGENWOORDIGER_PARTNER"
-        - test:
-            operation: EQUALS
-            subject: "$current.relatie_type"
-            value: "OUDER"
-          then: "WGBO_VERTEGENWOORDIGER_OUDER"
-        - test:
-            operation: EQUALS
-            subject: "$current.relatie_type"
-            value: "KIND"
-          then: "WGBO_VERTEGENWOORDIGER_KIND"
-        - else: "WGBO_VERTEGENWOORDIGER_SIBLING"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 7"
-      bwb_id: "BWBR0005290"
-      article: "465"
-      paragraph: "3"
-      url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-      juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01"
-      explanation: "Type gebaseerd op familierelatie conform hierarchie Art. 7:465 lid 3 BW"
-
-  # permissions: full permissions for medical decisions
-  - output: "permissions"
-    operation: FOREACH
-    subject: "$wgbo_vertegenwoordigingen"
-    value: "$WGBO_VERTEGENWOORDIGER_RECHTEN"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 7"
-      bwb_id: "BWBR0005290"
-      article: "465"
-      paragraph: "3"
-      url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-      juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&lid=3&z=2024-01-01&g=2024-01-01"
-      explanation: >
-        Art. 7:465 lid 3 BW: vertegenwoordiger neemt beslissingen over medische
-        behandeling namens wilsonbekwame patient.
-
-  # valid_from_dates: date of incapacity determination
-  - output: "valid_from_dates"
-    subject: "$wgbo_vertegenwoordigingen.datum_wilsonbekwaamheid"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 7"
-      bwb_id: "BWBR0005290"
-      article: "465"
-      url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-      juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-      explanation: "Vertegenwoordiging start bij vaststelling wilsonbekwaamheid"
-
-  # valid_until_dates: null (ongoing until recovery or death)
-  - output: "valid_until_dates"
-    operation: FOREACH
-    subject: "$wgbo_vertegenwoordigingen"
-    value: null
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 7"
-      bwb_id: "BWBR0005290"
-      article: "465"
-      url: "https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465"
-      juriconnect: "jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01"
-      explanation: "Vertegenwoordiging eindigt bij herstel wilsbekwaamheid of overlijden"
+            '
+      - output: valid_from_dates
+        value: $wgbo_vertegenwoordigingen.datum_wilsonbekwaamheid
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 7
+          bwb_id: BWBR0005290
+          article: '465'
+          url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465
+          juriconnect: jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01
+          explanation: Vertegenwoordiging start bij vaststelling wilsonbekwaamheid
+      - output: valid_until_dates
+        value:
+          operation: FOREACH
+          collection: $wgbo_vertegenwoordigingen
+          body: null
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 7
+          bwb_id: BWBR0005290
+          article: '465'
+          url: https://wetten.overheid.nl/BWBR0005290/2024-01-01#Boek7_Titeldeel7_Afdeling5_Artikel465
+          juriconnect: jci1.3:c:BWBR0005290&boek=7&artikel=465&z=2024-01-01&g=2024-01-01
+          explanation: Vertegenwoordiging eindigt bij herstel wilsbekwaamheid of overlijden
+    untranslatables:
+    - construct: iteratie over variabel aantal WGBO-vertegenwoordigingen
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal vertegenwoordigingsrelaties
+        is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal registraties
+        tot een vast maximum
+      accepted: true

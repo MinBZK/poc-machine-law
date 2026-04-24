@@ -1,3 +1,4 @@
+@slow
 Feature: Wet-synthese uit simulatieresultaten
   Als beleidsmaker
   Wil ik een vereenvoudigde wet kunnen genereren uit simulatieresultaten

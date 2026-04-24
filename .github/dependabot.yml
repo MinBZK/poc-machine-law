@@ -32,31 +32,7 @@ updates:
 
   # Go modules
   - package-ecosystem: gomod
-    directory: "/features"
-    schedule:
-      interval: weekly
-    groups:
-      go-deps:
-        patterns:
-          - "*"
-  - package-ecosystem: gomod
     directory: "/lac-to-regelspraak"
-    schedule:
-      interval: weekly
-    groups:
-      go-deps:
-        patterns:
-          - "*"
-  - package-ecosystem: gomod
-    directory: "/machinev2/backend"
-    schedule:
-      interval: weekly
-    groups:
-      go-deps:
-        patterns:
-          - "*"
-  - package-ecosystem: gomod
-    directory: "/machinev2/machine"
     schedule:
       interval: weekly
     groups:

@@ -1,7 +1,8 @@
 """Delegation manager for handling act-on-behalf-of scenarios.
 
 This module provides the DelegationManager class which determines what entities
-a user can act on behalf of by evaluating delegation provider laws via the RulesEngine.
+a user can act on behalf of by evaluating delegation provider laws via the
+regelrecht Rust engine (wrapped by RegelrechtServices).
 
 The DelegationManager discovers and evaluates all laws with discoverable: "DELEGATION_PROVIDER"
 and uses a standard interface to parse the results into Delegation objects.
@@ -11,7 +12,7 @@ import logging
 from datetime import date, datetime
 
 from machine.delegation.models import Delegation, DelegationContext
-from machine.service import Services
+from machine.regelrecht_services import RegelrechtServices
 
 logger = logging.getLogger(__name__)
 
@@ -32,17 +33,9 @@ class DelegationManager:
     - permissions: array of permission arrays
     - valid_from_dates: array of start dates
     - valid_until_dates: array of end dates (null = unlimited)
-
-    Attributes:
-        services: The Services instance for rule evaluation
     """
 
-    def __init__(self, services: Services):
-        """Initialize the DelegationManager.
-
-        Args:
-            services: The Services instance for rule evaluation
-        """
+    def __init__(self, services: RegelrechtServices):
         self.services = services
 
     def get_delegations_for_user(self, bsn: str, reference_date: date | None = None) -> list[Delegation]:

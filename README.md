@@ -224,17 +224,6 @@ uv run python law_mcp/test_client.py
 
 De MCP implementatie volgt de 2025-03-26 specificatie en ondersteunt Streamable HTTP transport voor AI agents.
 
-### Go server starten (backend)
-
-De web interface is geconfigureerd om standaard de Go engine te gebruiken (zie `web/config/config.yaml`). Om de Go server te starten:
-
-```bash
-cd machinev2/backend
-APP_BACKEND_LISTEN_ADDRESS=:8081 APP_INPUT_FILE=../../data/profiles.yaml APP_DEBUG=false go run . serve
-```
-
-De Go server is vervolgens beschikbaar op port 8081. Als je de Python engine wilt gebruiken in plaats van de Go engine, pas dan `web/config/config.yaml` aan door de `default: true` regel te verplaatsen naar de Python engine.
-
 ### Control Panel
 
 Er is ook een control panel beschikbaar op http://0.0.0.0:8000/admin/control waarmee je de engine kunt configureren en monitoren.

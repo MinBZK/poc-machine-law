@@ -1,23 +1,6 @@
 engines:
-  - id: py
-    name: Python engine
-    description: default processing engine
-    type: internal
+  - id: regelrecht
+    name: Regelrecht engine
+    description: regelrecht Rust engine (default)
+    type: regelrecht
     default: true
-  - id: go
-    name: Go engine
-    description: typed processing engine (beta)
-    type: http
-    domain: http://localhost:8081/v0
-    service_routing:
-      enabled: false
-      # When enabled, routes requests to different services based on service name
-      # Optional: Control whether to query all services for methods without service parameter
-      # query_all_for_cases: true    # Query all services for get_cases_by_bsn (default: true)
-      # query_all_for_claims: true   # Query all services for get_claims_by_bsn (default: true)
-      # query_all_for_profiles: false # Query all services for get_all_profiles (default: false, uses default URL)
-      # services:
-      #   TOESLAGEN:
-      #     domain: http://localhost:8082/v0
-      #   BELASTINGDIENST:
-      #     domain: http://localhost:8083/v0

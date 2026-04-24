@@ -1,223 +1,151 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.7/schema.json
-uuid: f3b2d5e8-1a4c-4f9b-a6d7-8e3f2b4a0c19
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
+$id: handelsregisterwet/jaarrekening
+regulatory_layer: WET
+publication_date: '2024-01-01'
+valid_from: '2024-01-01'
 name: Handelsregisterwet - Jaarrekening Deponeringsplicht
-law: handelsregisterwet/jaarrekening
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "ANDERE_HANDELING"
-discoverable: "BUSINESS"
-requires_manual_approval: false
-valid_from: 2024-01-01
-service: "KVK"
-description: >
-  Bepaling van de deponeringsplicht voor de jaarrekening op grond van artikel 394 van Boek 2
-  Burgerlijk Wetboek. Rechtspersonen (BV, NV, coöperatie, onderlinge waarborgmaatschappij) zijn
-  verplicht hun jaarrekening te deponeren bij het handelsregister van de KVK. Eenmanszaken en
-  vennootschappen onder firma (VOF) zijn hiervan vrijgesteld.
-
-legal_basis:
-  law: "Burgerlijk Wetboek Boek 2"
-  bwb_id: "BWBR0003045"
-  article: "394"
-  url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394"
-  juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01"
-  explanation: "Artikel 394 BW2 bepaalt dat rechtspersonen verplicht zijn de jaarrekening te deponeren bij het handelsregister"
-
-references:
-  - law: "Burgerlijk Wetboek Boek 2"
-    article: "360"
-    url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling1_Artikel360"
-  - law: "Handelsregisterwet 2007"
-    article: "19"
-    url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk4_Artikel19"
-
-properties:
-  parameters:
-    - name: "KVK_NUMMER"
-      description: "KvK-nummer van de organisatie"
-      type: "string"
-      required: true
-      legal_basis:
-        law: "Handelsregisterwet 2007"
-        bwb_id: "BWBR0021777"
-        article: "19"
-        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk4_Artikel19"
-        juriconnect: "jci1.3:c:BWBR0021777&artikel=19&z=2024-01-01&g=2024-01-01"
-        explanation: "Identificatie van de onderneming via het KvK-nummer voor de jaarrekening deponeringsplicht"
-
-  sources:
-    - name: "RECHTSVORM"
-      description: "Rechtsvorm van de organisatie volgens het handelsregister"
-      type: "string"
-      required: true
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "KVK"
-        table: "organisaties"
-        field: "rechtsvorm"
-        select_on:
-          - name: "kvk_nummer"
-            description: "KvK-nummer van de organisatie"
-            type: "string"
-            value: "$KVK_NUMMER"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 2"
-        bwb_id: "BWBR0003045"
-        article: "360"
-        url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling1_Artikel360"
-        juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=360&z=2024-01-01&g=2024-01-01"
-        explanation: "De rechtsvorm bepaalt of Titel 9 Boek 2 BW van toepassing is; alleen rechtspersonen vallen onder de deponeringsplicht"
-
-    - name: "LAATSTE_BOEKJAAR_EINDE"
-      description: "Einddatum van het laatste afgelopen boekjaar"
-      type: "date"
-      required: false
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "KVK"
-        table: "jaarrekeningen"
-        field: "laatste_boekjaar_einde"
-        select_on:
-          - name: "kvk_nummer"
-            description: "KvK-nummer van de organisatie"
-            type: "string"
-            value: "$KVK_NUMMER"
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 2"
-        bwb_id: "BWBR0003045"
-        article: "394"
-        url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394"
-        juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01"
-        explanation: "De jaarrekening moet binnen 8 dagen na vaststelling worden gedeponeerd, uiterlijk 12 maanden na einde boekjaar"
-
-  output:
-    - name: "heeft_deponeringsplicht"
-      description: "Of de jaarrekening gedeponeerd moet worden bij de KVK"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 2"
-        bwb_id: "BWBR0003045"
-        article: "394"
-        url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394"
-        juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01"
-        explanation: "Alleen rechtspersonen (BV, NV, coöperatie, etc.) zijn verplicht de jaarrekening te deponeren"
-
-    - name: "rapportage_methode"
-      description: "De wijze waarop de jaarrekening gedeponeerd moet worden"
-      type: "string"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 2"
-        bwb_id: "BWBR0003045"
-        article: "394"
-        url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394"
-        juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01"
-        explanation: "Deponering geschiedt digitaal via SBR (Standard Business Reporting) in XBRL-formaat"
-
-    - name: "volgende_deadline"
-      description: "Uiterste datum waarop de jaarrekening gedeponeerd moet zijn"
-      type: "date"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 2"
-        bwb_id: "BWBR0003045"
-        article: "394"
-        url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394"
-        juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01"
-        explanation: "De jaarrekening moet uiterlijk 12 maanden na het einde van het boekjaar zijn gedeponeerd"
-
-    - name: "reden_vrijstelling"
-      description: "Reden waarom de organisatie is vrijgesteld van de deponeringsplicht"
-      type: "string"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: secondary
-      legal_basis:
-        law: "Burgerlijk Wetboek Boek 2"
-        bwb_id: "BWBR0003045"
-        article: "360"
-        url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling1_Artikel360"
-        juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=360&z=2024-01-01&g=2024-01-01"
-        explanation: "Eenmanszaken en personenvennootschappen vallen niet onder Titel 9 Boek 2 BW en zijn daarom vrijgesteld"
-
-  definitions:
-    DEPONERINGSPLICHTIGE_RECHTSVORMEN:
-      - "BV"
-      - "NV"
-      - "COOPERATIE"
-      - "ONDERLINGE_WAARBORGMAATSCHAPPIJ"
-      - "STICHTING"
-      - "VERENIGING"
-    RAPPORTAGE_METHODE: "SBR/XBRL via KVK (kvk.nl/deponeren)"
-    DEPONERINGS_TERMIJN_MAANDEN: 12
-
-variables: []
-
-requirements:
-  - all:
-      - subject: "$RECHTSVORM"
-        operation: IN
-        value: "$DEPONERINGSPLICHTIGE_RECHTSVORMEN"
+bwb_id: BWBR0003045
+url: https://wetten.overheid.nl/BWBR0003045/2024-01-01
+service: KVK
+uuid: f3b2d5e8-1a4c-4f9b-a6d7-8e3f2b4a0c19
+discoverable: BUSINESS
+articles:
+- number: '394'
+  text: "1 De rechtspersoon is verplicht tot openbaarmaking van de jaarrekening binnen\
+    \ acht dagen na de vaststelling. De openbaarmaking geschiedt door deponering van\
+    \ de volledig in de Nederlandse taal gestelde jaarrekening of, als die niet is\
+    \ vervaardigd, de jaarrekening in het Frans, Duits of Engels, bij het handelsregister,\
+    \ indien van toepassing op de wijze als voorgeschreven bij of krachtens artikel\
+    \ 19a van de Handelsregisterwet 2007. De dag van vaststelling moet zijn vermeld.\n\
+    2 Is de jaarrekening niet binnen twee maanden na afloop van de voor het opmaken\
+    \ voorgeschreven termijn overeenkomstig de wettelijke voorschriften vastgesteld,\
+    \ dan maakt het bestuur onverwijld de opgemaakte jaarrekening op de in lid 1 voorgeschreven\
+    \ wijze openbaar; op de jaarrekening wordt vermeld dat zij nog niet is vastgesteld.\
+    \ Binnen twee maanden na gerechtelijke vernietiging van een jaarrekening moet\
+    \ de rechtspersoon een afschrift van de in de uitspraak opgenomen bevelen met\
+    \ betrekking tot de jaarrekening deponeren bij het handelsregister, met vermelding\
+    \ van de uitspraak.\n3 Uiterlijk twaalf maanden na afloop van het boekjaar moet\
+    \ de rechtspersoon de jaarrekening op de in lid 1 voorgeschreven wijze openbaar\
+    \ hebben gemaakt.\n4 Gelijktijdig met en op dezelfde wijze als de jaarrekening\
+    \ worden het bestuursverslag en de overige in artikel 392 bedoelde gegevens in\
+    \ het Nederlands of in een van de andere in het eerste lid genoemde talen openbaar\
+    \ gemaakt. Het voorafgaande geldt, behalve voor de in artikel 392 lid 1 onder\
+    \ a en e genoemde gegevens, niet, indien de stukken ten kantore van de rechtspersoon\
+    \ ter inzage van een ieder worden gehouden en op verzoek een volledig of gedeeltelijk\
+    \ afschrift daarvan ten hoogste tegen de kostprijs wordt verstrekt; hiervan doet\
+    \ de rechtspersoon opgaaf ter inschrijving in het handelsregister.\n5 De vorige\
+    \ leden gelden niet, indien Onze Minister van Economische Zaken de in artikel\
+    \ 58, artikel 101 of artikel 210 genoemde ontheffing heeft verleend; alsdan wordt\
+    \ een afschrift van die ontheffing bij het handelsregister gedeponeerd.\n6 De\
+    \ in de vorige leden bedoelde bescheiden worden gedurende zeven jaren bewaard.\
+    \ De Kamer van Koophandel mag de op deze bescheiden geplaatste gegevens overbrengen\
+    \ op andere gegevensdragers, die zij in hun plaats in het handelsregister bewaart,\
+    \ mits die overbrenging geschiedt met juiste en volledige weergave der gegevens\
+    \ en deze gegevens gedurende de volledige bewaartijd beschikbaar zijn en binnen\
+    \ redelijke tijd leesbaar kunnen worden gemaakt.\n7 Iedere belanghebbende kan\
+    \ van de rechtspersoon nakoming van de in de leden 1-5 omschreven verplichtingen\
+    \ vorderen.\n8 Een vennootschap waarvan effecten zijn toegelaten tot de handel\
+    \ op een gereglementeerde markt als bedoeld in de Wet op het financieel toezicht\
+    \ wordt geacht te hebben voldaan aan:\n  a. lid 1, indien zij de vastgestelde\
+    \ jaarrekening op grond van artikel 5:25o, eerste lid, van die wet heeft toegezonden\
+    \ aan de Stichting Autoriteit Financiële Markten;\n  b. lid 2, eerste volzin,\
+    \ indien zij mededeling heeft gedaan op grond van artikel 5:25o, tweede lid, van\
+    \ die wet aan de Stichting Autoriteit Financiële Markten;\n  c. vierde lid, eerste\
+    \ volzin, indien zij het bestuursverslag en de overige in artikel 392 bedoelde\
+    \ gegevens op grond van artikel 5:25o, vierde lid, van de Wet op het financieel\
+    \ toezicht heeft toegezonden aan de Stichting Autoriteit Financiële Markten."
+  url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Artikel394
+  machine_readable:
+    definitions:
+      deponeringsplichtige_rechtsvormen:
+      - BV
+      - NV
+      - COOPERATIE
+      - ONDERLINGE_WAARBORGMAATSCHAPPIJ
+      - STICHTING
+      - VERENIGING
+      rapportage_methode: SBR/XBRL via KVK (kvk.nl/deponeren)
+      deponerings_termijn_maanden: 12
+    execution:
+      produces:
+        legal_character: BESCHIKKING
+        decision_type: ANDERE_HANDELING
+      parameters:
+      - name: kvk_nummer
+        type: string
+        required: true
+      input:
+      - name: rechtsvorm
+        type: string
+        source:
+          table: organisaties
+          field: rechtsvorm
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: KVK
+      - name: laatste_boekjaar_einde
+        type: date
+        source:
+          table: jaarrekeningen
+          field: laatste_boekjaar_einde
+          select_on:
+          - name: kvk_nummer
+            value: $kvk_nummer
+          source_type: KVK
+      output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
+      - name: heeft_deponeringsplicht
+        type: boolean
+      - name: rapportage_methode
+        type: string
+      - name: volgende_deadline
+        type: date
+      - name: reden_vrijstelling
+        type: string
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $rechtsvorm
+            operation: IN
+            value: $deponeringsplichtige_rechtsvormen
+      - output: heeft_deponeringsplicht
+        value: true
         legal_basis:
-          law: "Burgerlijk Wetboek Boek 2"
-          bwb_id: "BWBR0003045"
-          article: "360"
-          url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling1_Artikel360"
-          juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=360&z=2024-01-01&g=2024-01-01"
-          explanation: "Titel 9 Boek 2 BW is alleen van toepassing op rechtspersonen; eenmanszaken en VOF zijn vrijgesteld"
-
-actions:
-  - output: "heeft_deponeringsplicht"
-    value: true
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 2"
-      bwb_id: "BWBR0003045"
-      article: "394"
-      url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394"
-      juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01"
-      explanation: "De organisatie is een rechtspersoon; de deponeringsplicht is van toepassing"
-
-  - output: "rapportage_methode"
-    value: "$RAPPORTAGE_METHODE"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 2"
-      bwb_id: "BWBR0003045"
-      article: "394"
-      url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394"
-      juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01"
-      explanation: "De jaarrekening wordt digitaal gedeponeerd via SBR in XBRL-formaat"
-
-  - output: "volgende_deadline"
-    value: "$LAATSTE_BOEKJAAR_EINDE"
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 2"
-      bwb_id: "BWBR0003045"
-      article: "394"
-      url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394"
-      juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01"
-      explanation: "De deadline is uiterlijk 12 maanden na het einde van het boekjaar"
-
-  - output: "reden_vrijstelling"
-    value: ""
-    legal_basis:
-      law: "Burgerlijk Wetboek Boek 2"
-      bwb_id: "BWBR0003045"
-      article: "360"
-      url: "https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling1_Artikel360"
-      juriconnect: "jci1.3:c:BWBR0003045&boek=2&artikel=360&z=2024-01-01&g=2024-01-01"
-      explanation: "Niet van toepassing; de organisatie heeft een deponeringsplicht"
+          law: Burgerlijk Wetboek Boek 2
+          bwb_id: BWBR0003045
+          article: '394'
+          url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394
+          juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01
+          explanation: De organisatie is een rechtspersoon; de deponeringsplicht is
+            van toepassing
+      - output: rapportage_methode
+        value: $rapportage_methode
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 2
+          bwb_id: BWBR0003045
+          article: '394'
+          url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394
+          juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01
+          explanation: De jaarrekening wordt digitaal gedeponeerd via SBR in XBRL-formaat
+      - output: volgende_deadline
+        value: $laatste_boekjaar_einde
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 2
+          bwb_id: BWBR0003045
+          article: '394'
+          url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling10_Artikel394
+          juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=394&z=2024-01-01&g=2024-01-01
+          explanation: De deadline is uiterlijk 12 maanden na het einde van het boekjaar
+      - output: reden_vrijstelling
+        value: ''
+        legal_basis:
+          law: Burgerlijk Wetboek Boek 2
+          bwb_id: BWBR0003045
+          article: '360'
+          url: https://wetten.overheid.nl/BWBR0003045/2024-01-01#Boek2_Titeldeel9_Afdeling1_Artikel360
+          juriconnect: jci1.3:c:BWBR0003045&boek=2&artikel=360&z=2024-01-01&g=2024-01-01
+          explanation: Niet van toepassing; de organisatie heeft een deponeringsplicht

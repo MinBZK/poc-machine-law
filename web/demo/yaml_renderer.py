@@ -38,12 +38,12 @@ def _discover_laws_cached(
             with open(yaml_file) as f:
                 data = yaml.safe_load(f)
 
-            # Extract metadata
+            # Extract metadata - v0.5.0 uses $id instead of law
             law_info = {
                 "path": str(relative_path.with_suffix("")),  # Remove .yaml extension
                 "file_path": str(relative_path),
                 "name": data.get("name", yaml_file.stem),
-                "law": data.get("law", ""),
+                "law": data.get("$id", data.get("law", "")),
                 "service": data.get("service", ""),
                 "description": data.get("description", ""),
                 "valid_from": str(data.get("valid_from", "")),
@@ -146,7 +146,7 @@ def _detect_cross_references(data: Any, path: str = "", all_laws: list[dict[str,
         new_data = {}
         for key, value in data.items():
             if key == "service_reference" and isinstance(value, dict):
-                # This is a cross-reference - add link metadata
+                # This is a cross-reference (legacy format) - add link metadata
                 service = value.get("service")
                 law = value.get("law")
                 if service and law:
@@ -156,6 +156,18 @@ def _detect_cross_references(data: Any, path: str = "", all_laws: list[dict[str,
                         value["_link"] = {
                             "target": target_path,
                             "display": f"{service}/{law}",
+                        }
+                new_data[key] = _detect_cross_references(value, f"{path}.{key}", all_laws)
+            elif key == "source" and isinstance(value, dict) and "regulation" in value:
+                # This is a cross-reference (v0.5.0 format) - add link metadata
+                service = value.get("service")
+                regulation = value.get("regulation")
+                if service and regulation:
+                    target_path = _find_law_path(regulation, service, all_laws)
+                    if target_path:
+                        value["_link"] = {
+                            "target": target_path,
+                            "display": f"{service}/{regulation}",
                         }
                 new_data[key] = _detect_cross_references(value, f"{path}.{key}", all_laws)
             else:
@@ -236,11 +248,17 @@ def get_yaml_section_priority(key: str) -> int:
     Lower numbers are more important and shown first.
     """
     priority_map = {
+        "$schema": -2,
+        "$id": -1,
         "name": 0,
         "law": 1,
+        "regulatory_layer": 1,
         "service": 2,
         "valid_from": 3,
+        "publication_date": 3,
+        "bwb_id": 4,
         "description": 4,
+        "articles": 5,
         "properties": 10,
         "input": 11,
         "output": 12,
@@ -302,8 +320,8 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
 
             html_parts.append(f'    <span class="yaml-key">{html.escape(str(k))}:</span>')
 
-            # Add cross-law link if this is a service_reference
-            if k == "service_reference" and isinstance(v, dict) and "_link" in v:
+            # Add cross-law link if this is a service_reference or source with regulation
+            if k in ("service_reference", "source") and isinstance(v, dict) and "_link" in v:
                 link_info = v["_link"]
                 html_parts.append(
                     f'    <a href="/demo/law/{html.escape(link_info["target"])}" class="cross-law-link">'
@@ -359,14 +377,17 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
                 label = item.get(
                     "name",
                     item.get(
-                        "output",
+                        "number",
                         item.get(
-                            "field",
+                            "output",
                             item.get(
-                                "subject",
+                                "field",
                                 item.get(
-                                    "law",
-                                    test_label or item.get("operation", "else" if has_else else f"Item {idx + 1}"),
+                                    "subject",
+                                    item.get(
+                                        "law",
+                                        test_label or item.get("operation", "else" if has_else else f"Item {idx + 1}"),
+                                    ),
                                 ),
                             ),
                         ),

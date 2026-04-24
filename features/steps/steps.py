@@ -5,7 +5,6 @@ from unittest import TestCase
 import pandas as pd
 from behave import given, then, when
 
-from machine.service import Services
 
 assertions = TestCase()
 
@@ -60,7 +59,9 @@ def _check_output_contains(context, field: str, value: str) -> None:
     expected = parse_value(value)
     actual_str = [str(x) for x in actual]
     expected_str = str(expected)
-    assertions.assertIn(expected_str, actual_str, f"Expected {field} to contain {expected_str}, but it was {actual_str}")
+    assertions.assertIn(
+        expected_str, actual_str, f"Expected {field} to contain {expected_str}, but it was {actual_str}"
+    )
 
 
 def _check_output_empty(context, field: str) -> None:
@@ -148,7 +149,13 @@ def step_impl(context, service, table):
 
     data = []
     for row in context.table:
-        processed_row = {k: v if k in STRING_FIELDS else parse_value(v) for k, v in row.items()}
+        processed_row = {}
+        for k, v in row.items():
+            if k in STRING_FIELDS:
+                # Convert "null" and empty strings to None for nullable fields
+                processed_row[k] = None if v in ("null", "") else v
+            else:
+                processed_row[k] = parse_value(v)
         data.append(processed_row)
 
     df = pd.DataFrame(data)
@@ -171,56 +178,58 @@ def step_impl(context, date):
             del context.services
     except Exception:
         pass
-    context.services = Services(date)
+    from machine.regelrecht_services import RegelrechtServices
+
+    context.services = RegelrechtServices(date)
 
 
 @given('een persoon met BSN "{bsn}"')
 def step_impl(context, bsn):
-    context.parameters["BSN"] = bsn
+    context.parameters["bsn"] = bsn
 
 
 @given('een organisatie met KVK-nummer "{kvk_nummer}"')
 def step_impl(context, kvk_nummer):
-    context.parameters["KVK_NUMMER"] = kvk_nummer
+    context.parameters["kvk_nummer"] = kvk_nummer
 
 
 @given('een {entity_type} met ID "{entity_id}"')
 def step_impl(context, entity_type, entity_id):
     """Generic entity setup. Converts entity_type to UPPER_CASE_ID parameter."""
     param_mapping = {
-        "ICT-project": "PROJECT_ID",
-        "organisatie": "ORGANISATIE_ID",
-        "archiefstuk": "ARCHIEFSTUK_ID",
-        "project": "PROJECT_ID",
+        "ICT-project": "project_id",
+        "organisatie": "organisatie_id",
+        "archiefstuk": "archiefstuk_id",
+        "project": "project_id",
     }
-    param_name = param_mapping.get(entity_type, f"{entity_type.upper().replace('-', '_')}_ID")
+    param_name = param_mapping.get(entity_type, f"{entity_type.lower().replace('-', '_')}_id")
     context.parameters[param_name] = entity_id
 
 
 @given('een werkgever met loonheffingennummer "{number}"')
 def step_impl(context, number):
-    context.parameters["LOONHEFFINGENNUMMER"] = number
+    context.parameters["loonheffingennummer"] = number
 
 
 @given('een werknemer met bruto jaarloon "{amount}" euro')
 def step_impl(context, amount):
-    context.parameters["BRUTO_LOON"] = float(amount)
+    context.parameters["bruto_loon"] = float(amount)
 
 
 @given('een onderneming met KVK nummer "{kvk_nummer}"')
 def step_impl(context, kvk_nummer):
-    context.parameters["KVK_NUMMER"] = kvk_nummer
-    context.test_data["KVK_NUMMER"] = kvk_nummer
+    context.parameters["kvk_nummer"] = kvk_nummer
+    context.test_data["kvk_nummer"] = kvk_nummer
 
 
 @given("er is geen Bibob-advies uitgebracht voor deze onderneming")
 def step_impl(context):
-    context.test_data["NO_BIBOB_ADVIES"] = True
+    context.test_data["no_bibob_advies"] = True
 
 
 @given('de aanvraag betreft een "{aanvraag_type}"')
 def step_impl(context, aanvraag_type):
-    context.parameters["AANVRAAG_TYPE"] = aanvraag_type
+    context.parameters["aanvraag_type"] = aanvraag_type
 
 
 @given("een archiefstuk met de volgende eigenschappen")
@@ -231,8 +240,8 @@ def step_impl(context):
     for row in context.table:
         for heading in context.table.headings:
             value = parse_value(row[heading])
-            context.parameters[heading.upper()] = value
-            context.test_data[heading.upper()] = value
+            context.parameters[heading] = value
+            context.test_data[heading] = value
 
 
 @given("alle aanvragen worden beoordeeld")
@@ -277,7 +286,7 @@ def step_impl(context, law, service):
 @when("de persoon dit aanvraagt")
 def step_impl(context):
     case_id = context.services.case_manager.submit_case(
-        bsn=context.parameters["BSN"],
+        bsn=context.parameters["bsn"],
         service_type=context.service,
         law=context.law,
         parameters=context.result.input,
@@ -291,6 +300,13 @@ def step_impl(context):
 def step_impl(context, reason):
     case = context.services.case_manager.get_case_by_id(context.case_id)
     case.decide(verified_result=context.result.output, reason=reason, verifier_id="BEOORDELAAR", approved=False)
+    # AWB art. 7:1, 6:7, 7:10: bezwaar mogelijk binnen 6 weken na besluit
+    case.determine_objection_status(
+        possible=True,
+        objection_period=6,
+        decision_period=6,
+        extension_period=6,
+    )
     context.services.case_manager.save(case)
 
 
@@ -303,9 +319,32 @@ def step_impl(context, reason):
 
 @when('de beoordelaar het bezwaar {approve} met reden "{reason}"')
 def step_impl(context, approve, reason):
-    approve = approve.lower() == "toewijst"
+    approved = approve.lower() == "toewijst"
     case = context.services.case_manager.get_case_by_id(context.case_id)
-    case.decide(verified_result=context.result.output, reason=reason, verifier_id="BEOORDELAAR", approved=approve)
+    case.decide(verified_result=context.result.output, reason=reason, verifier_id="BEOORDELAAR", approved=approved)
+    if not approved:
+        # Na afwijzing bezwaar: geen nieuw bezwaar mogelijk, wel beroep (AWB art. 7:1, 8:1)
+        case.determine_objection_status(
+            possible=False,
+            not_possible_reason="er is al eerder bezwaar gemaakt tegen dit besluit",
+        )
+        # AWB art. 8:1: na afwijzing bezwaar staat beroep open bij de rechtbank
+        # Bepaal competent_court uit jurisdictie data in services
+        competent_court = None
+        try:
+            jenv_service = context.services.services.get("JenV")
+            if jenv_service:
+                jurisdicties_df = jenv_service.source_dataframes.get("jurisdicties")
+                if jurisdicties_df is not None and "rechtbank" in jurisdicties_df.columns:
+                    competent_court = jurisdicties_df["rechtbank"].iloc[0]
+        except (AttributeError, IndexError, KeyError):
+            pass
+        case.determine_appeal_status(
+            possible=True,
+            appeal_period=6,
+            competent_court=competent_court,
+            court_type="RECHTBANK",
+        )
     context.services.case_manager.save(case)
 
 
@@ -318,7 +357,7 @@ def step_impl(context, chance):
         context.claims = []
 
     for row in context.table:
-        identifier = context.parameters.get("BSN") or context.parameters.get("KVK_NUMMER")
+        identifier = context.parameters.get("bsn") or context.parameters.get("kvk_nummer")
         claim_id = context.services.claim_manager.submit_claim(
             service=row["service"],
             key=row["key"],
@@ -580,7 +619,9 @@ def step_impl(context, amount):
 def step_impl(context):
     max_dagloon = 29067
     actual = context.result.output.get("ww_dagloon")
-    assertions.assertEqual(actual, max_dagloon, f"Expected dagloon to be maximized at €290.67, but was €{actual / 100:.2f}")
+    assertions.assertEqual(
+        actual, max_dagloon, f"Expected dagloon to be maximized at €290.67, but was €{actual / 100:.2f}"
+    )
 
 
 # =============================================================================
@@ -630,7 +671,9 @@ def step_impl(context):
     max_budget_2_kinderen_alo = 850200
     totaal = context.result.output.get("kindgebonden_budget_jaar", 0)
     assertions.assertLess(
-        totaal, max_budget_2_kinderen_alo, f"Expected budget to be reduced from maximum €8,502, but was €{totaal / 100:.2f}"
+        totaal,
+        max_budget_2_kinderen_alo,
+        f"Expected budget to be reduced from maximum €8,502, but was €{totaal / 100:.2f}",
     )
 
 
@@ -650,23 +693,25 @@ def step_impl(context):
         totaal, 800000, f"Expected high budget for 3 children with low income, but was €{totaal / 100:.2f}"
     )
     assertions.assertLess(
-        inkomen_afbouw, 100000, f"Expected minimal income reduction for low income, but afbouw was €{inkomen_afbouw / 100:.2f}"
+        inkomen_afbouw,
+        100000,
+        f"Expected minimal income reduction for low income, but afbouw was €{inkomen_afbouw / 100:.2f}",
     )
 
 
 @then("ontvangt de persoon extra bedragen voor kinderen 12+ en 16+")
 def step_impl(context):
     totaal = context.result.output.get("kindgebonden_budget_jaar", 0)
-    assertions.assertGreater(
-        totaal, 251100, f"Expected budget with age supplements, but was only €{totaal / 100:.2f}"
-    )
+    assertions.assertGreater(totaal, 251100, f"Expected budget with age supplements, but was only €{totaal / 100:.2f}")
 
 
 @then("is het kindgebonden budget maximaal door laag inkomen")
 def step_impl(context):
     inkomen_afbouw = context.result.output.get("inkomen_afbouw", 0)
     assertions.assertLess(
-        inkomen_afbouw, 50000, f"Expected minimal/no income reduction for low income, but afbouw was €{inkomen_afbouw / 100:.2f}"
+        inkomen_afbouw,
+        50000,
+        f"Expected minimal/no income reduction for low income, but afbouw was €{inkomen_afbouw / 100:.2f}",
     )
 
 

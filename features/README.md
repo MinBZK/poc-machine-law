@@ -19,7 +19,6 @@ Cross-cutting test files (case management, integration tests) may omit the servi
 
 ## Tags
 
-- `@skip-go` - Feature runs only in Python (no Go step definitions yet)
 - `@ui` - Requires Playwright browser installation; skipped by default in CI
 
 ## Running Tests
@@ -27,9 +26,6 @@ Cross-cutting test files (case management, integration tests) may omit the servi
 ```bash
 # Python (behave)
 uv run behave features --no-capture -v
-
-# Go (godog)
-cd features && go test -v .
 ```
 
 ## Generic Step Patterns
@@ -73,7 +69,6 @@ features/
 ├── integratie/         # Cross-cutting & integration tests
 ├── web/                # UI/web tests (@ui tagged)
 ├── steps/              # Python step definitions
-├── godogs_test.go      # Go step definitions
 └── README.md           # This file
 ```
 
@@ -83,5 +78,4 @@ features/
 2. Write a feature file following the naming convention above
 3. Place it in the appropriate subdirectory (or `overig/` if no category fits)
 4. Use generic step patterns where possible
-5. Run both Python and Go tests to verify
-6. Only commit if both engines pass (or add `@skip-go` if Go steps are missing)
+5. Run Python tests to verify

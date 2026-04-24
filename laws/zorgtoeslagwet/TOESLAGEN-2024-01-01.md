@@ -43,33 +43,33 @@ Geldig vanaf: 2024-01-01
 
 De <span style="color: green">hoogte_toeslag</span> is
 
-  - Indien <span style="color:green">$HEEFT_PARTNER</span> gelijk aan <span style="color:green">false</span>
+  - Indien <span style="color:green">$heeft_partner</span> gelijk aan <span style="color:green">false</span>
 
 
     dan
-    - Indien <span style="color:green">$INKOMEN</span> groter dan <span style="color:blue">$DREMPELINKOMEN_ALLEENSTAANDE</span>
+    - Indien <span style="color:green">$inkomen</span> groter dan <span style="color:blue">$drempelinkomen_alleenstaande</span>
 
 
       dan <span style="color:green">0</span>
 
 
-    - Indien <span style="color:green">$VERMOGEN</span> groter dan <span style="color:blue">$VERMOGENSGRENS_ALLEENSTAANDE</span>
+    - Indien <span style="color:green">$vermogen</span> groter dan <span style="color:blue">$vermogensgrens_alleenstaande</span>
 
 
       dan <span style="color:green">0</span>
 
 
-    - Anders <span style="color:green">$STANDAARDPREMIE</span> min <span style="color:blue">$PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND</span> keer <span style="color:green">$INKOMEN</span> minimaal <span style="color:blue">$DREMPELINKOMEN_ALLEENSTAANDE</span>
+    - Anders <span style="color:green">$standaardpremie</span> min <span style="color:blue">$percentage_drempelinkomen_alleenstaand</span> keer <span style="color:green">$inkomen</span> minimaal <span style="color:blue">$drempelinkomen_alleenstaande</span>
 
 
 
      plus
-      - Indien <span style="color:green">$INKOMEN</span> groter dan <span style="color:blue">$DREMPELINKOMEN_ALLEENSTAANDE</span>
+      - Indien <span style="color:green">$inkomen</span> groter dan <span style="color:blue">$drempelinkomen_alleenstaande</span>
 
 
-        dan <span style="color:green">$INKOMEN</span> min <span style="color:blue">$DREMPELINKOMEN_ALLEENSTAANDE</span>
+        dan <span style="color:green">$inkomen</span> min <span style="color:blue">$drempelinkomen_alleenstaande</span>
 
-       keer <span style="color:blue">$AFBOUWPERCENTAGE_MINIMUM</span>
+       keer <span style="color:blue">$afbouwpercentage_minimum</span>
 
 
 
@@ -84,43 +84,43 @@ De <span style="color: green">hoogte_toeslag</span> is
 
 
 
-  - Indien <span style="color:green">$HEEFT_PARTNER</span> gelijk aan <span style="color:green">true</span>
+  - Indien <span style="color:green">$heeft_partner</span> gelijk aan <span style="color:green">true</span>
 
 
     dan
-    - Indien <span style="color:green">$INKOMEN</span> plus <span style="color:green">$PARTNER_INKOMEN</span>
+    - Indien <span style="color:green">$inkomen</span> plus <span style="color:green">$partner_inkomen</span>
 
-     groter dan <span style="color:blue">$DREMPELINKOMEN_TOESLAGPARTNER</span>
-
-
-      dan <span style="color:green">0</span>
-
-
-    - Indien <span style="color:green">$GEZAMENLIJK_VERMOGEN</span> groter dan <span style="color:blue">$VERMOGENSGRENS_TOESLAGPARTNER</span>
+     groter dan <span style="color:blue">$drempelinkomen_toeslagpartner</span>
 
 
       dan <span style="color:green">0</span>
 
 
-    - Anders <span style="color:green">$STANDAARDPREMIE</span> keer <span style="color:green">2</span>
+    - Indien <span style="color:green">$gezamenlijk_vermogen</span> groter dan <span style="color:blue">$vermogensgrens_toeslagpartner</span>
 
-     min <span style="color:blue">$PERCENTAGE_DREMPELINKOMEN_MET_PARTNER</span> keer <span style="color:green">$INKOMEN</span> plus <span style="color:green">$PARTNER_INKOMEN</span>
 
-     minimaal <span style="color:blue">$DREMPELINKOMEN_TOESLAGPARTNER</span>
+      dan <span style="color:green">0</span>
+
+
+    - Anders <span style="color:green">$standaardpremie</span> keer <span style="color:green">2</span>
+
+     min <span style="color:blue">$percentage_drempelinkomen_met_partner</span> keer <span style="color:green">$inkomen</span> plus <span style="color:green">$partner_inkomen</span>
+
+     minimaal <span style="color:blue">$drempelinkomen_toeslagpartner</span>
 
 
 
      plus
-      - Indien <span style="color:green">$INKOMEN</span> plus <span style="color:green">$PARTNER_INKOMEN</span>
+      - Indien <span style="color:green">$inkomen</span> plus <span style="color:green">$partner_inkomen</span>
 
-       groter dan <span style="color:blue">$DREMPELINKOMEN_TOESLAGPARTNER</span>
+       groter dan <span style="color:blue">$drempelinkomen_toeslagpartner</span>
 
 
-        dan <span style="color:green">$INKOMEN</span> plus <span style="color:green">$PARTNER_INKOMEN</span>
+        dan <span style="color:green">$inkomen</span> plus <span style="color:green">$partner_inkomen</span>
 
-       min <span style="color:blue">$DREMPELINKOMEN_TOESLAGPARTNER</span>
+       min <span style="color:blue">$drempelinkomen_toeslagpartner</span>
 
-       keer <span style="color:blue">$AFBOUWPERCENTAGE_BOVEN_DREMPEL</span>
+       keer <span style="color:blue">$afbouwpercentage_boven_drempel</span>
 
 
 
