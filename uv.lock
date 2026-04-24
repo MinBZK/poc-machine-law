@@ -1640,6 +1640,7 @@ dependencies = [
     { name = "pillow" },
     { name = "python-multipart" },
     { name = "pyyaml" },
+    { name = "regelrecht-engine" },
     { name = "requests" },
     { name = "scikit-learn" },
     { name = "tavily-python" },
@@ -1685,6 +1686,7 @@ requires-dist = [
     { name = "pillow", specifier = ">=11.3.0" },
     { name = "python-multipart", specifier = ">=0.0.20" },
     { name = "pyyaml", specifier = ">=6.0.2" },
+    { name = "regelrecht-engine", git = "https://github.com/MinBZK/regelrecht.git?subdirectory=packages%2Fengine&rev=0f584e90ba578e460b592b351b59a30a4b2d48f0" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "scikit-learn", specifier = ">=1.8.0" },
     { name = "tavily-python", specifier = ">=0.5.1" },
@@ -2061,6 +2063,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/22/f5/df4e9027acead3ecc
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2c/58/ca301544e1fa93ed4f80d724bf5b194f6e4b945841c5bfd555878eea9fcb/referencing-0.37.0-py3-none-any.whl", hash = "sha256:381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231", size = 26766, upload-time = "2025-10-13T15:30:47.625Z" },
 ]
+
+[[package]]
+name = "regelrecht-engine"
+version = "0.2.0"
+source = { git = "https://github.com/MinBZK/regelrecht.git?subdirectory=packages%2Fengine&rev=0f584e90ba578e460b592b351b59a30a4b2d48f0#0f584e90ba578e460b592b351b59a30a4b2d48f0" }
 
 [[package]]
 name = "regex"

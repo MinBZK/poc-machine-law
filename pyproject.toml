@@ -30,6 +30,7 @@ dependencies = [
     "pillow>=11.3.0",
     "python-multipart>=0.0.20",
     "pyyaml>=6.0.2",
+    "regelrecht-engine @ git+https://github.com/MinBZK/regelrecht.git@0f584e90ba578e460b592b351b59a30a4b2d48f0#subdirectory=packages/engine",
     "requests>=2.32.3",
     "scikit-learn>=1.8.0",
     "tavily-python>=0.5.1",
