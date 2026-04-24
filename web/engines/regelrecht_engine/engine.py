@@ -215,10 +215,20 @@ def _rust_trace_to_pathnode(trace: dict, input_specs: dict[str, dict[str, Any]])
 
     _index(trace, None)
 
+    # Globally dedupe by name across the whole tree: the same underlying
+    # variable (e.g. geboortedatum) can be resolved inside multiple
+    # cross-law branches (wet_brp showing up under Leeftijd *and* under
+    # Heeft partner). Showing it once keeps the panel readable.
+    seen_names: set[str] = set()
+
     for name, spec in input_specs.items():
         resolve_type, details = _classify_input(spec)
         details["path"] = f"${name}"
         required = bool(spec.get("required", False))
+
+        if name in seen_names:
+            continue
+        seen_names.add(name)
 
         if resolve_type == "SERVICE":
             source = spec.get("source") or {}
@@ -237,7 +247,7 @@ def _rust_trace_to_pathnode(trace: dict, input_specs: dict[str, dict[str, Any]])
                 details=details,
             )
             if cross_node:
-                node.children = _crosslaw_children_as_pathnodes(cross_node, regulation, output)
+                node.children = _crosslaw_children_as_pathnodes(cross_node, regulation, output, seen=seen_names)
             root.children.append(node)
         else:
             if name not in resolve_nodes:
@@ -261,6 +271,7 @@ def _crosslaw_children_as_pathnodes(
     output: str,
     depth: int = 0,
     max_depth: int = 3,
+    seen: set[str] | None = None,
 ) -> list[PathNode]:
     """Return the decomposition children for a cross-law service.
 
@@ -272,12 +283,20 @@ def _crosslaw_children_as_pathnodes(
     of the same law, it becomes a nested ``service_evaluation`` so the
     user can drill in further (e.g. box1 → loon/winst/uitkeringen).
     Plain input components render as leaves.
+
+    ``seen`` is a global dedup set passed down from the top-level
+    walker so the same variable never renders twice even when it
+    shows up in multiple cross-law branches.
     """
     if depth >= max_depth:
         return []
 
+    if seen is None:
+        seen = set()
+
     nested_outputs = _output_specs_for_law(regulation)
     nested_inputs = _input_specs_for_law(regulation)
+    nested_definitions = _definition_names_for_law(regulation)
 
     # Find the action node for this output.
     action = _find_action_in_trace(cross_node, output)
@@ -289,11 +308,20 @@ def _crosslaw_children_as_pathnodes(
     if not refs:
         return []
 
-    seen: set[str] = set()
     children: list[PathNode] = []
+
+    # Built-in pseudo-variables exposed by the engine (reference date,
+    # calculation date, the ambient BSN) are plumbing details, not
+    # citizen-facing data.
+    _BUILTINS = {"referencedate", "calculation_date", "bsn", "kvk_nummer"}
 
     for ref_name, ref_value in refs:
         if ref_name in seen:
+            continue
+        # Skip engine built-ins and the law's own constant definitions —
+        # they're not data the citizen supplied or that was resolved
+        # from an authoritative source.
+        if ref_name in _BUILTINS or ref_name in nested_definitions:
             continue
         seen.add(ref_name)
 
@@ -314,7 +342,9 @@ def _crosslaw_children_as_pathnodes(
                 required=False,
                 details=details,
             )
-            node.children = _crosslaw_children_as_pathnodes(cross_node, regulation, ref_name, depth + 1, max_depth)
+            node.children = _crosslaw_children_as_pathnodes(
+                cross_node, regulation, ref_name, depth + 1, max_depth, seen=seen
+            )
             children.append(node)
         else:
             # Treat as input / data-source leaf.
@@ -412,6 +442,47 @@ _OUTPUT_SPEC_CACHE: dict[str, dict[str, dict[str, Any]]] = {}
 
 
 _INPUT_SPEC_CACHE: dict[str, dict[str, dict[str, Any]]] = {}
+
+
+_DEFINITION_CACHE: dict[str, set[str]] = {}
+
+
+def _definition_names_for_law(law_id: str) -> set[str]:
+    """Return the set of ``definitions:`` keys declared by ``law_id``.
+
+    Definitions are constants that live alongside the execution spec
+    (e.g. tax thresholds, allowed partner types). They're plumbing the
+    law itself consumes — not data the citizen supplied or that was
+    resolved from an authoritative source — so we hide them from the
+    dashboard trace.
+    """
+    if law_id in _DEFINITION_CACHE:
+        return _DEFINITION_CACHE[law_id]
+
+    from machine.utils import RuleResolver
+
+    names: set[str] = set()
+    try:
+        resolver = RuleResolver()
+        rules = [r for r in resolver.rules if r.law == law_id]
+        if rules:
+            latest = max(rules, key=lambda r: r.valid_from)
+            data = yaml.safe_load(Path(latest.path).read_text())
+            if isinstance(data, dict):
+                for article in data.get("articles", []):
+                    machine_readable = article.get("machine_readable", {}) or {}
+                    # YAML spec stores definitions directly under
+                    # machine_readable; some laws also nest them under
+                    # execution for historical reasons, so check both.
+                    for container in (machine_readable, machine_readable.get("execution", {}) or {}):
+                        definitions = container.get("definitions") or {}
+                        for key in definitions:
+                            names.add(key)
+    except Exception as exc:
+        logger.debug("Could not load definitions for %s: %s", law_id, exc)
+
+    _DEFINITION_CACHE[law_id] = names
+    return names
 
 
 def _input_specs_for_law(law_id: str) -> dict[str, dict[str, Any]]:
