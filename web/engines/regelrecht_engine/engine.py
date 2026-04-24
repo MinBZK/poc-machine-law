@@ -255,73 +255,129 @@ def _rust_trace_to_pathnode(trace: dict, input_specs: dict[str, dict[str, Any]])
     return root
 
 
-def _crosslaw_children_as_pathnodes(cross_node: dict, regulation: str, output: str) -> list[PathNode]:
-    """Return the "break-down" children for a cross-law service.
+def _crosslaw_children_as_pathnodes(
+    cross_node: dict,
+    regulation: str,
+    output: str,
+    depth: int = 0,
+    max_depth: int = 3,
+) -> list[PathNode]:
+    """Return the decomposition children for a cross-law service.
 
-    The prod dashboard shows, under a cross-law expansion, only the
-    *component outputs* that make up the requested output — not every
-    internal input or downstream cross-law the referenced law happens
-    to consume. For ``wet_inkomstenbelasting#inkomen`` that means
-    ``box1_inkomen``, ``box2_inkomen``, ``box3_inkomen``,
-    ``buitenlands_inkomen``, etc., because these are the outputs whose
-    sum is the parent ``inkomen``.
-
-    The Rust trace exposes these as ``action`` nodes with a distinct
-    output name. We surface the action nodes, skip the main output
-    itself (it's already the parent), and drop raw ``resolve`` /
-    nested ``cross_law_reference`` nodes.
+    Matches the production dashboard: under a cross-law expansion we
+    show the ``$var`` references that appear as direct arguments to
+    the action that produced the requested output. Those are the
+    "components" the value breaks down into (e.g. ``inkomen = box1 +
+    box2 + box3 + buitenlands``). When a component is itself an output
+    of the same law, it becomes a nested ``service_evaluation`` so the
+    user can drill in further (e.g. box1 → loon/winst/uitkeringen).
+    Plain input components render as leaves.
     """
-    nested_specs = _input_specs_for_law(regulation)
-    # Load the referenced law's own output declarations so we can
-    # classify each action output as amount / boolean / etc.
+    if depth >= max_depth:
+        return []
+
     nested_outputs = _output_specs_for_law(regulation)
+    nested_inputs = _input_specs_for_law(regulation)
 
-    children: list[PathNode] = []
+    # Find the action node for this output.
+    action = _find_action_in_trace(cross_node, output)
+    if not action:
+        return []
+
+    # Walk the action's operation tree and pick up the direct $var refs.
+    refs: list[tuple[str, Any]] = _collect_direct_refs(action)
+    if not refs:
+        return []
+
     seen: set[str] = set()
+    children: list[PathNode] = []
 
-    def _walk_actions(node: dict) -> None:
-        if not isinstance(node, dict):
-            return
-        nt = node.get("node_type")
-        name = node.get("name", "")
-        if nt == "action" and name and name != output and name not in seen:
-            seen.add(name)
-            out_spec = nested_outputs.get(name, {})
+    for ref_name, ref_value in refs:
+        if ref_name in seen:
+            continue
+        seen.add(ref_name)
+
+        if ref_name in nested_outputs:
+            # Same-law output: render as a nested service_evaluation so
+            # the dashboard can recurse one level further down.
+            out_spec = nested_outputs[ref_name]
             details = {
                 "type": out_spec.get("type"),
                 "type_spec": out_spec.get("type_spec"),
-                "path": f"${name}",
+                "path": f"${ref_name}",
             }
+            node = PathNode(
+                type="service_evaluation",
+                name=ref_name,
+                result=ref_value,
+                resolve_type="SERVICE",
+                required=False,
+                details=details,
+            )
+            node.children = _crosslaw_children_as_pathnodes(cross_node, regulation, ref_name, depth + 1, max_depth)
+            children.append(node)
+        else:
+            # Treat as input / data-source leaf.
+            spec = nested_inputs.get(ref_name, {})
+            resolve_type, details = _classify_input(spec) if spec else ("NONE", {"type": None, "type_spec": None})
+            details["path"] = f"${ref_name}"
             children.append(
                 PathNode(
                     type="resolve",
-                    name=name,
-                    result=node.get("result"),
-                    resolve_type="NONE",
-                    required=False,
+                    name=ref_name,
+                    result=ref_value,
+                    resolve_type=resolve_type,
+                    required=bool(spec.get("required", False)) if spec else False,
                     details=details,
                 )
             )
-            return  # don't descend into the action's own operation tree
-        # Skip nested cross-law bodies so we stay at a single level of
-        # breakdown; the outermost cross_node is still walked.
-        if nt == "cross_law_reference" and node is not cross_node:
-            return
-        for child in node.get("children", []):
-            _walk_actions(child)
 
-    # Also fall back to nested input name matching for cases where the
-    # referenced law doesn't compute its result through discrete
-    # actions (e.g. single-expression laws).
-    _walk_actions(cross_node)
-    # Preserve YAML declaration order when available.
-    if nested_outputs:
-        order = {name: i for i, name in enumerate(nested_outputs)}
-        children.sort(key=lambda n: order.get(n.name, len(order)))
-    # Consume nested_specs reference to keep the helper's contract
-    # stable — future callers may want to classify extra nodes.
-    _ = nested_specs
     return children
+
+
+def _find_action_in_trace(cross_node: dict, output: str) -> dict | None:
+    """Locate the ``action`` trace node that computes ``output``."""
+    for child in cross_node.get("children", []):
+        if not isinstance(child, dict):
+            continue
+        if child.get("node_type") == "action" and child.get("name") == output:
+            return child
+    # Fall back to depth search in case the action is wrapped.
+    for child in cross_node.get("children", []):
+        if not isinstance(child, dict):
+            continue
+        if child.get("node_type") == "article":
+            for grand in child.get("children", []):
+                if isinstance(grand, dict) and grand.get("node_type") == "action" and grand.get("name") == output:
+                    return grand
+    return None
+
+
+def _collect_direct_refs(action: dict) -> list[tuple[str, Any]]:
+    """Collect ``(name, result)`` for $var refs inside an action value.
+
+    Walks the action's operation subtree and returns the first
+    ``resolve`` node encountered per name — these are the direct
+    components of the action's computation.
+    """
+    out: list[tuple[str, Any]] = []
+    seen: set[str] = set()
+
+    def _walk(n: dict) -> None:
+        if not isinstance(n, dict):
+            return
+        if n.get("node_type") == "resolve":
+            name = n.get("name", "")
+            if name and name not in seen:
+                seen.add(name)
+                out.append((name, n.get("result")))
+            return
+        for c in n.get("children", []):
+            _walk(c)
+
+    for child in action.get("children", []):
+        _walk(child)
+    return out
 
 
 def _output_specs_for_law(law_id: str) -> dict[str, dict[str, Any]]:
