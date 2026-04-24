@@ -186,6 +186,69 @@ class RegelrechtServices:
         self._services.set_source_dataframe(service, table, df)
         self._register_dataframe(table, df)
 
+    def _apply_claims_to_data_sources(self, bsn: str, reference_date: str, approved: bool) -> bool:
+        """Mutate registered DataFrames so cross-law lookups see claim values.
+
+        Direct parameter merging only covers claims whose ``(service, law)``
+        matches the outer evaluation. When the evaluated law resolves an
+        input via a cross-law reference (e.g. SVB/algemene_ouderdomswet
+        reading leeftijd from RvIG/wet_brp), the nested law fetches from
+        a registered source DataFrame. Patching that row lets the nested
+        call observe the claim without any engine-side changes.
+
+        For each approved-or-pending claim we look up the target law YAML,
+        find the input named ``claim.key``, read its ``source.table`` and
+        ``source.field``, and update the matching BSN row in the
+        corresponding DataFrame. Claims that don't map to a concrete
+        ``(table, field)`` are left alone; they were already handled
+        above as direct parameter overrides when the outer law matches.
+        """
+        claims = self.claim_manager.get_claims_by_bsn(bsn, approved=approved, include_rejected=False)
+        if not claims:
+            return False
+
+        patched = False
+        for claim in claims:
+            rule = self.resolver.find_rule(claim.law, reference_date, claim.service)
+            if not rule:
+                continue
+            try:
+                data = _load_law_yaml(rule.path)
+            except Exception as e:
+                logger.debug("Could not load YAML for claim %s/%s: %s", claim.service, claim.law, e)
+                continue
+
+            source = _find_input_source(data, claim.key)
+            if not source:
+                continue
+            table = source.get("table")
+            field = source.get("field")
+            if not table or not field:
+                continue
+
+            svc = self._services.services.get(claim.service)
+            if svc is None:
+                continue
+            df = svc.source_dataframes.get(table)
+            if df is None or df.empty or "bsn" not in df.columns or field not in df.columns:
+                continue
+
+            mask = df["bsn"].astype(str) == str(bsn)
+            if not mask.any():
+                continue
+            new_df = df.copy()
+            new_df.loc[mask, field] = _to_native(claim.new_value)
+            svc.source_dataframes[table] = new_df
+            patched = True
+            logger.debug(
+                "Claim applied to data source %s.%s for bsn=%s: %s",
+                table,
+                field,
+                bsn,
+                claim.new_value,
+            )
+        return patched
+
     # -- Evaluation ------------------------------------------------------------
 
     def evaluate(
@@ -229,6 +292,19 @@ class RegelrechtServices:
                         if key not in params:
                             params[key] = _to_native(claim.new_value)
                             logger.debug("Claim: %s = %s", key, params[key])
+
+                # Apply claims targeted at *other* (service, law) pairs by
+                # patching the corresponding registered DataFrame row. This
+                # covers cross-law cases such as an AOW evaluation that
+                # internally fetches wet_brp.geboortedatum: the claim lives
+                # against (RvIG, wet_brp), not the outer (SVB, aow) call,
+                # but the engine resolves geboortedatum from the personen
+                # DataFrame, so patching that row makes the claim visible.
+                if self._apply_claims_to_data_sources(bsn, reference_date, approved):
+                    # Re-sync the engine's data sources so the patched rows
+                    # replace the originals (engine registration does not
+                    # deduplicate, so a fresh clear-and-register is needed).
+                    self._sync_engine_data_sources()
 
             data = _load_law_yaml(rule.path)
             law_id = data.get("$id", law)
@@ -479,6 +555,25 @@ def _find_missing_required_inputs(data: dict, params: dict) -> list[str]:
             if isinstance(source, dict) and source.get("source_type") == "claim":
                 missing.append(name)
     return missing
+
+
+def _find_input_source(data: dict, name: str) -> dict | None:
+    """Return the ``source`` block for the input named ``name``, or None.
+
+    Walks all articles in a law YAML and returns the first input whose
+    ``name`` matches. Returns ``None`` if the input is absent or if its
+    ``source`` is not a dict (e.g. cross-law regulation references, which
+    shouldn't be patched via DataFrames anyway).
+    """
+    for art in data.get("articles", []):
+        for inp in art.get("machine_readable", {}).get("execution", {}).get("input", []):
+            if inp.get("name") != name:
+                continue
+            source = inp.get("source")
+            if isinstance(source, dict):
+                return source
+            return None
+    return None
 
 
 def _build_input_mapping_from_yaml(data: dict) -> dict[str, dict]:
