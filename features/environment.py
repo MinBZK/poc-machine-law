@@ -86,6 +86,9 @@ def after_all(context) -> None:
 
 
 def before_scenario(context, scenario) -> None:
+    if "skip" in scenario.effective_tags:
+        scenario.skip("tagged @skip")
+        return
     context.config.setup_logging()
     context.test_data = {}
     context.parameters = {}
