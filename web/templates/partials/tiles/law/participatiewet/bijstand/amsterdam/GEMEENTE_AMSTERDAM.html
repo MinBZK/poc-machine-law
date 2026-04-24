@@ -1,6 +1,6 @@
 {% extends "partials/tiles/base_tile.html" %}
 {% block tile_content %}
-    {% include "partials/tiles/law/participatiewet/bijstand/GEMEENTE_AMSTERDAM/computation.html" %}
+    {% include "partials/tiles/law/participatiewet/bijstand/amsterdam/GEMEENTE_AMSTERDAM/computation.html" %}
     {% if result.uitkeringsbedrag and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
         {% if result.uitkeringsbedrag != current_case.claimed_result.uitkeringsbedrag %}
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
