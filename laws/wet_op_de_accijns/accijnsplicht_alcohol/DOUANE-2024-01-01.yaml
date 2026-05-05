@@ -332,7 +332,13 @@ properties:
     # Artikel 13: overige alcoholhoudende producten per hectoliter per volumeprocent
     TARIEF_OVERIGE_PER_HL_PER_PROCENT: 18.27
 
-    # Grenswaarden alcoholpercentage
+    # Minimale alcoholpercentages voor accijnsplicht
+    # Artikel 6: bier met een alcoholgehalte van meer dan 0,5 volumeprocent
+    GRENS_BIER_ALCOHOL: 0.5
+    # Artikelen 8, 11a, 12: wijn, tussenproducten en overige met meer dan 1,2 volumeprocent
+    GRENS_OVERIG_ALCOHOL: 1.2
+
+    # Grenswaarden alcoholpercentage voor tariefindeling
     GRENS_WIJN_ALCOHOL: 8.5
     GRENS_TUSSEN_ALCOHOL: 15
 
@@ -365,17 +371,37 @@ requirements:
           juriconnect: "jci1.3:c:BWBR0005251&artikel=1&z=2024-01-01&g=2024-01-01"
           explanation: "Het product moet vallen onder een van de in artikel 1 lid 1 genoemde categorieen van accijnsgoederen"
 
-      # Alcoholpercentage moet boven 0 liggen
-      - subject: "$ALCOHOLPERCENTAGE"
-        operation: GREATER_THAN
-        value: 0
-        legal_basis:
-          law: "Wet op de accijns"
-          bwb_id: "BWBR0005251"
-          article: "6"
-          url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel6"
-          juriconnect: "jci1.3:c:BWBR0005251&artikel=6&z=2024-01-01&g=2024-01-01"
-          explanation: "Accijns is alleen verschuldigd over producten met een alcoholgehalte van meer dan 0,5 volumeprocent (bier) of meer dan 1,2 volumeprocent (wijn en overige)"
+      # Alcoholpercentage moet boven de wettelijke drempel liggen per producttype
+      # Bier: > 0,5% vol (artikel 6), Wijn/tussenproducten/overige: > 1,2% vol (artikelen 8, 11a, 12)
+      - any:
+          - all:
+              - subject: "$TYPE_PRODUCT"
+                operation: EQUALS
+                value: "$TYPE_BIER"
+              - subject: "$ALCOHOLPERCENTAGE"
+                operation: GREATER_THAN
+                value: "$GRENS_BIER_ALCOHOL"
+                legal_basis:
+                  law: "Wet op de accijns"
+                  bwb_id: "BWBR0005251"
+                  article: "6"
+                  url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel6"
+                  juriconnect: "jci1.3:c:BWBR0005251&artikel=6&z=2024-01-01&g=2024-01-01"
+                  explanation: "Artikel 6: onder bier wordt verstaan elk product met een alcoholgehalte van meer dan 0,5 volumeprocent"
+          - all:
+              - subject: "$TYPE_PRODUCT"
+                operation: NOT_EQUALS
+                value: "$TYPE_BIER"
+              - subject: "$ALCOHOLPERCENTAGE"
+                operation: GREATER_THAN
+                value: "$GRENS_OVERIG_ALCOHOL"
+                legal_basis:
+                  law: "Wet op de accijns"
+                  bwb_id: "BWBR0005251"
+                  article: "8"
+                  url: "https://wetten.overheid.nl/BWBR0005251/2024-01-01#HoofdstukII_Artikel8"
+                  juriconnect: "jci1.3:c:BWBR0005251&artikel=8&z=2024-01-01&g=2024-01-01"
+                  explanation: "Artikelen 8, 11a en 12: wijn, tussenproducten en overige alcoholhoudende producten hebben een alcoholgehalte van meer dan 1,2 volumeprocent"
 
       # Hoeveelheid moet positief zijn
       - subject: "$HOEVEELHEID_HECTOLITER"

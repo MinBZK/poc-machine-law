@@ -176,19 +176,39 @@ class ParametricLearner:
     5. Re-validate after rounding
     """
 
-    def __init__(self, constraints: ParametricConstraints | None = None) -> None:
+    def __init__(
+        self,
+        constraints: ParametricConstraints | None = None,
+        cost_mode: bool | None = None,
+    ) -> None:
         self.constraints = constraints or ParametricConstraints()
+        # When cost_mode is None, _detect_primary_feature falls back to column inspection
+        # for backward compatibility. Callers that know the mode (e.g. run_synthesize.py)
+        # should pass it explicitly to avoid silent column-priority bugs when both
+        # citizen and business columns are present in the dataframe.
+        self.cost_mode = cost_mode
 
     def prepare_data(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
         """Prepare data, same interface as SynthesisLearner."""
         return prepare_synthesis_data(df)
 
     def _detect_primary_feature(self, df: pd.DataFrame) -> tuple[str, bool]:
-        """Detect the primary continuous feature and whether this is a cost model.
+        """Determine the primary continuous feature and the cost/benefit mode.
 
-        Returns:
-            (primary_column_name, cost_mode)
+        If the learner was constructed with an explicit ``cost_mode``, that mode is
+        authoritative and the matching column is selected. Otherwise the method
+        falls back to column inspection in citizen → business order.
         """
+        if self.cost_mode is True:
+            for col in ("jaaromzet", "vloeroppervlakte"):
+                if col in df.columns:
+                    return col, True
+            raise ValueError("cost_mode=True maar geen 'jaaromzet' of 'vloeroppervlakte' kolom in dataframe")
+        if self.cost_mode is False:
+            if "income" not in df.columns:
+                raise ValueError("cost_mode=False maar geen 'income' kolom in dataframe")
+            return "income", False
+
         if "income" in df.columns:
             return "income", False
         if "jaaromzet" in df.columns:

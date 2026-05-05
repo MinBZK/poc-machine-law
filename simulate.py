@@ -25,6 +25,25 @@ logger.setLevel(logging.ERROR)
 # Directory for storing populations
 POPULATIONS_DIR = Path("data/populations")
 
+# Tarieven voor de business-simulatie. Spiegelen de YAML-definities:
+#   laws/wet_op_de_accijns/accijnsplicht_alcohol/DOUANE-2024-01-01.yaml (definitions block)
+# Wijzigingen aan tarieven moeten op beide plekken gebeuren tot de simulatie
+# rechtstreeks uit de YAML leest.
+ACCIJNS_BIER_PER_HL_PER_PROCENT = 8.12  # art. 7 lid 1
+ACCIJNS_BIER_MINIMUM_PER_HL = 26.13  # art. 7 lid 1
+ACCIJNS_WIJN_LAAG_PER_HL = 47.95  # art. 10 (alcohol <= 8,5%)
+ACCIJNS_WIJN_HOOG_PER_HL = 95.69  # art. 10 (alcohol > 8,5%)
+ACCIJNS_WIJN_GRENS_ALCOHOL = 8.5  # art. 10
+ACCIJNS_TUSSEN_LAAG_PER_HL = 114.85  # art. 11d (alcohol <= 15%)
+ACCIJNS_TUSSEN_HOOG_PER_HL = 161.80  # art. 11d (alcohol > 15%)
+ACCIJNS_TUSSEN_GRENS_ALCOHOL = 15  # art. 11d
+ACCIJNS_OVERIGE_PER_HL_PER_PROCENT = 18.27  # art. 13
+
+# ZVW werkgeversbijdrage 2024 - Zorgverzekeringswet art. 42 jo. art. 43
+# Percentages worden jaarlijks vastgesteld bij ministeriele regeling.
+ZVW_WERKGEVERSPCT_2024 = 0.0657
+ZVW_MAX_BIJDRAGE_INKOMEN_2024 = 71_624.0
+
 
 class LawSimulator:
     def __init__(self, simulation_date="2025-03-01", law_parameters=None) -> None:
@@ -2327,28 +2346,25 @@ class LawSimulator:
             alc = b["alcoholpercentage"]
             hl = b["hoeveelheid_hectoliter"]
             if tp == "bier":
-                tarief = max(8.12 * alc, 26.13)  # art 7 lid 1
+                tarief = max(ACCIJNS_BIER_PER_HL_PER_PROCENT * alc, ACCIJNS_BIER_MINIMUM_PER_HL)
             elif tp in ("wijn_niet_mousserend", "wijn_mousserend"):
-                tarief = 47.95 if alc <= 8.5 else 95.69  # art 10
+                tarief = ACCIJNS_WIJN_LAAG_PER_HL if alc <= ACCIJNS_WIJN_GRENS_ALCOHOL else ACCIJNS_WIJN_HOOG_PER_HL
             elif tp in ("tussenproduct_niet_mousserend", "tussenproduct_mousserend"):
-                tarief = 114.85 if alc <= 15 else 161.80  # art 11d
+                tarief = (
+                    ACCIJNS_TUSSEN_LAAG_PER_HL if alc <= ACCIJNS_TUSSEN_GRENS_ALCOHOL else ACCIJNS_TUSSEN_HOOG_PER_HL
+                )
             elif tp == "overige_alcohol":
-                tarief = 18.27 * alc  # art 13
+                tarief = ACCIJNS_OVERIGE_PER_HL_PER_PROCENT * alc
             else:
                 tarief = 0.0
             accijns_amount = round(tarief * hl, 2)
 
-        # 9. ZVW werkgeversbijdrage: 6.57% over loon tot max €71.624 per werknemer
+        # 9. ZVW werkgeversbijdrage: 6,57% over loon tot maximumbijdrage-inkomen per werknemer
         zvw_eligible = b["aantal_werknemers"] > 0
         zvw_amount = 0.0
         if zvw_eligible:
-            zvw_pct = 0.0657
-            max_bijdrage_inkomen = 71624.0
-            for _ in range(b["aantal_werknemers"]):
-                loon = b["bruto_loon_per_werknemer"]
-                bijdrage_inkomen = min(loon, max_bijdrage_inkomen)
-                zvw_amount += bijdrage_inkomen * zvw_pct
-            zvw_amount = round(zvw_amount, 2)
+            bijdrage_inkomen = min(b["bruto_loon_per_werknemer"], ZVW_MAX_BIJDRAGE_INKOMEN_2024)
+            zvw_amount = round(b["aantal_werknemers"] * bijdrage_inkomen * ZVW_WERKGEVERSPCT_2024, 2)
 
         return {
             **b,

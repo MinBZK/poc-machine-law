@@ -505,7 +505,8 @@ def run_train_parametric(params: dict, selected_laws: list[str]) -> dict:
 
     simulator = LawSimulator(simulation_date)
 
-    if _is_business_profile(params, selected_laws):
+    is_business = _is_business_profile(params, selected_laws)
+    if is_business:
         results_df = simulator.run_business_simulation(num_businesses=num_people)
         synthesis_df = simulator.export_for_business_synthesis(results_df, selected_laws=selected_laws)
     else:
@@ -514,7 +515,7 @@ def run_train_parametric(params: dict, selected_laws: list[str]) -> dict:
         synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
 
     constraints = ParametricConstraints()
-    learner = ParametricLearner(constraints=constraints)
+    learner = ParametricLearner(constraints=constraints, cost_mode=is_business)
     model = learner.train(synthesis_df, selected_laws)
 
     # Generate YAML with appropriate config for citizen/business

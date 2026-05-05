@@ -351,7 +351,7 @@ Feature: Bepalen accijnsplicht en tarief alcoholhoudende dranken
 
   Scenario: Product met 0% alcohol - geen accijnsgoed
     # Casus: Alcoholvrij bier (0% vol) is geen accijnsgoed.
-    # Requirements niet voldaan: alcoholpercentage moet groter zijn dan 0.
+    # Requirements niet voldaan: alcoholpercentage moet groter zijn dan 0,5% (artikel 6).
     Given een organisatie met KVK-nummer "85234567"
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | sbi_code |
@@ -359,4 +359,100 @@ Feature: Bepalen accijnsplicht en tarief alcoholhoudende dranken
     When de wet_op_de_accijns/accijnsplicht_alcohol wordt uitgevoerd door DOUANE met
       | TYPE_PRODUCT | ALCOHOLPERCENTAGE | HOEVEELHEID_HECTOLITER | ACTIVITEIT |
       | bier         | 0                 | 10                     | handel     |
+    Then is niet voldaan aan de voorwaarden
+
+  Scenario: Bier met 0,3% alcohol - onder drempel, geen accijnsgoed
+    # Casus: Licht alcoholisch bier (0,3% vol) valt onder de drempel van 0,5%.
+    # Artikel 6: bier is pas accijnsplichtig bij meer dan 0,5 volumeprocent.
+    Given een organisatie met KVK-nummer "85234567"
+    And de volgende KVK organisaties gegevens:
+      | kvk_nummer | sbi_code |
+      | 85234567   | 56102    |
+    When de wet_op_de_accijns/accijnsplicht_alcohol wordt uitgevoerd door DOUANE met
+      | TYPE_PRODUCT | ALCOHOLPERCENTAGE | HOEVEELHEID_HECTOLITER | ACTIVITEIT |
+      | bier         | 0.3               | 10                     | handel     |
+    Then is niet voldaan aan de voorwaarden
+
+  Scenario: Bier met precies 0,5% alcohol - op drempel, geen accijnsgoed
+    # Casus: Bier met precies 0,5% vol valt niet onder accijns.
+    # Artikel 6: "meer dan 0,5 volumeprocent" - precies 0,5% is dus niet accijnsplichtig.
+    Given een organisatie met KVK-nummer "85234567"
+    And de volgende KVK organisaties gegevens:
+      | kvk_nummer | sbi_code |
+      | 85234567   | 56102    |
+    When de wet_op_de_accijns/accijnsplicht_alcohol wordt uitgevoerd door DOUANE met
+      | TYPE_PRODUCT | ALCOHOLPERCENTAGE | HOEVEELHEID_HECTOLITER | ACTIVITEIT |
+      | bier         | 0.5               | 10                     | handel     |
+    Then is niet voldaan aan de voorwaarden
+
+  Scenario: Wijn met 1,0% alcohol - onder drempel, geen accijnsgoed
+    # Casus: Licht alcoholische wijn (1,0% vol) valt onder de drempel van 1,2%.
+    # Artikel 8: wijn is pas accijnsplichtig bij meer dan 1,2 volumeprocent.
+    Given een organisatie met KVK-nummer "85234567"
+    And de volgende KVK organisaties gegevens:
+      | kvk_nummer | sbi_code |
+      | 85234567   | 56102    |
+    When de wet_op_de_accijns/accijnsplicht_alcohol wordt uitgevoerd door DOUANE met
+      | TYPE_PRODUCT          | ALCOHOLPERCENTAGE | HOEVEELHEID_HECTOLITER | ACTIVITEIT |
+      | wijn_niet_mousserend  | 1.0               | 10                     | handel     |
+    Then is niet voldaan aan de voorwaarden
+
+  Scenario: Wijn met precies 1,2% alcohol - op drempel, geen accijnsgoed
+    # Casus: Wijn met precies 1,2% vol valt niet onder accijns.
+    # Artikel 8: "meer dan 1,2 volumeprocent" - precies 1,2% is dus niet accijnsplichtig.
+    Given een organisatie met KVK-nummer "85234567"
+    And de volgende KVK organisaties gegevens:
+      | kvk_nummer | sbi_code |
+      | 85234567   | 56102    |
+    When de wet_op_de_accijns/accijnsplicht_alcohol wordt uitgevoerd door DOUANE met
+      | TYPE_PRODUCT          | ALCOHOLPERCENTAGE | HOEVEELHEID_HECTOLITER | ACTIVITEIT |
+      | wijn_niet_mousserend  | 1.2               | 10                     | handel     |
+    Then is niet voldaan aan de voorwaarden
+
+  Scenario: Tussenproduct met 1,0% alcohol - onder drempel, geen accijnsgoed
+    # Casus: Tussenproduct met 1,0% vol valt onder de drempel van 1,2%.
+    # Artikel 11a: tussenproducten zijn pas accijnsplichtig bij meer dan 1,2 volumeprocent.
+    Given een organisatie met KVK-nummer "85234567"
+    And de volgende KVK organisaties gegevens:
+      | kvk_nummer | sbi_code |
+      | 85234567   | 56102    |
+    When de wet_op_de_accijns/accijnsplicht_alcohol wordt uitgevoerd door DOUANE met
+      | TYPE_PRODUCT                    | ALCOHOLPERCENTAGE | HOEVEELHEID_HECTOLITER | ACTIVITEIT |
+      | tussenproduct_niet_mousserend   | 1.0               | 10                     | handel     |
+    Then is niet voldaan aan de voorwaarden
+
+  Scenario: Mousserende wijn met precies 1,2% alcohol - op drempel, geen accijnsgoed
+    # Casus: Mousserende wijn met precies 1,2% vol valt niet onder accijns.
+    # Artikel 8: "meer dan 1,2 volumeprocent" geldt voor zowel mousserend als niet-mousserend.
+    Given een organisatie met KVK-nummer "85234567"
+    And de volgende KVK organisaties gegevens:
+      | kvk_nummer | sbi_code |
+      | 85234567   | 56102    |
+    When de wet_op_de_accijns/accijnsplicht_alcohol wordt uitgevoerd door DOUANE met
+      | TYPE_PRODUCT      | ALCOHOLPERCENTAGE | HOEVEELHEID_HECTOLITER | ACTIVITEIT |
+      | wijn_mousserend   | 1.2               | 10                     | handel     |
+    Then is niet voldaan aan de voorwaarden
+
+  Scenario: Mousserend tussenproduct met precies 1,2% alcohol - op drempel, geen accijnsgoed
+    # Casus: Mousserend tussenproduct met precies 1,2% vol valt niet onder accijns.
+    # Artikel 11a: drempel van 1,2 volumeprocent geldt ook voor mousserende tussenproducten.
+    Given een organisatie met KVK-nummer "85234567"
+    And de volgende KVK organisaties gegevens:
+      | kvk_nummer | sbi_code |
+      | 85234567   | 56102    |
+    When de wet_op_de_accijns/accijnsplicht_alcohol wordt uitgevoerd door DOUANE met
+      | TYPE_PRODUCT                | ALCOHOLPERCENTAGE | HOEVEELHEID_HECTOLITER | ACTIVITEIT |
+      | tussenproduct_mousserend    | 1.2               | 10                     | handel     |
+    Then is niet voldaan aan de voorwaarden
+
+  Scenario: Onbekende producttype-categorie - geen accijnsgoed
+    # Casus: Een product dat niet in een van de wettelijke categorieen valt is geen accijnsgoed.
+    # Artikel 1 lid 1: alleen bier, wijn, tussenproducten en overige alcoholhoudende producten zijn accijnsgoed.
+    Given een organisatie met KVK-nummer "85234567"
+    And de volgende KVK organisaties gegevens:
+      | kvk_nummer | sbi_code |
+      | 85234567   | 56102    |
+    When de wet_op_de_accijns/accijnsplicht_alcohol wordt uitgevoerd door DOUANE met
+      | TYPE_PRODUCT  | ALCOHOLPERCENTAGE | HOEVEELHEID_HECTOLITER | ACTIVITEIT |
+      | frisdrank     | 5.0               | 10                     | handel     |
     Then is niet voldaan aan de voorwaarden
