@@ -14,6 +14,7 @@
     Position,
   } from '@xyflow/svelte';
   import LawNode from './LawNode.svelte';
+  import FitViewOnResize from './FitViewOnResize.svelte';
 
   // Import the styles for Svelte Flow to work
   import '@xyflow/svelte/dist/style.css';
@@ -662,6 +663,7 @@
     }}
     minZoom={0.1}
   >
+    <FitViewOnResize />
     <Controls showLock={false} />
     <Background variant={BackgroundVariant.Dots} />
     <MiniMap
