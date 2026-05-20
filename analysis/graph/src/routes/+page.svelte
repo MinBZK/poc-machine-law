@@ -62,9 +62,14 @@
 
   (async () => {
     try {
-      // Fetch the available laws from the backend
-      const response = await fetch('/laws/list');
-      filePaths = await response.json();
+      // Fetch all laws from the backend in the v0.5.0-compatible shape
+      // the graph expects. The shim lives at web/routers/laws.py::graph_data
+      // and translates v0.5.1 articles[*].machine_readable.execution
+      // into top-level properties.{input,output,sources}.
+      const graphResp = await fetch('/laws/graph-data');
+      let allLaws = (await graphResp.json()) as Law[];
+      // Keep filePaths populated for the per-law hyperlinks.
+      filePaths = allLaws.map((law) => `${law.service}/${law.law ?? law.name}-${law.valid_from}.yaml`);
 
       let i = 0;
 
@@ -73,21 +78,6 @@
 
       // Initialize a map of (service, output_field) to their UUIDs
       const serviceOutputToUUIDsMap = new Map<string, string[]>();
-
-      let allLaws = await Promise.all(
-        filePaths.map(async (filePath) => {
-          // Read the file content
-          // @ts-expect-error ts(2345) // Seems like a bug in the type definitions of `resolve`
-          const fileContent = await fetch(resolve(`/law/${filePath}`)).then((response) =>
-            response.text(),
-          );
-
-          // Parse the YAML content
-          const law = yaml.parse(fileContent) as Law;
-
-          return law;
-        }),
-      );
 
       // Filter to keep only the latest version of each law (by service and name)
       const lawMap = new Map<string, Law>();

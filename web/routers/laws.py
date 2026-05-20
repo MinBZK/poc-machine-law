@@ -218,6 +218,94 @@ async def list_laws():
     return JSONResponse(content=[law["file_path"] for law in all_laws if (law["service"], law["law"]) not in hidden])
 
 
+@router.get("/graph-data")
+async def graph_data():
+    """Return all laws in the shape the /analysis/graph Svelte app expects.
+
+    The graph app was written against the v0.5.0 YAML schema, where each
+    law exposed ``properties.input`` / ``properties.output`` /
+    ``properties.sources`` at the top level with ``service_reference``
+    metadata on cross-law inputs. v0.5.1 moved inputs and outputs under
+    ``articles[*].machine_readable.execution`` and renamed cross-law
+    references to ``source.regulation`` + ``source.output``. Rather
+    than port the graph frontend, we translate here so the existing
+    Svelte code keeps working without changes.
+    """
+    import yaml as _yaml
+
+    from web.demo.yaml_renderer import discover_laws
+    from web.feature_flags import FeatureFlags
+
+    laws_dir = os.path.join(os.path.dirname(__file__), "../../laws")
+    all_laws = discover_laws(laws_dir)
+
+    graph_laws = DemoProfiles.get_active_profile().get("graph_laws")
+    if graph_laws is not None:
+        allowed = set(graph_laws)
+        all_laws = [law for law in all_laws if law["path"] in allowed]
+    else:
+        hidden = {(s, l) for (s, l), v in FeatureFlags.LAW_DEFAULTS.items() if not v}
+        all_laws = [law for law in all_laws if (law["service"], law["law"]) not in hidden]
+
+    out = []
+    for law in all_laws:
+        yaml_path = os.path.join(laws_dir, law["file_path"])
+        try:
+            with open(yaml_path) as f:
+                data = _yaml.safe_load(f)
+        except Exception:
+            continue
+        if not isinstance(data, dict):
+            continue
+
+        inputs: list[dict] = []
+        outputs: list[dict] = []
+        sources: list[dict] = []
+        for article in data.get("articles", []):
+            exec_spec = (article.get("machine_readable") or {}).get("execution") or {}
+            for inp in exec_spec.get("input") or []:
+                translated = {
+                    "name": inp.get("name"),
+                    "description": inp.get("description", ""),
+                    "type": inp.get("type"),
+                    "required": inp.get("required", False),
+                }
+                source = inp.get("source") or {}
+                if source.get("regulation"):
+                    translated["service_reference"] = {
+                        "service": source.get("service"),
+                        "law": source.get("regulation"),
+                        "field": source.get("output", inp.get("name")),
+                    }
+                elif source.get("table"):
+                    translated["source_reference"] = {
+                        "table": source.get("table"),
+                        "field": source.get("field"),
+                        "fields": source.get("fields"),
+                    }
+                inputs.append(translated)
+            for outp in exec_spec.get("output") or []:
+                outputs.append(
+                    {
+                        "name": outp.get("name"),
+                        "description": outp.get("description", ""),
+                        "type": outp.get("type"),
+                    }
+                )
+
+        out.append(
+            {
+                "name": data.get("name") or data.get("$id") or law["law"],
+                "service": data.get("service") or law["service"],
+                "uuid": data.get("uuid") or f"{law['service']}:{law['law']}:{law['valid_from']}",
+                "valid_from": data.get("valid_from") or law["valid_from"],
+                "law": data.get("$id") or law["law"],
+                "properties": {"input": inputs, "output": outputs, "sources": sources},
+            }
+        )
+    return JSONResponse(content=out)
+
+
 @router.get("/demo-selection")
 async def demo_selection():
     """Return the graph_selected_laws UUIDs for the active demo profile.
