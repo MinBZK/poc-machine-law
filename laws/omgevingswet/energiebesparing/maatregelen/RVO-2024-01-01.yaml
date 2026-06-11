@@ -1,0 +1,228 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.7/schema.json
+uuid: 7c2e8f4a-91d3-4e5b-8a6f-2b0c9d1e3f57
+name: Erkende Maatregelenlijst energiebesparing (EML 2023, demo-subset)
+law: omgevingswet/energiebesparing/maatregelen
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+discoverable: "BUSINESS"
+requires_manual_approval: false
+valid_from: 2024-01-01
+service: "RVO"
+description: >
+  Bepaling welke maatregelen uit de Erkende Maatregelenlijst energiebesparing
+  (EML 2023, versie 1.3) van toepassing zijn, op basis van feitelijke
+  bedrijfskenmerken die de ondernemer aanlevert. Demo-subset van 7 maatregelen
+  uit de onderdelen Gebouwen en Faciliteiten; de volledige EML kent er ~150.
+  De parameter-descriptions zijn letterlijk de vragen die aan de ondernemer
+  gesteld worden.
+
+legal_basis:
+  law: "Besluit activiteiten leefomgeving"
+  bwb_id: "BWBR0041330"
+  article: "5.15"
+  url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+  juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 5.15 Bal verplicht tot het treffen van alle energiebesparende maatregelen met een terugverdientijd van 5 jaar of minder; de EML geldt als erkende invulling daarvan"
+
+references:
+  - law: "Erkende maatregelenlijst energiebesparing (EML) 2023, versie 1.3"
+    article: "Onderdelen Gebouwen en Faciliteiten"
+    url: "https://www.rvo.nl/sites/default/files/2023-11/erkende-maatregelenlijst-eml-2023-v-1-3.pdf"
+
+properties:
+  parameters:
+    - name: "HEEFT_KOELINSTALLATIE"
+      description: "Heeft het bedrijf een koel- of vriesinstallatie (koelcel, koelmeubel)?"
+      type: "boolean"
+      required: true
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+        explanation: "Feitelijk bedrijfskenmerk, aangeleverd door de ondernemer; bepaalt of de productkoeling-maatregelen (FD) van toepassing zijn"
+    - name: "HEEFT_AFZUIGINSTALLATIE"
+      description: "Heeft het bedrijf een afzuiginstallatie (keuken of ruimteventilatie)?"
+      type: "boolean"
+      required: true
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+        explanation: "Feitelijk bedrijfskenmerk, aangeleverd door de ondernemer; bepaalt of de afzuig-/ventilatiemaatregelen (FE4, GD1) van toepassing zijn"
+
+  output:
+    - name: "eml_gc1_van_toepassing"
+      description: "Gebouwen, Ruimteverwarming — Pas een klokregeling toe en regel deze in"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+        explanation: "EML 2023-maatregel GC1 (Gebouwen, Ruimteverwarming): een klokregeling op het centrale verwarmingssysteem geldt als erkende maatregel met terugverdientijd ≤ 5 jaar (art. 5.15 Bal)"
+    - name: "eml_gc3_van_toepassing"
+      description: "Gebouwen, Ruimteverwarming — Pas een weersafhankelijke regeling toe"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+        explanation: "EML 2023-maatregel GC3 (Gebouwen, Ruimteverwarming): een weersafhankelijke regeling van de aanvoertemperatuur geldt als erkende maatregel (art. 5.15 Bal)"
+    - name: "eml_gf4_van_toepassing"
+      description: "Gebouwen, Binnenverlichting — Vervang gloei-, halogeen- en spaarlampen door LED-lampen"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+        explanation: "EML 2023-maatregel GF4 (Gebouwen, Binnenverlichting): vervanging van gloei-, halogeen- en spaarlampen door LED geldt als erkende maatregel (art. 5.15 Bal)"
+    - name: "eml_fd3_van_toepassing"
+      description: "Faciliteiten, Productkoeling — Pas nachtafdekking toe bij semi-verticale koelmeubels"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+        explanation: "EML 2023-maatregel FD3 (Faciliteiten, Productkoeling): nachtafdekking bij semi-verticale koelmeubels; alleen van toepassing als het bedrijf een koelinstallatie heeft"
+    - name: "eml_fd7_van_toepassing"
+      description: "Faciliteiten, Productkoeling — Isoleer de wanden van koelcellen om warmte buiten te houden"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+        explanation: "EML 2023-maatregel FD7 (Faciliteiten, Productkoeling): isolatie van koelcelwanden; alleen van toepassing als het bedrijf een koelinstallatie heeft"
+    - name: "eml_fe4_van_toepassing"
+      description: "Faciliteiten, Grootkeukenapparatuur — Pas een laagdebiet afzuigkap toe bij grootkeukens"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+        explanation: "EML 2023-maatregel FE4 (Faciliteiten, Grootkeukenapparatuur): laagdebiet afzuigkap; alleen van toepassing als het bedrijf een afzuiginstallatie heeft"
+    - name: "eml_gd1_van_toepassing"
+      description: "Gebouwen, Ruimteventilatie — Pas een klokregeling toe op het ventilatiesysteem"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+        explanation: "EML 2023-maatregel GD1 (Gebouwen, Ruimteventilatie): klokregeling op het ventilatiesysteem; alleen van toepassing als het bedrijf een afzuiginstallatie heeft"
+
+  definitions: {}
+
+variables: []
+
+requirements: []
+
+actions:
+  # Demo-versimpeling: in de echte EML gelden technische randvoorwaarden (bv. aanwezigheid centraal verwarmingssysteem); hier onvoorwaardelijk.
+  - output: "eml_gc1_van_toepassing"
+    value: true
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+      explanation: "EML 2023-maatregel GC1 (Gebouwen, Ruimteverwarming): een klokregeling op het centrale verwarmingssysteem geldt als erkende maatregel met terugverdientijd ≤ 5 jaar (art. 5.15 Bal)"
+  - output: "eml_gc3_van_toepassing"
+    value: true
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+      explanation: "EML 2023-maatregel GC3 (Gebouwen, Ruimteverwarming): een weersafhankelijke regeling van de aanvoertemperatuur geldt als erkende maatregel (art. 5.15 Bal)"
+  - output: "eml_gf4_van_toepassing"
+    value: true
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+      explanation: "EML 2023-maatregel GF4 (Gebouwen, Binnenverlichting): vervanging van gloei-, halogeen- en spaarlampen door LED geldt als erkende maatregel (art. 5.15 Bal)"
+  - output: "eml_fd3_van_toepassing"
+    value: "$HEEFT_KOELINSTALLATIE"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+      explanation: "EML 2023-maatregel FD3 (Faciliteiten, Productkoeling): nachtafdekking bij semi-verticale koelmeubels; alleen van toepassing als het bedrijf een koelinstallatie heeft"
+  - output: "eml_fd7_van_toepassing"
+    value: "$HEEFT_KOELINSTALLATIE"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+      explanation: "EML 2023-maatregel FD7 (Faciliteiten, Productkoeling): isolatie van koelcelwanden; alleen van toepassing als het bedrijf een koelinstallatie heeft"
+  - output: "eml_fe4_van_toepassing"
+    value: "$HEEFT_AFZUIGINSTALLATIE"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+      explanation: "EML 2023-maatregel FE4 (Faciliteiten, Grootkeukenapparatuur): laagdebiet afzuigkap; alleen van toepassing als het bedrijf een afzuiginstallatie heeft"
+  - output: "eml_gd1_van_toepassing"
+    value: "$HEEFT_AFZUIGINSTALLATIE"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&z=2024-01-01&g=2024-01-01"
+      explanation: "EML 2023-maatregel GD1 (Gebouwen, Ruimteventilatie): klokregeling op het ventilatiesysteem; alleen van toepassing als het bedrijf een afzuiginstallatie heeft"
