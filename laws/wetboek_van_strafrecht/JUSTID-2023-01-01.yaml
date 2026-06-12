@@ -1,170 +1,96 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
-uuid: 41ffa9a4-89a6-4fed-acc7-6b4fdb2e56ce
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
+$id: wetboek_van_strafrecht
+regulatory_layer: WET
+publication_date: '2023-01-01'
+valid_from: '2023-01-01'
 name: Bepalen uitsluiting kiesrecht
-law: wetboek_van_strafrecht
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "TOEKENNING"
-valid_from: 2023-01-01
-service: "JUSTID"
-legal_basis:
-  law: "Wetboek van Strafrecht"
-  bwb_id: "BWBR0001854"
-  article: "28"
-  url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28"
-  juriconnect: "jci1.3:c:BWBR0001854&artikel=28&z=2024-01-01&g=2024-01-01"
-  explanation: "Artikel 28 Sr bepaalt dat bij veroordeling tot gevangenisstraf van ten minste een jaar de rechter ontzetting uit het kiesrecht kan uitspreken"
-description: >
-  Regels voor het bepalen of iemand is uitgesloten van het kiesrecht op basis van
-  een rechterlijke uitspraak volgens art. 28 Wetboek van Strafrecht.
-
-references:
-  - law: "Wetboek van Strafrecht"
-    article: "28"
-    url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28"
-
-properties:
-  parameters:
-    - name: "BSN"
-      description: "BSN van de persoon"
-      type: "string"
-      required: true
-      legal_basis:
-        law: "Wet justitiële en strafvorderlijke gegevens"
-        bwb_id: "BWBR0014194"
-        article: "8a"
-        url: "https://wetten.overheid.nl/BWBR0014194/2024-01-01#Artikel8a"
-        juriconnect: "jci1.3:c:BWBR0014194&artikel=8a&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 8a Wjsg bepaalt dat justitiële gegevens mogen worden verwerkt met gebruik van het BSN"
-
-  sources:
-    - name: "STEMRECHT_UITSLUITINGEN"
-      description: "Rechterlijke uitspraken met ontzetting uit kiesrecht"
-      type: "array"
-      legal_basis:
-        law: "Wetboek van Strafrecht"
-        bwb_id: "BWBR0001854"
-        article: "28"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28"
-        juriconnect: "jci1.3:c:BWBR0001854&artikel=28&lid=1&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 28 lid 1 Sr bepaalt de gevallen waarin ontzetting uit het kiesrecht kan worden uitgesproken"
-      temporal:
-        type: "period"
-        period_type: "continuous"
-      source_reference:
-        table: "ontzettingen"
-        fields: [ "startdatum", "einddatum" ]
-        select_on:
-          - name: "bsn"
-            description: "BSN van de persoon"
-            type: "string"
-            value: "$BSN"
-          - name: "type"
-            description: "Type ontzetting"
-            type: "string"
-            value: "KIESRECHT"
-
-  output:
-    - name: "heeft_stemrecht_uitsluiting"
-      description: "Is de persoon uitgesloten van kiesrecht"
-      type: "boolean"
-      legal_basis:
-        law: "Wetboek van Strafrecht"
-        bwb_id: "BWBR0001854"
-        article: "28"
-        paragraph: "4"
-        url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28"
-        juriconnect: "jci1.3:c:BWBR0001854&artikel=28&lid=4&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 28 lid 4 Sr bepaalt dat de ontzetting ingaat op de dag dat de uitspraak onherroepelijk is geworden"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-
-actions:
-  - output: "heeft_stemrecht_uitsluiting"
-    operation: IF
-    conditions:
-      - test:
-          subject: "$STEMRECHT_UITSLUITINGEN"
-          operation: NOT_NULL
-          legal_basis:
-            law: "Wetboek van Strafrecht"
-            bwb_id: "BWBR0001854"
-            article: "28"
-            paragraph: "1"
-            url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28"
-            juriconnect: "jci1.3:c:BWBR0001854&artikel=28&lid=1&z=2024-01-01&g=2024-01-01"
-            explanation: "Artikel 28 lid 1 Sr bepaalt dat ontzetting uit het kiesrecht bij rechterlijke uitspraak wordt opgelegd"
-        then:
-          operation: FOREACH
-          subject: "$STEMRECHT_UITSLUITINGEN"
-          combine: "OR"
-          value:
-            - operation: AND
-              values:
-                - operation: LESS_OR_EQUAL
-                  values:
-                    - "$startdatum"
-                    - "$calculation_date"
-                  legal_basis:
-                    law: "Wetboek van Strafrecht"
-                    bwb_id: "BWBR0001854"
-                    article: "28"
-                    paragraph: "4"
-                    url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28"
-                    juriconnect: "jci1.3:c:BWBR0001854&artikel=28&lid=4&z=2024-01-01&g=2024-01-01"
-                    explanation: "Artikel 28 lid 4 Sr bepaalt dat ontzetting ingaat op de dag dat de uitspraak onherroepelijk is geworden"
+bwb_id: BWBR0001854
+url: https://wetten.overheid.nl/BWBR0001854/2023-01-01
+service: JUSTID
+uuid: 41ffa9a4-89a6-4fed-acc7-6b4fdb2e56ce
+articles:
+- number: '28'
+  text: "1 De rechten waarvan de schuldige, in de bij de wet bepaalde gevallen, bij\
+    \ rechterlijke uitspraak kan worden ontzet, zijn:\n  1°. het bekleden van ambten\
+    \ of van bepaalde ambten;\n  2°. het dienen bij de gewapende macht;\n  3°. het\
+    \ recht de leden van algemeen vertegenwoordigende organen te verkiezen en tot\
+    \ lid van deze organen te worden verkozen;\n  4°. het zijn van raadsman of gerechtelijk\
+    \ bewindvoerder;\n  5°. de uitoefening van bepaalde beroepen.\n2 Ontzetting van\
+    \ leden van de rechterlijke macht die, hetzij voor hun leven, hetzij voor een\
+    \ bepaalde tijd, zijn aangesteld, of van andere voor hun leven aangestelde ambtenaren,\
+    \ geschiedt, ten opzichte van het ambt waartoe zij aldus zijn aangesteld, alleen\
+    \ in de gevallen en op de wijze bij de wet bepaald.\n3 Ontzetting van het recht\
+    \ bedoeld in het eerste lid, onder 3°, kan alleen worden uitgesproken bij veroordeling\
+    \ tot gevangenisstraf van ten minste een jaar.\n4 De rechter kan aan een krachtens\
+    \ algemene maatregel van bestuur aangewezen reclasseringsinstelling opdracht geven\
+    \ toezicht te houden op de naleving door de veroordeelde van de ontzetting van\
+    \ het recht om ambten of bepaalde ambten te bekleden en het recht om bepaalde\
+    \ beroepen uit te oefenen."
+  url: https://wetten.overheid.nl/BWBR0001854/2023-01-01#Artikel28
+  machine_readable:
+    execution:
+      produces:
+        legal_character: BESCHIKKING
+        decision_type: TOEKENNING
+      parameters:
+      - name: bsn
+        type: string
+        required: true
+      input:
+      - name: stemrecht_uitsluitingen
+        type: array
+        source:
+          table: ontzettingen
+          select_on:
+          - name: bsn
+            value: $bsn
+          - name: type
+            value: KIESRECHT
+          fields:
+          - startdatum
+          - einddatum
+      output:
+      - name: heeft_stemrecht_uitsluiting
+        type: boolean
+      actions:
+      - output: heeft_stemrecht_uitsluiting
+        value:
+          operation: IF
+          cases:
+          - when:
+              operation: EXISTS
+              subject: $stemrecht_uitsluitingen
+            then:
+              operation: FOREACH
+              collection: $stemrecht_uitsluitingen
+              body:
+                operation: AND
+                conditions:
+                - operation: LESS_THAN_OR_EQUAL
+                  subject: $startdatum
+                  value: $referencedate
                 - operation: OR
-                  values:
-                    - operation: EQUALS
-                      subject: "$einddatum"
-                      value: null
-                      legal_basis:
-                        law: "Wetboek van Strafrecht"
-                        bwb_id: "BWBR0001854"
-                        article: "31"
-                        url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel31"
-                        juriconnect: "jci1.3:c:BWBR0001854&artikel=31&z=2024-01-01&g=2024-01-01"
-                        explanation: "Artikel 31 Sr bepaalt de duur van bijkomende straffen waaronder ontzetting uit het kiesrecht"
-                    - operation: GREATER_OR_EQUAL
-                      values:
-                        - "$einddatum"
-                        - "$calculation_date"
-                      legal_basis:
-                        law: "Wetboek van Strafrecht"
-                        bwb_id: "BWBR0001854"
-                        article: "31"
-                        url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel31"
-                        juriconnect: "jci1.3:c:BWBR0001854&artikel=31&z=2024-01-01&g=2024-01-01"
-                        explanation: "Artikel 31 Sr bepaalt dat ontzetting eindigt na de door de rechter bepaalde termijn"
-                  legal_basis:
-                    law: "Wetboek van Strafrecht"
-                    bwb_id: "BWBR0001854"
-                    article: "31"
-                    url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel31"
-                    juriconnect: "jci1.3:c:BWBR0001854&artikel=31&z=2024-01-01&g=2024-01-01"
-                    explanation: "Artikel 31 Sr bepaalt de duur van de ontzetting uit het kiesrecht"
-              legal_basis:
-                law: "Wetboek van Strafrecht"
-                bwb_id: "BWBR0001854"
-                article: "28"
-                paragraph: "4"
-                url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28"
-                juriconnect: "jci1.3:c:BWBR0001854&artikel=28&lid=4&z=2024-01-01&g=2024-01-01"
-                explanation: "Artikel 28 lid 4 Sr bepaalt de geldigheidsperiode van de ontzetting"
-          legal_basis:
-            law: "Wetboek van Strafrecht"
-            bwb_id: "BWBR0001854"
-            article: "28"
-            url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28"
-            juriconnect: "jci1.3:c:BWBR0001854&artikel=28&z=2024-01-01&g=2024-01-01"
-            explanation: "Artikel 28 Sr bepaalt controle op alle uitspraken met ontzetting uit het kiesrecht"
-      - else: false
-    legal_basis:
-      law: "Wetboek van Strafrecht"
-      bwb_id: "BWBR0001854"
-      article: "28"
-      url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28"
-      juriconnect: "jci1.3:c:BWBR0001854&artikel=28&z=2024-01-01&g=2024-01-01"
-      explanation: "Artikel 28 Sr bepaalt de vaststelling van uitsluiting van het kiesrecht"
+                  conditions:
+                  - operation: EQUALS
+                    subject: $einddatum
+                    value: null
+                  - operation: GREATER_THAN_OR_EQUAL
+                    subject: $einddatum
+                    value: $referencedate
+              combine: OR
+          default: false
+        legal_basis:
+          law: Wetboek van Strafrecht
+          bwb_id: BWBR0001854
+          article: '28'
+          url: https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28
+          juriconnect: jci1.3:c:BWBR0001854&artikel=28&z=2024-01-01&g=2024-01-01
+          explanation: Artikel 28 Sr bepaalt de vaststelling van uitsluiting van het
+            kiesrecht
+    untranslatables:
+    - construct: iteratie over variabel aantal stemrecht-uitsluitingen
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal uitsluitingen
+        is dynamisch en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal uitsluitingen
+        tot een vast maximum
+      accepted: true

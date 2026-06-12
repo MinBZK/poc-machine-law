@@ -1,244 +1,216 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
-uuid: 9c6e5a4f-3d8b-4c2a-9e7d-6b4f8c9a3e2d
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
+$id: besluit_kerninstallaties
+regulatory_layer: WET
+publication_date: '2024-01-01'
+valid_from: '2024-01-01'
 name: Besluit kerninstallaties, splijtstoffen en ertsen
-law: besluit_kerninstallaties
-law_type: "FORMELE_WET"
-legal_character: "BESLUIT_VAN_ALGEMENE_STREKKING"
-decision_type: "ALGEMEEN_VERBINDEND_VOORSCHRIFT"
-discoverable: "BUSINESS"
-valid_from: 2024-01-01
-service: "ANVS"
-description: >
-  Regelgeving voor kerninstallaties, splijtstoffen en ertsen. Dit besluit werkt de Kernenergiewet
-  uit met concrete eisen voor financiële zekerheid, beveiligingsplannen, deskundigheid en andere
-  voorwaarden voor vergunningverlening.
-
-legal_basis:
-  law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-  bwb_id: "BWBR0002667"
-  url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-  juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-  explanation: "Dit besluit geeft uitvoering aan de Kernenergiewet"
-
-references:
-  - law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-    article: "19"
-    url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-  - law: "Kernenergiewet"
-    article: "15b"
-    url: "https://wetten.overheid.nl/BWBR0002402/2024-07-01#Hoofdstuk3_Artikel15b"
-  - law: "Kernenergiewet"
-    article: "15c"
-    url: "https://wetten.overheid.nl/BWBR0002402/2024-07-01#Hoofdstuk3_Artikel15c"
-
-properties:
-  parameters:
-    - name: "heeft_beveiligingsplan"
-      description: "Of er een goedgekeurd beveiligingsplan aanwezig is"
-      type: "boolean"
-      required: true
-      legal_basis:
-        law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-        bwb_id: "BWBR0002667"
-        url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-        explanation: "Het besluit vereist een beveiligingsplan voor nucleaire installaties"
-
-    - name: "heeft_noodplan"
-      description: "Of er een noodplan aanwezig is"
-      type: "boolean"
-      required: true
-      legal_basis:
-        law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-        bwb_id: "BWBR0002667"
-        url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-        explanation: "Het besluit vereist een noodplan voor nucleaire installaties"
-
-    - name: "heeft_beeindigingsplan"
-      description: "Of er een plan voor beëindiging/ontmanteling aanwezig is"
-      type: "boolean"
-      required: false
-      legal_basis:
-        law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-        bwb_id: "BWBR0002667"
-        url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-        explanation: "Het besluit kan een beëindigingsplan vereisen voor nucleaire installaties"
-
-    - name: "financiele_zekerheid_bedrag"
-      description: "Bedrag van de gestelde financiële zekerheid in eurocent"
-      type: "amount"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      required: true
-      legal_basis:
-        law: "Kernenergiewet"
-        bwb_id: "BWBR0002402"
-        article: "15b"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0002402/2024-07-01#Hoofdstuk3_Artikel15b"
-        juriconnect: "jci1.3:c:BWBR0002402&artikel=15b&lid=1&z=2024-07-01&g=2024-07-01"
-        explanation: "Artikel 15b lid 1 vereist zekerheid voor betaling van schadevergoeding"
-
-    - name: "aantal_deskundigen"
-      description: "Aantal stralingsbeschermingsdeskundigen beschikbaar"
-      type: "number"
-      type_spec:
-        precision: 0
-        min: 0
-      required: true
-      legal_basis:
-        law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-        bwb_id: "BWBR0002667"
-        url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-        explanation: "Het besluit vereist voldoende deskundigen voor stralingsbescherming"
-
-  output:
-    - name: "financiele_zekerheid_gesteld"
-      description: "Of voldoende financiële zekerheid is gesteld"
-      type: "boolean"
-      legal_basis:
-        law: "Kernenergiewet"
-        bwb_id: "BWBR0002402"
-        article: "15b"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0002402/2024-07-01#Hoofdstuk3_Artikel15b"
-        juriconnect: "jci1.3:c:BWBR0002402&artikel=15b&lid=1&z=2024-07-01&g=2024-07-01"
-        explanation: "Artikel 15b lid 1 bepaalt dat vergunning kan worden geweigerd zonder financiële zekerheid"
-
-    - name: "beveiligingsplan_voldoet"
-      description: "Of het beveiligingsplan voldoet aan de eisen"
-      type: "boolean"
-      legal_basis:
-        law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-        bwb_id: "BWBR0002667"
-        url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-        explanation: "Het besluit stelt eisen aan het beveiligingsplan"
-
-    - name: "noodplan_voldoet"
-      description: "Of het noodplan voldoet aan de eisen"
-      type: "boolean"
-      legal_basis:
-        law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-        bwb_id: "BWBR0002667"
-        url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-        explanation: "Het besluit stelt eisen aan het noodplan"
-
-    - name: "deskundigheid_voldoende"
-      description: "Of voldoende deskundigen beschikbaar zijn"
-      type: "boolean"
-      legal_basis:
-        law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-        bwb_id: "BWBR0002667"
-        url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-        explanation: "Het besluit vereist voldoende deskundigheid"
-
-    - name: "administratieve_eisen_voldaan"
-      description: "Of alle administratieve eisen zijn voldaan"
-      type: "boolean"
-      legal_basis:
-        law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-        bwb_id: "BWBR0002667"
-        url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-        explanation: "Het besluit stelt diverse administratieve eisen"
-
-  definitions:
-    MINIMAAL_FINANCIELE_ZEKERHEID: 100000000  # 1 miljoen euro in eurocent
-    MINIMUM_AANTAL_DESKUNDIGEN: 1
-
-requirements:
-  - subject: "$financiele_zekerheid_bedrag"
-    operation: GREATER_OR_EQUAL
-    value: 0
-
-actions:
-  - output: "financiele_zekerheid_gesteld"
-    operation: IF
-    legal_basis:
-      law: "Kernenergiewet"
-      bwb_id: "BWBR0002402"
-      article: "15b"
-      paragraph: "1"
-      url: "https://wetten.overheid.nl/BWBR0002402/2024-07-01#Hoofdstuk3_Artikel15b"
-      juriconnect: "jci1.3:c:BWBR0002402&artikel=15b&lid=1&z=2024-07-01&g=2024-07-01"
-      explanation: "Artikel 15b lid 1 vereist zekerheid voor betaling van schadevergoeding"
-    conditions:
-      - test:
-          subject: "$financiele_zekerheid_bedrag"
-          operation: GREATER_OR_EQUAL
-          value: "$MINIMAAL_FINANCIELE_ZEKERHEID"
-        then: true
-      - else: false
-
-  - output: "beveiligingsplan_voldoet"
-    value: "$heeft_beveiligingsplan"
-    legal_basis:
-      law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-      bwb_id: "BWBR0002667"
-      url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-      juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-      explanation: "Het besluit vereist een beveiligingsplan"
-
-  - output: "noodplan_voldoet"
-    value: "$heeft_noodplan"
-    legal_basis:
-      law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-      bwb_id: "BWBR0002667"
-      url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-      juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-      explanation: "Het besluit vereist een noodplan"
-
-  - output: "deskundigheid_voldoende"
-    operation: IF
-    legal_basis:
-      law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-      bwb_id: "BWBR0002667"
-      url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-      juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-      explanation: "Het besluit vereist voldoende deskundigheid"
-    conditions:
-      - test:
-          subject: "$aantal_deskundigen"
-          operation: GREATER_OR_EQUAL
-          value: "$MINIMUM_AANTAL_DESKUNDIGEN"
-        then: true
-      - else: false
-
-  - output: "administratieve_eisen_voldaan"
-    operation: IF
-    legal_basis:
-      law: "Besluit kerninstallaties, splijtstoffen en ertsen"
-      bwb_id: "BWBR0002667"
-      url: "https://wetten.overheid.nl/BWBR0002667/2025-01-01"
-      juriconnect: "jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01"
-      explanation: "Het besluit stelt diverse eisen die cumulatief voldaan moeten worden"
-    conditions:
-      - test:
-          operation: AND
-          values:
-            - operation: EQUALS
-              values:
-                - "$financiele_zekerheid_gesteld"
-                - true
-            - operation: EQUALS
-              values:
-                - "$beveiligingsplan_voldoet"
-                - true
-            - operation: EQUALS
-              values:
-                - "$noodplan_voldoet"
-                - true
-            - operation: EQUALS
-              values:
-                - "$deskundigheid_voldoende"
-                - true
-        then: true
-      - else: false
+bwb_id: BWBR0002667
+url: https://wetten.overheid.nl/BWBR0002667/2024-01-01
+service: ANVS
+uuid: 9c6e5a4f-3d8b-4c2a-9e7d-6b4f8c9a3e2d
+discoverable: BUSINESS
+articles:
+- number: '1'
+  text: "1 In dit besluit en de daarop berustende bepalingen wordt verstaan onder:\n\
+    \  - beheer van verbruikte splijtstoffen:\nalle activiteiten die te maken hebben\
+    \ met het hanteren, de voorbehandeling, de behandeling, het conditioneren, de\
+    \ opslag, de opwerking of de eindberging van verbruikte splijtstoffen, met uitzondering\
+    \ van het vervoer buiten het terrein van de faciliteit;\n  - bron:\nsplijtstof\
+    \ of erts;\n  - buiten-ontwerpongeval:\nongeval waarvan de kans dat het zich voordoet\
+    \ geringer is dan elk van de gepostuleerde begin-gebeurtenissen en waarbij niet\
+    \ is uit te sluiten dat door het vrijkomen van splijtstoffen of radioactieve stoffen\
+    \ de bij artikel 18 vastgestelde limietwaarden voor de gepostuleerde begin-gebeurtenissen\
+    \ worden overschreden;\n  - gehalte:\nmassagehalte van de elementen uranium, thorium\
+    \ en plutonium in splijtstoffen;\n  - gepostuleerde begin-gebeurtenissen:\nredelijkerwijs\
+    \ mogelijk te achten voorvallen die bij juist functioneren van de daartoe speciaal\
+    \ ontworpen veiligheidssystemen tot voorzienbare bedrijfsgevolgen of ongevalsomstandigheden\
+    \ leiden die een besmetting of een blootstelling van de omgeving kunnen veroorzaken;\n\
+    \  - gevaarlijke stof:\ngevaarlijke stof als bedoeld in artikel 3, tiende lid,\
+    \ van de Seveso-richtlijn;\n  - handeling:\nhandeling als genoemd in artikel 15\
+    \ van de wet, niet zijnde het vervoeren van, het voorhanden hebben bij opslag\
+    \ in verband met vervoer, of het binnen of buiten Nederlands grondgebied brengen\
+    \ of doen brengen van splijtstoffen of ertsen, uitgezonderd bij een interventie,\
+    \ een ongeval of een radiologische noodsituatie;\n  - hoogactieve bron:\nhoogactieve\
+    \ bron als bedoeld in artikel 1.2 in samenhang met bijlage 1 van het Besluit basisveiligheidsnormen\
+    \ stralingsbescherming;\n  - ingekapselde bron:\nsplijtstoffen of ertsen welke\
+    \ permanent in een omhulsel zijn ingekapseld, dan wel gebonden zijn in vaste vorm\
+    \ teneinde onder normale gebruiksomstandigheden iedere verspreiding van splijtstoffen\
+    \ of ertsen te voorkomen;\n  - lid van de bevolking:\neen persoon uit de bevolking\
+    \ binnen of buiten een locatie, niet zijnde een werknemer gedurende zijn werktijd\
+    \ of een persoon die een medische blootstelling ondergaat;\n  - locatie:\ninrichting\
+    \ of uitrusting als bedoeld in artikel 15, onder b of c, van de wet, locatie waarop\
+    \ een milieubelastende activiteit die is aangewezen in hoofdstuk 3 van het Besluit\
+    \ activiteiten leefomgeving wordt verricht of plaats waar een handeling wordt\
+    \ verricht;\n  - natuurlijk uranium:\ndoor een chemisch scheidingsproces verkregen\
+    \ uranium waarin de uraniumisotopen zich in de natuurlijke verhouding bevinden;\n\
+    \  - nucleaire drukapparatuur:\nspeciaal voor nucleair gebruik in inrichtingen\
+    \ als bedoeld in artikel 15, onder b, van de wet ontworpen drukapparatuur die\
+    \ bij defecten de verspreiding van radioactiviteit kan veroorzaken, met uitzondering\
+    \ van splijtstofstaven en opslag- en transportverpakkingen;\n  - ondernemer:\n\
+    natuurlijke persoon, rechtspersoon of bestuursorgaan onder wiens verantwoordelijkheid\
+    \ een handeling wordt verricht of maatregel wordt uitgevoerd;\n  - ontmantelingsplan:\n\
+    plan met een beschrijving van de wijze waarop een inrichting als bedoeld in artikel\
+    \ 15, onder b, van de wet buiten gebruik wordt gesteld en ontmanteld;\n  - Onze\
+    \ Minister:\nOnze Minister van Infrastructuur en Milieu;\n  - referentiedreiging:\n\
+    lange termijnanalyse van dreigingen van diefstal van de in de bijlage genoemde\
+    \ splijtstoffen en ertsen dan wel van sabotage van die splijtstoffen of ertsen,\
+    \ of van inrichtingen als bedoeld in artikel 15, onder b, van de wet;\n  - schade:\n\
+    nadelige gevolgen van ioniserende straling voor mensen, dieren, planten en goederen;\n\
+    \  - Seveso-richtlijn:\nRichtlijn 2012/18/EU van het Europees Parlement en de\
+    \ Raad van 4 juli 2012 betreffende de beheersing van de gevaren van zware ongevallen\
+    \ waarbij gevaarlijke stoffen zijn betrokken, houdende wijziging en vervolgens\
+    \ intrekking van Richtlijn 96/82/EG van de Raad (PbEU 2012, L 197);\n  - splijtstof\
+    \ of erts bevattende afvalstof:\nsplijtstof die, of erts dat krachtens artikel\
+    \ 19 van dit besluit in samenhang met artikel 10.7, eerste en tweede lid, van\
+    \ het Besluit basisveiligheidsnormen stralingsbescherming als zodanig is aangemerkt\
+    \ en niet wordt geloosd;\n  - verbruikte splijtstof:\nkernsplijtstof die bestraald\
+    \ is en permanent uit een reactorkern is verwijderd;\n  - verrijkingsgraad:\n\
+    massagehalte van uranium-235 en uranium-233 tezamen in verrijkt uranium;\n  -\
+    \ verrijkt uranium:\nuranium met een hoger massapercentage uranium-235 dan in\
+    \ natuurlijk uranium;\n  - wet:\nKernenergiewet.\n2 In dit besluit en de daarop\
+    \ berustende bepalingen wordt onder «activiteit», «blootstelling», «deskundige»,\
+    \ «effectieve dosis» «eindberging», «equivalente dosis», «gezondheidsschade»,\
+    \ «omgevingsdosisequivalent», «radiotoxiciteitsequivalent», »richtlijn 2011/77/Euratom»\
+    \ en «wet» verstaan hetgeen daaronder wordt verstaan in artikel 1.2 in samenhang\
+    \ met bijlage 1 van het Besluit basisveiligheidsnormen stralingsbescherming.\n\
+    3 In dit besluit en de daarop berustende bepalingen wordt onder «besmetting»,\
+    \ «lozing in de lucht», «lozing in het openbare riool» en «lozing in het oppervlaktewater»\
+    \ verstaan hetgeen daaronder wordt verstaan in artikel 1.2 in samenhang met bijlage\
+    \ 1 van het Besluit basisveiligheidsnormen stralingsbescherming, met dien verstande\
+    \ dat in plaats van «radioactieve stoffen» telkens «splijtstoffen of ertsen» wordt\
+    \ gelezen.\n4 Vervallen.\n5 In dit besluit en de daarop berustende bepalingen\
+    \ wordt onder «voorhanden hebben» mede verstaan: in bezit hebben, beheren, bewaren\
+    \ of anderszins feitelijk onder zich hebben, of het vervaardigen, bewerken, hanteren\
+    \ en opslaan, met uitzondering van het voorhanden hebben bij de opslag in verband\
+    \ met vervoer.\n6 In dit besluit en de daarop berustende bepalingen wordt onder\
+    \ drukvaten, installatieleidingen, veiligheidsappendages en onder druk staande\
+    \ appendages verstaan hetgeen daaronder wordt verstaan in het Warenwetbesluit\
+    \ drukapparatuur."
+  url: https://wetten.overheid.nl/BWBR0002667/2024-01-01#Artikel1
+  machine_readable:
+    definitions:
+      minimaal_financiele_zekerheid: 100000000
+      minimum_aantal_deskundigen: 1
+    execution:
+      produces:
+        legal_character: BESLUIT_VAN_ALGEMENE_STREKKING
+        decision_type: ALGEMEEN_VERBINDEND_VOORSCHRIFT
+      parameters:
+      - name: heeft_beveiligingsplan
+        type: boolean
+        required: true
+      - name: heeft_noodplan
+        type: boolean
+        required: true
+      - name: heeft_beeindigingsplan
+        type: boolean
+      - name: financiele_zekerheid_bedrag
+        type: amount
+        required: true
+        type_spec:
+          unit: eurocent
+          precision: 0
+          min: 0
+      - name: aantal_deskundigen
+        type: number
+        required: true
+        type_spec:
+          precision: 0
+          min: 0
+      output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
+      - name: financiele_zekerheid_gesteld
+        type: boolean
+      - name: beveiligingsplan_voldoet
+        type: boolean
+      - name: noodplan_voldoet
+        type: boolean
+      - name: deskundigheid_voldoende
+        type: boolean
+      - name: administratieve_eisen_voldaan
+        type: boolean
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          subject: $financiele_zekerheid_bedrag
+          operation: GREATER_THAN_OR_EQUAL
+          value: 0
+      - output: financiele_zekerheid_gesteld
+        value:
+          operation: IF
+          cases:
+          - when:
+              operation: GREATER_THAN_OR_EQUAL
+              subject: $financiele_zekerheid_bedrag
+              value: $minimaal_financiele_zekerheid
+            then: true
+          default: false
+        legal_basis:
+          law: Kernenergiewet
+          bwb_id: BWBR0002402
+          article: 15b
+          paragraph: '1'
+          url: https://wetten.overheid.nl/BWBR0002402/2024-07-01#Hoofdstuk3_Artikel15b
+          juriconnect: jci1.3:c:BWBR0002402&artikel=15b&lid=1&z=2024-07-01&g=2024-07-01
+          explanation: Artikel 15b lid 1 vereist zekerheid voor betaling van schadevergoeding
+      - output: beveiligingsplan_voldoet
+        value: $heeft_beveiligingsplan
+        legal_basis:
+          law: Besluit kerninstallaties, splijtstoffen en ertsen
+          bwb_id: BWBR0002667
+          url: https://wetten.overheid.nl/BWBR0002667/2025-01-01
+          juriconnect: jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01
+          explanation: Het besluit vereist een beveiligingsplan
+      - output: noodplan_voldoet
+        value: $heeft_noodplan
+        legal_basis:
+          law: Besluit kerninstallaties, splijtstoffen en ertsen
+          bwb_id: BWBR0002667
+          url: https://wetten.overheid.nl/BWBR0002667/2025-01-01
+          juriconnect: jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01
+          explanation: Het besluit vereist een noodplan
+      - output: deskundigheid_voldoende
+        value:
+          operation: IF
+          cases:
+          - when:
+              operation: GREATER_THAN_OR_EQUAL
+              subject: $aantal_deskundigen
+              value: $minimum_aantal_deskundigen
+            then: true
+          default: false
+        legal_basis:
+          law: Besluit kerninstallaties, splijtstoffen en ertsen
+          bwb_id: BWBR0002667
+          url: https://wetten.overheid.nl/BWBR0002667/2025-01-01
+          juriconnect: jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01
+          explanation: Het besluit vereist voldoende deskundigheid
+      - output: administratieve_eisen_voldaan
+        value:
+          operation: IF
+          cases:
+          - when:
+              operation: AND
+              conditions:
+              - operation: EQUALS
+                subject: $financiele_zekerheid_gesteld
+                value: true
+              - operation: EQUALS
+                subject: $beveiligingsplan_voldoet
+                value: true
+              - operation: EQUALS
+                subject: $noodplan_voldoet
+                value: true
+              - operation: EQUALS
+                subject: $deskundigheid_voldoende
+                value: true
+            then: true
+          default: false
+        legal_basis:
+          law: Besluit kerninstallaties, splijtstoffen en ertsen
+          bwb_id: BWBR0002667
+          url: https://wetten.overheid.nl/BWBR0002667/2025-01-01
+          juriconnect: jci1.3:c:BWBR0002667&z=2025-01-01&g=2025-01-01
+          explanation: Het besluit stelt diverse eisen die cumulatief voldaan moeten
+            worden

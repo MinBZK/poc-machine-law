@@ -17,7 +17,6 @@ from web.dependencies import (
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
-from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
 from web.feature_flags import is_auto_approve_claims_enabled, is_chat_enabled
 from web.utils import format_message
 
@@ -280,9 +279,8 @@ async def get_chat_page(
         profile = services.get_profile_data(bsn)
         if not profile:
             return HTMLResponse("Profile not found", status_code=404)
-    except UnexpectedStatus as e:
-        error_message = e.content.decode("utf-8") if e.content else "No response content"
-        return HTMLResponse(f"Server error: {error_message}", status_code=500)
+    except Exception as e:
+        return HTMLResponse(f"Server error: {e}", status_code=500)
 
     # Get available and configured LLM providers
     available_providers = LLMFactory.get_available_providers()
@@ -375,9 +373,8 @@ async def websocket_endpoint(
                 await websocket.send_text(json.dumps({"error": error_msg}))
                 manager.disconnect(client_id)
                 return
-        except UnexpectedStatus as e:
-            error_message = e.content.decode("utf-8") if e.content else "No response content"
-            error_msg = f"Server error getting profile for BSN {bsn}: {error_message}"
+        except Exception as e:
+            error_msg = f"Server error getting profile for BSN {bsn}: {e}"
             print(error_msg)
             await websocket.send_text(json.dumps({"error": error_msg}))
             manager.disconnect(client_id)

@@ -73,34 +73,26 @@ def filter_behave_output(output: str) -> str:
 
 async def _run_behave_async(run_id: str, feature_path: str, line_number: int | None = None) -> None:
     """Run behave in the background and stream output."""
-    print(f"DEBUG: _run_behave_async started for run_id {run_id}")
     try:
         # Ensure run_id exists in _test_runs
         if run_id not in _test_runs:
-            print(f"DEBUG: run_id {run_id} not in _test_runs, adding it")
             _test_runs[run_id] = {
                 "status": "running",
                 "output": "",
                 "raw_output": "",
             }
-        else:
-            print(f"DEBUG: run_id {run_id} already in _test_runs")
-
         # Build command
         if line_number:
             cmd = ["uv", "run", "behave", f"{feature_path}:{line_number}", "--no-capture", "-v"]
         else:
             cmd = ["uv", "run", "behave", str(feature_path), "--no-capture", "-v"]
 
-        print(f"DEBUG: About to create subprocess with cmd: {cmd}")
         # Create subprocess
         process = await asyncio.create_subprocess_exec(
             *cmd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
         )
-        print(f"DEBUG: Subprocess created, PID: {process.pid}")
-
         # Stream output with timeout (using wait_for for compatibility)
         timeout_seconds = 60
         output_lines = []
@@ -372,15 +364,10 @@ async def run_scenario(request: Request) -> JSONResponse:
             "scenario_name": scenario["name"],
         }
 
-        print(f"DEBUG: Created run_id {run_id}, _test_runs now has {len(_test_runs)} entries")
-        print(f"DEBUG: _test_runs keys: {list(_test_runs.keys())}")
-
         # Start async task and keep reference to prevent garbage collection
         task = asyncio.create_task(_run_behave_async(run_id, feature_path, line_number))
         _active_tasks.add(task)
         task.add_done_callback(_active_tasks.discard)
-
-        print(f"DEBUG: Started async task for run_id {run_id}")
 
         return JSONResponse(content={"run_id": run_id, "status": "started"})
 
@@ -391,14 +378,9 @@ async def run_scenario(request: Request) -> JSONResponse:
 @router.get("/feature/run-status/{run_id}", response_class=JSONResponse)
 async def get_run_status(run_id: str) -> JSONResponse:
     """Get status and output of a running test."""
-    print(f"DEBUG: get_run_status called for run_id {run_id}")
-    print(f"DEBUG: _test_runs has {len(_test_runs)} entries: {list(_test_runs.keys())}")
-
     if run_id not in _test_runs:
-        print(f"DEBUG: run_id {run_id} NOT FOUND in _test_runs!")
         raise HTTPException(status_code=404, detail="Run ID not found")
 
-    print(f"DEBUG: Returning status for run_id {run_id}: {_test_runs[run_id]}")
     return JSONResponse(content=_test_runs[run_id])
 
 

@@ -1,220 +1,118 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
-uuid: 50a9a87f-f222-473b-978f-6846f3cee076
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
+$id: wet_adviescollege_ict_toetsing
+regulatory_layer: WET
+publication_date: '2024-07-01'
+valid_from: '2024-07-01'
 name: ICT-toetsing Adviesplicht
-law: wet_adviescollege_ict_toetsing
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "TOEKENNING"
-discoverable: "BUSINESS"
-valid_from: 2024-07-01
-service: "ACICT"
-description: >
-  Bepaling van de adviesplicht voor ICT-projecten volgens de Wet Adviescollege ICT-toetsing.
-  Het Adviescollege ICT-toetsing adviseert over ICT-projecten en informatiesystemen bij
-  de centrale overheid met een minimale investering van €5 miljoen. De adviesplicht geldt
-  voor ministeries, zelfstandige bestuursorganen, politie en de rechterlijke macht, met
-  uitzondering van wapensystemen van het Ministerie van Defensie.
-
-legal_basis:
-  law: "Wet Adviescollege ICT-toetsing"
-  bwb_id: "BWBR0049412"
-  article: "1"
-  url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1"
-  juriconnect: "jci1.3:c:BWBR0049412&artikel=1&z=2024-07-01&g=2024-07-01"
-  explanation: "Deze service implementeert artikel 1 en 7 van de Wet Adviescollege ICT-toetsing die bepaalt voor welke ICT-projecten advies kan worden gevraagd"
-
-references:
-  - law: "Wet Adviescollege ICT-toetsing"
-    article: "1"
-    url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1"
-  - law: "Wet Adviescollege ICT-toetsing"
-    article: "7"
-    url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel7"
-  - law: "Wet Adviescollege ICT-toetsing"
-    article: "14"
-    url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel14"
-
-properties:
-  parameters:
-    - name: "PROJECT_ID"
-      description: "Unieke identificatie van het ICT-project"
-      type: "string"
-      required: true
-      legal_basis:
-        law: "Wet Adviescollege ICT-toetsing"
-        bwb_id: "BWBR0049412"
-        article: "1"
-        url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1"
-        juriconnect: "jci1.3:c:BWBR0049412&artikel=1&z=2024-07-01&g=2024-07-01"
-        explanation: "Project identificatie is nodig om het ICT-project te kunnen toetsen"
-
-  sources:
-    - name: "PROJECT_KOSTEN"
-      description: "Totale kosten van het ICT-project over de gehele levenscyclus"
-      type: "number"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      required: true
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "ACICT"
-        table: "ict_projecten"
-        field: "totale_kosten"
-        select_on:
-          - name: "project_id"
-            description: "Project identificatie"
-            type: "string"
-            value: "$PROJECT_ID"
-      legal_basis:
-        law: "Wet Adviescollege ICT-toetsing"
-        bwb_id: "BWBR0049412"
-        article: "1"
-        url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1"
-        juriconnect: "jci1.3:c:BWBR0049412&artikel=1&z=2024-07-01&g=2024-07-01"
-        explanation: "De kostendrempel van €5 miljoen bepaalt of een project onder de adviesplicht valt volgens artikel 1"
-
-    - name: "ORGANISATIE_TYPE"
-      description: "Type organisatie dat het ICT-project uitvoert"
-      type: "string"
-      required: true
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "ACICT"
-        table: "ict_projecten"
-        field: "organisatie_type"
-        select_on:
-          - name: "project_id"
-            description: "Project identificatie"
-            type: "string"
-            value: "$PROJECT_ID"
-      legal_basis:
-        law: "Wet Adviescollege ICT-toetsing"
-        bwb_id: "BWBR0049412"
-        article: "1"
-        url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1"
-        juriconnect: "jci1.3:c:BWBR0049412&artikel=1&z=2024-07-01&g=2024-07-01"
-        explanation: "Artikel 1 definieert welke organisaties van de centrale overheid onder de wet vallen"
-
-    - name: "PROJECT_TYPE"
-      description: "Type ICT-project (regulier of wapensysteem)"
-      type: "string"
-      required: true
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        source_type: "ACICT"
-        table: "ict_projecten"
-        field: "project_type"
-        select_on:
-          - name: "project_id"
-            description: "Project identificatie"
-            type: "string"
-            value: "$PROJECT_ID"
-      legal_basis:
-        law: "Wet Adviescollege ICT-toetsing"
-        bwb_id: "BWBR0049412"
-        article: "14"
-        url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel14"
-        juriconnect: "jci1.3:c:BWBR0049412&artikel=14&z=2024-07-01&g=2024-07-01"
-        explanation: "Artikel 14 sluit wapensystemen van het Ministerie van Defensie expliciet uit van de adviesplicht"
-
-  output:
-    - name: "adviesplicht"
-      description: "Of het ICT-project onder de adviesplicht van het Adviescollege ICT-toetsing valt"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Wet Adviescollege ICT-toetsing"
-        bwb_id: "BWBR0049412"
-        article: "7"
-        url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel7"
-        juriconnect: "jci1.3:c:BWBR0049412&artikel=7&z=2024-07-01&g=2024-07-01"
-        explanation: "Artikel 7 bepaalt wanneer het Adviescollege advies uitbrengt over ICT-projecten"
-
-    - name: "project_kosten"
-      description: "Totale kosten van het ICT-project"
-      type: "amount"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      citizen_relevance: secondary
-      legal_basis:
-        law: "Wet Adviescollege ICT-toetsing"
-        bwb_id: "BWBR0049412"
-        article: "1"
-        url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1"
-        juriconnect: "jci1.3:c:BWBR0049412&artikel=1&z=2024-07-01&g=2024-07-01"
-        explanation: "De projectkosten zijn relevant voor transparantie over de adviesplicht"
-
-  definitions:
-    KOSTEN_DREMPEL: 500000000  # €5.000.000 in eurocenten
-
-actions:
-  - legal_basis:
-      law: "Wet Adviescollege ICT-toetsing"
-      bwb_id: "BWBR0049412"
-      article: "7"
-      url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel7"
-      juriconnect: "jci1.3:c:BWBR0049412&artikel=7&z=2024-07-01&g=2024-07-01"
-      explanation: "De adviesplicht wordt bepaald door de cumulatieve voorwaarden uit artikel 1, 7 en 14"
-    output: "adviesplicht"
-    operation: AND
-    values:
-      - operation: GREATER_OR_EQUAL
-        subject: "$PROJECT_KOSTEN"
-        value: "$KOSTEN_DREMPEL"
+bwb_id: BWBR0049412
+url: https://wetten.overheid.nl/BWBR0049412/2024-07-01
+service: ACICT
+uuid: 50a9a87f-f222-473b-978f-6846f3cee076
+discoverable: BUSINESS
+articles:
+- number: '1'
+  text: "In deze wet wordt verstaan onder:\n  – Adviescollege: het Adviescollege ICT-toetsing,\
+    \ bedoeld in artikel 2;\n  – centrale overheid: de ministeries, de krachtens publiekrecht\
+    \ ingestelde zelfstandige bestuursorganen als bedoeld in artikel 4 van de Kaderwet\
+    \ zelfstandige bestuursorganen, de politie en de Raad voor de rechtspraak;\n \
+    \ – ICT-project: een project of programma, dan wel projecten of programma’s die\
+    \ onderlinge samenhang hebben, van de centrale overheid waarvan de kosten voor\
+    \ de ICT-componenten over de gehele looptijd van het project of programma ten\
+    \ minste € 5.000.000 bedragen;\n  – informatiesysteem: een samenhangend geheel\
+    \ van gegevensverzamelingen, procedures, processen en programmatuur van de centrale\
+    \ overheid, alsmede de voor het informatiesysteem getroffen voorzieningen voor\
+    \ opslag, verwerking en communicatie;\n  – korpschef van politie: de korpschef,\
+    \ bedoeld in artikel 27 van de Politiewet 2012;\n  – Onze Minister: Onze Minister\
+    \ van Binnenlandse Zaken en Koninkrijksrelaties;\n  – Onze Minister die verantwoordelijk\
+    \ is voor de ICT-voorziening: Onze Minister die verantwoordelijk is voor het ICT-project\
+    \ of het informatiesysteem waarop het advies betrekking heeft;\n  – Onze Minister\
+    \ die het aangaat: Onze Minister die de eerste ondertekenaar is van de wet of\
+    \ lagere regelgeving bij welke een zelfstandig bestuursorgaan is ingesteld;\n\
+    \  – zelfstandig bestuursorgaan: een krachtens publiekrecht ingesteld zelfstandig\
+    \ bestuursorgaan als bedoeld in artikel 4 van de Kaderwet zelfstandige bestuursorganen."
+  url: https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1
+  machine_readable:
+    definitions:
+      kosten_drempel: 500000000
+    execution:
+      produces:
+        legal_character: BESCHIKKING
+        decision_type: TOEKENNING
+      parameters:
+      - name: project_id
+        type: string
+        required: true
+      input:
+      - name: totale_kosten
+        type: number
+        source:
+          table: ict_projecten
+          field: totale_kosten
+          select_on:
+          - name: project_id
+            value: $project_id
+          source_type: ACICT
+      - name: organisatie_type
+        type: string
+        source:
+          table: ict_projecten
+          field: organisatie_type
+          select_on:
+          - name: project_id
+            value: $project_id
+          source_type: ACICT
+      - name: project_type
+        type: string
+        source:
+          table: ict_projecten
+          field: project_type
+          select_on:
+          - name: project_id
+            value: $project_id
+          source_type: ACICT
+      output:
+      - name: adviesplicht
+        type: boolean
+      - name: project_kosten
+        type: amount
+        type_spec:
+          unit: eurocent
+          precision: 0
+          min: 0
+      actions:
+      - output: adviesplicht
+        value:
+          operation: AND
+          conditions:
+          - operation: GREATER_THAN_OR_EQUAL
+            subject: $totale_kosten
+            value: $kosten_drempel
+          - operation: IN
+            subject: $organisatie_type
+            values:
+            - MINISTERIE
+            - ZBO
+            - POLITIE
+            - RECHTERLIJKE_MACHT
+          - operation: NOT
+            value:
+              operation: EQUALS
+              subject: $project_type
+              value: WAPENSYSTEEM
         legal_basis:
-          law: "Wet Adviescollege ICT-toetsing"
-          bwb_id: "BWBR0049412"
-          article: "1"
-          url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1"
-          juriconnect: "jci1.3:c:BWBR0049412&artikel=1&z=2024-07-01&g=2024-07-01"
-          explanation: "Artikel 1 stelt de kostendrempel van €5 miljoen voor ICT-componenten"
-      - operation: IN
-        subject: "$ORGANISATIE_TYPE"
-        values:
-          - "MINISTERIE"
-          - "ZBO"
-          - "POLITIE"
-          - "RECHTERLIJKE_MACHT"
+          law: Wet Adviescollege ICT-toetsing
+          bwb_id: BWBR0049412
+          article: '7'
+          url: https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel7
+          juriconnect: jci1.3:c:BWBR0049412&artikel=7&z=2024-07-01&g=2024-07-01
+          explanation: De adviesplicht wordt bepaald door de cumulatieve voorwaarden
+            uit artikel 1, 7 en 14
+      - output: project_kosten
+        value: $totale_kosten
         legal_basis:
-          law: "Wet Adviescollege ICT-toetsing"
-          bwb_id: "BWBR0049412"
-          article: "1"
-          url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1"
-          juriconnect: "jci1.3:c:BWBR0049412&artikel=1&z=2024-07-01&g=2024-07-01"
-          explanation: "Artikel 1 definieert de centrale overheid als ministeries, ZBO's, politie en rechterlijke macht"
-      - subject: "$PROJECT_TYPE"
-        operation: NOT_EQUALS
-        value: "WAPENSYSTEEM"
-        legal_basis:
-          law: "Wet Adviescollege ICT-toetsing"
-          bwb_id: "BWBR0049412"
-          article: "14"
-          url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel14"
-          juriconnect: "jci1.3:c:BWBR0049412&artikel=14&z=2024-07-01&g=2024-07-01"
-          explanation: "Artikel 14 sluit wapensystemen van Defensie expliciet uit van de adviesplicht"
-
-  - output: "project_kosten"
-    value: "$PROJECT_KOSTEN"
-    legal_basis:
-      law: "Wet Adviescollege ICT-toetsing"
-      bwb_id: "BWBR0049412"
-      article: "1"
-      url: "https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1"
-      juriconnect: "jci1.3:c:BWBR0049412&artikel=1&z=2024-07-01&g=2024-07-01"
-      explanation: "De projectkosten worden doorgegeven voor transparantie"
+          law: Wet Adviescollege ICT-toetsing
+          bwb_id: BWBR0049412
+          article: '1'
+          url: https://wetten.overheid.nl/BWBR0049412/2024-07-01#Artikel1
+          juriconnect: jci1.3:c:BWBR0049412&artikel=1&z=2024-07-01&g=2024-07-01
+          explanation: De projectkosten worden doorgegeven voor transparantie

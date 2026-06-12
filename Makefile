@@ -1,7 +1,6 @@
 PROJECT_NAME := lac
 CLUSTER_EXISTS := $$(k3d cluster list $(PROJECT_NAME) --no-headers | wc -l | xargs)
 ARCH := $(shell if [ "$(shell uname -m)" = "arm64" ]; then echo "linux/arm64"; else echo "linux/amd64"; fi)
-GENERATE_DIRS := $(shell grep '^\s*\./.*' go.work | tr -d '(' | tr -d ')' | tr -d ' ' | sed 's/^\.//')
 
 
 .PHONY: set_k8s_context
@@ -32,15 +31,5 @@ clean:
 
 .PHONY: lint
 lint:
-	find . -maxdepth 3 -type d -exec sh -c "cd \"{}\"/ && if [ -f go.mod ]; then golangci-lint run; fi;" \;
-
-generate:
-	openapi-python-client generate --path machinev2/api/openapi.yaml --output-path web/engines/http_engine/machine_client --overwrite
-	@if [ -z "$(GENERATE_DIRS)" ]; then \
-		echo "No directories found in go.work"; \
-		exit 1; \
-	fi
-	@for dir in $(GENERATE_DIRS); do \
-		echo "Running go generate in $$dir"; \
-		(cd $$dir && go generate ./...); \
-	done
+	ruff check
+	ruff format --check

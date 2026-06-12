@@ -1,63 +1,133 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
-uuid: 9c4e7b2d-6f3a-4e8b-9d5c-1a7f8b3e4c6d
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
+$id: uwv_toetsingsinkomen
+regulatory_layer: WET
+publication_date: '2020-01-01'
+valid_from: '2020-01-01'
 name: UWV Toetsingsinkomen
-law: uwv_toetsingsinkomen
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "TOEKENNING"
-valid_from: 2020-01-01
-service: "UWV"
-description: >
-  Toetsingsinkomen zoals geadministreerd door UWV voor de berekening van
-  inkomensafhankelijke regelingen zoals toeslagen.
-
-legal_basis:
-  law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
-  bwb_id: "BWBR0013060"
-  article: "54"
-  url: "https://wetten.overheid.nl/BWBR0013060/2025-01-01"
-  juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2025-01-01&g=2025-01-01"
-  explanation: "UWV verwerkt inkomensgegevens voor toeslagenberekeningen"
-
-properties:
-  parameters:
-    - name: "BSN"
-      description: "BSN van de persoon"
-      type: "string"
-      required: true
-
-  sources:
-    - name: "INKOMENSGEGEVENS"
-      description: "Toetsingsinkomen van de persoon"
-      type: "object"
-      legal_basis:
-        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
-        bwb_id: "BWBR0013060"
-        article: "54"
-        url: "https://wetten.overheid.nl/BWBR0013060/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2025-01-01&g=2025-01-01"
-        explanation: "UWV administreert toetsingsinkomen"
-      source_reference:
-        table: "uwv_toetsingsinkomen"
-        fields: ["toetsingsinkomen"]
-        select_on:
-          - name: "bsn"
-            description: "Burgerservicenummer van de persoon"
-            type: "string"
-            value: "$BSN"
-
-  output:
-    - name: "toetsingsinkomen"
-      description: "Toetsingsinkomen in eurocenten voor berekening toeslagen"
-      type: "amount"
-      legal_basis:
-        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
-        bwb_id: "BWBR0013060"
-        article: "54"
-        url: "https://wetten.overheid.nl/BWBR0013060/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2025-01-01&g=2025-01-01"
-        explanation: "Toetsingsinkomen voor inkomensafhankelijke regelingen"
-
-actions:
-  - output: "toetsingsinkomen"
-    value: "$INKOMENSGEGEVENS.toetsingsinkomen"
+bwb_id: BWBR0013060
+url: https://wetten.overheid.nl/BWBR0013060/2020-01-01
+service: UWV
+uuid: 9c4e7b2d-6f3a-4e8b-9d5c-1a7f8b3e4c6d
+articles:
+- number: '54'
+  text: "1 Een ieder verstrekt op verzoek aan het Uitvoeringsinstituut werknemersverzekeringen,\
+    \ de Sociale verzekeringsbank en Onze Minister en de Inspectie SZW, kosteloos,\
+    \ alle gegevens en inlichtingen die noodzakelijk zijn voor de uitvoering van bij\
+    \ of krachtens deze wet of enige andere wet door het desbetreffende bestuursorgaan\
+    \ en de Inspectie SZW uit te voeren taken ten opzichte van:\n  a. de betrokken\
+    \ persoon zelf;\n  b. de persoon in wiens dienst of voor wie hij arbeid verricht,\
+    \ heeft verricht of zou kunnen gaan verrichten;\n  c. de persoon, die in zijn\
+    \ dienst of voor hem arbeid verricht, heeft verricht of zou kunnen gaan verrichten.\n\
+    2 Een ieder kan uit eigen beweging de in het eerste lid bedoelde gegevens en inlichtingen\
+    \ aan de in het eerste lid bedoelde bestuursorganen en aan de Inspectie SZW verstrekken.\n\
+    3 Alle gegevens en inlichtingen die noodzakelijk zijn voor de uitvoering van de\
+    \ in het eerste lid bedoelde taken worden aan de in dat lid genoemde bestuursorganen\
+    \ en aan de Inspectie SZW op verzoek, kosteloos, tevens verstrekt door:\n  a.\
+    \ de colleges van burgemeester en wethouders;\n  b. de Belastingdienst;\n  c.\
+    \ de persoon, bedoeld in artikel 14, eerste lid, van de Arbeidsomstandighedenwet\
+    \ die belast is met de taken, bedoeld in artikel 14, eerste lid, onderdeel b,\
+    \ van die wet en de arbodienst, bedoeld in de Arbeidsomstandighedenwet;\n  d.\
+    \ het CAK, genoemd in artikel 6.1.1, eerste lid, van de Wet langdurige zorg, de\
+    \ zorgverzekeraars, bedoeld in de Zorgverzekeringswet, en de Wlz-uitvoerder bedoeld\
+    \ in artikel 1.1.1 van de Wet langdurige zorg;\n  e. de bedrijfstakpensioenfondsen,\
+    \ ondernemingspensioenfondsen, risicofondsen, stichtingen tot uitvoering van een\
+    \ regeling inzake vervroegd uittreden, en andere organen belast met het doen van\
+    \ uitkeringen of verstrekkingen die bij of krachtens artikel 6 van de Toeslagenwet\
+    \ als inkomen worden aangemerkt;\n  f. de Kamer van Koophandel, met dien verstande\
+    \ dat dit, in afwijking van de aanhef van dit lid, geschiedt tegen betaling van\
+    \ de daarvoor op grond van de Handelsregisterwet 2007 vastgestelde vergoeding;\n\
+    \  g. de korpschef en de bevelhebber van de Koninklijke marechaussee in de zin\
+    \ van de Vreemdelingenwet 2000;\n  h. Onze Minister van Veiligheid en Justitie\
+    \ voor zover het betreft de persoon die rechtens zijn vrijheid is ontnomen of\
+    \ de persoon die zich onttrekt aan de tenuitvoerlegging van een vrijheidsstraf\
+    \ of vrijheidsbenemende maatregel;\n  i. de door Onze Minister aangewezen ambtenaren\
+    \ als bedoeld in artikel 14 van de Wet arbeid vreemdelingen en artikel 24 van\
+    \ de Arbeidsomstandighedenwet;\n  j. griffiers van colleges, geheel of ten dele\
+    \ met rechtspraak belast, desgevraagd in de vorm van uittreksels uit of afschriften\
+    \ van uitspraken, registers en andere stukken;\n  k. Onze Minister van Onderwijs,\
+    \ Cultuur en Wetenschap en, voorzover het betreft het onderwijs of onderzoek op\
+    \ het gebied van landbouw, natuurlijke omgeving en voedsel, Onze Minister van\
+    \ Economische Zaken;\n  l. het Landelijk Bureau Inning Onderhoudsbijdragen, bedoeld\
+    \ in de Wet Landelijk Bureau Inning Onderhoudsbijdragen;\n  m. Onze Minister voor\
+    \ zover het betreft de uitvoering van de Wet inburgering;\n  n. Onze Minister\
+    \ en de colleges van burgemeester en wethouders voor zover het gegevens betreft\
+    \ die verwerkt worden in het landelijk register kinderopvang, bedoeld in de Wet\
+    \ kinderopvang.\n4 De in het eerste en derde lid bedoelde gegevens en inlichtingen\
+    \ worden op verzoek, binnen de daarbij gestelde termijn, verstrekt in schriftelijke\
+    \ vorm of in een andere vorm die redelijkerwijs kan worden verlangd.\n5 Degene\
+    \ op wie de in het eerste en derde lid bedoelde verplichting rust geeft op verzoek\
+    \ aan een bestuursorgaan als bedoeld in het eerste lid, alsmede aan de Inspectie\
+    \ SZW inzage in alle bescheiden en andere gegevensdragers, stelt deze op verzoek\
+    \ ter beschikking voor het nemen van afschrift en verleent de ter zake verlangde\
+    \ medewerking, voorzover dit noodzakelijk is voor de uitvoering van de in het\
+    \ eerste lid bedoelde taken door het in dat lid bedoelde bestuursorgaan en de\
+    \ Inspectie SZW.\n6 De Belastingdienst verstrekt aan het Uitvoeringsinstituut\
+    \ werknemersverzekeringen en de Sociale verzekeringsbank, zonder dat daaraan een\
+    \ verzoek ten grondslag ligt, gegevens over samenloop van een uitkering met inkomen\
+    \ uit of in verband met arbeid of bedrijf of over vermogen, die bij de uitvoering\
+    \ van een belastingwet of bij de invordering van enige rijksbelasting bekend zijn\
+    \ geworden, voor zover die gegevens noodzakelijk zijn voor de uitvoering van de\
+    \ in het eerste lid bedoelde taken met betrekking tot het verstrekken van uitkeringen\
+    \ en taken, bedoeld in artikel 30, vijfde lid, en artikel 34, tweede lid. Voorts\
+    \ verstrekt de Belastingdienst aan de Sociale verzekeringsbank, zonder dat daaraan\
+    \ een verzoek ten grondslag ligt, gegevens over verzekerde en niet verzekerde\
+    \ tijdvakken, die bij de uitvoering van een belastingwet of bij de invordering\
+    \ van enige rijksbelasting bekend zijn geworden, voor zover die gegevens noodzakelijk\
+    \ zijn voor de verzekerdenadministratie, bedoeld in artikel 35.\n7 Onze Minister\
+    \ van Buitenlandse Zaken verstrekt ten aanzien van de Nederlander die in het buitenland\
+    \ rechtens zijn vrijheid is ontnomen, onverwijld en kosteloos de gegevens en inlichtingen\
+    \ waarover hij beschikt en die noodzakelijk zijn voor het recht op uitkering,\
+    \ aan de Sociale verzekeringsbank en het Uitvoeringsinstituut werknemersverzekeringen,\
+    \ waarbij hij gebruik kan maken van het burgerservicenummer. Bij ministeriële\
+    \ regeling kunnen regels worden gesteld over de uitvoering van dit lid.\n8 Alle\
+    \ gegevens en inlichtingen die noodzakelijk zijn voor de uitvoering van de in\
+    \ het eerste lid bedoelde taken, worden aan de in dat lid genoemde bestuursorganen\
+    \ tevens verstrekt door:\n  a. de instanties die in het kader van de openbare\
+    \ nutsvoorzieningen energie en water leveren;\n  b. de instanties en personen\
+    \ die woonruimte verhuren.\n9 Onze Minister van Veiligheid en Justitie verstrekt\
+    \ ten aanzien van de persoon die rechtens zijn vrijheid is ontnomen of de persoon\
+    \ die zich onttrekt aan de tenuitvoerlegging van een vrijheidsstraf of vrijheidsbenemende\
+    \ maatregel, onverwijld en kosteloos de gegevens en alle overige opgaven en inlichtingen,\
+    \ waarover deze beschikt en die noodzakelijk zijn voor het recht op uitkering,\
+    \ aan de Sociale verzekeringsbank en het Uitvoeringsinstituut werknemersverzekeringen,\
+    \ waarbij hij gebruik kan maken van het burgerservicenummer.\n10 Re-integratiebedrijven\
+    \ verstrekken aan het Uitvoeringsinstituut werknemersverzekeringen alle gegevens\
+    \ en inlichtingen die noodzakelijk zijn voor de uitvoering van de krachtens deze\
+    \ wet aan het Uitvoeringsinstituut opgedragen taken. Bij of krachtens algemene\
+    \ maatregel van bestuur kunnen regels worden gesteld voor de gegevens die worden\
+    \ verstrekt.\n11 Bij algemene maatregel van bestuur kunnen andere instanties dan\
+    \ genoemd in het derde, zesde, zevende, achtste en negende lid worden aangewezen,\
+    \ waarvoor de verplichtingen, bedoeld in het derde, vierde en vijfde lid, eveneens\
+    \ gelden, voor zover het betreft de verstrekking van nader bij algemene maatregel\
+    \ van bestuur aan te wijzen gegevens en inlichtingen, en bij of krachtens algemene\
+    \ maatregel van bestuur kunnen nadere regels worden gesteld voor het verder verwerken\
+    \ van voor het toezicht op de naleving van wetten ontvangen gegevens met het oog\
+    \ op de opsporing van strafbare feiten als bedoeld in artikel 85.\n12 Bij of krachtens\
+    \ algemene maatregel van bestuur kunnen nadere regels worden gesteld voor de voorwaarden,\
+    \ die aan de gegevensverstrekking op grond van dit artikel worden verbonden."
+  url: https://wetten.overheid.nl/BWBR0013060/2020-01-01#Artikel54
+  machine_readable:
+    execution:
+      produces:
+        legal_character: BESCHIKKING
+        decision_type: TOEKENNING
+      parameters:
+      - name: bsn
+        type: string
+        required: true
+      input:
+      - name: inkomensgegevens
+        type: object
+        source:
+          table: uwv_toetsingsinkomen
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - toetsingsinkomen
+      output:
+      - name: toetsingsinkomen
+        type: amount
+      actions:
+      - output: toetsingsinkomen
+        value: $inkomensgegevens.toetsingsinkomen

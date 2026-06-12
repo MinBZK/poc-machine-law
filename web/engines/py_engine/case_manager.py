@@ -2,7 +2,7 @@ import datetime
 from typing import Any
 from uuid import UUID
 
-from machine.service import Services
+from machine.regelrecht_services import RegelrechtServices
 
 from ..case_manager_interface import CaseManagerInterface
 from ..models import Case, CaseObjectionStatus, CaseStatus, Event
@@ -13,7 +13,7 @@ class CaseManager(CaseManagerInterface):
     Implementation of CaseManagerInterface that uses the embedded Python machine.service library.
     """
 
-    def __init__(self, services: Services):
+    def __init__(self, services: RegelrechtServices):
         self.case_manager = services.case_manager
 
     def get_case(self, bsn: str, service: str, law: str) -> Case | None:

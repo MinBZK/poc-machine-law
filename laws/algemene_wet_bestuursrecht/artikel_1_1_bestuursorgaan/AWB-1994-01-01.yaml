@@ -1,371 +1,332 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
-uuid: 7b2c4d8e-3f91-4a6b-9c5e-8d7f6a5b4c3d
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
+$id: algemene_wet_bestuursrecht
+regulatory_layer: WET
+publication_date: '1994-01-01'
+valid_from: '1994-01-01'
 name: Bestuursorgaan Definitie
-description: Bepaalt of een organisatie kwalificeert als bestuursorgaan volgens artikel 1:1 van de Algemene wet bestuursrecht (Awb), inclusief A-organen, B-organen en wettelijke uitzonderingen.
-law: algemene_wet_bestuursrecht
-article: "1:1"
-discoverable: "BUSINESS"
-valid_from: 1994-01-01
-service: "AWB"
-
-properties:
-  parameters:
-    - name: "ORGANISATIE_ID"
-      description: Unieke identifier van de organisatie waarvan bepaald moet worden of het een bestuursorgaan is
-      type: "string"
-      required: true
-
-  sources:
-    - name: "IS_ORGAAN_VAN_RECHTSPERSOON"
-      description: Of de organisatie een orgaan is van een publiekrechtelijke rechtspersoon
-      type: "boolean"
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "is_orgaan_van_rechtspersoon"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-    - name: "PUBLIEKRECHTELIJKE_RECHTSPERSOON_TYPE"
-      description: Type publiekrechtelijke rechtspersoon (RIJK, PROVINCIE, WATERSCHAP, GEMEENTE, OPENBAAR_LICHAAM)
-      type: "string"
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "publiekrechtelijke_rechtspersoon_type"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-    - name: "HEEFT_PUBLIEKRECHTELIJKE_BEVOEGDHEID"
-      description: Of de organisatie publiekrechtelijke bevoegdheid heeft
-      type: "boolean"
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "heeft_publiekrechtelijke_bevoegdheid"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-    - name: "BEVOEGDHEID_BIJ_OF_KRACHTENS_WET"
-      description: Of de publiekrechtelijke bevoegdheid is verleend bij of krachtens de wet
-      type: "boolean"
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "bevoegdheid_bij_of_krachtens_wet"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-    - name: "OVERHEIDSFINANCIERING_PERCENTAGE"
-      description: Percentage van de activiteiten dat wordt gefinancierd door de overheid
-      type: "number"
-      type_spec:
-        precision: 2
-        min: 0
-        max: 100
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "overheidsfinanciering_percentage"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-    - name: "CRITERIA_DOOR_OVERHEID_BEPAALD"
-      description: Of de criteria voor toekenning door de overheid zijn bepaald
-      type: "boolean"
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "criteria_door_overheid_bepaald"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-    - name: "IS_UITSLUITEND_FINANCIELE_UITKERING"
-      description: Of de organisatie uitsluitend financiele uitkeringen verstrekt
-      type: "boolean"
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "is_uitsluitend_financiele_uitkering"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-    - name: "IS_VOLKSVERTEGENWOORDIGEND_ORGAAN"
-      description: Of de organisatie een volksvertegenwoordigend orgaan is (uitgezonderd van bestuursorgaan)
-      type: "boolean"
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "is_volksvertegenwoordigend_orgaan"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-    - name: "IS_RECHTERLIJK_ORGAAN"
-      description: Of de organisatie een rechterlijk orgaan is (uitgezonderd van bestuursorgaan)
-      type: "boolean"
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "is_rechterlijk_orgaan"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-    - name: "IS_OMBUDSMAN"
-      description: Of de organisatie de Nationale Ombudsman is (uitgezonderd van bestuursorgaan)
-      type: "boolean"
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "is_ombudsman"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-    - name: "IS_ALGEMENE_REKENKAMER"
-      description: Of de organisatie de Algemene Rekenkamer is (uitgezonderd van bestuursorgaan)
-      type: "boolean"
-      source_reference:
-        source_type: "AWB"
-        table: "organisaties"
-        field: "is_algemene_rekenkamer"
-        select_on:
-          - name: "organisatie_id"
-            description: Identifier van de organisatie
-            type: "string"
-            value: "$ORGANISATIE_ID"
-
-  output:
-    - name: "is_bestuursorgaan"
-      description: Of de organisatie kwalificeert als bestuursorgaan in de zin van de Awb
-      type: "boolean"
-      citizen_relevance: primary
-
-    - name: "bestuursorgaan_type"
-      description: Type bestuursorgaan (A_ORGAAN, B_ORGAAN, of GEEN_BESTUURSORGAAN)
-      type: "string"
-      citizen_relevance: secondary
-
-    - name: "exclusion_reason"
-      description: Reden waarom de organisatie is uitgezonderd van de definitie bestuursorgaan
-      type: "string"
-      citizen_relevance: secondary
-
-    - name: "is_excluded"
-      description: Of de organisatie valt onder een van de wettelijke uitzonderingen van artikel 1:1 lid 2
-      type: "boolean"
-      citizen_relevance: secondary
-
-    - name: "qualifies_as_bestuursorgaan"
-      description: Of de organisatie voldoet aan de criteria voor bestuursorgaan (zonder rekening te houden met uitzonderingen)
-      type: "boolean"
-      citizen_relevance: secondary
-
-    - name: "is_a_orgaan"
-      description: Of de organisatie een A-orgaan is (orgaan van publiekrechtelijke rechtspersoon)
-      type: "boolean"
-      citizen_relevance: secondary
-
-    - name: "is_b_orgaan"
-      description: Of de organisatie een B-orgaan is (met publiekrechtelijke bevoegdheid bij of krachtens wet)
-      type: "boolean"
-      citizen_relevance: secondary
-
-  definitions:
-    TWEE_DERDE_DREMPEL: 66.67
-
-actions:
-  - output: "is_excluded"
-    operation: OR
-    values:
-      - subject: "$IS_VOLKSVERTEGENWOORDIGEND_ORGAAN"
-        operation: EQUALS
-        value: true
-      - subject: "$IS_RECHTERLIJK_ORGAAN"
-        operation: EQUALS
-        value: true
-      - subject: "$IS_OMBUDSMAN"
-        operation: EQUALS
-        value: true
-      - subject: "$IS_ALGEMENE_REKENKAMER"
-        operation: EQUALS
-        value: true
-
-  - output: "qualifies_as_bestuursorgaan"
-    operation: OR
-    values:
-      - operation: AND
-        values:
-          - subject: "$IS_ORGAAN_VAN_RECHTSPERSOON"
-            operation: EQUALS
+bwb_id: BWBR0005537
+url: https://wetten.overheid.nl/BWBR0005537/1994-01-01
+service: AWB
+uuid: 7b2c4d8e-3f91-4a6b-9c5e-8d7f6a5b4c3d
+discoverable: BUSINESS
+articles:
+- number: '1'
+  text: '1. Onder bestuursorgaan wordt verstaan: a. een orgaan van een rechtspersoon
+    die krachtens publiekrecht is ingesteld, of b. een ander persoon of college, met
+    enig openbaar gezag bekleed. 2. De volgende organen, personen en colleges worden
+    niet als bestuursorgaan aangemerkt: a. de wetgevende macht; b. de kamers en de
+    verenigde vergadering der Staten-Generaal; c. onafhankelijke, bij de wet ingestelde
+    organen die met rechtspraak zijn belast, alsmede de Raad voor de rechtspraak en
+    het College van afgevaardigden; d. de Raad van State en zijn afdelingen; e. de
+    Algemene Rekenkamer; f. de Nationale ombudsman en de substituut-ombudsmannen als
+    bedoeld in artikel 9, eerste lid, van de Wet Nationale ombudsman, en ombudsmannen
+    en ombudscommissies als bedoeld in artikel 9:17, onderdeel b; g. de voorzitters,
+    leden, griffiers en secretarissen van de in de onderdelen b tot en met f bedoelde
+    organen, de procureur-generaal, de plaatsvervangend procureur-generaal en de advocaten-generaal
+    bij de Hoge Raad, de besturen van de in onderdeel c bedoelde organen alsmede de
+    voorzitters van die besturen, alsmede de commissies uit het midden van de in de
+    onderdelen b tot en met f bedoelde organen; h. de commissie van toezicht op de
+    inlichtingen- en veiligheidsdiensten en haar afdelingen, bedoeld in artikel 97
+    van de Wet op de inlichtingen- en veiligheidsdiensten 2017; i. de toetsingscommissie
+    inzet bevoegdheden, bedoeld in artikel 32 van de Wet op de inlichtingen- en veiligheidsdiensten
+    2017. 3. Een ingevolge het tweede lid uitgezonderd orgaan, persoon of college
+    wordt wel als bestuursorgaan aangemerkt voor zover het orgaan, de persoon of het
+    college besluiten neemt of handelingen verricht ten aanzien van een persoon met
+    betrekking tot diens in artikel 3 van de Ambtenarenwet 2017 bedoelde hoedanigheid,
+    zijn nagelaten betrekkingen of zijn rechtverkrijgenden, met uitzondering van een
+    voor het leven benoemde ambtenaar werkzaam bij de Raad van State en zijn afdelingen
+    en de Algemene Rekenkamer. 4. De vermogensrechtelijke gevolgen van een handeling
+    van een bestuursorgaan treffen de rechtspersoon waartoe het bestuursorgaan behoort.'
+  url: https://wetten.overheid.nl/BWBR0005537/1994-01-01#Artikel1
+  machine_readable:
+    definitions:
+      twee_derde_drempel: 66.67
+    execution:
+      parameters:
+      - name: organisatie_id
+        type: string
+        required: true
+      input:
+      - name: is_orgaan_van_rechtspersoon
+        type: boolean
+        source:
+          table: organisaties
+          field: is_orgaan_van_rechtspersoon
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      - name: publiekrechtelijke_rechtspersoon_type
+        type: string
+        source:
+          table: organisaties
+          field: publiekrechtelijke_rechtspersoon_type
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      - name: heeft_publiekrechtelijke_bevoegdheid
+        type: boolean
+        source:
+          table: organisaties
+          field: heeft_publiekrechtelijke_bevoegdheid
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      - name: bevoegdheid_bij_of_krachtens_wet
+        type: boolean
+        source:
+          table: organisaties
+          field: bevoegdheid_bij_of_krachtens_wet
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      - name: overheidsfinanciering_percentage
+        type: number
+        source:
+          table: organisaties
+          field: overheidsfinanciering_percentage
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      - name: criteria_door_overheid_bepaald
+        type: boolean
+        source:
+          table: organisaties
+          field: criteria_door_overheid_bepaald
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      - name: is_uitsluitend_financiele_uitkering
+        type: boolean
+        source:
+          table: organisaties
+          field: is_uitsluitend_financiele_uitkering
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      - name: is_volksvertegenwoordigend_orgaan
+        type: boolean
+        source:
+          table: organisaties
+          field: is_volksvertegenwoordigend_orgaan
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      - name: is_rechterlijk_orgaan
+        type: boolean
+        source:
+          table: organisaties
+          field: is_rechterlijk_orgaan
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      - name: is_ombudsman
+        type: boolean
+        source:
+          table: organisaties
+          field: is_ombudsman
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      - name: is_algemene_rekenkamer
+        type: boolean
+        source:
+          table: organisaties
+          field: is_algemene_rekenkamer
+          select_on:
+          - name: organisatie_id
+            value: $organisatie_id
+          source_type: AWB
+      output:
+      - name: is_bestuursorgaan
+        type: boolean
+      - name: bestuursorgaan_type
+        type: string
+      - name: exclusion_reason
+        type: string
+      - name: is_excluded
+        type: boolean
+      - name: qualifies_as_bestuursorgaan
+        type: boolean
+      - name: is_a_orgaan
+        type: boolean
+      - name: is_b_orgaan
+        type: boolean
+      actions:
+      - output: is_excluded
+        value:
+          operation: OR
+          conditions:
+          - operation: EQUALS
+            subject: $is_volksvertegenwoordigend_orgaan
             value: true
-          - subject: "$PUBLIEKRECHTELIJKE_RECHTSPERSOON_TYPE"
-            operation: IN
+          - operation: EQUALS
+            subject: $is_rechterlijk_orgaan
+            value: true
+          - operation: EQUALS
+            subject: $is_ombudsman
+            value: true
+          - operation: EQUALS
+            subject: $is_algemene_rekenkamer
+            value: true
+      - output: qualifies_as_bestuursorgaan
+        value:
+          operation: OR
+          conditions:
+          - operation: AND
+            conditions:
+            - operation: EQUALS
+              subject: $is_orgaan_van_rechtspersoon
+              value: true
+            - operation: IN
+              subject: $publiekrechtelijke_rechtspersoon_type
+              values:
+              - RIJK
+              - PROVINCIE
+              - WATERSCHAP
+              - GEMEENTE
+              - OPENBAAR_LICHAAM
+          - operation: AND
+            conditions:
+            - operation: EQUALS
+              subject: $heeft_publiekrechtelijke_bevoegdheid
+              value: true
+            - operation: EQUALS
+              subject: $bevoegdheid_bij_of_krachtens_wet
+              value: true
+            - operation: EQUALS
+              subject: $is_uitsluitend_financiele_uitkering
+              value: false
+          - operation: AND
+            conditions:
+            - operation: EQUALS
+              subject: $is_uitsluitend_financiele_uitkering
+              value: true
+            - operation: GREATER_THAN_OR_EQUAL
+              subject: $overheidsfinanciering_percentage
+              value: $twee_derde_drempel
+            - operation: EQUALS
+              subject: $criteria_door_overheid_bepaald
+              value: true
+      - output: is_bestuursorgaan
+        value:
+          operation: AND
+          conditions:
+          - operation: EQUALS
+            subject: $qualifies_as_bestuursorgaan
+            value: true
+          - operation: NOT
+            value:
+              operation: EQUALS
+              subject: $is_excluded
+              value: true
+      - output: is_a_orgaan
+        value:
+          operation: AND
+          conditions:
+          - operation: EQUALS
+            subject: $is_orgaan_van_rechtspersoon
+            value: true
+          - operation: IN
+            subject: $publiekrechtelijke_rechtspersoon_type
             values:
-              - "RIJK"
-              - "PROVINCIE"
-              - "WATERSCHAP"
-              - "GEMEENTE"
-              - "OPENBAAR_LICHAAM"
-      - operation: AND
-        values:
-          - subject: "$HEEFT_PUBLIEKRECHTELIJKE_BEVOEGDHEID"
+            - RIJK
+            - PROVINCIE
+            - WATERSCHAP
+            - GEMEENTE
+            - OPENBAAR_LICHAAM
+      - output: is_b_orgaan
+        value:
+          operation: OR
+          conditions:
+          - operation: AND
+            conditions:
+            - operation: EQUALS
+              subject: $heeft_publiekrechtelijke_bevoegdheid
+              value: true
+            - operation: EQUALS
+              subject: $bevoegdheid_bij_of_krachtens_wet
+              value: true
+            - operation: EQUALS
+              subject: $is_uitsluitend_financiele_uitkering
+              value: false
+          - operation: AND
+            conditions:
+            - operation: EQUALS
+              subject: $is_uitsluitend_financiele_uitkering
+              value: true
+            - operation: GREATER_THAN_OR_EQUAL
+              subject: $overheidsfinanciering_percentage
+              value: $twee_derde_drempel
+            - operation: EQUALS
+              subject: $criteria_door_overheid_bepaald
+              value: true
+      - output: bestuursorgaan_type
+        value: GEEN_BESTUURSORGAAN
+      - output: bestuursorgaan_type
+        value:
+          operation: STATIC
+          condition:
+            operation: AND
+            conditions:
+            - operation: EQUALS
+              subject: $is_bestuursorgaan
+              value: true
+            - operation: EQUALS
+              subject: $is_a_orgaan
+              value: true
+          value: A_ORGAAN
+      - output: bestuursorgaan_type
+        value:
+          operation: STATIC
+          condition:
+            operation: AND
+            conditions:
+            - operation: EQUALS
+              subject: $is_bestuursorgaan
+              value: true
+            - operation: EQUALS
+              subject: $is_b_orgaan
+              value: true
+          value: B_ORGAAN
+      - output: exclusion_reason
+        value:
+          operation: STATIC
+          condition:
             operation: EQUALS
+            subject: $is_volksvertegenwoordigend_orgaan
             value: true
-          - subject: "$BEVOEGDHEID_BIJ_OF_KRACHTENS_WET"
+          value: VOLKSVERTEGENWOORDIGEND_ORGAAN
+      - output: exclusion_reason
+        value:
+          operation: STATIC
+          condition:
             operation: EQUALS
+            subject: $is_rechterlijk_orgaan
             value: true
-          - subject: "$IS_UITSLUITEND_FINANCIELE_UITKERING"
+          value: RECHTERLIJK_ORGAAN
+      - output: exclusion_reason
+        value:
+          operation: STATIC
+          condition:
             operation: EQUALS
-            value: false
-      - operation: AND
-        values:
-          - subject: "$IS_UITSLUITEND_FINANCIELE_UITKERING"
-            operation: EQUALS
+            subject: $is_ombudsman
             value: true
-          - subject: "$OVERHEIDSFINANCIERING_PERCENTAGE"
-            operation: GREATER_OR_EQUAL
-            value: "$TWEE_DERDE_DREMPEL"
-          - subject: "$CRITERIA_DOOR_OVERHEID_BEPAALD"
+          value: OMBUDSMAN
+      - output: exclusion_reason
+        value:
+          operation: STATIC
+          condition:
             operation: EQUALS
+            subject: $is_algemene_rekenkamer
             value: true
-
-  - output: "is_bestuursorgaan"
-    operation: AND
-    values:
-      - subject: "$qualifies_as_bestuursorgaan"
-        operation: EQUALS
-        value: true
-      - subject: "$is_excluded"
-        operation: NOT_EQUALS
-        value: true
-
-  - output: "is_a_orgaan"
-    operation: AND
-    values:
-      - subject: "$IS_ORGAAN_VAN_RECHTSPERSOON"
-        operation: EQUALS
-        value: true
-      - subject: "$PUBLIEKRECHTELIJKE_RECHTSPERSOON_TYPE"
-        operation: IN
-        values:
-          - "RIJK"
-          - "PROVINCIE"
-          - "WATERSCHAP"
-          - "GEMEENTE"
-          - "OPENBAAR_LICHAAM"
-
-  - output: "is_b_orgaan"
-    operation: OR
-    values:
-      - operation: AND
-        values:
-          - subject: "$HEEFT_PUBLIEKRECHTELIJKE_BEVOEGDHEID"
-            operation: EQUALS
-            value: true
-          - subject: "$BEVOEGDHEID_BIJ_OF_KRACHTENS_WET"
-            operation: EQUALS
-            value: true
-          - subject: "$IS_UITSLUITEND_FINANCIELE_UITKERING"
-            operation: EQUALS
-            value: false
-      - operation: AND
-        values:
-          - subject: "$IS_UITSLUITEND_FINANCIELE_UITKERING"
-            operation: EQUALS
-            value: true
-          - subject: "$OVERHEIDSFINANCIERING_PERCENTAGE"
-            operation: GREATER_OR_EQUAL
-            value: "$TWEE_DERDE_DREMPEL"
-          - subject: "$CRITERIA_DOOR_OVERHEID_BEPAALD"
-            operation: EQUALS
-            value: true
-
-  - output: "bestuursorgaan_type"
-    value: "GEEN_BESTUURSORGAAN"
-
-  - output: "bestuursorgaan_type"
-    condition:
-      operation: AND
-      values:
-        - subject: "$is_bestuursorgaan"
-          operation: EQUALS
-          value: true
-        - subject: "$is_a_orgaan"
-          operation: EQUALS
-          value: true
-    operation: STATIC
-    value: "A_ORGAAN"
-
-  - output: "bestuursorgaan_type"
-    condition:
-      operation: AND
-      values:
-        - subject: "$is_bestuursorgaan"
-          operation: EQUALS
-          value: true
-        - subject: "$is_b_orgaan"
-          operation: EQUALS
-          value: true
-    operation: STATIC
-    value: "B_ORGAAN"
-
-  - output: "exclusion_reason"
-    condition:
-      subject: "$IS_VOLKSVERTEGENWOORDIGEND_ORGAAN"
-      operation: EQUALS
-      value: true
-    operation: STATIC
-    value: "VOLKSVERTEGENWOORDIGEND_ORGAAN"
-
-  - output: "exclusion_reason"
-    condition:
-      subject: "$IS_RECHTERLIJK_ORGAAN"
-      operation: EQUALS
-      value: true
-    operation: STATIC
-    value: "RECHTERLIJK_ORGAAN"
-
-  - output: "exclusion_reason"
-    condition:
-      subject: "$IS_OMBUDSMAN"
-      operation: EQUALS
-      value: true
-    operation: STATIC
-    value: "OMBUDSMAN"
-
-  - output: "exclusion_reason"
-    condition:
-      subject: "$IS_ALGEMENE_REKENKAMER"
-      operation: EQUALS
-      value: true
-    operation: STATIC
-    value: "ALGEMENE_REKENKAMER"
+          value: ALGEMENE_REKENKAMER

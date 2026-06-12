@@ -23,7 +23,7 @@ from law_mcp.exceptions import (
 # Mock data moved to web/engines/py_engine/services/profiles.py
 from law_mcp.models import AvailableLaw, LawExecutionResult, LawSpec, ProfileData
 from law_mcp.utils import get_current_date, sanitize_input, validate_bsn
-from machine.service import Services
+from machine.regelrecht_services import RegelrechtServices
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +40,8 @@ class LawEngineAdapter:
             # Get current date as reference
             reference_date = get_current_date()
 
-            # Initialize the main services object
-            self.services = Services(reference_date)
+            # Initialize the main services object (Rust engine via PyO3)
+            self.services = RegelrechtServices(reference_date)
 
             # Get the rule resolver
             self.rule_resolver = self.services.resolver
@@ -51,12 +51,6 @@ class LawEngineAdapter:
         except Exception as e:
             logger.error(f"Failed to initialize law engine adapter: {e}")
             raise
-
-    def _get_rule_service(self, service_name: str):
-        """Get rule service for the given service name"""
-        if service_name not in self.services.services:
-            raise ServiceNotFoundError(service_name, available_services=list(self.services.services.keys()))
-        return self.services.services[service_name]
 
     async def execute_law(
         self,
@@ -104,8 +98,9 @@ class LawEngineAdapter:
             param_info = ", ".join([f"{k}={v}" for k, v in parameters.items()])
             logger.info(f"Executing law {service}.{law} with parameters ({param_info}) on {reference_date}")
 
-            # Get the rule service
-            rule_service = self._get_rule_service(service)
+            # Validate that the service is known
+            if service not in self.services.services:
+                raise ServiceNotFoundError(service, available_services=list(self.services.services.keys()))
 
             # Get rule specification
             spec = self.rule_resolver.get_rule_spec(law, reference_date, service=service)
@@ -117,7 +112,8 @@ class LawEngineAdapter:
             if overrides:
                 execution_parameters.update(overrides)
 
-            result = rule_service.evaluate(
+            result = self.services.evaluate(
+                service=service,
                 law=law,
                 reference_date=reference_date,
                 parameters=execution_parameters,
@@ -126,14 +122,8 @@ class LawEngineAdapter:
                 approved=approved,
             )
 
-            # Extract execution path if available
+            # Execution path is not available via the Rust engine yet.
             execution_path = None
-            if result.path:
-                try:
-                    execution_path = self.services.extract_value_tree(result.path)
-                except Exception as e:
-                    logger.warning(f"Failed to extract execution path: {e}")
-                    execution_path = {"error": "Could not serialize execution path"}
 
             law_result = LawExecutionResult(
                 output=result.output,

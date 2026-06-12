@@ -1,13 +1,17 @@
 {% extends "partials/tiles/base_tile.html" %}
 {% block tile_content %}
-    <p class="text-gray-600">
+    <div class="text-gray-700 space-y-2">
         {% if result %}
             {% for key, value in result.items() %}
                 {% if value is not none and value is not mapping %}
-                    <div class="mb-2">
-                        <span class="font-medium">{{ key|replace('_', ' ') |title }}:</span>
+                    <div>
+                        <span class="font-medium">{{ key|replace('_', ' ') |capitalize }}:</span>
                         {% if value is boolean %}
                             {{ 'Ja' if value else 'Nee' }}
+                        {% elif value is number and value is not boolean and value|abs >= 1000 and ('bedrag' in key or 'toeslag' in key or 'kapitaal' in key or 'belasting' in key or 'inkomen' in key or 'korting' in key or 'premie' in key or 'vrijlating' in key or 'vermogen' in key or 'bijdrage' in key or 'uitkering' in key) %}
+                            {{ (value / 100) | format_currency }}
+                        {% elif value is iterable and value is not string %}
+                            {{ value | join(", ") }}
                         {% else %}
                             {{ value }}
                         {% endif %}
@@ -15,5 +19,5 @@
                 {% endif %}
             {% endfor %}
         {% endif %}
-    </p>
+    </div>
 {% endblock %}

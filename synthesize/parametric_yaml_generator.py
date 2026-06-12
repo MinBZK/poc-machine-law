@@ -50,7 +50,6 @@ class ParametricYAMLGenerator:
     def generate(self, model: ParametricModel) -> dict[str, Any]:
         """Generate YAML spec from parametric model."""
         yaml_spec = {
-            "$id": "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json",
             "uuid": str(uuid.uuid4()),
             "name": self.config.law_display_name,
             "law": self.config.law_name,

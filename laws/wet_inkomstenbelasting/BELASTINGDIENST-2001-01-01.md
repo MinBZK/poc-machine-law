@@ -75,30 +75,30 @@ Regel bepaal/bereken box1 inkomen \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">box1_inkomen</span> is
-<span style="color:green">$BOX1_DIENSTBETREKKING</span> plus <span style="color:green">$BOX1_ONDERNEMING</span> plus <span style="color:green">$BOX1_UITKERINGEN</span> plus <span style="color:green">$BOX1_OVERIGE_WERKZAAMHEDEN</span> plus <span style="color:green">$BOX1_EIGEN_WONING</span>
+<span style="color:green">$box1_dienstbetrekking</span> plus <span style="color:green">$box1_onderneming</span> plus <span style="color:green">$box1_uitkeringen</span> plus <span style="color:green">$box1_overige_werkzaamheden</span> plus <span style="color:green">$box1_eigen_woning</span>
 
 
 Regel bepaal/bereken box2 inkomen \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">box2_inkomen</span> is
-<span style="color:green">$BOX2_DIVIDEND</span> plus <span style="color:green">$BOX2_AANDELEN</span>
+<span style="color:green">$box2_dividend</span> plus <span style="color:green">$box2_aandelen</span>
 
 
 Regel bepaal/bereken box3 bezittingen \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">box3_bezittingen</span> is
-<span style="color:green">$BOX3_SPAREN</span> plus <span style="color:green">$BOX3_BELEGGEN</span> plus <span style="color:green">$BOX3_ONROEREND_GOED</span>
+<span style="color:green">$box3_sparen</span> plus <span style="color:green">$box3_beleggen</span> plus <span style="color:green">$box3_onroerend_goed</span>
 
- min <span style="color:green">$BOX3_SCHULDEN</span> min
-  - Indien <span style="color:green">$HEEFT_PARTNER</span> gelijk aan <span style="color:green">true</span>
-
-
-    dan <span style="color:blue">$BOX3_HEFFINGSVRIJE_VOET_PARTNERS</span>
+ min <span style="color:green">$box3_schulden</span> min
+  - Indien <span style="color:green">$heeft_partner</span> gelijk aan <span style="color:green">true</span>
 
 
-  - Anders <span style="color:blue">$BOX3_HEFFINGSVRIJE_VOET_ALLEENSTAAND</span>
+    dan <span style="color:blue">$box3_heffingsvrije_voet_partners</span>
+
+
+  - Anders <span style="color:blue">$box3_heffingsvrije_voet_alleenstaand</span>
 
 
 
@@ -110,14 +110,14 @@ Regel bepaal/bereken box3 inkomen \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">box3_inkomen</span> is
-<span style="color:green">$box3_bezittingen</span> keer <span style="color:blue">$BOX3_FORFAITAIR_RENDEMENT</span>
+<span style="color:green">$box3_bezittingen</span> keer <span style="color:blue">$box3_forfaitair_rendement</span>
 
 
 Regel bepaal/bereken belastbaar inkomen \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">belastbaar_inkomen</span> is
-<span style="color:green">$box1_inkomen</span> plus <span style="color:green">$box2_inkomen</span> plus <span style="color:green">$box3_inkomen</span> plus  min <span style="color:green">$PERSOONSGEBONDEN_AFTREK</span>
+<span style="color:green">$box1_inkomen</span> plus <span style="color:green">$box2_inkomen</span> plus <span style="color:green">$box3_inkomen</span> plus  min <span style="color:green">$persoonsgebonden_aftrek</span>
 
 
 
@@ -126,7 +126,7 @@ Regel bepaal/bereken box1 inkomen na aftrek \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">box1_inkomen_na_aftrek</span> is
-<span style="color:green">$box1_inkomen</span> min <span style="color:green">$PERSOONSGEBONDEN_AFTREK</span>
+<span style="color:green">$box1_inkomen</span> min <span style="color:green">$persoonsgebonden_aftrek</span>
 
 
 
@@ -135,7 +135,7 @@ Regel bepaal/bereken resterende aftrek na box1 \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">resterende_aftrek_na_box1</span> is
-<span style="color:green">$PERSOONSGEBONDEN_AFTREK</span> min <span style="color:green">$box1_inkomen</span>
+<span style="color:green">$persoonsgebonden_aftrek</span> min <span style="color:green">$box1_inkomen</span>
 
 
 
@@ -171,7 +171,7 @@ Regel bepaal/bereken is aow leeftijd \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">is_aow_leeftijd</span> is
-<span style="color:green">$LEEFTIJD</span> groter dan of gelijk aan <span style="color:green">$PENSIOENLEEFTIJD</span>
+<span style="color:green">$leeftijd</span> groter dan of gelijk aan <span style="color:green">$pensioenleeftijd</span>
 
 
 Regel bepaal/bereken box1 belasting \
@@ -183,18 +183,18 @@ De <span style="color: green">box1_belasting</span> is
 
 
     dan
-    - Indien <span style="color:green">$box1_inkomen_na_aftrek</span> minder dan of gelijk aan <span style="color:blue">$BOX1_SCHIJF1_GRENS</span>
+    - Indien <span style="color:green">$box1_inkomen_na_aftrek</span> minder dan of gelijk aan <span style="color:blue">$box1_schijf1_grens</span>
 
 
-      dan <span style="color:green">$box1_inkomen_na_aftrek</span> keer <span style="color:blue">$BOX1_TARIEF1_AOW</span>
+      dan <span style="color:green">$box1_inkomen_na_aftrek</span> keer <span style="color:blue">$box1_tarief1_aow</span>
 
 
 
-    - Anders <span style="color:blue">$BOX1_SCHIJF1_GRENS</span> keer <span style="color:blue">$BOX1_TARIEF1_AOW</span>
+    - Anders <span style="color:blue">$box1_schijf1_grens</span> keer <span style="color:blue">$box1_tarief1_aow</span>
 
-     plus <span style="color:green">$box1_inkomen_na_aftrek</span> min <span style="color:blue">$BOX1_SCHIJF1_GRENS</span>
+     plus <span style="color:green">$box1_inkomen_na_aftrek</span> min <span style="color:blue">$box1_schijf1_grens</span>
 
-     keer <span style="color:blue">$BOX1_TARIEF2_AOW</span>
+     keer <span style="color:blue">$box1_tarief2_aow</span>
 
 
 
@@ -203,18 +203,18 @@ De <span style="color: green">box1_belasting</span> is
 
 
   - Anders
-    - Indien <span style="color:green">$box1_inkomen_na_aftrek</span> minder dan of gelijk aan <span style="color:blue">$BOX1_SCHIJF1_GRENS</span>
+    - Indien <span style="color:green">$box1_inkomen_na_aftrek</span> minder dan of gelijk aan <span style="color:blue">$box1_schijf1_grens</span>
 
 
-      dan <span style="color:green">$box1_inkomen_na_aftrek</span> keer <span style="color:blue">$BOX1_TARIEF1</span>
+      dan <span style="color:green">$box1_inkomen_na_aftrek</span> keer <span style="color:blue">$box1_tarief1</span>
 
 
 
-    - Anders <span style="color:blue">$BOX1_SCHIJF1_GRENS</span> keer <span style="color:blue">$BOX1_TARIEF1</span>
+    - Anders <span style="color:blue">$box1_schijf1_grens</span> keer <span style="color:blue">$box1_tarief1</span>
 
-     plus <span style="color:green">$box1_inkomen_na_aftrek</span> min <span style="color:blue">$BOX1_SCHIJF1_GRENS</span>
+     plus <span style="color:green">$box1_inkomen_na_aftrek</span> min <span style="color:blue">$box1_schijf1_grens</span>
 
-     keer <span style="color:blue">$BOX1_TARIEF2</span>
+     keer <span style="color:blue">$box1_tarief2</span>
 
 
 
@@ -228,18 +228,18 @@ Geldig vanaf: 2001-01-01
 
 De <span style="color: green">box2_belasting</span> is
 
-  - Indien <span style="color:green">$box2_inkomen_na_aftrek</span> minder dan of gelijk aan <span style="color:blue">$BOX2_SCHIJF1_GRENS</span>
+  - Indien <span style="color:green">$box2_inkomen_na_aftrek</span> minder dan of gelijk aan <span style="color:blue">$box2_schijf1_grens</span>
 
 
-    dan <span style="color:green">$box2_inkomen_na_aftrek</span> keer <span style="color:blue">$BOX2_TARIEF1</span>
+    dan <span style="color:green">$box2_inkomen_na_aftrek</span> keer <span style="color:blue">$box2_tarief1</span>
 
 
 
-  - Anders <span style="color:blue">$BOX2_SCHIJF1_GRENS</span> keer <span style="color:blue">$BOX2_TARIEF1</span>
+  - Anders <span style="color:blue">$box2_schijf1_grens</span> keer <span style="color:blue">$box2_tarief1</span>
 
-   plus <span style="color:green">$box2_inkomen_na_aftrek</span> min <span style="color:blue">$BOX2_SCHIJF1_GRENS</span>
+   plus <span style="color:green">$box2_inkomen_na_aftrek</span> min <span style="color:blue">$box2_schijf1_grens</span>
 
-   keer <span style="color:blue">$BOX2_TARIEF2</span>
+   keer <span style="color:blue">$box2_tarief2</span>
 
 
 
@@ -250,7 +250,7 @@ Regel bepaal/bereken box3 belasting \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">box3_belasting</span> is
-<span style="color:green">$box3_inkomen_na_aftrek</span> keer <span style="color:blue">$BOX3_BELASTINGTARIEF</span>
+<span style="color:green">$box3_inkomen_na_aftrek</span> keer <span style="color:blue">$box3_belastingtarief</span>
 
 
 Regel bepaal/bereken algemene heffingskorting \
@@ -261,17 +261,17 @@ De <span style="color: green">algemene_heffingskorting</span> is
   - Indien <span style="color:green">$is_aow_leeftijd</span> gelijk aan <span style="color:green">true</span>
 
 
-    dan <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_MAX_AOW</span> min
-    - Indien <span style="color:green">$box1_inkomen</span> groter dan <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
+    dan <span style="color:blue">$algemene_heffingskorting_max_aow</span> min
+    - Indien <span style="color:green">$box1_inkomen</span> groter dan <span style="color:blue">$algemene_heffingskorting_afbouw_start</span>
 
 
-      dan <span style="color:green">$box1_inkomen</span> min <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
+      dan <span style="color:green">$box1_inkomen</span> min <span style="color:blue">$algemene_heffingskorting_afbouw_start</span>
 
-     minimaal <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_NULPUNT</span> min <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
+     minimaal <span style="color:blue">$algemene_heffingskorting_nulpunt</span> min <span style="color:blue">$algemene_heffingskorting_afbouw_start</span>
 
 
 
-     keer <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_AOW</span>
+     keer <span style="color:blue">$algemene_heffingskorting_afbouw_aow</span>
 
 
 
@@ -284,17 +284,17 @@ De <span style="color: green">algemene_heffingskorting</span> is
 
 
 
-  - Anders <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_MAX</span> min
-    - Indien <span style="color:green">$box1_inkomen</span> groter dan <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
+  - Anders <span style="color:blue">$algemene_heffingskorting_max</span> min
+    - Indien <span style="color:green">$box1_inkomen</span> groter dan <span style="color:blue">$algemene_heffingskorting_afbouw_start</span>
 
 
-      dan <span style="color:green">$box1_inkomen</span> min <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
+      dan <span style="color:green">$box1_inkomen</span> min <span style="color:blue">$algemene_heffingskorting_afbouw_start</span>
 
-     minimaal <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_NULPUNT</span> min <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
+     minimaal <span style="color:blue">$algemene_heffingskorting_nulpunt</span> min <span style="color:blue">$algemene_heffingskorting_afbouw_start</span>
 
 
 
-     keer <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW</span>
+     keer <span style="color:blue">$algemene_heffingskorting_afbouw</span>
 
 
 
@@ -316,17 +316,17 @@ De <span style="color: green">arbeidskorting</span> is
   - Indien <span style="color:green">$is_aow_leeftijd</span> gelijk aan <span style="color:green">true</span>
 
 
-    dan <span style="color:blue">$ARBEIDSKORTING_MAX_AOW</span> min
-    - Indien <span style="color:green">$BOX1_DIENSTBETREKKING</span> groter dan <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
+    dan <span style="color:blue">$arbeidskorting_max_aow</span> min
+    - Indien <span style="color:green">$box1_dienstbetrekking</span> groter dan <span style="color:blue">$arbeidskorting_afbouw_start</span>
 
 
-      dan <span style="color:green">$BOX1_DIENSTBETREKKING</span> min <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
+      dan <span style="color:green">$box1_dienstbetrekking</span> min <span style="color:blue">$arbeidskorting_afbouw_start</span>
 
-     minimaal <span style="color:blue">$ARBEIDSKORTING_NULPUNT</span> min <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
+     minimaal <span style="color:blue">$arbeidskorting_nulpunt</span> min <span style="color:blue">$arbeidskorting_afbouw_start</span>
 
 
 
-     keer <span style="color:blue">$ARBEIDSKORTING_AFBOUW_AOW</span>
+     keer <span style="color:blue">$arbeidskorting_afbouw_aow</span>
 
 
 
@@ -339,17 +339,17 @@ De <span style="color: green">arbeidskorting</span> is
 
 
 
-  - Anders <span style="color:blue">$ARBEIDSKORTING_MAX</span> min
-    - Indien <span style="color:green">$BOX1_DIENSTBETREKKING</span> groter dan <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
+  - Anders <span style="color:blue">$arbeidskorting_max</span> min
+    - Indien <span style="color:green">$box1_dienstbetrekking</span> groter dan <span style="color:blue">$arbeidskorting_afbouw_start</span>
 
 
-      dan <span style="color:green">$BOX1_DIENSTBETREKKING</span> min <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
+      dan <span style="color:green">$box1_dienstbetrekking</span> min <span style="color:blue">$arbeidskorting_afbouw_start</span>
 
-     minimaal <span style="color:blue">$ARBEIDSKORTING_NULPUNT</span> min <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
+     minimaal <span style="color:blue">$arbeidskorting_nulpunt</span> min <span style="color:blue">$arbeidskorting_afbouw_start</span>
 
 
 
-     keer <span style="color:blue">$ARBEIDSKORTING_AFBOUW</span>
+     keer <span style="color:blue">$arbeidskorting_afbouw</span>
 
 
 
@@ -368,20 +368,20 @@ Geldig vanaf: 2001-01-01
 
 De <span style="color: green">inkomensafhankelijke_combinatiekorting</span> is
 
-  - Indien <span style="color:green">$HEEFT_KINDEREN_ONDER_12</span> gelijk aan <span style="color:green">true</span>
+  - Indien <span style="color:green">$heeft_kinderen_onder_12</span> gelijk aan <span style="color:green">true</span>
 
-   en <span style="color:green">$BOX1_DIENSTBETREKKING</span> groter dan <span style="color:blue">$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN</span>
-
-
-
-
-    dan <span style="color:blue">$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_BASIS</span> plus <span style="color:green">$BOX1_DIENSTBETREKKING</span> min <span style="color:blue">$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN</span>
-
-   keer <span style="color:blue">$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_PERCENTAGE</span>
+   en <span style="color:green">$box1_dienstbetrekking</span> groter dan <span style="color:blue">$inkomensafhankelijke_combinatiekorting_min_inkomen</span>
 
 
 
-   minimaal <span style="color:blue">$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MAX</span>
+
+    dan <span style="color:blue">$inkomensafhankelijke_combinatiekorting_basis</span> plus <span style="color:green">$box1_dienstbetrekking</span> min <span style="color:blue">$inkomensafhankelijke_combinatiekorting_min_inkomen</span>
+
+   keer <span style="color:blue">$inkomensafhankelijke_combinatiekorting_percentage</span>
+
+
+
+   minimaal <span style="color:blue">$inkomensafhankelijke_combinatiekorting_max</span>
 
 
 
@@ -411,7 +411,7 @@ Regel bepaal/bereken buitenlands inkomen \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">buitenlands_inkomen</span> is
-<span style="color:green">$BUITENLANDS_INKOMEN</span>
+<span style="color:green">$buitenlands_inkomen</span>
 
 
 Regel bepaal/bereken inkomen \
@@ -425,9 +425,9 @@ Regel bepaal/bereken vermogen \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">vermogen</span> is
-<span style="color:green">$BOX3_SPAREN</span> plus <span style="color:green">$BOX3_BELEGGEN</span> plus <span style="color:green">$BOX3_ONROEREND_GOED</span>
+<span style="color:green">$box3_sparen</span> plus <span style="color:green">$box3_beleggen</span> plus <span style="color:green">$box3_onroerend_goed</span>
 
- min <span style="color:green">$BOX3_SCHULDEN</span>
+ min <span style="color:green">$box3_schulden</span>
 
 
 Regel bepaal/bereken partner box1 inkomen \
@@ -437,7 +437,7 @@ De <span style="color: green">partner_box1_inkomen</span> is
 
   - Indien
 
-    dan <span style="color:green">$PARTNER_BOX1_DIENSTBETREKKING</span> plus <span style="color:green">$PARTNER_BOX1_UITKERINGEN</span> plus <span style="color:green">$PARTNER_BOX1_ONDERNEMING</span> plus <span style="color:green">$PARTNER_BOX1_OVERIGE_WERKZAAMHEDEN</span> plus <span style="color:green">$PARTNER_BOX1_EIGEN_WONING</span>
+    dan <span style="color:green">$partner_box1_dienstbetrekking</span> plus <span style="color:green">$partner_box1_uitkeringen</span> plus <span style="color:green">$partner_box1_onderneming</span> plus <span style="color:green">$partner_box1_overige_werkzaamheden</span> plus <span style="color:green">$partner_box1_eigen_woning</span>
 
 
 
@@ -454,7 +454,7 @@ De <span style="color: green">partner_box2_inkomen</span> is
 
   - Indien
 
-    dan <span style="color:green">$PARTNER_BOX2_DIVIDEND</span> plus <span style="color:green">$PARTNER_BOX2_AANDELEN</span>
+    dan <span style="color:green">$partner_box2_dividend</span> plus <span style="color:green">$partner_box2_aandelen</span>
 
 
 
@@ -471,13 +471,13 @@ De <span style="color: green">partner_box3_inkomen</span> is
 
   - Indien
 
-    dan <span style="color:green">$PARTNER_BOX3_SPAREN</span> plus <span style="color:green">$PARTNER_BOX3_BELEGGEN</span> plus <span style="color:green">$PARTNER_BOX3_ONROEREND_GOED</span>
+    dan <span style="color:green">$partner_box3_sparen</span> plus <span style="color:green">$partner_box3_beleggen</span> plus <span style="color:green">$partner_box3_onroerend_goed</span>
 
-   min <span style="color:green">$PARTNER_BOX3_SCHULDEN</span> min <span style="color:blue">$HEFFINGSVRIJ_VERMOGEN</span>
+   min <span style="color:green">$partner_box3_schulden</span> min <span style="color:blue">$heffingsvrij_vermogen</span>
 
 
 
-   keer <span style="color:blue">$BOX3_RENDEMENT</span>
+   keer <span style="color:blue">$box3_rendement</span>
 
 
 
@@ -489,7 +489,7 @@ Regel bepaal/bereken partner buitenlands inkomen \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">partner_buitenlands_inkomen</span> is
-<span style="color:green">$PARTNER_BUITENLANDS_INKOMEN</span>
+<span style="color:green">$partner_buitenlands_inkomen</span>
 
 
 Regel bepaal/bereken partner inkomen \
@@ -506,9 +506,9 @@ De <span style="color: green">gezamenlijk_vermogen</span> is
 
   - Indien
 
-    dan <span style="color:green">$vermogen</span> plus <span style="color:green">$PARTNER_BOX3_SPAREN</span> plus <span style="color:green">$PARTNER_BOX3_BELEGGEN</span> plus <span style="color:green">$PARTNER_BOX3_ONROEREND_GOED</span>
+    dan <span style="color:green">$vermogen</span> plus <span style="color:green">$partner_box3_sparen</span> plus <span style="color:green">$partner_box3_beleggen</span> plus <span style="color:green">$partner_box3_onroerend_goed</span>
 
-   min <span style="color:green">$PARTNER_BOX3_SCHULDEN</span>
+   min <span style="color:green">$partner_box3_schulden</span>
 
 
 
@@ -522,14 +522,14 @@ Regel bepaal/bereken bezittingen \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">bezittingen</span> is
-<span style="color:green">$BOX3_SPAREN</span> plus <span style="color:green">$BOX3_BELEGGEN</span> plus <span style="color:green">$BOX3_ONROEREND_GOED</span>
+<span style="color:green">$box3_sparen</span> plus <span style="color:green">$box3_beleggen</span> plus <span style="color:green">$box3_onroerend_goed</span>
 
 
 Regel bepaal/bereken bedrijfsinkomen \
 Geldig vanaf: 2001-01-01
 
 De <span style="color: green">bedrijfsinkomen</span> is
-<span style="color:green">$BOX1_ONDERNEMING</span> delen door <span style="color:green">12</span>
+<span style="color:green">$box1_onderneming</span> delen door <span style="color:green">12</span>
 
 
 Regel bepaal/bereken maandelijks inkomen \

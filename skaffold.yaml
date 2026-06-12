@@ -15,15 +15,6 @@ build:
         manual:
           - src: "**/*.go"
             dest: /build
-    - image: go-engine-image
-      context: .
-      docker:
-        dockerfile: machinev2/backend/dev.Dockerfile
-      sync:
-        manual:
-          - src: "machinev2/**/*.go"
-            dest: /build
-            strip: "machinev2"
     - image: web-image
       context: .
       docker:

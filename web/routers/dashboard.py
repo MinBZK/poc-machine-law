@@ -101,7 +101,7 @@ async def total_net_income(
             result = machine_service.evaluate(
                 service=service,
                 law=law,
-                parameters={"BSN": bsn},
+                parameters={"bsn": bsn},
                 reference_date=TODAY,
                 effective_date=date,  # Pass the date as effective_date
                 approved=False,  # Show current state including pending changes

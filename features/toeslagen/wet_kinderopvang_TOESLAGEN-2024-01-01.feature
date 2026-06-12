@@ -18,7 +18,7 @@ Feature: Berekening Kinderopvangtoeslag
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 888888888 | 3600000                   | 0                         | 0                     | 0                               | 0            |
     And de volgende UWV wet_structuur_uitvoeringsorganisatie_werk_en_inkomen gegevens:
-      | BSN       | verzekerde_jaren |
+      | bsn       | verzekerde_jaren |
       | 888888888 | 5             |
     And de volgende UWV dienstverbanden gegevens:
       | bsn       | start_date | end_date   |
@@ -28,9 +28,9 @@ Feature: Berekening Kinderopvangtoeslag
     And is niet voldaan aan de voorwaarden
     When de burger deze gegevens indient:
       | service   | law              | key                    | nieuwe_waarde                                                                                                                                                                                      | reden               | bewijs |
-      | TOESLAGEN | wet_kinderopvang | KINDEROPVANG_KVK          | 12345678                                                                                                                                                                                           | verplichte gegevens |        |
-      | TOESLAGEN | wet_kinderopvang | AANGEGEVEN_UREN         | [{"kind_bsn": "111111111", "uren_per_jaar": 2000, "uurtarief": 850, "soort_opvang": "DAGOPVANG"}, {"kind_bsn": "222222222", "uren_per_jaar": 1500, "uurtarief": 900, "soort_opvang": "DAGOPVANG"}] | verplichte gegevens |        |
-      | TOESLAGEN | wet_kinderopvang | VERWACHTE_PARTNER_UREN | 0                                                                                                                                                                                                  | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | kinderopvang_kvk          | 12345678                                                                                                                                                                                           | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | aangegeven_uren         | [{"kind_bsn": "111111111", "uren_per_jaar": 2000, "uurtarief": 850, "soort_opvang": "DAGOPVANG"}, {"kind_bsn": "222222222", "uren_per_jaar": 1500, "uurtarief": 900, "soort_opvang": "DAGOPVANG"}] | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | verwachte_partner_uren | 0                                                                                                                                                                                                  | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then ontbreken er geen verplichte gegevens
     And heeft de persoon recht op kinderopvangtoeslag
@@ -48,7 +48,7 @@ Feature: Berekening Kinderopvangtoeslag
       | 888888888 | 4500000                   | 0                         | 0                     | 0                               | 0            |
       | 999999999 | 3800000                   | 0                         | 0                     | 0                               | 0            |
     And de volgende UWV wet_structuur_uitvoeringsorganisatie_werk_en_inkomen gegevens:
-      | BSN       | verzekerde_jaren |
+      | bsn       | verzekerde_jaren |
       | 888888888 | 8             |
       | 999999999 | 6             |
     And de volgende UWV dienstverbanden gegevens:
@@ -57,9 +57,9 @@ Feature: Berekening Kinderopvangtoeslag
       | 999999999 | 2023-01-01 |          |
     When de burger deze gegevens indient:
       | service   | law              | key                    | nieuwe_waarde                                                                                                                           | reden               | bewijs |
-      | TOESLAGEN | wet_kinderopvang | KINDEROPVANG_KVK          | 87654321                                                                                                                                | verplichte gegevens |        |
-      | TOESLAGEN | wet_kinderopvang | AANGEGEVEN_UREN         | [{"kind_bsn": "333333333", "uren_per_jaar": 2500, "uurtarief": 895, "soort_opvang": "DAGOPVANG", "LRK_registratienummer": "123456789"}] | verplichte gegevens |        |
-      | TOESLAGEN | wet_kinderopvang | VERWACHTE_PARTNER_UREN | 30                                                                                                                                      | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | kinderopvang_kvk          | 87654321                                                                                                                                | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | aangegeven_uren         | [{"kind_bsn": "333333333", "uren_per_jaar": 2500, "uurtarief": 895, "soort_opvang": "DAGOPVANG", "LRK_registratienummer": "123456789"}] | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | verwachte_partner_uren | 30                                                                                                                                      | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then heeft de persoon recht op kinderopvangtoeslag
     And is het toeslagbedrag "7383.75" euro
@@ -75,16 +75,16 @@ Feature: Berekening Kinderopvangtoeslag
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 888888888 | 3200000                   | 0                         | 0                     | 0                               | 0            |
     And de volgende UWV wet_structuur_uitvoeringsorganisatie_werk_en_inkomen gegevens:
-      | BSN       | verzekerde_jaren |
+      | bsn       | verzekerde_jaren |
       | 888888888 | 4             |
     And de volgende UWV dienstverbanden gegevens:
       | bsn       | start_date | end_date |
       | 888888888 | 2023-03-01 |          |
     When de burger deze gegevens indient:
       | service   | law              | key                    | nieuwe_waarde                                                                                                                                                                                                                                                      | reden               | bewijs |
-      | TOESLAGEN | wet_kinderopvang | KINDEROPVANG_KVK          | 23456789                                                                                                                                                                                                                                                           | verplichte gegevens |        |
-      | TOESLAGEN | wet_kinderopvang | AANGEGEVEN_UREN         | [{"kind_bsn": "444444444", "uren_per_jaar": 1200, "uurtarief": 790, "soort_opvang": "BSO", "LRK_registratienummer": "234567890"}, {"kind_bsn": "555555555", "uren_per_jaar": 1200, "uurtarief": 790, "soort_opvang": "BSO", "LRK_registratienummer": "234567890"}] | verplichte gegevens |        |
-      | TOESLAGEN | wet_kinderopvang | VERWACHTE_PARTNER_UREN | 0                                                                                                                                                                                                                                                                  | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | kinderopvang_kvk          | 23456789                                                                                                                                                                                                                                                           | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | aangegeven_uren         | [{"kind_bsn": "444444444", "uren_per_jaar": 1200, "uurtarief": 790, "soort_opvang": "BSO", "LRK_registratienummer": "234567890"}, {"kind_bsn": "555555555", "uren_per_jaar": 1200, "uurtarief": 790, "soort_opvang": "BSO", "LRK_registratienummer": "234567890"}] | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | verwachte_partner_uren | 0                                                                                                                                                                                                                                                                  | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then heeft de persoon recht op kinderopvangtoeslag
     And is het toeslagbedrag "17648.64" euro
@@ -101,7 +101,7 @@ Feature: Berekening Kinderopvangtoeslag
       | 888888888 | 2900000                   | 0                         | 0                     | 0                               | 0            |
       | 777777777 | 1200000                   | 0                         | 0                     | 0                               | 0            |
     And de volgende UWV wet_structuur_uitvoeringsorganisatie_werk_en_inkomen gegevens:
-      | BSN       | verzekerde_jaren |
+      | bsn       | verzekerde_jaren |
       | 888888888 | 3             |
       | 777777777 | 2             |
     And de volgende UWV dienstverbanden gegevens:
@@ -110,9 +110,9 @@ Feature: Berekening Kinderopvangtoeslag
       | 777777777 | 2023-01-01 | 2023-01-15 |
     When de burger deze gegevens indient:
       | service   | law              | key                    | nieuwe_waarde                                                                                                                           | reden               | bewijs |
-      | TOESLAGEN | wet_kinderopvang | KINDEROPVANG_KVK          | 34567890                                                                                                                                | verplichte gegevens |        |
-      | TOESLAGEN | wet_kinderopvang | AANGEGEVEN_UREN         | [{"kind_bsn": "666666666", "uren_per_jaar": 1800, "uurtarief": 880, "soort_opvang": "DAGOPVANG", "LRK_registratienummer": "345678901"}] | verplichte gegevens |        |
-      | TOESLAGEN | wet_kinderopvang | VERWACHTE_PARTNER_UREN | 15                                                                                                                                      | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | kinderopvang_kvk          | 34567890                                                                                                                                | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | aangegeven_uren         | [{"kind_bsn": "666666666", "uren_per_jaar": 1800, "uurtarief": 880, "soort_opvang": "DAGOPVANG", "LRK_registratienummer": "345678901"}] | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | verwachte_partner_uren | 15                                                                                                                                      | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then heeft de persoon geen recht op kinderopvangtoeslag
 
@@ -128,7 +128,7 @@ Feature: Berekening Kinderopvangtoeslag
       | 888888888 | 2800000                   | 0                         | 0                     | 0                               | 0            |
       | 888888880 | 2100000                   | 0                         | 0                     | 0                               | 0            |
     And de volgende UWV wet_structuur_uitvoeringsorganisatie_werk_en_inkomen gegevens:
-      | BSN       | verzekerde_jaren |
+      | bsn       | verzekerde_jaren |
       | 888888888 | 7             |
       | 888888880 | 5             |
     And de volgende UWV dienstverbanden gegevens:
@@ -137,9 +137,9 @@ Feature: Berekening Kinderopvangtoeslag
       | 888888880 | 2020-02-01 |          |
     When de burger deze gegevens indient:
       | service   | law              | key                    | nieuwe_waarde                                                                                                                                                                                                                                                            | reden               | bewijs |
-      | TOESLAGEN | wet_kinderopvang | KINDEROPVANG_KVK          | 56789012                                                                                                                                                                                                                                                                 | verplichte gegevens |        |
-      | TOESLAGEN | wet_kinderopvang | AANGEGEVEN_UREN         | [{"kind_bsn": "888888881", "uren_per_jaar": 2000, "uurtarief": 899, "soort_opvang": "DAGOPVANG", "LRK_registratienummer": "567890123"}, {"kind_bsn": "888888882", "uren_per_jaar": 1000, "uurtarief": 750, "soort_opvang": "BSO", "LRK_registratienummer": "567890124"}] | verplichte gegevens |        |
-      | TOESLAGEN | wet_kinderopvang | VERWACHTE_PARTNER_UREN | 30                                                                                                                                                                                                                                                                       | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | kinderopvang_kvk          | 56789012                                                                                                                                                                                                                                                                 | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | aangegeven_uren         | [{"kind_bsn": "888888881", "uren_per_jaar": 2000, "uurtarief": 899, "soort_opvang": "DAGOPVANG", "LRK_registratienummer": "567890123"}, {"kind_bsn": "888888882", "uren_per_jaar": 1000, "uurtarief": 750, "soort_opvang": "BSO", "LRK_registratienummer": "567890124"}] | verplichte gegevens |        |
+      | TOESLAGEN | wet_kinderopvang | verwachte_partner_uren | 30                                                                                                                                                                                                                                                                       | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then heeft de persoon recht op kinderopvangtoeslag
     And is het toeslagbedrag "20384.00" euro

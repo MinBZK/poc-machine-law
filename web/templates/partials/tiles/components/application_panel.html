@@ -96,7 +96,7 @@
                             <div>Wet: {{ law }}</div>
                             <div>Service: {{ service }}</div>
                             <div>Geldig vanaf: {{ rule_spec.valid_from }}</div>
-                            <div>Versie: {{ rule_spec.uuid }}</div>
+                            {% if rule_spec.uuid %}<div>Versie: {{ rule_spec.uuid }}</div>{% endif %}
                         </div>
                     </div>
                 </div>

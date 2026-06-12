@@ -1,547 +1,411 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
-uuid: 5d8e4b3a-6f9c-4a2d-8e7b-1c9f2a5b8d3e
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
+$id: wet_op_het_kindgebonden_budget
+regulatory_layer: WET
+publication_date: '2025-01-01'
+valid_from: '2025-01-01'
 name: Kindgebonden Budget
-law: wet_op_het_kindgebonden_budget
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "TOEKENNING"
-discoverable: "CITIZEN"
-valid_from: 2025-01-01
-service: "TOESLAGEN"
-description: >
-  Berekeningsregels voor het bepalen van het recht op en de hoogte van het kindgebonden budget
-  volgens de Wet op het kindgebonden budget. Het kindgebonden budget is een bijdrage in de kosten
-  voor kinderen tot 18 jaar. Het basisbedrag is €2.511 per kind, met extra bedragen voor oudere
-  kinderen (€703 voor 12-15 jaar, €936 voor 16-17 jaar). Alleenstaande ouders zonder partner
-  krijgen een extra verhoging van €3.389 (ALO-kop). De hoogte wordt inkomensafhankelijk afgebouwd.
-
-legal_basis:
-  law: "Wet op het kindgebonden budget"
-  bwb_id: "BWBR0022751"
-  article: "2"
-  url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01"
-  juriconnect: "jci1.3:c:BWBR0022751&z=2025-01-01&g=2025-01-01"
-  explanation: "De Wet op het kindgebonden budget regelt de bijdrage in de kosten voor kinderen"
-
-references:
-  - law: "Wet op het kindgebonden budget"
-    article: "2"
-    url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-  - law: "Wet op het kindgebonden budget"
-    article: "3"
-    url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel3"
-
-properties:
-  parameters:
-    - name: "BSN"
-      description: "BSN van de ouder"
-      type: "string"
-      required: true
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 2 bepaalt dat kindgebonden budget wordt toegekend aan de ouder"
-
-  input:
-    - name: "HEEFT_PARTNER"
-      description: "Heeft een partner (toeslagpartner)"
-      type: "boolean"
-      service_reference:
-        service: "RvIG"
-        field: "heeft_partner"
-        law: "wet_brp"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        paragraph: "6"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=6&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 2 lid 6 bepaalt dat alleenstaande ouders zonder partner recht hebben op een verhoging"
-
-    - name: "PARTNER_BSN"
-      description: "BSN van de partner (indien aanwezig)"
-      type: "string"
-      service_reference:
-        service: "RvIG"
-        field: "partner_bsn"
-        law: "wet_brp"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        paragraph: "6"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=6&z=2025-01-01&g=2025-01-01"
-        explanation: "Partner BSN nodig voor gezamenlijk toetsingsinkomen en vermogen"
-
-    - name: "AANTAL_KINDEREN"
-      description: "Aantal kinderen waarvoor kinderbijslag wordt ontvangen"
-      type: "number"
-      service_reference:
-        service: "SVB"
-        field: "aantal_kinderen"
-        law: "algemene_kinderbijslagwet"
-      type_spec:
-        precision: 0
-        min: 0
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=1&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 2 lid 1 bepaalt dat kindgebonden budget wordt berekend per kind"
-
-    - name: "KINDEREN_LEEFTIJDEN"
-      description: "Leeftijden van alle kinderen"
-      type: "array"
-      service_reference:
-        service: "SVB"
-        field: "kinderen_leeftijden"
-        law: "algemene_kinderbijslagwet"
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        paragraph: "4"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=4&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 2 lid 4 bepaalt extra bedragen afhankelijk van leeftijd kinderen"
-
-    - name: "ONTVANGT_KINDERBIJSLAG"
-      description: "Ontvangt kinderbijslag voor het kind"
-      type: "boolean"
-      service_reference:
-        service: "SVB"
-        field: "ontvangt_kinderbijslag"
-        law: "algemene_kinderbijslagwet"
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=1&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 2 lid 1 bepaalt dat ouder kinderbijslag moet ontvangen"
-
-    - name: "TOETSINGSINKOMEN"
-      description: "Toetsingsinkomen van de ouder"
-      type: "amount"
-      service_reference:
-        service: "UWV"
-        field: "toetsingsinkomen"
-        law: "uwv_toetsingsinkomen"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-        immutable_after: "P2Y"
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        paragraph: "5"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=5&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 2 lid 5 bepaalt dat het budget wordt verminderd op basis van toetsingsinkomen"
-
-    - name: "PARTNER_TOETSINGSINKOMEN"
-      description: "Toetsingsinkomen van de partner"
-      type: "amount"
-      service_reference:
-        service: "UWV"
-        field: "toetsingsinkomen"
-        law: "uwv_toetsingsinkomen"
-        parameters:
-          - name: "BSN"
-            reference: "$PARTNER_BSN"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-        immutable_after: "P2Y"
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        paragraph: "5"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=5&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 2 lid 5 bepaalt dat gezamenlijk inkomen wordt gebruikt voor paren"
-
-    - name: "VERMOGEN"
-      description: "Vermogen van de ouder"
-      type: "amount"
-      service_reference:
-        service: "BELASTINGDIENST"
-        field: "vermogen"
-        law: "belastingdienst_vermogen"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "point_in_time"
-        reference: "$prev_january_first"
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "3"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel3"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=3&lid=1&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 3 lid 1 stelt vermogensgrenzen vast voor recht op kindgebonden budget"
-
-    - name: "PARTNER_VERMOGEN"
-      description: "Vermogen van de partner"
-      type: "amount"
-      service_reference:
-        service: "BELASTINGDIENST"
-        field: "vermogen"
-        law: "belastingdienst_vermogen"
-        parameters:
-          - name: "BSN"
-            reference: "$PARTNER_BSN"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "point_in_time"
-        reference: "$prev_january_first"
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "3"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel3"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=3&lid=1&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 3 lid 1 stelt vermogensgrenzen voor partners"
-
-  output:
-    - name: "heeft_recht_op_kindgebonden_budget"
-      description: "Geeft aan of de ouder recht heeft op kindgebonden budget"
-      type: "boolean"
-      temporal:
-        type: "period"
-        period_type: "year"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 2 bepaalt de voorwaarden voor recht op kindgebonden budget"
-
-    - name: "kindgebonden_budget_jaar"
-      description: "Totale hoogte van het kindgebonden budget per jaar"
-      type: "amount"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-      citizen_relevance: primary
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 2 bepaalt de hoogte van het kindgebonden budget"
-
-    - name: "alo_kop_bedrag"
-      description: "Bedrag van de alleenstaande ouderkop (ALO-kop)"
-      type: "amount"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-      citizen_relevance: secondary
-      legal_basis:
-        law: "Wet op het kindgebonden budget"
-        bwb_id: "BWBR0022751"
-        article: "2"
-        paragraph: "6"
-        url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-        juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=6&z=2025-01-01&g=2025-01-01"
-        explanation: "Artikel 2 lid 6 bepaalt de verhoging voor alleenstaande ouders"
-
-  definitions:
-    BASISBEDRAG_PER_KIND: 251100  # €2.511
-    EXTRA_12_15_JAAR: 70300  # €703
-    EXTRA_16_17_JAAR: 93600  # €936
-    ALO_KOP: 348000  # €3.480 (2025 bedrag)
-    DREMPELINKOMEN_ALLEENSTAAND: 2840600  # €28.406
-    DREMPELINKOMEN_PARTNER: 4041600  # €40.416
-    EXTRA_DREMPEL_PARTNER: 913900  # €9.139
-    AFBOUWPERCENTAGE: 0.071  # 7.1%
-    VERMOGENSGRENS_ALLEENSTAAND: 14189600  # €141.896
-    VERMOGENSGRENS_PARTNER: 17942900  # €179.429
-
-requirements:
-  - all:
-      # Kinderbijslag voorwaarde
-      - subject: "$ONTVANGT_KINDERBIJSLAG"
-        operation: EQUALS
-        value: true
-        legal_basis:
-          law: "Wet op het kindgebonden budget"
-          bwb_id: "BWBR0022751"
-          article: "2"
-          paragraph: "1"
-          url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-          juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=1&z=2025-01-01&g=2025-01-01"
-          explanation: "Artikel 2 lid 1 vereist dat ouder kinderbijslag ontvangt"
-
-      # Minimaal 1 kind
-      - subject: "$AANTAL_KINDEREN"
-        operation: GREATER_THAN
-        value: 0
-        legal_basis:
-          law: "Wet op het kindgebonden budget"
-          bwb_id: "BWBR0022751"
-          article: "2"
-          paragraph: "1"
-          url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-          juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=1&z=2025-01-01&g=2025-01-01"
-          explanation: "Artikel 2 lid 1 bepaalt dat kindgebonden budget geldt per kind"
-
-      # Vermogenstoets
-      - operation: IF
-        legal_basis:
-          law: "Wet op het kindgebonden budget"
-          bwb_id: "BWBR0022751"
-          article: "3"
-          paragraph: "1"
-          url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel3"
-          juriconnect: "jci1.3:c:BWBR0022751&artikel=3&lid=1&z=2025-01-01&g=2025-01-01"
-          explanation: "Artikel 3 lid 1 bepaalt de vermogensgrenzen"
-        conditions:
-          - test:
-              subject: "$HEEFT_PARTNER"
+bwb_id: BWBR0022751
+url: https://wetten.overheid.nl/BWBR0022751/2025-01-01
+service: TOESLAGEN
+uuid: 5d8e4b3a-6f9c-4a2d-8e7b-1c9f2a5b8d3e
+discoverable: CITIZEN
+articles:
+- number: '2'
+  text: "1 Aanspraak op een kindgebonden budget heeft de ouder voor een kind voor\
+    \ wie aan die ouder op grond van artikel 18 van de Algemene Kinderbijslagwet kinderbijslag\
+    \ wordt betaald of zou worden betaald indien artikel 7, tweede lid van die wet\
+    \ niet van toepassing zou zijn, met dien verstande dat de aanspraak op een kindgebonden\
+    \ budget bestaat met ingang van de kalendermaand na de maand waarin het kind is\
+    \ geboren dan wel tot het huishouden is gaan behoren tot en met de kalendermaand\
+    \ waarin het kind de leeftijd van 18 jaar bereikt.\n2 Het kindgebonden budget\
+    \ bedraagt voor een berekeningsjaar:\n  a. indien de ouder aanspraak heeft voor\
+    \ een kind: € 2.511;\n  b. indien de ouder aanspraak heeft voor twee of meer kinderen:\
+    \ € 2.511 per kind voor het tweede of volgende kind.\n3 Een ouder heeft aanspraak\
+    \ op een verhoging van het kindgebonden budget in een berekeningsjaar voor een\
+    \ kind met ingang van de kalendermaand na de maand waarin dat kind de leeftijd\
+    \ van 12 jaar heeft bereikt.\n4 Voor een kind dat 12 jaar of ouder is, maar jonger\
+    \ is dan 16 jaar bedraagt de verhoging van het kindgebonden budget € 703.\n5 Voor\
+    \ een kind dat 16 of 17 jaar is, bedraagt de verhoging van het kindgebonden budget\
+    \ met ingang van de kalendermaand na de maand waarin het kind de leeftijd van\
+    \ 16 jaar heeft bereikt € 936,00.\n6 De ouder die geen partner heeft, heeft aanspraak\
+    \ op een verhoging van het kindgebonden budget van € 3.389.\n7 Bij een toetsingsinkomen\
+    \ van de ouder die geen partner heeft, van meer dan het drempelinkomen wordt de\
+    \ som van de bedragen waarop recht bestaat op grond van het tweede, vierde, vijfde\
+    \ en zesde lid verminderd met 7,10% van het verschil tussen het toetsingsinkomen\
+    \ en het drempelinkomen.\n8 Bij een gezamenlijk toetsingsinkomen van de ouder\
+    \ en zijn partner van meer dan het met € 9.139,00 verhoogde drempelinkomen wordt\
+    \ de som van de bedragen waarop recht bestaat op grond van het tweede, vierde\
+    \ en vijfde lid verminderd met 7,10% van het verschil tussen het gezamenlijk toetsingsinkomen\
+    \ en het met € 9.139,00 verhoogde drempelinkomen.\n9 Een ouder als bedoeld in\
+    \ het eerste en derde lid en zijn partner die tevens ouder is als bedoeld in het\
+    \ eerste lid worden voor de toepassing van deze wet geacht gezamenlijk één aanspraak\
+    \ te hebben.\n10 Indien aan twee ouders kinderbijslag wordt uitbetaald op basis\
+    \ van het recht op kinderbijslag van één van die ouders, heeft alleen de ouder,\
+    \ wiens recht op kinderbijslag wordt uitbetaald aanspraak op een kindgebonden\
+    \ budget.\n11 De aanspraak op een kindgebonden budget wordt voor iedere kalendermaand\
+    \ afzonderlijk bepaald.\n12 Indien de ouder:\n  a. aanspraak heeft op kindgebonden\
+    \ budget voor een kind, en\n  b. voor dat kind voor de toepassing van de Algemene\
+    \ Kinderbijslagwet een ander land dan Nederland, een van de andere lidstaten van\
+    \ de Europese Unie, een andere staat die partij is bij de Overeenkomst betreffende\
+    \ de Europese Economische Ruimte en Zwitserland als woonland in aanmerking wordt\
+    \ genomen,\nbedraagt het kindgebonden budget een bij ministeriële regeling vastgesteld\
+    \ percentage van de in het tweede lid, onderdeel a, en vierde tot en met zesde\
+    \ lid bedoelde bedragen. Het percentage wordt zo bepaald dat het een weergave\
+    \ is van de verhouding tussen het kostenniveau van het land dat als woonland in\
+    \ aanmerking wordt genomen en dat van Nederland. Het percentage bedraagt maximaal\
+    \ 100.\n13 Indien de ouder:\n  a. aanspraak heeft op kindgebonden budget voor\
+    \ meer dan een kind, en\n  b. voor een of meer van die kinderen voor de toepassing\
+    \ van de Algemene Kinderbijslagwet een ander land dan Nederland, een van de andere\
+    \ lidstaten van de Europese Unie, een andere staat die partij is bij de Overeenkomst\
+    \ betreffende de Europese Economische Ruimte en Zwitserland als woonland in aanmerking\
+    \ wordt genomen,\nbedraagt het kindgebonden budget een volgens bij ministeriële\
+    \ regeling te stellen regels vastgesteld bedrag. Dat bedrag is gebaseerd op de\
+    \ in het tweede en vierde tot en met zesde lid, opgenomen bedragen en de verhouding\
+    \ tussen het kostenniveau van het land dat als woonland in aanmerking wordt genomen\
+    \ voor het desbetreffende kind of voor de desbetreffende kinderen en dat van Nederland\
+    \ uitgedrukt in procenten. Het percentage bedraagt maximaal 100.\n14 Het twaalfde\
+    \ en dertiende lid zijn niet van toepassing indien het een kind betreft dat op\
+    \ de eerste dag van een kalenderkwartaal niet in Nederland woont doch langer dan\
+    \ drie maanden onafgebroken in Nederland verblijft."
+  url: https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2
+  machine_readable:
+    definitions:
+      basisbedrag_per_kind: 251100
+      extra_12_15_jaar: 70300
+      extra_16_17_jaar: 93600
+      alo_kop: 348000
+      drempelinkomen_alleenstaand: 2840600
+      drempelinkomen_partner: 4041600
+      extra_drempel_partner: 913900
+      afbouwpercentage: 0.071
+      vermogensgrens_alleenstaand: 14189600
+      vermogensgrens_partner: 17942900
+    execution:
+      produces:
+        legal_character: BESCHIKKING
+        decision_type: TOEKENNING
+      parameters:
+      - name: bsn
+        type: string
+        required: true
+      input:
+      - name: heeft_partner
+        type: boolean
+        source:
+          regulation: wet_brp
+          output: heeft_partner
+          service: RvIG
+          parameters:
+            bsn: $bsn
+        temporal:
+          type: point_in_time
+          reference: $referencedate
+      - name: partner_bsn
+        type: string
+        source:
+          regulation: wet_brp
+          output: partner_bsn
+          service: RvIG
+          parameters:
+            bsn: $bsn
+        temporal:
+          type: point_in_time
+          reference: $referencedate
+      - name: aantal_kinderen
+        type: number
+        type_spec:
+          precision: 0
+          min: 0
+        source:
+          regulation: algemene_kinderbijslagwet
+          output: aantal_kinderen
+          service: SVB
+          parameters:
+            bsn: $bsn
+      - name: kinderen_leeftijden
+        type: array
+        source:
+          regulation: algemene_kinderbijslagwet
+          output: kinderen_leeftijden
+          service: SVB
+          parameters:
+            bsn: $bsn
+      - name: ontvangt_kinderbijslag
+        type: boolean
+        source:
+          regulation: algemene_kinderbijslagwet
+          output: ontvangt_kinderbijslag
+          service: SVB
+          parameters:
+            bsn: $bsn
+      - name: toetsingsinkomen
+        type: amount
+        type_spec:
+          unit: eurocent
+          precision: 0
+          min: 0
+        source:
+          regulation: uwv_toetsingsinkomen
+          output: toetsingsinkomen
+          service: UWV
+          parameters:
+            bsn: $bsn
+        temporal:
+          type: period
+          period_type: year
+          immutable_after: P2Y
+      - name: partner_toetsingsinkomen
+        type: amount
+        type_spec:
+          unit: eurocent
+          precision: 0
+          min: 0
+        source:
+          regulation: uwv_toetsingsinkomen
+          output: toetsingsinkomen
+          service: UWV
+          parameters:
+            bsn: $partner_bsn
+        temporal:
+          type: period
+          period_type: year
+          immutable_after: P2Y
+      - name: vermogen
+        type: amount
+        type_spec:
+          unit: eurocent
+          precision: 0
+          min: 0
+        source:
+          regulation: belastingdienst_vermogen
+          output: vermogen
+          service: BELASTINGDIENST
+          parameters:
+            bsn: $bsn
+        temporal:
+          type: point_in_time
+          reference: $prev_january_first
+      - name: partner_vermogen
+        type: amount
+        type_spec:
+          unit: eurocent
+          precision: 0
+          min: 0
+        source:
+          regulation: belastingdienst_vermogen
+          output: vermogen
+          service: BELASTINGDIENST
+          parameters:
+            bsn: $partner_bsn
+        temporal:
+          type: point_in_time
+          reference: $prev_january_first
+      output:
+      - name: voldoet_aan_voorwaarden
+        type: boolean
+      - name: heeft_recht_op_kindgebonden_budget
+        type: boolean
+      - name: kindgebonden_budget_jaar
+        type: amount
+        type_spec:
+          unit: eurocent
+          precision: 0
+          min: 0
+      - name: alo_kop_bedrag
+        type: amount
+        type_spec:
+          unit: eurocent
+          precision: 0
+          min: 0
+      actions:
+      - output: voldoet_aan_voorwaarden
+        value:
+          operation: AND
+          conditions:
+          - subject: $ontvangt_kinderbijslag
+            operation: EQUALS
+            value: true
+          - subject: $aantal_kinderen
+            operation: GREATER_THAN
+            value: 0
+          - operation: IF
+            cases:
+            - when:
+                subject: $heeft_partner
+                operation: EQUALS
+                value: true
+              then:
+                operation: LESS_THAN
+                subject:
+                  operation: ADD
+                  values:
+                  - $vermogen
+                  - $partner_vermogen
+                value: $vermogensgrens_partner
+            default:
+              operation: LESS_THAN
+              subject: $vermogen
+              value: $vermogensgrens_alleenstaand
+      - output: leeftijdstoeslagen
+        value:
+          operation: FOREACH
+          collection: $kinderen_leeftijden
+          body:
+            operation: IF
+            cases:
+            - when:
+                operation: GREATER_THAN_OR_EQUAL
+                subject: $leeftijd
+                value: 16
+              then:
+                operation: IF
+                cases:
+                - when:
+                    operation: LESS_THAN_OR_EQUAL
+                    subject: $leeftijd
+                    value: 17
+                  then: $extra_16_17_jaar
+                default: 0
+            - when:
+                operation: GREATER_THAN_OR_EQUAL
+                subject: $leeftijd
+                value: 12
+              then:
+                operation: IF
+                cases:
+                - when:
+                    operation: LESS_THAN_OR_EQUAL
+                    subject: $leeftijd
+                    value: 15
+                  then: $extra_12_15_jaar
+                default: 0
+            default: 0
+          combine: ADD
+          as: leeftijd
+      - output: alo_kop_bedrag
+        value:
+          operation: IF
+          cases:
+          - when:
               operation: EQUALS
+              subject: $heeft_partner
+              value: false
+            then: $alo_kop
+          default: 0
+        legal_basis:
+          law: Wet op het kindgebonden budget
+          bwb_id: BWBR0022751
+          article: '2'
+          paragraph: '6'
+          url: https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2
+          juriconnect: jci1.3:c:BWBR0022751&artikel=2&lid=6&z=2025-01-01&g=2025-01-01
+          explanation: Artikel 2 lid 6 bepaalt dat alleenstaande ouders zonder partner
+            recht hebben op verhoging van €3.480
+      - output: heeft_partner
+        value: $heeft_partner
+        legal_basis:
+          law: Wet op het kindgebonden budget
+          bwb_id: BWBR0022751
+          article: '2'
+          paragraph: '6'
+          url: https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2
+          juriconnect: jci1.3:c:BWBR0022751&artikel=2&lid=6&z=2025-01-01&g=2025-01-01
+          explanation: Partnerstatus bepaalt of ALO-kop van toepassing is
+      - output: kindgebonden_budget_jaar
+        value:
+          operation: IF
+          cases:
+          - when:
+              operation: EQUALS
+              subject: $heeft_partner
+              value: false
+            then:
+              operation: MAX
+              values:
+              - operation: SUBTRACT
+                values:
+                - operation: ADD
+                  values:
+                  - operation: MULTIPLY
+                    values:
+                    - $aantal_kinderen
+                    - $basisbedrag_per_kind
+                  - $leeftijdstoeslagen
+                  - $alo_kop_bedrag
+                - operation: IF
+                  cases:
+                  - when:
+                      operation: GREATER_THAN
+                      subject: $toetsingsinkomen
+                      value: $drempelinkomen_alleenstaand
+                    then:
+                      operation: MULTIPLY
+                      values:
+                      - operation: SUBTRACT
+                        values:
+                        - $toetsingsinkomen
+                        - $drempelinkomen_alleenstaand
+                      - $afbouwpercentage
+                  default: 0
+              - 0
+          - when:
+              operation: EQUALS
+              subject: $heeft_partner
               value: true
             then:
-              operation: LESS_THAN
+              operation: MAX
               values:
+              - operation: SUBTRACT
+                values:
                 - operation: ADD
                   values:
-                    - "$VERMOGEN"
-                    - "$PARTNER_VERMOGEN"
-                - "$VERMOGENSGRENS_PARTNER"
-          - else:
-              operation: LESS_THAN
-              values:
-                - "$VERMOGEN"
-                - "$VERMOGENSGRENS_ALLEENSTAAND"
-
-actions:
-  - output: "leeftijdstoeslagen"
-    description: "Totale leeftijdstoeslagen voor alle kinderen"
-    operation: FOREACH
-    combine: ADD
-    subject: "$KINDEREN_LEEFTIJDEN"
-    as: "leeftijd"
-    value:
-      - operation: IF
-        conditions:
-          - test:
-              operation: GREATER_OR_EQUAL
-              values:
-                - "$leeftijd"
-                - 16
-            then:
-              operation: IF
-              conditions:
-                - test:
-                    operation: LESS_OR_EQUAL
+                  - operation: MULTIPLY
                     values:
-                      - "$leeftijd"
-                      - 17
-                  then: "$EXTRA_16_17_JAAR"
-                - else: 0
-          - test:
-              operation: GREATER_OR_EQUAL
-              values:
-                - "$leeftijd"
-                - 12
-            then:
-              operation: IF
-              conditions:
-                - test:
-                    operation: LESS_OR_EQUAL
-                    values:
-                      - "$leeftijd"
-                      - 15
-                  then: "$EXTRA_12_15_JAAR"
-                - else: 0
-          - else: 0
-
-  - output: "alo_kop_bedrag"
-    operation: IF
-    legal_basis:
-      law: "Wet op het kindgebonden budget"
-      bwb_id: "BWBR0022751"
-      article: "2"
-      paragraph: "6"
-      url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-      juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=6&z=2025-01-01&g=2025-01-01"
-      explanation: "Artikel 2 lid 6 bepaalt dat alleenstaande ouders zonder partner recht hebben op verhoging van €3.480"
-    conditions:
-      - test:
-          subject: "$HEEFT_PARTNER"
-          operation: EQUALS
-          value: false
-        then: "$ALO_KOP"
-      - else: 0
-
-  - output: "heeft_partner"
-    value: "$HEEFT_PARTNER"
-    legal_basis:
-      law: "Wet op het kindgebonden budget"
-      bwb_id: "BWBR0022751"
-      article: "2"
-      paragraph: "6"
-      url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-      juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=6&z=2025-01-01&g=2025-01-01"
-      explanation: "Partnerstatus bepaalt of ALO-kop van toepassing is"
-
-  - output: "kindgebonden_budget_jaar"
-    operation: IF
-    legal_basis:
-      law: "Wet op het kindgebonden budget"
-      bwb_id: "BWBR0022751"
-      article: "2"
-      url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-      juriconnect: "jci1.3:c:BWBR0022751&artikel=2&z=2025-01-01&g=2025-01-01"
-      explanation: "Artikel 2 bepaalt berekening afhankelijk van partnerstatus en inkomen"
-    conditions:
-      # Alleenstaande ouder
-      - test:
-          subject: "$HEEFT_PARTNER"
-          operation: EQUALS
-          value: false
-        legal_basis:
-          law: "Wet op het kindgebonden budget"
-          bwb_id: "BWBR0022751"
-          article: "2"
-          paragraph: "6"
-          url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-          juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=6&z=2025-01-01&g=2025-01-01"
-          explanation: "Artikel 2 lid 6 bepaalt de berekening voor alleenstaande ouders"
-        then:
-          operation: MAX
-          values:
-            - operation: SUBTRACT
-              values:
-                # Basisbedrag + leeftijdstoeslagen + ALO-kop
-                - operation: ADD
-                  values:
-                    # Basisbedrag per kind
-                    - operation: MULTIPLY
-                      values:
-                        - "$AANTAL_KINDEREN"
-                        - "$BASISBEDRAG_PER_KIND"
-                    # Leeftijdstoeslagen
-                    - "$leeftijdstoeslagen"
-                    # ALO-kop
-                    - "$alo_kop_bedrag"
-                # Afbouw op basis van inkomen boven drempel
+                    - $aantal_kinderen
+                    - $basisbedrag_per_kind
+                  - $leeftijdstoeslagen
                 - operation: IF
-                  conditions:
-                    - test:
-                        operation: GREATER_THAN
+                  cases:
+                  - when:
+                      operation: GREATER_THAN
+                      subject:
+                        operation: ADD
                         values:
-                          - "$TOETSINGSINKOMEN"
-                          - "$DREMPELINKOMEN_ALLEENSTAAND"
-                      then:
-                        operation: MULTIPLY
+                        - $toetsingsinkomen
+                        - $partner_toetsingsinkomen
+                      value:
+                        operation: ADD
                         values:
-                          - operation: SUBTRACT
-                            values:
-                              - "$TOETSINGSINKOMEN"
-                              - "$DREMPELINKOMEN_ALLEENSTAAND"
-                          - "$AFBOUWPERCENTAGE"
-                    - else: 0
-            - 0
-
-      # Met partner
-      - test:
-          subject: "$HEEFT_PARTNER"
-          operation: EQUALS
-          value: true
-        legal_basis:
-          law: "Wet op het kindgebonden budget"
-          bwb_id: "BWBR0022751"
-          article: "2"
-          paragraph: "5"
-          url: "https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2"
-          juriconnect: "jci1.3:c:BWBR0022751&artikel=2&lid=5&z=2025-01-01&g=2025-01-01"
-          explanation: "Artikel 2 lid 5 bepaalt de berekening voor paren"
-        then:
-          operation: MAX
-          values:
-            - operation: SUBTRACT
-              values:
-                # Basisbedrag + leeftijdstoeslagen
-                - operation: ADD
-                  values:
-                    - operation: MULTIPLY
+                        - $drempelinkomen_partner
+                        - $extra_drempel_partner
+                    then:
+                      operation: MULTIPLY
                       values:
-                        - "$AANTAL_KINDEREN"
-                        - "$BASISBEDRAG_PER_KIND"
-                    - "$leeftijdstoeslagen"
-                # Afbouw op basis van gezamenlijk inkomen
-                - operation: IF
-                  conditions:
-                    - test:
-                        operation: GREATER_THAN
+                      - operation: SUBTRACT
                         values:
-                          - operation: ADD
-                            values:
-                              - "$TOETSINGSINKOMEN"
-                              - "$PARTNER_TOETSINGSINKOMEN"
-                          - operation: ADD
-                            values:
-                              - "$DREMPELINKOMEN_PARTNER"
-                              - "$EXTRA_DREMPEL_PARTNER"
-                      then:
-                        operation: MULTIPLY
-                        values:
-                          - operation: SUBTRACT
-                            values:
-                              - operation: ADD
-                                values:
-                                  - "$TOETSINGSINKOMEN"
-                                  - "$PARTNER_TOETSINGSINKOMEN"
-                              - operation: ADD
-                                values:
-                                  - "$DREMPELINKOMEN_PARTNER"
-                                  - "$EXTRA_DREMPEL_PARTNER"
-                          - "$AFBOUWPERCENTAGE"
-                    - else: 0
-            - 0
+                        - operation: ADD
+                          values:
+                          - $toetsingsinkomen
+                          - $partner_toetsingsinkomen
+                        - operation: ADD
+                          values:
+                          - $drempelinkomen_partner
+                          - $extra_drempel_partner
+                      - $afbouwpercentage
+                  default: 0
+              - 0
+        legal_basis:
+          law: Wet op het kindgebonden budget
+          bwb_id: BWBR0022751
+          article: '2'
+          url: https://wetten.overheid.nl/BWBR0022751/2025-01-01#Artikel2
+          juriconnect: jci1.3:c:BWBR0022751&artikel=2&z=2025-01-01&g=2025-01-01
+          explanation: Artikel 2 bepaalt berekening afhankelijk van partnerstatus
+            en inkomen
+    untranslatables:
+    - construct: iteratie over variabel aantal kinderen voor leeftijdstoeslag
+      reason: FOREACH niet beschikbaar in v0.5.1 schema; het aantal kinderen is dynamisch
+        en kan niet vooraf worden uitgerold
+      suggestion: Voeg FOREACH toe aan het schema of beperk het aantal kinderen tot
+        een vast maximum
+      accepted: true

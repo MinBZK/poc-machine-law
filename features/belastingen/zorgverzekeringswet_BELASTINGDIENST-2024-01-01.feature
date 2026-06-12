@@ -1,4 +1,3 @@
-@skip-go
 Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
   Als werkgever
   Wil ik weten hoeveel werkgeversbijdrage Zvw ik moet afdragen
@@ -17,7 +16,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     # Werkgeversbijdrage: 40.000 x 6,57% = EUR 2.628
     Given een werkgever met loonheffingennummer "123456789L01"
     And een werknemer met bruto jaarloon "40000" euro
-    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    When de zvw/werkgeversbijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "4000000" eurocent
     And is de werkgeversbijdrage "262800" eurocent
 
@@ -27,7 +26,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     # Werkgeversbijdrage: 24.000 x 6,57% = EUR 1.576,80
     Given een werkgever met loonheffingennummer "123456789L01"
     And een werknemer met bruto jaarloon "24000" euro
-    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    When de zvw/werkgeversbijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "2400000" eurocent
     And is de werkgeversbijdrage "157680" eurocent
 
@@ -37,7 +36,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     # Werkgeversbijdrage: 71.628 x 6,57% = EUR 4.705,96
     Given een werkgever met loonheffingennummer "123456789L01"
     And een werknemer met bruto jaarloon "100000" euro
-    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    When de zvw/werkgeversbijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "7162800" eurocent
     And is de werkgeversbijdrage "470596" eurocent
 
@@ -47,7 +46,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     # Werkgeversbijdrage: 71.628 x 6,57% = EUR 4.705,96
     Given een werkgever met loonheffingennummer "123456789L01"
     And een werknemer met bruto jaarloon "71628" euro
-    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    When de zvw/werkgeversbijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "7162800" eurocent
     And is de werkgeversbijdrage "470596" eurocent
 
@@ -57,7 +56,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     # Werkgeversbijdrage: 71.627 x 6,57% = EUR 4.705,89
     Given een werkgever met loonheffingennummer "123456789L01"
     And een werknemer met bruto jaarloon "71627" euro
-    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    When de zvw/werkgeversbijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "7162700" eurocent
     And is de werkgeversbijdrage "470589" eurocent
 
@@ -67,7 +66,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     # Werkgeversbijdrage: maximaal EUR 4.705,96
     Given een werkgever met loonheffingennummer "123456789L01"
     And een werknemer met bruto jaarloon "200000" euro
-    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    When de zvw/werkgeversbijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "7162800" eurocent
     And is de werkgeversbijdrage "470596" eurocent
 
@@ -77,7 +76,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     # Werkgeversbijdrage: EUR 0
     Given een werkgever met loonheffingennummer "123456789L01"
     And een werknemer met bruto jaarloon "0" euro
-    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    When de zvw/werkgeversbijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "0" eurocent
     And is de werkgeversbijdrage "0" eurocent
 
@@ -87,7 +86,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     # Werkgeversbijdrage: 20.000 x 6,57% = EUR 1.314
     Given een werkgever met loonheffingennummer "123456789L01"
     And een werknemer met bruto jaarloon "20000" euro
-    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    When de zvw/werkgeversbijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "2000000" eurocent
     And is de werkgeversbijdrage "131400" eurocent
 
@@ -97,7 +96,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     # Werkgeversbijdrage: 56.000 x 6,57% = EUR 3.679,20
     Given een werkgever met loonheffingennummer "123456789L01"
     And een werknemer met bruto jaarloon "56000" euro
-    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    When de zvw/werkgeversbijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "5600000" eurocent
     And is de werkgeversbijdrage "367920" eurocent
 
@@ -107,6 +106,6 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     # Werkgeversbijdrage: 45.123,45 x 6,57% = EUR 2.964,61
     Given een werkgever met loonheffingennummer "123456789L01"
     And een werknemer met bruto jaarloon "45123.45" euro
-    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    When de zvw/werkgeversbijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "4512345" eurocent
     And is de werkgeversbijdrage "296461" eurocent

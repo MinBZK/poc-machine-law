@@ -147,8 +147,9 @@ def validate_variable_definitions(
     defined = collect_defined_variables(yaml_data)
     referenced = find_variables_in_dict(yaml_data)
 
-    # calculation_date is implicitly defined
+    # calculation_date / referencedate is implicitly defined
     referenced.discard("$calculation_date")
+    referenced.discard("$referencedate")
 
     undefined = {v.replace("$", "") for v in referenced} - defined
 
@@ -295,7 +296,7 @@ def fetch_and_format_data(url: str) -> str:
 
 
 # Get the schema content
-with open("schema/v0.1.4/schema.json") as sf:
+with open("schema/v0.5.1/schema.json") as sf:
     schema_content = sf.read()
 
 analyize_law_prompt = ChatPromptTemplate(

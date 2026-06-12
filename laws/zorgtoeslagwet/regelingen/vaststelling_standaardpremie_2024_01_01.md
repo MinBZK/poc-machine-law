@@ -15,4 +15,4 @@ Regel bepaal/bereken standaardpremie \
 Geldig vanaf: 2024-01-01
 
 De <span style="color: green">standaardpremie</span> is
-<span style="color:blue">$STANDAARDPREMIE_2024</span>
+<span style="color:blue">$standaardpremie_2024</span>

@@ -49,8 +49,8 @@ case_seeds:
       match_field: "kvk_nummer"
       bsn_field: "bsn_eigenaar"
     parameters:
-      KVK_NUMMER: "kvk_nummer"
-      ACTIVITEITSDATUM: "datum"
+      kvk_nummer: "kvk_nummer"
+      activiteitsdatum: "datum"
     result:
       komt_in_aanmerking_voor_geluidsontheffing: true
 profiles:
@@ -97,7 +97,7 @@ profiles:
           postcode: 1021HS
           woonplaats: Amsterdam
           type: WOONADRES
-        CHILDREN_DATA:
+        children_data:
         - bsn: '100000001'
           kinderen:
           - geboortedatum: '2020-01-01'
@@ -350,7 +350,7 @@ profiles:
           postcode: 1103SK
           woonplaats: Amsterdam
           type: WOONADRES
-        CHILDREN_DATA:
+        children_data:
         - bsn: '999991905'
           kinderen:
           - kind_bsn: '999991723'
@@ -1257,7 +1257,7 @@ profiles:
           postcode: 1094HK
           woonplaats: Amsterdam
           type: WOONADRES
-        CHILDREN_DATA:
+        children_data:
         - bsn: '100000002'
           kinderen:
           - geboortedatum: '2014-05-15'
@@ -1456,7 +1456,7 @@ profiles:
           postcode: 1053ED
           woonplaats: Amsterdam
           type: WOONADRES
-        CHILDREN_DATA:
+        children_data:
         - bsn: '100000003'
           kinderen:
           - geboortedatum: '2011-08-30'
@@ -1797,7 +1797,7 @@ profiles:
           postcode: 1093BS
           woonplaats: Amsterdam
           type: WOONADRES
-        CHILDREN_DATA:
+        children_data:
         - bsn: '300000001'
           kinderen:
           - geboortedatum: '2018-06-12'
@@ -2486,7 +2486,7 @@ profiles:
           postcode: 1015DX
           woonplaats: Amsterdam
           type: WOONADRES
-        CHILDREN_DATA:
+        children_data:
         - bsn: '999993660'
           kinderen:
           - geboortedatum: '2020-01-01'
@@ -2744,7 +2744,7 @@ profiles:
           postcode: 1103SK
           woonplaats: Amsterdam
           type: WOONADRES
-        CHILDREN_DATA:
+        children_data:
         - bsn: '999993872'
           kinderen:
           - kind_bsn: '999991723'

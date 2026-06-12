@@ -1,40 +1,30 @@
 import logging
 from datetime import datetime
-from enum import Enum
 
 import pandas as pd
 
 from machine.profile_loader import get_project_root, load_profiles_from_yaml
-from machine.service import Services
+from machine.regelrecht_services import RegelrechtServices
 from web.config_loader import ConfigLoader
 
 from .case_manager_interface import CaseManagerInterface
 from .claim_manager_interface import ClaimManagerInterface
 from .engine_interface import EngineInterface
-from .http_engine import CaseManager as HTTPCaseManager
-from .http_engine import ClaimManager as HTTPClaimManager
-from .http_engine import MachineService as HTTPMachineService
 from .py_engine import CaseManager as PythonCaseManager
 from .py_engine import ClaimManager as PythonClaimManager
-from .py_engine import PythonMachineService
+from .regelrecht_engine import RegelrechtMachineService
 
 logger = logging.getLogger(__name__)
 
 
-class MachineType(Enum):
-    """Enum to specify which machine implementation to use."""
-
-    INTERNAL = "internal"
-    HTTP = "http"
-
-
 config_loader = ConfigLoader()
 
-# Configure service for the internal engine
-services = Services(datetime.today().strftime("%Y-%m-%d"))
+# RegelrechtServices wraps Services and uses the Rust engine via PyO3.
+# The same instance is shared by case/claim managers and the web machine adapter.
+services = RegelrechtServices(datetime.today().strftime("%Y-%m-%d"))
 
 
-def _initialize_profiles(services_instance: Services) -> None:
+def _initialize_profiles(services_instance: RegelrechtServices) -> None:
     """
     Load all profiles from YAML and initialize them into the services instance.
 
@@ -139,7 +129,7 @@ def _initialize_profiles(services_instance: Services) -> None:
 _initialize_profiles(services)
 
 
-def _seed_historical_cases(services_instance: Services) -> None:
+def _seed_historical_cases(services_instance: RegelrechtServices) -> None:
     """
     Seed historical cases from profiles.yaml into the CaseManager.
 
@@ -271,34 +261,18 @@ class MachineFactory:
         Create a machine service of the specified type.
 
         Args:
-            machine_type: The type of machine implementation to use
-            services: The Services instance (required for PYTHON type)
-            go_api_url: The URL for the Go API (used for GO type)
+            engine_id: The engine identifier from config
 
         Returns:
-            An instance of a EngineInterface implementation
-
-        Raises:
-            ValueError: If machine_type is PYTHON and services is None
+            An instance of a RegelrechtMachineService
         """
 
         engine = config_loader.get_engine(engine_id)
-        engine_type = MachineType(engine.type)
+        if engine.type != "regelrecht":
+            raise ValueError(f"Unknown engine type: {engine.type}. Only 'regelrecht' is supported.")
 
-        if engine_type == MachineType.INTERNAL:
-            if services is None:
-                raise ValueError("Services instance is required for internal Python implementation")
-            logger.info(f"[MachineFactory] Creating PythonMachineService for engine: {engine_id}")
-            return PythonMachineService(services)
-        elif engine_type == MachineType.HTTP:
-            logger.info(
-                f"[MachineFactory] Creating HTTPMachineService for engine: {engine_id}, domain: {engine.domain}"
-            )
-            if engine.service_routing:
-                logger.info(f"[MachineFactory] Service routing config: enabled={engine.service_routing.enabled}")
-            return HTTPMachineService(base_url=engine.domain, service_routing_config=engine.service_routing)
-        else:
-            raise ValueError(f"Unknown machine type: {engine_type}")
+        logger.info(f"[MachineFactory] Creating RegelrechtMachineService for engine: {engine_id}")
+        return RegelrechtMachineService(services=services)
 
 
 class CaseManagerFactory:
@@ -307,37 +281,18 @@ class CaseManagerFactory:
     @staticmethod
     def create_case_manager(engine_id: str) -> CaseManagerInterface:
         """
-        Create a case manager of the specified type.
+        Create a case manager.
 
         Args:
-            machine_type: The type of machine implementation to use
-            services: The Services instance (required for PYTHON type)
-            go_api_url: The URL for the Go API (used for GO type)
+            engine_id: The engine identifier from config
 
         Returns:
             An instance of a CaseManagerInterface implementation
-
-        Raises:
-            ValueError: If machine_type is PYTHON and services is None
         """
-
-        engine = config_loader.get_engine(engine_id)
-        engine_type = MachineType(engine.type)
-
-        if engine_type == MachineType.INTERNAL:
-            if services is None:
-                raise ValueError("Services instance is required for internal Python implementation")
-            logger.info(f"[CaseManagerFactory] Creating PythonCaseManager for engine: {engine_id}")
-            return PythonCaseManager(services)
-        elif engine_type == MachineType.HTTP:
-            logger.info(
-                f"[CaseManagerFactory] Creating HTTPCaseManager for engine: {engine_id}, domain: {engine.domain}"
-            )
-            if engine.service_routing:
-                logger.info(f"[CaseManagerFactory] Service routing config: enabled={engine.service_routing.enabled}")
-            return HTTPCaseManager(base_url=engine.domain, service_routing_config=engine.service_routing)
-        else:
-            raise ValueError(f"Unknown machine type: {engine_type}")
+        if services is None:
+            raise ValueError("Services instance is required for case management")
+        logger.info(f"[CaseManagerFactory] Creating PythonCaseManager for engine: {engine_id}")
+        return PythonCaseManager(services)
 
 
 class ClaimManagerFactory:
@@ -346,34 +301,15 @@ class ClaimManagerFactory:
     @staticmethod
     def create_claim_manager(engine_id: str) -> ClaimManagerInterface:
         """
-        Create a case manager of the specified type.
+        Create a claim manager.
 
         Args:
-            machine_type: The type of machine implementation to use
-            services: The Services instance (required for PYTHON type)
-            go_api_url: The URL for the Go API (used for GO type)
+            engine_id: The engine identifier from config
 
         Returns:
             An instance of a ClaimManagerInterface implementation
-
-        Raises:
-            ValueError: If machine_type is PYTHON and services is None
         """
-
-        engine = config_loader.get_engine(engine_id)
-        engine_type = MachineType(engine.type)
-
-        if engine_type == MachineType.INTERNAL:
-            if services is None:
-                raise ValueError("Services instance is required for internal Python implementation")
-            logger.info(f"[ClaimManagerFactory] Creating PythonClaimManager for engine: {engine_id}")
-            return PythonClaimManager(services)
-        elif engine_type == MachineType.HTTP:
-            logger.info(
-                f"[ClaimManagerFactory] Creating HTTPClaimManager for engine: {engine_id}, domain: {engine.domain}"
-            )
-            if engine.service_routing:
-                logger.info(f"[ClaimManagerFactory] Service routing config: enabled={engine.service_routing.enabled}")
-            return HTTPClaimManager(base_url=engine.domain, service_routing_config=engine.service_routing)
-        else:
-            raise ValueError(f"Unknown machine type: {engine_type}")
+        if services is None:
+            raise ValueError("Services instance is required for claim management")
+        logger.info(f"[ClaimManagerFactory] Creating PythonClaimManager for engine: {engine_id}")
+        return PythonClaimManager(services)

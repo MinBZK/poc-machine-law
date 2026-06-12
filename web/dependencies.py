@@ -1,4 +1,5 @@
 import locale
+import logging
 from datetime import date, datetime
 from importlib.metadata import version as get_version
 from pathlib import Path
@@ -8,6 +9,8 @@ from engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from engines.factory import CaseManagerFactory, ClaimManagerFactory, MachineFactory
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
+
+logger = logging.getLogger(__name__)
 
 
 def get_app_version() -> str:

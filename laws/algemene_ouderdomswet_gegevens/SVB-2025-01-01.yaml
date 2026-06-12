@@ -1,66 +1,77 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
-uuid: 5a2f8c3d-9e7b-4a1c-8f6d-2b9e4c7a3f5d
+$schema: https://raw.githubusercontent.com/MinBZK/regelrecht/refs/heads/main/schema/v0.5.1/schema.json
+$id: algemene_ouderdomswet_gegevens
+regulatory_layer: WET
+publication_date: '2020-01-01'
+valid_from: '2020-01-01'
 name: Algemene Ouderdomswet Gegevens
-law: algemene_ouderdomswet_gegevens
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "TOEKENNING"
-valid_from: 2020-01-01
-service: "SVB"
-description: >
-  Gegevens over pensioenleeftijd en AOW-gerechtigdheid zoals geadministreerd door SVB.
-
-legal_basis:
-  law: "Algemene Ouderdomswet"
-  bwb_id: "BWBR0002221"
-  article: "7a"
-  url: "https://wetten.overheid.nl/BWBR0002221/2025-01-01"
-  juriconnect: "jci1.3:c:BWBR0002221&artikel=7a&z=2025-01-01&g=2025-01-01"
-  explanation: "SVB administreert pensioenleeftijd volgens artikel 7a AOW"
-
-properties:
-  parameters:
-    - name: "BSN"
-      description: "BSN van de persoon"
-      type: "string"
-      required: true
-
-  sources:
-    - name: "PENSIOENGEGEVENS"
-      description: "Pensioengegevens van de persoon"
-      type: "object"
-      legal_basis:
-        law: "Algemene Ouderdomswet"
-        bwb_id: "BWBR0002221"
-        article: "7a"
-        url: "https://wetten.overheid.nl/BWBR0002221/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0002221&artikel=7a&z=2025-01-01&g=2025-01-01"
-        explanation: "SVB administreert pensioenleeftijd"
-      source_reference:
-        table: "algemene_ouderdomswet_gegevens"
-        fields: ["pensioenleeftijd"]
-        select_on:
-          - name: "bsn"
-            description: "Burgerservicenummer van de persoon"
-            type: "string"
-            value: "$BSN"
-
-  output:
-    - name: "pensioenleeftijd"
-      description: "Pensioenleeftijd van de persoon in jaren"
-      type: "number"
-      type_spec:
-        precision: 0
-        min: 65
-        max: 70
-      legal_basis:
-        law: "Algemene Ouderdomswet"
-        bwb_id: "BWBR0002221"
-        article: "7a"
-        url: "https://wetten.overheid.nl/BWBR0002221/2025-01-01"
-        juriconnect: "jci1.3:c:BWBR0002221&artikel=7a&z=2025-01-01&g=2025-01-01"
-        explanation: "Pensioenleeftijd volgens artikel 7a AOW (geleidelijk oplopend van 65 naar 67)"
-
-actions:
-  - output: "pensioenleeftijd"
-    value: "$PENSIOENGEGEVENS.pensioenleeftijd"
+bwb_id: BWBR0002221
+url: https://wetten.overheid.nl/BWBR0002221/2020-01-01
+service: SVB
+uuid: 5a2f8c3d-9e7b-4a1c-8f6d-2b9e4c7a3f5d
+articles:
+- number: 7a
+  text: "1 De pensioengerechtigde leeftijd en de aanvangsleeftijd zijn:\n  a. vóór\
+    \ 1 januari 2013: 65, respectievelijk 15 jaar;\n  b. in 2013: 65 jaar en één maand,\
+    \ respectievelijk 15 jaar en één maand;\n  c. in 2014: 65 jaar en twee maanden,\
+    \ respectievelijk 15 jaar en twee maanden;\n  d. in 2015: 65 jaar en drie maanden,\
+    \ respectievelijk 15 jaar en drie maanden;\n  e. in 2016: 65 jaar en zes maanden,\
+    \ respectievelijk 15 jaar en zes maanden;\n  f. in 2017: 65 jaar en negen maanden,\
+    \ respectievelijk 15 jaar en negen maanden;\n  g. in 2018: 66 jaar, respectievelijk\
+    \ 16 jaar;\n  h. in 2019: 66 jaar en vier maanden, respectievelijk 16 jaar en\
+    \ vier maanden;\n  i. in 2020: 66 jaar en vier maanden, respectievelijk 16 jaar\
+    \ en vier maanden;\n  j. in 2021: 66 jaar en vier maanden, respectievelijk 16\
+    \ jaar en vier maanden;\n  k. in 2022: 66 jaar en zeven maanden, respectievelijk\
+    \ 16 jaar en zeven maanden;\n  l. in 2023: 66 jaar en tien maanden, respectievelijk\
+    \ 16 jaar en tien maanden;\n  m. in 2024: 67 jaar, respectievelijk 17 jaar;\n\
+    \  n. in 2025 en de kalenderjaren daarna: de pensioengerechtigde leeftijd en de\
+    \ aanvangsleeftijd, die jaarlijks op basis van de verhoging van de pensioengerechtigde\
+    \ leeftijd en de aanvangsleeftijd op grond van het tweede lid worden vastgesteld.\n\
+    Op pensioengerechtigden die in een bepaald kalenderjaar de pensioengerechtigde\
+    \ leeftijd hebben bereikt zijn de pensioengerechtigde leeftijd en de aanvangsleeftijd\
+    \ in de kalenderjaren daarna niet van toepassing.\n2 De verhoging van de pensioengerechtigde\
+    \ leeftijd en de aanvangsleeftijd in 2025 en de kalenderjaren daarna wordt jaarlijks,\
+    \ voor de eerste maal uiterlijk op 1 januari 2020 voor het jaar 2025, vastgesteld\
+    \ volgens de volgende formule:\nV = (L – 18,26) – (P – 65)\nwaarbij:\nV staat\
+    \ voor de periode waarmee de pensioengerechtigde leeftijd respectievelijk aanvangsleeftijd\
+    \ wordt verhoogd, uitgedrukt in perioden van een jaar;\nL staat voor de geraamde\
+    \ macro gemiddelde resterende levensverwachting op 65-jarige leeftijd in het kalenderjaar\
+    \ van verhoging;\nP staat voor de pensioengerechtigde leeftijd in het kalenderjaar\
+    \ voorafgaande aan het kalenderjaar van verhoging.\nIndien V negatief is of minder\
+    \ dan 0,25 bedraagt, wordt deze gesteld op 0. Indien V 0,25 of meer bedraagt,\
+    \ wordt deze gesteld op drie maanden.\nDe volgens de formule vastgestelde verdere\
+    \ verhoging van de pensioengerechtigde leeftijd en de aanvangsleeftijd wordt door\
+    \ of namens Onze Minister medegedeeld in de Staatscourant.\n3 De verhoging, bedoeld\
+    \ in het tweede lid, treedt telkens in werking vijf jaar na de uiterste datum\
+    \ van vaststelling, bedoeld in het tweede lid, voor de eerste maal met ingang\
+    \ van 1 januari 2025.\n4 De ramingen van de macro gemiddelde resterende levensverwachting,\
+    \ bedoeld in het tweede lid, worden uitgevoerd en bekendgemaakt door het CBS."
+  url: https://wetten.overheid.nl/BWBR0002221/2020-01-01#Artikel7a
+  machine_readable:
+    execution:
+      produces:
+        legal_character: BESCHIKKING
+        decision_type: TOEKENNING
+      parameters:
+      - name: bsn
+        type: string
+        required: true
+      input:
+      - name: pensioengegevens
+        type: object
+        source:
+          table: algemene_ouderdomswet_gegevens
+          select_on:
+          - name: bsn
+            value: $bsn
+          fields:
+          - pensioenleeftijd
+      output:
+      - name: pensioenleeftijd
+        type: number
+        type_spec:
+          precision: 0
+          min: 65
+          max: 70
+      actions:
+      - output: pensioenleeftijd
+        value: $pensioengegevens.pensioenleeftijd

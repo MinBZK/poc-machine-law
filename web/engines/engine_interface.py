@@ -1,12 +1,33 @@
+import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 
-from machine.service import Services
+from machine.regelrecht_services import RegelrechtServices
+
+
+def _load_dashboard_primary_outputs() -> dict[str, str]:
+    """Load the ``(service/law) -> primary output`` map used for dashboard sorting.
+
+    Laws in this map rank by the value of their declared primary output
+    only. Laws not in the map fall back to the sum of all numeric outputs.
+    The map lives in ``web/config/dashboard_outputs.json`` so it can be
+    edited without touching engine YAMLs.
+    """
+    path = Path(__file__).resolve().parent.parent / "config" / "dashboard_outputs.json"
+    try:
+        data = json.loads(path.read_text())
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    return {k: v for k, v in data.items() if not k.startswith("_")}
+
+
+_DASHBOARD_PRIMARY_OUTPUTS = _load_dashboard_primary_outputs()
 
 
 @dataclass
@@ -111,7 +132,7 @@ class EngineInterface(ABC):
             properties.append(f"🗓️ {age} jaar")
 
         # Add children
-        children_data = rvig_data.get("CHILDREN_DATA", [])
+        children_data = rvig_data.get("children_data", [])
         for child_entry in children_data:
             if "kinderen" in child_entry:
                 num_children = len(child_entry["kinderen"])
@@ -224,16 +245,11 @@ class EngineInterface(ABC):
         reset the engine data.
         """
 
-    def get_services(self) -> Services | None:
-        """
-        Get the underlying Services instance.
+    def get_services(self) -> RegelrechtServices | None:
+        """Return the underlying RegelrechtServices instance, if any.
 
-        This method allows access to the underlying Services for features
-        that need direct access to service providers (e.g., delegation).
-
-        Returns:
-            Services instance if available (internal Python engine),
-            None if not available (HTTP engine).
+        Used by features like delegation that need direct access to the
+        underlying law engine and registered data sources.
         """
         return None
 
@@ -282,59 +298,67 @@ class EngineInterface(ABC):
                 # Run the law for this person and get results
                 result = self.evaluate(service=service, law=law, parameters={"BSN": bsn}, reference_date=current_date)
 
-                # Extract financial impact from result based on citizen_relevance
+                # Extract the primary output value as the ranking impact.
+                #
+                # Laws listed in web/config/dashboard_outputs.json declare which
+                # output represents the "real" result for the citizen; we use
+                # that value as the score. Laws not in the map fall back to the
+                # sum of all numeric outputs (less precise but usually OK).
                 impact_value = 0
-                if result and result.output and rule_spec:
-                    # Create mapping of output names to their output definitions
-                    output_definitions = {}
-                    for output_def in rule_spec.get("properties", {}).get("output", []):
-                        output_name = output_def.get("name")
-                        if output_name:
-                            output_definitions[output_name] = output_def
+                if result and result.output:
+                    key = f"{service}/{law}"
+                    primary_name = _DASHBOARD_PRIMARY_OUTPUTS.get(key)
 
-                    # Track all primary numeric outputs to potentially sum them
-                    primary_numeric_outputs = []
+                    output_definitions: dict[str, dict] = {}
+                    if rule_spec:
+                        for output_def in rule_spec.get("properties", {}).get("output", []):
+                            output_name = output_def.get("name")
+                            if output_name:
+                                output_definitions[output_name] = output_def
 
-                    # Process outputs according to their relevance
-                    for output_name, output_data in result.output.items():
-                        # Get the output definition if available
-                        output_def = output_definitions.get(output_name)
+                    def _score(name: str, data: Any) -> float:
+                        """Score a single output value for dashboard ranking."""
+                        output_def = output_definitions.get(name) or {}
+                        output_type = output_def.get("type", "")
+                        if not output_type:
+                            if isinstance(data, bool):
+                                output_type = "boolean"
+                            elif isinstance(data, (int, float)):
+                                output_type = "amount"
+                        if output_type in ("amount", "number") and isinstance(data, (int, float)):
+                            value = float(data)
+                            temporal = output_def.get("temporal", {})
+                            if temporal.get("type") == "period" and temporal.get("period_type") == "month":
+                                value *= 12
+                            return abs(value)
+                        if output_type == "boolean" and data is True:
+                            return 50000.0
+                        return 0.0
 
-                        # Skip if no definition found or not marked as primary
-                        if not output_def or output_def.get("citizen_relevance") != "primary":
-                            continue
+                    if primary_name and primary_name in result.output:
+                        # Explicit primary output — use its value directly.
+                        impact_value = _score(primary_name, result.output[primary_name])
+                    else:
+                        # Fallback: sum every numeric output we can score.
+                        total = 0.0
+                        has_positive_bool = False
+                        for name, data in result.output.items():
+                            if name in ("voldoet_aan_voorwaarden",):
+                                continue
+                            score = _score(name, data)
+                            if score == 50000.0:
+                                has_positive_bool = True
+                            else:
+                                total += score
+                        if total > 0:
+                            impact_value = total
+                        elif has_positive_bool:
+                            impact_value = 50000
 
-                        try:
-                            # Use the type from the definition instead of inferring
-                            output_type = output_def.get("type", "")
-
-                            # Handle numeric types (amount, number)
-                            if output_type in ["amount", "number"]:
-                                numeric_value = float(output_data)
-
-                                # Normalize to yearly values based on temporal definition
-                                temporal = output_def.get("temporal", {})
-                                if temporal.get("type") == "period" and temporal.get("period_type") == "month":
-                                    # If monthly, multiply by 12 to get yearly equivalent
-                                    numeric_value *= 12
-
-                                primary_numeric_outputs.append(abs(numeric_value))
-
-                            # Handle boolean types with standard importance for eligibility
-                            elif output_type == "boolean" and output_data is True:
-                                impact_value = max(impact_value, 50000)  # Assign importance to eligibility
-
-                        except (ValueError, TypeError):
-                            # If not convertible to number, skip
-                            print(f"Skipping non-numeric output {output_name}: {output_data}")
-
-                    # If we have multiple primary numeric outputs, sum them
-                    if len(primary_numeric_outputs) > 0:
-                        impact_value = max(impact_value, sum(primary_numeric_outputs))
-
-                # Assign importance to missing required value
+                # Missing-required laws get a mid-range score so they stay
+                # visible but don't push all working laws off the top.
                 if result.missing_required:
-                    impact_value = max(impact_value, 100000)
+                    impact_value = max(impact_value, 10000)
 
                 # Store in cache
                 self._impact_cache[cache_key] = impact_value

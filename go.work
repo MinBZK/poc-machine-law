@@ -1,9 +1,0 @@
-go 1.25.3
-
-use (
-	./features
-	./lac-to-regelspraak
-	./machinev2/backend
-	./machinev2/machine
-	./simulator
-)
