@@ -6,10 +6,9 @@ on:
   pull_request:
     branches: [main]
 
-# The two Go jobs already declared this; the `test` job did not, so it ran with
-# whatever the repository default is. That job runs `uv sync` and the whole
-# behave suite, which executes every Python dependency in the lockfile. None of
-# that needs a token that can write to this repository.
+# These jobs pull in and run third-party code: the Python dependency tree, the
+# Go module tree, and a Playwright browser download. None of it needs a token
+# that can write to this repository.
 permissions:
   contents: read
 
