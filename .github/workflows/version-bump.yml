@@ -20,14 +20,25 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.VERSION_BUMP_TOKEN }}
+          # Without this, actions/checkout writes VERSION_BUMP_TOKEN into the
+          # checkout's git config and leaves it there for the rest of the job -
+          # where the pip install below, and everything it pulls in, can read it
+          # off disk. That token pushes to main. The Semantic Release step
+          # re-arms the remote itself, after the install is done, and the
+          # VERSION-sync step below inherits that remote.
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
+      # Pinned: an unpinned `pip install` resolves whatever was published most
+      # recently and executes that package's build/setup code. That is the same
+      # delivery path the npm registry compromises of the past year used
+      # (chalk/debug, shai-hulud, keyv/cacheable). Bump this deliberately.
       - name: Install python-semantic-release
-        run: pip install python-semantic-release
+        run: pip install 'python-semantic-release==10.6.1'
 
       - name: Configure Git
         run: |
@@ -38,9 +49,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.VERSION_BUMP_TOKEN }}
         run: |
+          # Re-arm the push credential here rather than letting checkout leave
+          # it on disk for the whole job. This also makes the push independent
+          # of how python-semantic-release resolves its own credentials.
+          git remote set-url origin \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           # Run semantic-release (it handles version bump, commit, tag, and push)
           semantic-release version
 
+      # Pushes over the remote the Semantic Release step re-armed; it does not
+      # rely on a credential persisted by checkout.
       - name: Sync VERSION file
         run: |
           # Sync VERSION file with pyproject.toml version
