@@ -20,12 +20,12 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.VERSION_BUMP_TOKEN }}
-          # Without this, actions/checkout writes VERSION_BUMP_TOKEN into the
-          # checkout's git config and leaves it there for the rest of the job -
-          # where the pip install below, and everything it pulls in, can read it
-          # off disk. That token pushes to main. The Semantic Release step
-          # re-arms the remote itself, after the install is done, and the
-          # VERSION-sync step below inherits that remote.
+          # Without this, actions/checkout leaves a VERSION_BUMP_TOKEN
+          # credential header behind in a $RUNNER_TEMP config file that the
+          # checkout pulls in via `includeIf` - readable off disk for the rest
+          # of the job by the pip install below and everything it pulls in.
+          # That token can push to main. The steps that push take the token
+          # from the environment instead.
           persist-credentials: false
 
       - name: Set up Python
@@ -33,10 +33,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      # Pinned: an unpinned `pip install` resolves whatever was published most
-      # recently and executes that package's build/setup code. That is the same
-      # delivery path the npm registry compromises of the past year used
-      # (chalk/debug, shai-hulud, keyv/cacheable). Bump this deliberately.
+      # Pinned: an unpinned `pip install` takes the highest version on PyPI, so
+      # a compromised release would land in this job - which holds a token that
+      # can push to main - as soon as it was published. PyPI does not allow
+      # re-uploading an existing version, so an exact pin closes that window.
+      # It pins the top-level package only; the transitive dependencies are
+      # still resolved at install time. Bump deliberately - including if 10.6.1
+      # is ever yanked, because an exact pin installs a yanked version anyway.
       - name: Install python-semantic-release
         run: pip install 'python-semantic-release==10.6.1'
 
@@ -45,21 +48,25 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      # semantic-release authenticates itself: it builds a push URL from
+      # GITHUB_SERVER_URL, GITHUB_ACTOR, GITHUB_REPOSITORY and GH_TOKEN and uses
+      # that both to check the upstream has not moved and to push the release
+      # commit and tag. The origin remote only has to exist - it does not have
+      # to carry credentials.
       - name: Semantic Release
         env:
           GH_TOKEN: ${{ secrets.VERSION_BUMP_TOKEN }}
         run: |
-          # Re-arm the push credential here rather than letting checkout leave
-          # it on disk for the whole job. This also makes the push independent
-          # of how python-semantic-release resolves its own credentials.
-          git remote set-url origin \
-            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           # Run semantic-release (it handles version bump, commit, tag, and push)
           semantic-release version
 
-      # Pushes over the remote the Semantic Release step re-armed; it does not
-      # rely on a credential persisted by checkout.
+      # Last step in the job, and the only one left that needs push rights.
+      # Keep the credential inline on the push rather than storing it with
+      # `git remote set-url`: that way it is exposed for the length of one
+      # command instead of sitting in .git/config on disk.
       - name: Sync VERSION file
+        env:
+          GH_TOKEN: ${{ secrets.VERSION_BUMP_TOKEN }}
         run: |
           # Sync VERSION file with pyproject.toml version
           VERSION=$(grep -oP 'version = "\K[^"]+' pyproject.toml | head -1)
@@ -67,5 +74,5 @@ jobs:
             echo "$VERSION" > VERSION
             git add VERSION
             git commit -m "chore: sync VERSION file to $VERSION"
-            git push origin main
+            git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main
           fi
