@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main]
 
+# The two Go jobs already declared this; the `test` job did not, so it ran with
+# whatever the repository default is. That job runs `uv sync` and the whole
+# behave suite, which executes every Python dependency in the lockfile. None of
+# that needs a token that can write to this repository.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -58,10 +65,6 @@ jobs:
   go-test-features:
     name: Run Go Features
     runs-on: ubuntu-latest
-    # Add this permissions block
-    permissions:
-      # Set only what you need
-      contents: read
 
     steps:
       - name: Checkout code
@@ -83,10 +86,6 @@ jobs:
   go-test-machinev2:
     name: Run Go Tests
     runs-on: ubuntu-latest
-    # Add this permissions block
-    permissions:
-      # Set only what you need
-      contents: read
 
     steps:
       - name: Checkout code

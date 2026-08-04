@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [ main ]
 
+# This workflow declared no permissions at all, so it ran with whatever the
+# repository default is. It runs `uv sync`, installs a Playwright browser and
+# executes the test suite - the whole Python dependency tree gets to run. None
+# of that needs a token that can write to this repository.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
