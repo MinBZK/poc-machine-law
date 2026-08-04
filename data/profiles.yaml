@@ -3377,11 +3377,12 @@ profiles:
   # Profile: Curator who manages a curandus
   '400100001':
     name: Geert de Vries
-    description: Professioneel curator, bewindvoerder en mentor voor meerdere cliënten
+    description: Professioneel curator, bewindvoerder en mentor voor meerdere cliënten, tevens gevolmachtigde
     properties:
       - Curator
       - Bewindvoerder
       - Mentor
+      - Gevolmachtigde
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -3399,6 +3400,17 @@ profiles:
           residence_address: Lange Nieuwstraat 10, 3512PH Utrecht
           has_fixed_address: true
           household_size: 1
+      NOTARIAAT:
+        # Volmacht registratie - Geert heeft algemene volmacht van zijn buurvrouw
+        volmacht_registraties:
+        - bsn_gevolmachtigde: '400100001'
+          bsn_volmachtgever: '500000010'
+          naam_volmachtgever: Maria de Jong
+          volmacht_type: ALGEMENE_VOLMACHT
+          datum_ingang: '2022-09-01'
+          datum_einde: null
+          status: ACTIEF
+          is_herroepen: false
       RECHTSPRAAK:
         # Curatele registraties - Geert is curator voor Sophie
         curatele_registraties:

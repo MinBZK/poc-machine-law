@@ -81,6 +81,7 @@ async def get_current_context(request: Request, bsn: str):
             "subject_type": context.subject_type,
             "subject_name": context.subject_name,
             "delegation_type": context.delegation_type,
+            "legal_category": context.legal_category,
             "permissions": context.permissions,
         }
     return {"active": False, "actor_bsn": bsn}
@@ -106,8 +107,9 @@ async def list_delegations(
                 "subject_type": d.subject_type,
                 "subject_name": d.subject_name,
                 "delegation_type": d.delegation_type,
+                "legal_category": d.legal_category,
                 "permissions": d.permissions,
-                "valid_from": d.valid_from.isoformat(),
+                "valid_from": d.valid_from.isoformat() if d.valid_from else None,
                 "valid_until": d.valid_until.isoformat() if d.valid_until else None,
             }
             for d in delegations

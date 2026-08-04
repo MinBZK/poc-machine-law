@@ -43,6 +43,7 @@ class RuleSpec:
     valid_from: datetime
     service: str
     discoverable: str
+    legal_category: str
     properties: dict[str, Any]
 
     @classmethod
@@ -59,6 +60,7 @@ class RuleSpec:
             name=data.get("name", ""),
             law=data.get("law", ""),
             discoverable=data.get("discoverable", ""),
+            legal_category=data.get("legal_category", ""),
             valid_from=data.get("valid_from")
             if isinstance(data.get("valid_from"), datetime)
             else datetime.combine(data.get("valid_from"), datetime.min.time()),
@@ -157,6 +159,7 @@ class RuleResolver:
                 "valid_from": rule.valid_from,
                 "service": rule.service,
                 "discoverable": rule.discoverable,
+                "legal_category": rule.legal_category,
                 **{f"prop_{k}": v for k, v in rule.properties.items()},
             }
             for rule in self.rules

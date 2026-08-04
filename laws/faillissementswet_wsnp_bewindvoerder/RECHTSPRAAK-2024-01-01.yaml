@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.8/schema.json
 uuid: 1a8ce7cd-8c96-41ae-806c-d6387e43c0dd
 name: Bepalen WSNP-bewindvoerder en vertegenwoordigingsbevoegdheid schuldsanering
 law: faillissementswet_wsnp_bewindvoerder
@@ -7,7 +7,8 @@ legal_character: "BESCHIKKING"
 decision_type: "ANDERE_HANDELING"
 valid_from: 2024-01-01
 service: "RECHTSPRAAK"
-discoverable: "DELEGATION_PROVIDER"
+discoverable: "REPRESENTATION_PROVIDER"
+legal_category: "VERTEGENWOORDIGING_VAN_RECHTSWEGE"
 legal_basis:
   law: "Faillissementswet"
   bwb_id: "BWBR0001860"

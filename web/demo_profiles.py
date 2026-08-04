@@ -155,6 +155,63 @@ DEMO_PROFILES: dict[str, dict] = {
             ],
         },
     },
+    "geert": {
+        "name": "Geert",
+        "type": "vertegenwoordiger",
+        "bsn": "400100001",
+        "kvk": None,
+        "default_law_path": "zorgtoeslagwet/TOESLAGEN-2025-01-01",
+        "default_feature_path": "features/toeslagen/zorgtoeslagwet_TOESLAGEN-2025-01-01.feature",
+        "default_law_tabs": [
+            {
+                "id": "law-tab-1",
+                "path": "zorgtoeslagwet/TOESLAGEN-2025-01-01",
+                "name": "Zorgtoeslag",
+                "law": "zorgtoeslagwet",
+                "service": "TOESLAGEN",
+            },
+        ],
+        "zaaksysteem_service": "TOESLAGEN",
+        "portal_tab_label": "Burger.nl",
+        "portal_heading": "Waar heb ik recht op? Wat zijn mijn plichten?",
+        "portal_subtitle": "Bekijk hier uw toeslagen, uitkeringen, aangiften, en andere regelingen van de overheid.",
+        "feature_flags": {
+            "DELEGATION": True,
+            "AUTO_APPROVE_CLAIMS": False,
+            "HARMONIZE": False,
+            "SIMULATION": False,
+        },
+        "sidebar_laws": [
+            "zorgtoeslagwet/TOESLAGEN-2025-01-01",
+        ],
+        "graph_laws": None,
+        "graph_selected_laws": [],
+        "disabled_laws": {
+            "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw"],
+            "GEMEENTE_ROTTERDAM": [
+                "alcoholwet/vergunning",
+                "algemene_plaatselijke_verordening/exploitatievergunning",
+                "algemene_plaatselijke_verordening/terrassen",
+                "algemene_plaatselijke_verordening/ontheffingspas_geluid",
+                "verordening_precariobelasting",
+            ],
+            "KVK": ["handelsregisterwet/jaarrekening"],
+            "NVWA": ["warenwet/haccp", "warenwet/meldplicht"],
+            "PENSIOENFONDS": ["pensioenwet"],
+            "RVO": [
+                "omgevingswet/werkgebonden_personenmobiliteit",
+                "omgevingswet/energiebesparing/informatieplicht",
+            ],
+            "SVB": [
+                "algemene_kinderbijslagwet",
+                "algemene_nabestaandenwet",
+                "algemene_ouderdomswet/leeftijdsbepaling",
+                "algemene_ouderdomswet_gegevens",
+                "participatiewet/aio",
+            ],
+            "TOESLAGEN": ["wet_kinderopvang"],
+        },
+    },
 }
 
 DEFAULT_PROFILE = "merijn"

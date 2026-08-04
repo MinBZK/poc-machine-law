@@ -18,6 +18,7 @@ type RuleSpec struct {
 	LegalCharacter *string       `yaml:"legal_character,omitempty"`
 	DecisionType   *string       `yaml:"decision_type,omitempty"`
 	Discoverable   *string       `yaml:"discoverable,omitempty"`
+	LegalCategory  *string       `yaml:"legal_category,omitempty"`
 	ValidFrom      time.Time     `yaml:"valid_from"`
 	Service        string        `yaml:"service"`
 	Description    string        `yaml:"description"`

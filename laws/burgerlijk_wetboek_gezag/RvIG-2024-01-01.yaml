@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.8/schema.json
 uuid: a87bbb48-0bde-487a-af4d-3dc7f4a7c220
 name: Bepalen vertegenwoordigingsbevoegdheid minderjarigen
 law: burgerlijk_wetboek_gezag
@@ -7,7 +7,8 @@ legal_character: "BESCHIKKING"
 decision_type: "ANDERE_HANDELING"
 valid_from: 2024-01-01
 service: "RvIG"
-discoverable: "DELEGATION_PROVIDER"
+discoverable: "REPRESENTATION_PROVIDER"
+legal_category: "BEVOEGDHEID"
 legal_basis:
   law: "Burgerlijk Wetboek Boek 1"
   bwb_id: "BWBR0002656"
