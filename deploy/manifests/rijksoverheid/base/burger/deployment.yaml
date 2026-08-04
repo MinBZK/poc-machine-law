@@ -18,6 +18,16 @@ spec:
           ports:
             - name: http
               containerPort: 8000
+          env:
+            # WARNING: env[0,1,2] are referenced by index in sandbox overlay patches — do not reorder
+            - name: WALLET_VERIFIER_REQUESTER_URL  # env[0]
+              value: "http://rijksoverheid-wallet-verifier-svc:3010"
+            - name: WALLET_VERIFIER_WALLET_URL     # env[1]
+              value: "http://wallet-verifier.127-0-0-1.nip.io:8080"
+            - name: WALLET_RETURN_URL              # env[2]
+              value: "http://burger.127-0-0-1.nip.io:8080"
+            - name: FEATURE_WALLET
+              value: "true"
           volumeMounts:
             - name: config-yaml
               mountPath: /app/web/config/config.yaml

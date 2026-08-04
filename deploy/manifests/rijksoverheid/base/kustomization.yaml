@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - mijnoverheid
   - burger
+  - wallet
 
 configurations:
   - kustomize-config.yaml

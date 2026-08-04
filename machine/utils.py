@@ -12,7 +12,7 @@ try:
 except ImportError:
     from yaml import Loader
 
-BASE_DIR = "laws"
+BASE_DIR = str(Path(__file__).parent.parent / "laws")
 
 
 # Cache for parsed YAML files
