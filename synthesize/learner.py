@@ -189,8 +189,10 @@ class SynthesisLearner:
             if tree_.feature[node] == -2:  # Leaf node
                 value = tree_.value[node]
                 total = value[0].sum()
-                positive = value[0][1]
-                prediction = "eligible" if positive > value[0][0] else "not_eligible"
+                # Handle single-class trees (e.g. all eligible) where value has only 1 column
+                positive = value[0][1] if len(value[0]) > 1 else value[0][0]
+                negative = value[0][0] if len(value[0]) > 1 else 0
+                prediction = "eligible" if positive > negative else "not_eligible"
                 samples = int(tree_.n_node_samples[node])
 
                 # Only include rules that lead to "eligible" and have enough samples
