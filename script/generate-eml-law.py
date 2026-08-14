@@ -19,6 +19,7 @@ import re
 import sys
 import urllib.request
 from collections import defaultdict
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -440,7 +441,10 @@ def bouw_wet(per_lijst: dict[str, list[dict]]) -> dict:
         "decision_type": "ANDERE_HANDELING",
         "discoverable": "BUSINESS",
         "requires_manual_approval": False,
-        "valid_from": "2024-01-01",
+        # Als date en niet als string: het schema accepteert beide, maar de
+        # engine draait er `datetime.combine` op en weigert de wet bij een
+        # string ("combine() argument 1 must be datetime.date, not str").
+        "valid_from": date(2024, 1, 1),
         "service": "RVO",
         "description": (
             "Bepaling welke erkende maatregelen ter verduurzaming van het energiegebruik voor een bedrijf gelden. "

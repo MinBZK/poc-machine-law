@@ -7,7 +7,7 @@ legal_character: BESCHIKKING
 decision_type: ANDERE_HANDELING
 discoverable: BUSINESS
 requires_manual_approval: false
-valid_from: '2024-01-01'
+valid_from: 2024-01-01
 service: RVO
 description: |-
   Bepaling welke erkende maatregelen ter verduurzaming van het energiegebruik voor een bedrijf gelden. De wet draagt alle 149 maatregelen van de algemene bijlagen (VII en XIV) en alle 106 maatregelen van de glastuinbouwbijlagen (VIIaa en XIVa), met per maatregel de uitgangssituatie, de technische en economische randvoorwaarden, het doelmatig beheer en onderhoud en de alternatieve maatregelen, letterlijk zoals vastgesteld. Welke bijlagen gelden volgt uit de aanwijzing in artikel 4.14, tweede lid, en artikel 5.29, tweede lid, van de Omgevingsregeling. De wet stelt niet vast dat aan de randvoorwaarden van een maatregel is voldaan; die geeft zij mee zodat de ondernemer ze kan nagaan.
