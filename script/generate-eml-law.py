@@ -50,6 +50,12 @@ BIJLAGEN = {
     ("Gebouwen", "glastuinbouw"): "XIVa",
 }
 
+GRONDSLAG_PER_ONDERDEEL = {
+    "Faciliteiten": "artikel 5.15, vierde lid, Besluit activiteiten leefomgeving",
+    "Processen": "artikel 5.15, vierde lid, Besluit activiteiten leefomgeving",
+    "Gebouwen": "artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving",
+}
+
 OR = {
     "law": "Omgevingsregeling",
     "bwb_id": "BWBR0045528",
@@ -72,8 +78,31 @@ WBM = {
 }
 
 
+# De ankers op wetten.overheid.nl dragen de hele hoofdstukindeling, niet alleen
+# het artikelnummer. Een verzonnen "#Artikel3.205" bestaat niet en laat de lezer
+# bovenaan een regeling van duizenden artikelen achter, precies waar een
+# verwijzing hem vandaan moest houden. Overgenomen uit de gepubliceerde tekst.
+ANKERS = {
+    ("BWBR0045528", "4.14"): "Hoofdstuk4_Afdeling4.4_Artikel4.14",
+    ("BWBR0045528", "4.14a"): "Hoofdstuk4_Afdeling4.4_Artikel4.14a",
+    ("BWBR0045528", "5.29"): "Hoofdstuk5_Afdeling5.1_Paragraaf5.1.4_Artikel5.29",
+    ("BWBR0045528", "5.30"): "Hoofdstuk5_Afdeling5.1_Paragraaf5.1.4_Artikel5.30",
+    ("BWBR0041330", "5.15"): "Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15",
+    ("BWBR0041330", "3.205"): "Hoofdstuk3_Afdeling3.6_Paragraaf3.6.2_Artikel3.205",
+    ("BWBR0041330", "3.211"): "Hoofdstuk3_Afdeling3.6_Paragraaf3.6.4_Artikel3.211",
+    ("BWBR0041297", "3.84"): "Hoofdstuk3_Afdeling3.4_Paragraaf3.4.1_Artikel3.84",
+    ("BWBR0007168", "60"): "HoofdstukVI_Afdeling4_Artikel60",
+}
+
+
 def grondslag(bron: dict, artikel: str, lid: str | None, uitleg: str) -> dict:
     """Bouw een legal_basis-blok conform legal_basis_format.md."""
+    anker = ANKERS.get((bron["bwb_id"], artikel))
+    if anker is None:
+        raise KeyError(
+            f"geen geverifieerd anker voor {bron['law']} artikel {artikel}; "
+            "zoek het op in de gepubliceerde tekst in plaats van het te raden"
+        )
     jc = f"jci1.3:c:{bron['bwb_id']}&artikel={artikel}"
     if lid:
         jc += f"&lid={lid}"
@@ -81,7 +110,7 @@ def grondslag(bron: dict, artikel: str, lid: str | None, uitleg: str) -> dict:
         "law": bron["law"],
         "bwb_id": bron["bwb_id"],
         "article": artikel,
-        "url": f"{bron['url']}#Artikel{artikel}",
+        "url": f"{bron['url']}#{anker}",
         "juriconnect": f"{jc}&z=2024-01-01&g=2024-01-01",
         "explanation": uitleg,
     }
@@ -152,6 +181,12 @@ def bouw_maatregelen(tabbladen: dict, lijst: str) -> list[dict]:
             "onderdeel": onderdeel,
             "categorie": tekst(rij["Categorie"]),
             "bijlage": BIJLAGEN[(onderdeel, lijst)],
+            # Welk artikel deze maatregel aanwijst. De maatregelen voor gebouwen
+            # zijn die bedoeld in artikel 3.84, vijfde lid, Bbl; die voor
+            # milieubelastende activiteiten die bedoeld in artikel 5.15, vierde
+            # lid, Bal. Twee grondslagen dus, en de wet moet per maatregel de
+            # juiste noemen in plaats van alles onder één artikel te hangen.
+            "grondslag": GRONDSLAG_PER_ONDERDEEL[onderdeel],
             "naam": tekst(rij["Naam Maatregel"]),
             "omschrijving": tekst(rij["Omschrijving Maatregel"]),
             "uitgangssituatie": tekst(rij["Uitgangssituatie"]),
@@ -307,11 +342,12 @@ def bouw_wet(per_lijst: dict[str, list[dict]]) -> dict:
             "temporal": momentopname,
             "citizen_relevance": "secondary",
             "legal_basis": grondslag(
-                OR,
-                "5.29",
-                None,
-                "Artikel 5.29 Omgevingsregeling wijst bijlage XIV aan als de maatregelen bedoeld in artikel 3.84, "
-                "vijfde lid, Bbl, en in afwijking daarvan bijlage XIVa voor de glastuinbouwsector.",
+                BBL,
+                "3.84",
+                "5",
+                "Artikel 3.84, vijfde lid, Bbl draagt op bij ministeriele regeling de maatregelen aan te wijzen die "
+                "voor gebouwen een terugverdientijd van ten hoogste vijf jaar hebben. Artikel 5.29 Omgevingsregeling "
+                "wijst daarvoor bijlage XIV aan, en in afwijking daarvan bijlage XIVa voor de glastuinbouwsector.",
             ),
         },
         {
@@ -475,6 +511,11 @@ def bouw_wet(per_lijst: dict[str, list[dict]]) -> dict:
                 "law": "Omgevingsregeling, bijlage VIIaa (glastuinbouwsector)",
                 "article": "4.14, tweede lid",
                 "url": "https://wetten.overheid.nl/BWBR0045528/2024-01-01#BijlageVIIaa",
+            },
+            {
+                "law": "Besluit bouwwerken leefomgeving",
+                "article": "3.84, vijfde lid",
+                "url": "https://wetten.overheid.nl/BWBR0041297/2024-01-01#Hoofdstuk3_Afdeling3.4_Paragraaf3.4.1_Artikel3.84",
             },
             {
                 "law": "Omgevingsregeling, bijlage XIV",

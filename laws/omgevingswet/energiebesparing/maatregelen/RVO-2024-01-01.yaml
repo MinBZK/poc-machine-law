@@ -16,7 +16,7 @@ legal_basis:
   law: Omgevingsregeling
   bwb_id: BWBR0045528
   article: '4.14'
-  url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Artikel4.14
+  url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Hoofdstuk4_Afdeling4.4_Artikel4.14
   juriconnect: jci1.3:c:BWBR0045528&artikel=4.14&z=2024-01-01&g=2024-01-01
   explanation: Artikel 4.14 Omgevingsregeling wijst de maatregelen aan bedoeld in artikel 5.15, vierde
     lid, Bal, en artikel 5.29 die bedoeld in artikel 3.84, vijfde lid, Bbl. Samen vormen die aanwijzingen
@@ -28,6 +28,9 @@ references:
 - law: Omgevingsregeling, bijlage VIIaa (glastuinbouwsector)
   article: 4.14, tweede lid
   url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#BijlageVIIaa
+- law: Besluit bouwwerken leefomgeving
+  article: 3.84, vijfde lid
+  url: https://wetten.overheid.nl/BWBR0041297/2024-01-01#Hoofdstuk3_Afdeling3.4_Paragraaf3.4.1_Artikel3.84
 - law: Omgevingsregeling, bijlage XIV
   article: 5.29, eerste lid
   url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#BijlageXIV
@@ -48,7 +51,7 @@ properties:
       law: Besluit activiteiten leefomgeving
       bwb_id: BWBR0041330
       article: '3.205'
-      url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Artikel3.205
+      url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk3_Afdeling3.6_Paragraaf3.6.2_Artikel3.205
       juriconnect: jci1.3:c:BWBR0041330&artikel=3.205&z=2024-01-01&g=2024-01-01
       explanation: Artikel 3.205 Bal wijst het telen van gewassen in kassen aan als milieubelastende activiteit;
         het derde lid zondert huishoudens, beroep aan huis, educatieve doeleinden, onderzoeksinstellingen
@@ -62,7 +65,7 @@ properties:
       law: Besluit activiteiten leefomgeving
       bwb_id: BWBR0041330
       article: '3.211'
-      url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Artikel3.211
+      url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk3_Afdeling3.6_Paragraaf3.6.4_Artikel3.211
       juriconnect: jci1.3:c:BWBR0041330&artikel=3.211&z=2024-01-01&g=2024-01-01
       explanation: Artikel 3.211 Bal wijst het telen van gewassen in een gebouw, anders dan een kas, aan
         als milieubelastende activiteit; het derde lid zondert huishoudens, beroep aan huis, educatieve
@@ -76,7 +79,7 @@ properties:
       law: Wet belastingen op milieugrondslag
       bwb_id: BWBR0007168
       article: '60'
-      url: https://wetten.overheid.nl/BWBR0007168/2024-01-01#Artikel60
+      url: https://wetten.overheid.nl/BWBR0007168/2024-01-01#HoofdstukVI_Afdeling4_Artikel60
       juriconnect: jci1.3:c:BWBR0007168&artikel=60&lid=1&z=2024-01-01&g=2024-01-01
       explanation: Artikel 60, eerste lid, Wet belastingen op milieugrondslag regelt het verlaagde tarief
         voor de glastuinbouw. Dat tarief verandert de terugverdientijd en is daarom in artikel 4.14, tweede
@@ -91,7 +94,7 @@ properties:
       law: Besluit activiteiten leefomgeving
       bwb_id: BWBR0041330
       article: '5.15'
-      url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Artikel5.15
+      url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
       juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01
       explanation: Artikel 5.15, eerste lid, Bal verplicht tot maatregelen met een terugverdientijd van
         ten hoogste vijf jaar. Een maatregel kan alleen gelden als de installatie of het gebouwdeel waarop
@@ -109,7 +112,7 @@ properties:
       law: Omgevingsregeling
       bwb_id: BWBR0045528
       article: '4.14'
-      url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Artikel4.14
+      url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Hoofdstuk4_Afdeling4.4_Artikel4.14
       juriconnect: jci1.3:c:BWBR0045528&artikel=4.14&lid=2&z=2024-01-01&g=2024-01-01
       explanation: Artikel 4.14, tweede lid, en artikel 5.29, tweede lid, van de Omgevingsregeling wijzen
         de glastuinbouwbijlagen aan bij een activiteit als bedoeld in artikel 3.205 van het Besluit activiteiten
@@ -127,7 +130,7 @@ properties:
       law: Omgevingsregeling
       bwb_id: BWBR0045528
       article: '4.14'
-      url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Artikel4.14
+      url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Hoofdstuk4_Afdeling4.4_Artikel4.14
       juriconnect: jci1.3:c:BWBR0045528&artikel=4.14&z=2024-01-01&g=2024-01-01
       explanation: Artikel 4.14 Omgevingsregeling wijst bijlage VII aan als de maatregelen bedoeld in
         artikel 5.15, vierde lid, Bal, en in afwijking daarvan bijlage VIIaa voor de glastuinbouwsector.
@@ -137,13 +140,16 @@ properties:
     temporal: *id001
     citizen_relevance: secondary
     legal_basis:
-      law: Omgevingsregeling
-      bwb_id: BWBR0045528
-      article: '5.29'
-      url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Artikel5.29
-      juriconnect: jci1.3:c:BWBR0045528&artikel=5.29&z=2024-01-01&g=2024-01-01
-      explanation: Artikel 5.29 Omgevingsregeling wijst bijlage XIV aan als de maatregelen bedoeld in
-        artikel 3.84, vijfde lid, Bbl, en in afwijking daarvan bijlage XIVa voor de glastuinbouwsector.
+      law: Besluit bouwwerken leefomgeving
+      bwb_id: BWBR0041297
+      article: '3.84'
+      url: https://wetten.overheid.nl/BWBR0041297/2024-01-01#Hoofdstuk3_Afdeling3.4_Paragraaf3.4.1_Artikel3.84
+      juriconnect: jci1.3:c:BWBR0041297&artikel=3.84&lid=5&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 3.84, vijfde lid, Bbl draagt op bij ministeriele regeling de maatregelen aan
+        te wijzen die voor gebouwen een terugverdientijd van ten hoogste vijf jaar hebben. Artikel 5.29
+        Omgevingsregeling wijst daarvoor bijlage XIV aan, en in afwijking daarvan bijlage XIVa voor de
+        glastuinbouwsector.
+      paragraph: '5'
   - name: maatregelen
     description: De erkende maatregelen uit de voor dit bedrijf geldende bijlagen, in de categorieen die
       bij het bedrijf voorkomen, met de randvoorwaarden waaronder elke maatregel geldt.
@@ -154,7 +160,7 @@ properties:
       law: Besluit activiteiten leefomgeving
       bwb_id: BWBR0041330
       article: '5.15'
-      url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Artikel5.15
+      url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
       juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=4&z=2024-01-01&g=2024-01-01
       explanation: Artikel 5.15, vierde lid, Bal bepaalt dat bij ministeriele regeling maatregelen worden
         aangewezen die in ieder geval een terugverdientijd van ten hoogste vijf jaar hebben; artikel 3.84,
@@ -170,7 +176,7 @@ properties:
       law: Besluit activiteiten leefomgeving
       bwb_id: BWBR0041330
       article: '5.15'
-      url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Artikel5.15
+      url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
       juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=4&z=2024-01-01&g=2024-01-01
       explanation: Telling van de op grond van artikel 5.15, vierde lid, Bal en artikel 3.84, vijfde lid,
         Bbl aangewezen maatregelen die in de aanwezige categorieen vallen.
@@ -181,6 +187,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vergroot de persluchtbuffer.
       omschrijving: Door het aansluiten van een (extra) buffervat op het bestaande persluchtnet kan meer
         perslucht opgeslagen worden, waardoor het aantal starts en stops van de compressor wordt beperkt.
@@ -209,6 +216,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een afsluiter met tijdschakelaar om verlies van perslucht buiten bedrijfstijden te
         beperken.
       omschrijving: Door het toepassen van een afsluiter met tijdschakelaar op het persluchtnet of delen
@@ -230,6 +238,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een flow-drukregelaar toe in het persluchtnet.
       omschrijving: |-
         Door integratie van een flow-drukregelaar (regelklep direct na het buffervat) in een persluchtnet kunnen schommelingen in de persluchtvraag worden uitgebalanceerd. Om de schommelingen op te vangen is de persdruk vaak hoger ingesteld dan nodig. Door toepassing van een flow-drukregelaar kan de persdruk in het buffervat worden verlaagd. De verlaging in persdruk zorgt voor een besparing op het energiegebruik van de compressor.
@@ -254,6 +263,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een luchtkanaal zodat de persluchtcompressor (koude) buitenlucht aanzuigt.
       omschrijving: Plaats een luchtkanaal voor het aanzuigen van buitenlucht of van binnenlucht uit een
         onverwarmde ruimte. Als de persluchtcompressor koudere lucht aanzuigt kan er energiezuiniger perslucht
@@ -273,6 +283,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik zuinige persluchtgereedschappen.
       omschrijving: Door gebruik te maken van nieuwe en energiezuinige perslucht aangedreven gereedschappen,
         zoals blaaspistolen, wordt er minder perslucht gebruikt en energie bespaard.
@@ -299,6 +310,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik elektrisch handgereedschap als vervanging voor pneumatisch aangedreven gereedschap.
       omschrijving: Door waar mogelijk elektrisch handgereedschap toe te passen en perslucht aangedreven
         gereedschap alleen te gebruiken wanneer er geen elektrisch alternatief is, kan het persluchtgebruik
@@ -322,6 +334,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik een blower voor het schoonblazen in plaats van perslucht.
       omschrijving: Voor werkzaamheden zoals schoonblazen van vloeren en machines waarbij met perslucht
         wordt geblazen kan een decentrale blower worden gebruikt. Dit is energiezuiniger dan blazen met
@@ -343,6 +356,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang de regelklepbediening op basis van perslucht door elektrische aandrijvingen.
       omschrijving: Door het op perslucht aangedreven besturend element (actuator) van de regelklep te
         vervangen door een servo- of stappenmotor, kan energie worden bespaard. Bij een perslucht aangedreven
@@ -365,6 +379,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Verlaag de stoomdruk van het centrale stoomnet.
       omschrijving: Een verlaging van de stoomdruk zorgt voor lagere (stoom)temperaturen en voor een lagere
         schoorsteentemperatuur. Daardoor verliest de ketel minder warmte en wordt het warmteverlies door
@@ -396,6 +411,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik een economiser om warmte uit de rookgassen van de stoomketel nuttig in te zetten.
       omschrijving: Door het uitkoelen van rookgas met een economiser kan de restwarmte uit de rookgassen
         worden benut om het ketelvoedingwater voor te verwarmen.
@@ -418,6 +434,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik een rookgascondensor om warmte uit de rookgassen van de stoomketel nuttig in te zetten.
       omschrijving: Door het condenseren van rookgas met een RVS-condensor kan de restwarmte uit de rookgassen
         nuttig worden ingezet. Toepassing van de maatregel vereist dat de brander van de stoomketel opnieuw
@@ -440,6 +457,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang stoom als middel voor ruimteverwarming.
       omschrijving: Door stoom als middel voor ruimteverwarming te vervangen voor een efficiënter alternatief
         wordt energie bespaard. Mogelijke alternatieven zijn een indirect gestookte heater, een direct
@@ -464,6 +482,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer ongeïsoleerde warme delen van de stoomketel.
       omschrijving: Door het aanbrengen van isolatiemateriaal met een Rd-waarde van ten minste 1,0 m²K/W
         bij ongeïsoleerde mangaten, ketel-achterfronten en voedingswaterregelkleppen van stoomketels,
@@ -478,6 +497,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer stoomleidingen en appendages.
       omschrijving: Door het aanbrengen van isolatiemateriaal met een Rd-waarde van ten minste 2,5 m²K/W
         rondom stoomleidingen en appendages wordt warmteverlies tegengegaan.
@@ -490,6 +510,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een omgekeerde osmose (RO)-installatie toe om de ketelwaterkwaliteit te verbeteren.
       omschrijving: Met een omgekeerde osmose-installatie kan de waterkwaliteit voor een gasgestookte
         stoomketel worden verbeterd. Hierdoor is er minder toevoeging van nieuw water nodig en wordt er
@@ -510,6 +531,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een warmtewisselaar bij de uitgang van een heetwaterproces om het suppletiewater voor
         te verwarmen met warmte uit te lozen water.
       omschrijving: Door het plaatsen van een warmtewisselaar bij de uitgang van een heetwaterproces kan
@@ -531,6 +553,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Aandrijvingen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregeling toe op machines.
       omschrijving: |-
         Met de toepassing van een frequentieregelaar op de elektromotor welke een machine of machinedeel aandrijft kan de motor optimaal worden ingezet in de bedrijfsvoering.
@@ -563,6 +586,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Aandrijvingen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregeling op pompen toe.
       omschrijving: Door het toepassen van een frequentieregelaar op de pomp kan de pomp optimaal worden
         ingeregeld. Daarbij wordt het werkpunt van de pomp zodanig gekozen dat de pomp zijn functie goed
@@ -593,6 +617,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Aandrijvingen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregeling toe op compressoren van onder andere de koel-, vries- en persluchtinstallaties.
       omschrijving: Door het toepassen van de frequentieregelaar wordt het toerental van de compressor
         optimaal ingeregeld, zodanig dat de compressor de gewenste druk en debiet kan leveren met een
@@ -623,6 +648,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Aandrijvingen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang elektromotoren met efficiëntieklasse IE2 of lager door een motor met efficiëntieklasse
         IE4 of hoger.
       omschrijving: Elektromotoren met een hogere efficiëntieklasse, zoals IE4 gebruiken minder elektriciteit
@@ -645,6 +671,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Aandrijvingen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang IE3-elektromotoren door efficiëntieklasse IE4 of hoger.
       omschrijving: Elektromotoren met een hogere efficiëntieklasse, zoals IE4 gebruiken minder elektriciteit
         dan elektromotoren met een lagere efficiëntieklasse. Door het vervangen van IE3-elektromotoren
@@ -665,6 +692,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik een alternatief voor elektrische verwarming aan de binnenzijde van de glazen deur
         van een verticaal vriesmeubel.
       omschrijving: Door anti-condensfolie of een coating aan de binnenkant van de glazen deur aan te
@@ -685,6 +713,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats deuren voor verticale koelmeubels.
       omschrijving: Door het plaatsen van glazen deuren voor verticale koelmeubels is er minder koudeverlies
         vanuit het meubel naar de ruimte. Dit vermindert het energiegebruik voor koeling en het energiegebruik
@@ -704,6 +733,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas nachtafdekking toe bij semi-verticale koelmeubels.
       omschrijving: Een semi-verticaal koelmeubel heeft schappen die van onder naar boven minder diep
         worden. Nachtafdekking bestaat vaak uit een of meer rolgordijnen die aan het koelmeubel kunnen
@@ -726,6 +756,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats dagafdekking op horizontale vriesmeubels.
       omschrijving: Door schuifdeuren of andere dagafdekking toe te passen op horizontale vriesmeubels
         vindt er minder koudeverlies plaats vanuit het meubel naar de ruimte. Dit vermindert het energiegebruik
@@ -739,6 +770,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer koel- en vriesleidingen.
       omschrijving: Door het aanbrengen van isolatie om koel- en vriesleidingen wordt koudeverlies naar
         de omgeving beperkt. Hierdoor zal het energiegebruik van de koelinstallatie afnemen. Gebruik vanwege
@@ -755,6 +787,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Koppel de verdamperventilator aan de vriesceldeur.
       omschrijving: Door het koppelen van de verdamperventilator aan de vriesceldeur gaat deze uit op
         het moment dat de deur wordt geopend. Dit voorkomt onnodig koudeverlies bij het openen van de
@@ -777,6 +810,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer de wanden van koelcellen om warmte buiten te houden.
       omschrijving: Door het isoleren van de koelcelwanden wordt koudeverlies naar de omgeving voorkomen
         en de temperatuur in een koelcel behouden. Pas isolatiemateriaal toe met een Rd-waarde van ten
@@ -795,6 +829,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Regel de verdamperventilatoren van koelcellen op basis van meerdere temperatuursensoren.
       omschrijving: In de koelcellen draait continu een ventilator bij de verdamper om temperatuurverschillen
         in de koelcel te voorkomen. Door de verdamperventilator te regelen op basis van meerdere temperatuursensoren
@@ -818,6 +853,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregelaar toe om het circulatievoud te regelen bij gekoelde opslag van groente,
         fruit of andere plantaardige producten (levend product).
       omschrijving: Het circulatievoud van de lucht is het aantal malen per uur dat een ruimte-inhoud
@@ -840,6 +876,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Scheid de luchttoevoer naar de koelinstallatie van de warme lucht uit de koelinstallatie.
       omschrijving: Wanneer een condensor binnen staat wordt de warmte van de condensor overgedragen aan
         de te koelen lucht. Door het plaatsen van een apart aanzuigkanaal vanuit de buitenlucht of een
@@ -863,6 +900,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een condensordrukregeling op buitenluchttemperatuur toe op de koelinstallatie.
       omschrijving: Door het toepassen van een automatische condensordrukregeling op basis van de buitenluchttemperatuur,
         zal de condensortemperatuur op jaarbasis gemiddeld dalen. Hierdoor werkt de koelinstallatie efficiënter.
@@ -882,6 +920,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik de restwarmte van de condensors van de koelinstallatie.
       omschrijving: Door middel van een extra warmtewisselaar in het persgascircuit kan de restwarmte
         uit de condensors nuttig worden gebruikt.
@@ -902,6 +941,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas dagafdekking toe bij semi-verticale koelmeubels.
       omschrijving: Door het toepassen van dagafdekking bij een semi-verticaal koelmeubel vindt er minder
         koudeverlies plaats vanuit het meubel naar de ruimte. Dit vermindert het energiegebruik voor koeling
@@ -920,6 +960,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats LED-armaturen in gekoelde cellen.
       omschrijving: Door het vervangen van TL verlichting in gekoelde ruimten door LED-armaturen wordt
         het vermogen van de verlichting beperkt. Naast de beperking van het elektrische vermogen wordt
@@ -934,6 +975,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas heetgasontdooiing toe op de vriesinstallatie.
       omschrijving: Om een goede koeling mogelijk te maken dient ijsvorming voorkomen te worden. Door
         het toepassen van heetgasontdooiing bij plaatsing van een nieuwe vriesinstallatie kan energie
@@ -948,6 +990,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang de infrarood-salamander door een salamander met automatische pan/bord detectie.
       omschrijving: Door het vervangen van de infrarood-salamander door een salamander met pan/bord detectie
         kan worden voorkomen dat deze onnodig aanstaat wanneer deze niet in gebruik is.
@@ -964,6 +1007,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas hot-fill toe bij bestaande vaatwasapparatuur in grootkeukens.
       omschrijving: Door het toepassen van warmwater uit een bestaande warmwateraansluiting in vaatwasapparatuur
         (hot-fill) wordt warm water gebruikt dat op een efficiëntere manier is geproduceerd. Dit is bijvoorbeeld
@@ -988,6 +1032,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een dubbelwandige vaatwasser toe in grootkeukens.
       omschrijving: Door het toepassen van een energiezuinige dubbelwandige horecavaatwasser vindt minder
         warmteverlies plaats door de wanden van de vaatwasser. Daardoor wordt energie bespaard.
@@ -1003,6 +1048,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een laagdebiet afzuigkap toe bij grootkeukens.
       omschrijving: In een laagdebiet afzuigkap zijn luchttoevoercompartimenten aangebracht voor het inblazen
         van lucht aan de onder- en/of binnenzijde van de luifelranden. Dit leidt tot betere afvangprestaties
@@ -1020,6 +1066,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een elektrisch frituurtoestel toe in plaats van een gasgestookt toestel.
       omschrijving: Door het vervangen van het huidige frituurtoestel op gas door een elektrisch frituurtoestel
         wordt het warmteverlies naar de omgeving verminderd. Hierdoor neemt de efficiëntie toe.
@@ -1039,6 +1086,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een elektrische combisteamer toe in plaats van een gasgestookte variant.
       omschrijving: Door het toepassen van een elektrische combisteamer in plaats van een gasgestookte
         combisteamer kan op aardgas worden bespaard.
@@ -1058,6 +1106,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Ovens
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een rookgasklep toe in het rookgaskanaal van de gasgestookte oven om warmteverlies te
         beperken.
       omschrijving: Toepassen van rookgaskleppen bij ovens om warmteverlies als gevolg van thermische
@@ -1082,6 +1131,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Ovens
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas modulerende branders in ovens toe.
       omschrijving: |-
         Door het toepassen van modulerende branders in ovens wordt het brandervermogen beter geregeld op basis van de warmtevraag, waardoor minder stilstands- en opstartverliezen plaatsvinden.
@@ -1100,6 +1150,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Terreinverlichting
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een tijdklok samen met een daglichtregeling als de verlichting op vaste tijden moet
         branden terwijl het donker is.
       omschrijving: Door het gebruik van een tijdklok samen met een daglichtregeling staan lampen die
@@ -1118,6 +1169,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Terreinverlichting
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een bewegingssensor op plaatsen waar de lampen niet altijd aan hoeven te zijn.
       omschrijving: Door het plaatsen van een bewegingssensor op plaatsen waar de terreinverlichting alleen
         aan hoeft te zijn als er mensen aanwezig zijn, staan lampen niet onnodig aan.
@@ -1137,6 +1189,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Terreinverlichting
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats extra schakelaars voor de veldverlichting per veld.
       omschrijving: Door het plaatsen van extra schakelaars om de veldverlichting per veld te kunnen schakelen,
         die na een gekozen tijd automatisch uit gaan, worden velden niet onnodig verlicht.
@@ -1157,6 +1210,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Terreinverlichting
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang op een lichtmast de armaturen met spaarlampen of gasontladingslampen door LED-armaturen.
       omschrijving: Door op een lichtmast armaturen met spaarlampen of gasontladingslampen te vervangen
         door LED-armaturen wordt het energiegebruik beperkt. De lichtmast blijft behouden.
@@ -1173,6 +1227,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Terreinverlichting
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang bij terreinverlichting zonder mast de armaturen met gasontladingslampen door LED-armaturen.
       omschrijving: Door bij terreinverlichting, die niet op een mast staat, het armatuur met gasontladingslampen
         te vervangen door LED-armaturen wordt het energiegebruik beperkt.
@@ -1187,6 +1242,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zwembad
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang in bestaande kozijnen en ramen in de zwembadruimte het enkelglas door HR++ glas.
       omschrijving: Door het bestaande enkel glas te vervangen door HR++ glas wordt warmteverlies beperkt.
       uitgangssituatie: Er zijn ramen of kozijnen met enkel glas aanwezig in de verwarmde zwembadruimtes.
@@ -1200,6 +1256,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zwembad
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas isolatie toe op ongeïsoleerde zwembadwaterleidingen in een zwembad.
       omschrijving: Door het aanbrengen van isolatiemateriaal met een Rd-waarde van minimaal 1,4 m²K/W
         rondom zwembadwaterleidingen, flenzen en appendages wordt het warmteverlies verminderd.
@@ -1221,6 +1278,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zwembad
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Dek het zwembad af met zwembadafdekking buiten de openingstijden.
       omschrijving: Door het afdekken van een rechthoekig zwembad na sluitingstijd wordt warmteverlies
         via verdamping tegengegaan.
@@ -1237,6 +1295,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zwembad
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een glijbaanafsluiter op de uitgang van de waterglijbaan, die deels buiten de gebouwschil
         loopt.
       omschrijving: Door aan de uitgang onderaan de glijbaan een glijbaanafsluiter te plaatsen, wordt
@@ -1258,6 +1317,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zwembad
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer de wanden van het zwembassin.
       omschrijving: Door het plaatsen van isolatieplaten met een Rd-waarde van ten minste 1,8 m²K/W wordt
         warmteverlies door de wanden van het zwembassin beperkt.
@@ -1275,6 +1335,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zwembad
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Win warmte terug uit het spoelwater door gebruik te maken van een spoelwaterbuffer.
       omschrijving: Door gebruik te maken van een spoelwaterbuffer kan warmte uit het spoelwater van het
         zwembad worden teruggewonnen met een warmtewisselaar.
@@ -1291,6 +1352,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zwembad
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een HR-ketel toe voor zwembadwaterverwarming.
       omschrijving: Door de bestaande ketel te vervangen door een hoogrendement HR-107 ketel wordt de
         efficiëntie van de verwarming van het zwembadwater verhoogd.
@@ -1311,6 +1373,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zwembad
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Verbeter de isolatie van het dak van het zwembad.
       omschrijving: Een zwembad heeft over het algemeen een hoge binnentemperatuur. Door het dak (verder)
         te isoleren tot een Rc-waarde van 6,3 m²K/W wordt het warmteverlies beperkt en is er minder energie
@@ -1326,6 +1389,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zwembad
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een efficiënte warmtewisselaar toe op de balansventilatie van het zwembad.
       omschrijving: Door een dubbele kruisstroomwarmtewisselaar toe te passen in de balansventilatie van
         het zwembad wordt het warmteverlies beperkt.
@@ -1347,6 +1411,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas virtualisatie en consolidatie toe bij servers.
       omschrijving: Door middel van virtualisatie en consolidatie (het intern of extern samenvoegen van
         werklast) wordt het aantal in gebruik zijnde servers teruggebracht.
@@ -1367,6 +1432,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Stel geautomatiseerd energiebeheer in op servers
       omschrijving: Door het instellen van geautomatiseerd energiebeheer (power management) past de server
         zijn energiegebruik aan op de actuele vraag naar verwerkingscapaciteit. Het afstemmen kan door
@@ -1386,6 +1452,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Neem een laagbelaste Uninterrupted Power Supply (UPS) uit bedrijf.
       omschrijving: Door de belasting van UPS-en (Batterijen) te optimaliseren kan een maximale conversie
         efficiëntie worden bereikt. Door het uit bedrijf nemen van laagbelaste UPS-en (<30%) en/of het
@@ -1410,6 +1477,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een buitenluchtklep toe voor koeling van de serverruimte.
       omschrijving: Bij kleine serverruimtes die grenzen aan de buitenlucht kan een geautomatiseerde buitenluchtklep
         een effectieve maatregel zijn. Door het toepassen van een buitenluchtklep met sensoren voor luchtvochtigheid
@@ -1437,6 +1505,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een energiezuinige koelinstallatie toe voor de koeling van serverruimten.
       omschrijving: Vervang bestaande directe expansie koelinstallaties door nieuwe efficiëntere koelinstallaties.
         Door lagere condensatietemperaturen in tussenseizoen en winter verbetert de efficiëntie substantieel
@@ -1457,6 +1526,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Breng een scheiding aan tussen de koude aanvoerlucht en de warme afvoerlucht in de datazaal.
       omschrijving: Door het aanbrengen van gangafdekking, deuren en blindplaten worden koude en warme
         compartimenten gecreëerd. Dat voorkomt vermenging van koude aanvoerlucht waarmee de apparatuur
@@ -1472,6 +1542,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Roltrap
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas aanbodafhankelijke regeling met twee snelheden of met onderbrekende roltrapbesturing toe.
       omschrijving: Door het toepassen van een aanbodafhankelijke regeling met twee snelheden of een onderbrekende
         roltrapbesturing, wordt de roltrap stilgezet of vertraagd als er geen aanbod is van personen.
@@ -1491,6 +1562,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zonnepanelen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats zonnepanelen op het dak.
       omschrijving: Door de plaatsing van zonnepanelen wordt duurzame elektriciteit opgewekt. Daarmee
         wordt bespaard op de inkoop van elektriciteit via het elektriciteitsnet.
@@ -1526,6 +1598,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Energiebeheersysteem
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een automatisch energieregistratie- en bewakingssysteem (EBS) met rapportagefunctie toe,
         waarbij gas- en warmte- (per uur) en elektragebruik (per kwartier) van het gebouw wordt geregistreerd.
       omschrijving: Voor het beheren van het gas-, elektriciteits- en warmtegebruik is een automatisch
@@ -1549,6 +1622,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Isoleer spouwmuren van gebouwen.
       omschrijving: |-
         Door het aanbrengen van isolatie in spouwmuren wordt het warmteverlies in het stookseizoen beperkt.
@@ -1584,6 +1658,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Isoleer platte daken (bovenop de dakbedekking).
       omschrijving: Door het aanbrengen van isolatiemateriaal met een Rd-waarde van ten minste 2,1 m²K/W
         op ongeïsoleerde daken wordt het warmteverlies in het stookseizoen beperkt. Dit kan worden aangebracht
@@ -1610,6 +1685,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een automatisch sluitmechanisme toe bij overheaddeuren.
       omschrijving: Door het toepassen van een automatisch sluitmechanisme bij een overheaddeur sluit
         deze zodra iemand de deur is gepasseerd. Dit voorkomt warmteverlies, doordat de deur een kortere
@@ -1629,6 +1705,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Isoleer platte daken (onder de dakbedekking).
       omschrijving: Door het aanbrengen van isolatie met een Rd-waarde van ten minste 3,7 m²K/W op ongeïsoleerde
         daken wordt het warmteverlies in het stookseizoen beperkt. Breng de isolatie aan onder de dakbedekking
@@ -1650,6 +1727,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang in bestaande kozijnen en ramen het enkelglas door HR++ glas.
       omschrijving: Door in bestaande kozijnen en ramen het enkelglas door HR++-glas te vervangen wordt
         warmteverlies in het stookseizoen beperkt.
@@ -1672,6 +1750,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang in bestaande kozijnen en ramen dubbelglas door HR++-glas.
       omschrijving: Door in bestaande kozijnen en ramen het dubbel glas door HR++-glas te vervangen wordt
         warmteverlies in het stookseizoen beperkt.
@@ -1697,6 +1776,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Gebruik opblaasbare luchtkussens bij een vrachtwagendocking.
       omschrijving: Door een afsluitvoorziening met opblaasbare luchtkussens te plaatsen bij een docking
         voor vrachtwagens wordt het warmteverlies beperkt.
@@ -1717,6 +1797,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Plaats een loopdeur in overheaddeuren.
       omschrijving: Door het plaatsen van overheaddeuren met een loopdeur voor personen wordt warmteverlies
         voorkomen, omdat de gehele deur dan minder vaak open gaat.
@@ -1736,6 +1817,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een klokregeling toe en regel deze in.
       omschrijving: Pas voor het centrale verwarmingssysteem een klokregeling of klokthermostaat toe en
         regel deze zo in dat de werkelijke gebruikstijden zo nauw mogelijk worden gevolgd. Dit voorkomt
@@ -1756,6 +1838,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas naast de bestaande verwarmingsketel een elektrische warmtepomp toe.
       omschrijving: Door naast de bestaande verwarmingsketel een elektrische lucht/water warmtepomp toe
         te passen kan een groot gedeelte van het jaar de warmte uit de buitenlucht en/of ventilatielucht
@@ -1792,6 +1875,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een weersafhankelijke regeling toe.
       omschrijving: Gebruik voor de aanvoertemperatuur van het verwarmingswater een automatische regeling
         op basis van de buitentemperatuur. Hierdoor kan de warmte uit het rookgas teruggewonnen worden
@@ -1813,6 +1897,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Isoleer de verwarmingsleidingen en appendages in niet of beperkt verwarmde ruimtes.
       omschrijving: Door het toepassen van buisisolatie met een Rd-waarde van ten minste 0,5 m²K/W om
         de verwarmingsleidingen en appendages wordt het warmteverlies in niet of beperkt verwarmde ruimtes,
@@ -1829,6 +1914,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Isoleer ventilatiekanalen in onverwarmde ruimtes.
       omschrijving: Door het toepassen van isolatiemateriaal met een Rd-waarde van ten minste 0,7 m²K/W
         om de ventilatiekanalen wordt het warmteverlies in onverwarmde ruimtes beperkt.
@@ -1843,6 +1929,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een individuele regeling van de temperatuur per ruimte toe.
       omschrijving: Door per ruimte een individuele (na)regeling van de temperatuur met een thermostatische
         radiatorkraan of andere temperatuurregeling toe te passen, hoeft deze niet onnodig te worden verwarmd.
@@ -1857,6 +1944,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas frequentiegeregelde circulatiepompen toe.
       omschrijving: Door toepassing van frequentiegeregelde circulatiepompen in het verwarmingssysteem
         kan het debiet worden aangepast aan de warmtevraag, waardoor de pomp efficienter werkt. Pas de
@@ -1874,6 +1962,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang directgestookte gasheaters in bedrijfshallen door directgestookte HR-gasheaters.
       omschrijving: Door in bedrijfshallen een directgestookte conventionele gasheater te vervangen door
         een directgestookt hoog rendement (HR) toestel wordt energie bespaard.
@@ -1896,6 +1985,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een klokregeling toe op het ventilatiesysteem.
       omschrijving: Door het ventilatiesysteem van een gebouw te voorzien van een klokregeling kan deze
         buiten bedrijfstijden uit of naar een veel lager debiet worden gezet. Er geldt hier een dubbel
@@ -1921,6 +2011,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas warmteterugwinning toe op een ventilatiesysteem met mechanische toevoer en afvoer.
       omschrijving: Door in een ventilatiesysteem met mechanische toevoer en afvoer warmteterugwinning
         met een twincoilsysteem toe te passen worden warmteverliezen door ventilatie beperkt. Er zijn
@@ -1943,6 +2034,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang ventilatoren van klasse IE1 door ventilatoren van klasse IE4 of hoger.
       omschrijving: Door IE1-ventilatoren door ventilatoren van klasse IE4 of hoger te vervangen, neemt
         de efficiëntie van de ventilatie toe. IE staat voor International Efficiency en is een aanduiding
@@ -1964,6 +2056,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang indirect gedreven IE1-slakkenhuisventilatoren door direct gedreven ventilatoren.
       omschrijving: Door in de luchtbehandelingskast (LBK) de ventilatorsectie met indirect gedreven IE1-slakkenhuisventilatoren
         te vervangen door een ventilatorsectie met direct gedreven ventilatoren (plugfans) neemt de efficiëntie
@@ -1985,6 +2078,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang indirect gedreven IE2-slakkenhuisventilatoren door direct gedreven ventilatoren.
       omschrijving: Door in de luchtbehandelingskast (LBK) de ventilatorsectie met indirect gedreven IE2-slakkenhuisventilatoren
         te vervangen door een ventilatorsectie met direct gedreven ventilatoren (plugfans) wordt de efficiëntie
@@ -2006,6 +2100,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang indirect gedreven IE3 slakkenhuisventilatoren door direct gedreven ventilatoren.
       omschrijving: Door in de luchtbehandelingskast (LBK) de ventilatorsectie met indirect gedreven IE3-slakkenhuisventilatoren
         te vervangen door een ventilatorsectie met direct gedreven ventilatoren (plugfans) wordt de efficientie
@@ -2027,6 +2122,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang ventilatoren van klasse IE2 of IE3 door ventilatoren van klasse IE4 of hoger.
       omschrijving: Door IE2 of IE3-ventilatoren door ventilatoren van klasse IE4 of hoger te vervangen,
         neemt de efficiëntie van de ventilatie toe. IE staat voor International Efficiency en is een aanduiding
@@ -2045,6 +2141,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Warm tapwater
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Isoleer warmwaterleidingen en appendages.
       omschrijving: |-
         Met het aanbrengen van isolatie met een Rd-waarde van ten minste 0,5 m²K/W rondom de circulatieleidingen en appendages van het warme tapwater wordt warmteverlies tegengegaan.
@@ -2063,6 +2160,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Warm tapwater
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Gebruik waterbesparende douchekoppen.
       omschrijving: Door in douches waterbesparende douchekoppen toe te passen wordt er minder warm tapwater
         gebruikt.
@@ -2085,6 +2183,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Warm tapwater
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang bij een indirect verwarmd voorraadvat de bestaande ketel door een HR-ketel.
       omschrijving: Door in een warm tapwatersysteem met een indirect verwarmd voorraadvat een hoogrendementsketel
         (HR) toe te passen in plaats van een verbeterd rendementsketel of conventionele ketel wordt het
@@ -2104,6 +2203,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een regeling toe op de verlichting, zodat deze buiten gebruikstijden niet onnodig brandt.
       omschrijving: Door gebruik van een regeling wordt het onnodig branden van verlichting buiten gebruikstijden
         voorkomen. Er zijn diverse regelingen die hiervoor kunnen worden toegepast, zoals aanwezigheidsdetectie
@@ -2119,6 +2219,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang TL8-buizen door LED-buizen.
       omschrijving: Door het vervangen van TL-buizen (TL8) in de armaturen door LED-buizen wordt het energiegebruik
         beperkt. Het wisselen van de buizen door LED-buizen met een vergelijkbare lichtopbrengst en lichtkleur
@@ -2141,6 +2242,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang TL5-fluorescentiebuizen door LED-buizen.
       omschrijving: Door het vervangen van TL5-buizen in de armaturen door LED-buizen wordt het energiegebruik
         beperkt. Het wisselen van de buizen door LED-buizen met een vergelijkbare lichtopbrengst en lichtkleur
@@ -2163,6 +2265,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang gloei-, halogeen- en spaarlampen door LED-lampen.
       omschrijving: Door gloei-, halogeen- en spaarlampen in de bestaande armaturen te vervangen door
         LED-lampen wordt het energiegebruik beperkt.
@@ -2185,6 +2288,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang gasontladingslampen door LED-lampen.
       omschrijving: Vervang gasontladingslampen in de armaturen door LED-lampen. Dit beperkt het energiegebruik.
       uitgangssituatie: 'Er zijn armaturen met één van de volgende gasontladingslampen aanwezig: kwiklampen,
@@ -2207,6 +2311,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang montagebalken en lichtlijnen met TL8-buizen door LED-armaturen.
       omschrijving: Door bij montagebalken en lichtlijnen de armaturen met TL8-buizen te vervangen door
         LED-armaturen wordt het energiegebruik beperkt.
@@ -2224,6 +2329,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang plafondspots met spaarlampen door LED-spots.
       omschrijving: Door plafondspots met spaarlampen (CFL of PL) te vervangen door spots met LED-verlichting
         wordt het energiegebruik beperkt.
@@ -2240,6 +2346,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang wandarmaturen met spaarlampen door LED-wandarmaturen.
       omschrijving: Door wandarmaturen met spaarlampen te vervangen door LED-wandarmaturen wordt het energiegebruik
         beperkt.
@@ -2256,6 +2363,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang wandarmaturen met halogeenlampen door LED-wandarmaturen.
       omschrijving: Door wandarmaturen met halogeenlampen te vervangen door LED-wandarmaturen wordt het
         energiegebruik beperkt.
@@ -2272,6 +2380,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang spots met halogeenlampen door LED-spots.
       omschrijving: Door spots met halogeenlampen te vervangen door spots met LED-verlichting wordt het
         energiegebruik beperkt.
@@ -2288,6 +2397,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang railspots met halogeenlampen door LED-railspots.
       omschrijving: Door railspotarmaturen met halogeenlampen te vervangen door LED-railspots wordt het
         energiegebruik beperkt. De bestaande spanningsrail/contactrail blijft bewaard.
@@ -2306,6 +2416,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang railspots met gasontladingslampen door LED-railspots.
       omschrijving: Door railspots met gasontladingslampen te vervangen door LED-railspots wordt het energiegebruik
         beperkt. De bestaande spanningsrail/contactrail blijft bewaard.
@@ -2328,6 +2439,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang pendelarmaturen en opbouwarmaturen met gasontladingslampen door LED-armaturen.
       omschrijving: Door pendelarmaturen en opbouwarmaturen ("high bay") met gasontladingslampen te vervangen
         door LED-armaturen wordt het energiegebruik beperkt.
@@ -2342,6 +2454,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang ingebouwde plafondarmaturen met TL8-buizen door LED-armaturen.
       omschrijving: Door de ingebouwde plafondarmaturen met TL8-buizen te vervangen door LED-armaturen
         wordt het energiegebruik beperkt.
@@ -2355,6 +2468,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang vluchtwegsignaleringsarmaturen met TL-buizen of spaarlampen door LED-armaturen.
       omschrijving: Door vluchtwegsignaleringsarmaturen met TL-buizen of spaarlampen te vervangen door
         vluchtwegsignaleringsarmaturen met LED-verlichting wordt het energiegebruik beperkt.
@@ -2367,6 +2481,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Buitenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang armaturen met TL8-buizen door LED-armaturen.
       omschrijving: Door ingebouwde en opgebouwde armaturen met TL8-buizen (die niet op een mast zitten)
         te vervangen door LED-armaturen wordt het energiegebruik verlaagd.
@@ -2380,6 +2495,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Buitenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang wandarmaturen met halogeenlampen door LED-armaturen.
       omschrijving: Door wandarmaturen met halogeenlampen te vervangen door LED-armaturen, wordt het energiegebruik
         beperkt.
@@ -2393,6 +2509,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Buitenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang wandarmaturen met spaarlampen door LED-armaturen.
       omschrijving: Door wandarmaturen met spaarlampen te vervangen door LED-armaturen, wordt het energiegebruik
         beperkt.
@@ -2406,6 +2523,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Buitenverlichting
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang armaturen met gasontladingslampen door LED-armaturen.
       omschrijving: Door ingebouwde en opgebouwde armaturen (die niet op een mast zitten) met gasontladingslampen
         (Kwiklampenkwiklampen, SON, HPL, HQL of HPI) door LED-armaturen te vervangen, wordt het energiegebruik
@@ -2421,6 +2539,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Zonnepanelen
       bijlage: XIV
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Plaats zonnepanelen op het dak.
       omschrijving: Door de plaatsing van zonnepanelen wordt duurzame elektriciteit opgewekt. Daarmee
         wordt bespaard op de inkoop van elektriciteit via het elektriciteitsnet.
@@ -2456,6 +2575,7 @@ properties:
       onderdeel: Processen
       categorie: Natlakspuitcabines
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een omschakelmodule toe om de ventilatiestand van de spuitcabine automatisch van ventilatie-
         naar circulatie te schakelen.
       omschrijving: Tijdens het spuitproces moet er voldoende ventilatie met verse buitenlucht zijn. Na
@@ -2479,6 +2599,7 @@ properties:
       onderdeel: Processen
       categorie: Natlakspuitcabines
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Win de warmte terug uit de ventilatielucht van de spuitcabine.
       omschrijving: Bij warmteterugwinning uit ventilatielucht bij een spuitcabine wordt de verse buitenlucht
         voorverwarmd met restwarmte uit de afgezogen ventilatielucht. Door warmte terug te winnen is er
@@ -2503,6 +2624,7 @@ properties:
       onderdeel: Processen
       categorie: Natlakspuitcabines
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een openbrandersysteem toe voor de verwarming van de spuitcabine.
       omschrijving: Door het toepassen van een openbrandersysteem bij spuitcabines worden de rookgassen
         van de brander(s) gemengd met de ventilatielucht en worden deze niet eerst naar buiten afgevoerd.
@@ -2528,6 +2650,7 @@ properties:
       onderdeel: Processen
       categorie: Natlakspuitcabines
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik hangschakelaars voor het spuitpistool om de afzuiging van de spuitcabine te beperken.
       omschrijving: |-
         Tijdens spuitwerkzaamheden is een grote hoeveelheid verse lucht van ten minste 20 °C nodig. Door gebruik te maken van hangschakelaars wordt de afzuiging automatisch in debiet verminderd wanneer het handspuitpistool wordt opgehangen aan deze schakelaar. Zo wordt er alleen op hoog debiet afgezogen wanneer er daadwerkelijk wordt gespoten. Hiermee wordt het energiegebruik van de ventilatoren en de luchtverwarming verminderd.
@@ -2551,6 +2674,7 @@ properties:
       onderdeel: Processen
       categorie: Natlakspuitcabines
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas infrarooddrogers toe als droogsysteem voor spotreparaties.
       omschrijving: Voor spotreparaties (zoals een kleine deuk, kras of buts) is het toepassen van infrarooddrogers
         een energiezuiniger alternatief voor het gebruik van de spuitcabine, doordat hiermee niet de gehele
@@ -2565,6 +2689,7 @@ properties:
       onderdeel: Processen
       categorie: Drogen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas vermogensregeling toe op de ventilatietoevoer naar de droogkamer.
       omschrijving: Door het toepassen van toerenregeling of andere vermogensregeling op de ventilatietoevoer
         naar de droogkamer kan het ventileren worden beperkt. Hierdoor neemt het energiegebruik van de
@@ -2588,6 +2713,7 @@ properties:
       onderdeel: Processen
       categorie: Drogen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een vochtsensor inclusief regeling toe in de uittredelucht van droogprocessen.
       omschrijving: |-
         Door toepassing van een vochtsensor, inclusief regeling op basis van het vochtgehalte van de uittredelucht, kan het recirculatiedebiet van de drooglucht worden verhoogd. Dat zorgt voor energiebesparing door de vermindering van verse luchttoevoer op lage temperatuur.
@@ -2610,6 +2736,7 @@ properties:
       onderdeel: Processen
       categorie: Procesbaden
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een warmtepomp toe voor de verwarming van een procesbad.
       omschrijving: De bestaande externe elektrische verwarming (heater) van een procesbad wordt vervangen
         door een externe hoge temperatuur (HT) warmtepomp. Het toepassen van een warmtepomp is energie-efficiënter.
@@ -2636,6 +2763,7 @@ properties:
       onderdeel: Processen
       categorie: Procesbaden
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer de wanden van een verwarmd procesbad.
       omschrijving: Door het toepassen van isolatiemateriaal met een Rd-waarde van tenminste 1,5 m² K/W
         en kunststof of roestvrijstalen (RVS) beplating wordt warmteverlies door de badwanden verminderd
@@ -2650,6 +2778,7 @@ properties:
       onderdeel: Processen
       categorie: Procesbaden
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Dek warme procesbaden af om het warmteverlies te beperken.
       omschrijving: Door het afdekken van warme procesbaden buiten bedrijfstijden wordt verdampingsverlies
         tegengegaan.
@@ -2667,6 +2796,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Optimaliseer de procesparameters van procesapparatuur.
       omschrijving: Bepaal de optimale procesparameters zoals opwarmtijd, koeltijd, draaiuren, druk en
         temperatuur van de procesapparatuur en regel deze in, zodat er minimaal energiegebruik is met
@@ -2686,6 +2816,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Zuig warme lucht af bij grote warmteproducerende apparaten zodat de ruimte minder hoeft te
         worden gekoeld.
       omschrijving: Door de warme afblaaslucht van de warmteproducerende installaties naar buiten af te
@@ -2709,6 +2840,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Regel het luchtafzuigdebiet bij droog- en moffelovens op basis van de bezettingsgraad.
       omschrijving: Door een droog- of moffeloven uit te rusten met een bezettingsgraadmeter en een frequentieregelaar
         kan de hoeveelheid ventilatie worden geminimaliseerd bij een lagere bezetting. Hierdoor hoeft
@@ -2729,6 +2861,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een hoogfrequente HR-lader toe voor het opladen van tractiebatterijen.
       omschrijving: Door de toepassing van een hoogfrequente HR-lader voor het opladen van tractiebatterijen
         neemt de efficiëntie van het oplaadproces fors toe. Tractiebatterijen worden gebruikt in voertuigen
@@ -2748,6 +2881,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een filter op de afvoerlucht van de snipperafzuiger en blaas de afgezogen lucht terug
         de ruimte in.
       omschrijving: Door het plaatsen van een filterinstallatie op de snipperafzuiger kan de afgezogen
@@ -2774,6 +2908,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregelaar toe op de ventilator van de centrale stofafzuiging.
       omschrijving: Door het toepassen van een frequentieregeling op de ventilatoren van de centrale stofafzuiging,
         kan het debiet beter worden geregeld op basis van de vraag.
@@ -2801,6 +2936,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een stopknop om het onnodig aanstaan van het centraal stofzuigersysteem te voorkomen.
       omschrijving: Door het installeren van een stopknop binnen handbereik zal de tijd dat het centrale
         stofzuigersysteem in bedrijf is afnemen. Hiermee wordt het energiegebruik verminderd.
@@ -2828,6 +2964,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een frequentieregelaar om het opgenomen vermogen van het centrale vacuümsysteem te
         beperken.
       omschrijving: Als het centrale vacuümsysteem continu op onderdruk wordt gehouden, zorgt dit bij
@@ -2857,6 +2994,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang aanwezige verlichting op of nabij procesapparatuur door LED-verlichting.
       omschrijving: Door het vervangen van TL-buizen (TL8), spaar-, halogeen- of gasontladingslampen door
         LED-lampen wordt het energiegebruik van de verlichting beperkt.
@@ -2877,6 +3015,7 @@ properties:
       onderdeel: Processen
       categorie: Proceswarmte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats aanvullende platen in de platenwarmtewisselaar om de warmteoverdracht te vergroten.
       omschrijving: Door uitbreiding van de warmtewisselaar met meerdere platen wordt het warmteuitwisselend
         oppervlak van vloeistof-vloeistof platenwarmtewisselaars vergroot en kan meer warmte worden overgedragen.
@@ -2901,6 +3040,7 @@ properties:
       onderdeel: Processen
       categorie: Proceswarmte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer warme productleidingen en appendages.
       omschrijving: Door het aanbrengen van isolatiemateriaal met een Rd-waarde van minimaal 1,5 m²K/W
         om leidingen en appendages waarin warme producten worden verplaatst wordt het warmteverlies beperkt.
@@ -2916,6 +3056,7 @@ properties:
       onderdeel: Processen
       categorie: Proceswarmte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer de wanden van hoge temperatuur procesvaten om warmteverlies te beperken.
       omschrijving: Door het aanbrengen van isolatiemateriaal met een Rd-waarde van ten minste 0,7 m²K/W
         op de wanden van hoge temperatuur procesvaten wordt warmteverlies naar de omgeving beperkt. Een
@@ -2936,6 +3077,7 @@ properties:
       onderdeel: Processen
       categorie: Proceswarmte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer de wanden van verwarmde opslagtanks.
       omschrijving: Door het aanbrengen van isolatiemateriaal met een Rd-waarde van minimaal 1,5 m²K/W
         rondom verwarmde tanks wordt het warmteverlies beperkt. Bij gesloten tanks moet, indien de constructie
@@ -2954,6 +3096,7 @@ properties:
       onderdeel: Processen
       categorie: Proceswarmte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een elektrische verwarmingsmantel toe voor IBC-containers.
       omschrijving: Door het toepassen van een elektrische verwarmingsmantel voor het vorstvrij houden
         van een IBC-container (Intermediate Bulk Container) gedurende vorstperiodes hoeft niet de hele
@@ -2974,6 +3117,7 @@ properties:
       onderdeel: Processen
       categorie: Proceswarmte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik het warme en koude water uit de sterilisatiecyclus van producten of goederen voor
         verwarming en koeling van het sterilisatiewater.
       omschrijving: Na het steriliseren wordt het warme water in de warme buffer gepompt en na het koelen
@@ -2997,6 +3141,7 @@ properties:
       onderdeel: Processen
       categorie: Proceswarmte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik de restwarmte uit het blancheerproces door het plaatsen van een warmtewisselaar.
       omschrijving: Door het plaatsen van een warmtewisselaar bij de uitgaande stroom van de blancheur
         kan het suppletiewater worden voorverwarmd met spuiwater tot 60 °C.
@@ -3018,6 +3163,7 @@ properties:
       onderdeel: Processen
       categorie: Proceswarmte
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik de warmte van folieblazen nuttig voor de verwarming van een dichtbijgelegen ruimte.
       omschrijving: Warme lucht van de folieblaasinstallatie kan nuttig worden gebruikt voor ruimteverwarming
         van een aangrenzende productieruimte of een aangrenzend magazijn. Hierdoor hoeft minder energie
@@ -3040,6 +3186,7 @@ properties:
       onderdeel: Processen
       categorie: Proceskoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een warmtewisselaar om de restwarmte in koelwater te benutten.
       omschrijving: Door de restwarmte uit het koelwater met een warmtewisselaar terug te winnen, kan
         deze ergens anders worden ingezet en wordt energie bespaard.
@@ -3066,6 +3213,7 @@ properties:
       onderdeel: Processen
       categorie: Proceskoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een drycooler toe voor de koeling van procesapparatuur.
       omschrijving: Door het toepassen van een drycooler voor de koeling van procesapparatuur kan gebruik
         worden gemaakt van vrij beschikbare koeling uit de buitenlucht als aanvulling op de koelmachine.
@@ -3095,6 +3243,7 @@ properties:
       onderdeel: Processen
       categorie: Proceskoeling
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas voorkoeling met (leiding)water toe in een proces met ijswaterkoeling.
       omschrijving: Door in het koelproces een voorkoelstap met leidingwater toe te passen, kan het ijswatergebruik
         worden beperkt. IJswater wordt dan alleen nog gebruikt voor de laatste koelstap.
@@ -3118,6 +3267,7 @@ properties:
       onderdeel: Processen
       categorie: Veehouderijen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een voorkoeler met koud (leiding)water toe bij het koelen van melk.
       omschrijving: Door het voorkoelen van melk met koud (leiding)water zal de koelmachine minder energie
         gebruiken voor het afkoelen van de melk. Daarnaast wordt het water dat gebruikt wordt voor het
@@ -3138,6 +3288,7 @@ properties:
       onderdeel: Processen
       categorie: Veehouderijen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregelaar toe om het vermogen van de vacuümpomp van de melkinstallatie te
         beperken.
       omschrijving: Door het plaatsen van een frequentieregelaar op de vacuümpomp kan het toerental van
@@ -3159,6 +3310,7 @@ properties:
       onderdeel: Processen
       categorie: Veehouderijen
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een energiezuinige regeling toe op infrarood warmtelampen.
       omschrijving: Door het toepassen van een halveringsschakelaar of een dimmer op de infrarood warmtelampen
         voor het warm houden van jonge dieren, kan de brandsterkte van de lampen worden aangepast.
@@ -3175,6 +3327,7 @@ properties:
       onderdeel: Processen
       categorie: Datacentrum
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Stel een hogere koeltemperatuur in voor de koeling van servers.
       omschrijving: |-
         De setpoint van de zaalkoelers is minimaal gelijk aan de bovengrens van de door ASHRAE aanbevolen temperatuur van 27 °C bij gebruik van compressiekoeling of natte koeling. Door het verhogen van de koeltemperatuur kan meer gebruik worden gemaakt van vrije koeling en werkt de koeling efficiënter.
@@ -3190,6 +3343,7 @@ properties:
       onderdeel: Processen
       categorie: Datacentrum
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregelaar toe om het vermogen van de zaalkoelers te beperken.
       omschrijving: De zaalkoelers (CRAH's) worden voorzien van een frequentieregelaar waardoor het toerental
         van de zaalkoelers op temperatuur kan worden geregeld. De ventilatoren draaien daardoor gemiddeld
@@ -3208,6 +3362,7 @@ properties:
       onderdeel: Processen
       categorie: Datacentrum
       bijlage: VII
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas vrije koeling toe bij de koelinstallatie in het datacentrum.
       omschrijving: Door vrije koeling te integreren in de koelvoorziening van het datacentrum, kan het
         gebruik van de compressiekoelinstallatie worden beperkt. Er bestaan verschillende systemen voor
@@ -3230,6 +3385,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vergroot de persluchtbuffer.
       omschrijving: Door het aansluiten van een (extra) buffervat op het bestaande persluchtnet kan meer
         perslucht opgeslagen worden, waardoor het aantal starts en stops van de compressor wordt beperkt.
@@ -3258,6 +3414,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een afsluiter met tijdschakelaar om verlies van perslucht buiten bedrijfstijden te
         beperken.
       omschrijving: Door het toepassen van een afsluiter met tijdschakelaar op het persluchtnet of delen
@@ -3279,6 +3436,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een flow-drukregelaar toe in het persluchtnet.
       omschrijving: |-
         Door integratie van een flow-drukregelaar (regelklep direct na het buffervat) in een persluchtnet kunnen schommelingen in de persluchtvraag worden uitgebalanceerd. Om de schommelingen op te vangen is de persdruk vaak hoger ingesteld dan nodig. Door toepassing van een flow-drukregelaar kan de persdruk in het buffervat worden verlaagd. De verlaging in persdruk zorgt voor een besparing op het energiegebruik van de compressor.
@@ -3303,6 +3461,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een luchtkanaal zodat de persluchtcompressor (koude) buitenlucht aanzuigt.
       omschrijving: Plaats een luchtkanaal voor het aanzuigen van buitenlucht of van binnenlucht uit een
         onverwarmde ruimte. Als de persluchtcompressor koudere lucht aanzuigt kan er energiezuiniger perslucht
@@ -3322,6 +3481,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik zuinige persluchtgereedschappen.
       omschrijving: Door gebruik te maken van nieuwe en energiezuinige perslucht aangedreven gereedschappen,
         zoals blaaspistolen, wordt er minder perslucht gebruikt en energie bespaard.
@@ -3348,6 +3508,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik elektrisch handgereedschap als vervanging voor pneumatisch aangedreven gereedschap.
       omschrijving: Door waar mogelijk elektrisch handgereedschap toe te passen en perslucht aangedreven
         gereedschap alleen te gebruiken wanneer er geen elektrisch alternatief is, kan het persluchtgebruik
@@ -3371,6 +3532,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik een blower voor het schoonblazen in plaats van perslucht.
       omschrijving: Voor werkzaamheden zoals schoonblazen van vloeren en machines waarbij met perslucht
         wordt geblazen kan een decentrale blower worden gebruikt. Dit is energiezuiniger dan blazen met
@@ -3392,6 +3554,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Perslucht
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang de regelklepbediening op basis van perslucht door elektrische aandrijvingen.
       omschrijving: Door het op perslucht aangedreven besturend element (actuator) van de regelklep te
         vervangen door een servo- of stappenmotor, kan energie worden bespaard. Bij een perslucht aangedreven
@@ -3414,6 +3577,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Verlaag de stoomdruk van het centrale stoomnet.
       omschrijving: Een verlaging van de stoomdruk zorgt voor lagere (stoom)temperaturen en voor een lagere
         schoorsteentemperatuur. Daardoor verliest de ketel minder warmte en wordt het warmteverlies door
@@ -3445,6 +3609,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik een rookgascondensor om warmte uit de rookgassen van de stoomketel nuttig in te zetten.
       omschrijving: Door het condenseren van rookgas met een RVS-condensor kan de restwarmte uit de rookgassen
         nuttig worden ingezet. Toepassing van de maatregel vereist dat de brander van de stoomketel opnieuw
@@ -3470,6 +3635,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang stoom als middel voor ruimteverwarming.
       omschrijving: Door stoom als middel voor ruimteverwarming te vervangen voor een efficiënter alternatief
         wordt energie bespaard. Mogelijke alternatieven zijn een indirect gestookte heater, een direct
@@ -3494,6 +3660,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer ongeïsoleerde warme delen van de stoomketel.
       omschrijving: Door het aanbrengen van isolatiemateriaal met een Rd-waarde van ten minste 1,0 m²K/W
         bij ongeïsoleerde mangaten, ketel-achterfronten en voedingswaterregelkleppen van stoomketels,
@@ -3508,6 +3675,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer stoomleidingen en appendages.
       omschrijving: Door het aanbrengen van isolatiemateriaal met een Rd-waarde van ten minste 2,5 m²K/W
         rondom stoomleidingen en appendages wordt warmteverlies tegengegaan.
@@ -3520,6 +3688,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een omgekeerde osmose (RO)-installatie toe om de ketelwaterkwaliteit te verbeteren.
       omschrijving: Met een omgekeerde osmose-installatie kan de waterkwaliteit voor een gasgestookte
         stoomketel worden verbeterd. Hierdoor is er minder toevoeging van nieuw water nodig en wordt er
@@ -3540,6 +3709,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Stoom
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een warmtewisselaar bij de uitgang van een heetwaterproces om het suppletiewater voor
         te verwarmen met warmte uit te lozen water.
       omschrijving: Door het plaatsen van een warmtewisselaar bij de uitgang van een heetwaterproces kan
@@ -3561,6 +3731,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Aandrijvingen
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregeling toe op machines.
       omschrijving: |-
         Met de toepassing van een frequentieregelaar op de elektromotor welke een machine of machinedeel aandrijft kan de motor optimaal worden ingezet in de bedrijfsvoering.
@@ -3593,6 +3764,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Aandrijvingen
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregeling op pompen toe.
       omschrijving: Door het toepassen van een frequentieregelaar op de pomp kan de pomp optimaal worden
         ingeregeld. Daarbij wordt het werkpunt van de pomp zodanig gekozen dat de pomp zijn functie goed
@@ -3623,6 +3795,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Aandrijvingen
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregeling toe op compressoren van onder andere de koel-, vries- en persluchtinstallaties.
       omschrijving: Door het toepassen van de frequentieregelaar wordt het toerental van de compressor
         optimaal ingeregeld, zodanig dat de compressor de gewenste druk en debiet kan leveren met een
@@ -3653,6 +3826,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Aandrijvingen
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang elektromotoren met efficiëntieklasse IE2 of lager door een motor met efficiëntieklasse
         IE4 of hoger.
       omschrijving: Elektromotoren met een hogere efficiëntieklasse, zoals IE4 gebruiken minder elektriciteit
@@ -3675,6 +3849,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Aandrijvingen
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang IE3-elektromotoren door efficiëntieklasse IE4 of hoger.
       omschrijving: Elektromotoren met een hogere efficiëntieklasse, zoals IE4 gebruiken minder elektriciteit
         dan elektromotoren met een lagere efficiëntieklasse. Door het vervangen van IE3-elektromotoren
@@ -3695,6 +3870,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer koel- en vriesleidingen.
       omschrijving: Door het aanbrengen van isolatie om koel- en vriesleidingen wordt koudeverlies naar
         de omgeving beperkt. Hierdoor zal het energiegebruik van de koelinstallatie afnemen. Gebruik vanwege
@@ -3711,6 +3887,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Koppel de verdamperventilator aan de vriesceldeur.
       omschrijving: Door het koppelen van de verdamperventilator aan de vriesceldeur gaat deze uit op
         het moment dat de deur wordt geopend. Dit voorkomt onnodig koudeverlies bij het openen van de
@@ -3733,6 +3910,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer de wanden van koelcellen om warmte buiten te houden.
       omschrijving: Door het isoleren van de koelcelwanden wordt koudeverlies naar de omgeving voorkomen
         en de temperatuur in een koelcel behouden. Pas isolatiemateriaal toe met een Rd-waarde van ten
@@ -3751,6 +3929,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Regel de verdamperventilatoren van koelcellen op basis van meerdere temperatuursensoren.
       omschrijving: In de koelcellen draait continu een ventilator bij de verdamper om temperatuurverschillen
         in de koelcel te voorkomen. Door de verdamperventilator te regelen op basis van meerdere temperatuursensoren
@@ -3774,6 +3953,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregelaar toe om het circulatievoud te regelen bij gekoelde opslag van groente,
         fruit of andere plantaardige producten (levend product).
       omschrijving: Het circulatievoud van de lucht is het aantal malen per uur dat een ruimte-inhoud
@@ -3796,6 +3976,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Scheid de luchttoevoer naar de koelinstallatie van de warme lucht uit de koelinstallatie.
       omschrijving: Wanneer een condensor binnen staat wordt de warmte van de condensor overgedragen aan
         de te koelen lucht. Door het plaatsen van een apart aanzuigkanaal vanuit de buitenlucht of een
@@ -3819,6 +4000,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een condensordrukregeling op buitenluchttemperatuur toe op de koelinstallatie.
       omschrijving: Door het toepassen van een automatische condensordrukregeling op basis van de buitenluchttemperatuur,
         zal de condensortemperatuur op jaarbasis gemiddeld dalen. Hierdoor werkt de koelinstallatie efficiënter.
@@ -3838,6 +4020,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Gebruik de restwarmte van de condensors van de koelinstallatie.
       omschrijving: Door middel van een extra warmtewisselaar in het persgascircuit kan de restwarmte
         uit de condensors nuttig worden gebruikt.
@@ -3858,6 +4041,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas dagafdekking toe bij semi-verticale koelmeubels.
       omschrijving: Door het toepassen van dagafdekking bij een semi-verticaal koelmeubel vindt er minder
         koudeverlies plaats vanuit het meubel naar de ruimte. Dit vermindert het energiegebruik voor koeling
@@ -3873,6 +4057,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats LED-armaturen in gekoelde cellen.
       omschrijving: Door het vervangen van TL verlichting in gekoelde ruimten door LED-armaturen wordt
         het vermogen van de verlichting beperkt. Naast de beperking van het elektrische vermogen wordt
@@ -3887,6 +4072,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Productkoeling
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas heetgasontdooiing toe op de vriesinstallatie.
       omschrijving: Om een goede koeling mogelijk te maken dient ijsvorming voorkomen te worden. Door
         het toepassen van heetgasontdooiing bij plaatsing van een nieuwe vriesinstallatie kan energie
@@ -3901,6 +4087,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang de infrarood-salamander door een salamander met automatische pan/bord detectie.
       omschrijving: Door het vervangen van de infrarood-salamander door een salamander met pan/bord detectie
         kan worden voorkomen dat deze onnodig aanstaat wanneer deze niet in gebruik is.
@@ -3917,6 +4104,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas hot-fill toe bij bestaande vaatwasapparatuur in grootkeukens.
       omschrijving: Door het toepassen van warmwater uit een bestaande warmwateraansluiting in vaatwasapparatuur
         (hot-fill) wordt warm water gebruikt dat op een efficiëntere manier is geproduceerd. Dit is bijvoorbeeld
@@ -3941,6 +4129,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een dubbelwandige vaatwasser toe in grootkeukens.
       omschrijving: Door het toepassen van een energiezuinige dubbelwandige horecavaatwasser vindt minder
         warmteverlies plaats door de wanden van de vaatwasser. Daardoor wordt energie bespaard.
@@ -3956,6 +4145,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een laagdebiet afzuigkap toe bij grootkeukens.
       omschrijving: In een laagdebiet afzuigkap zijn luchttoevoercompartimenten aangebracht voor het inblazen
         van lucht aan de onder- en/of binnenzijde van de luifelranden. Dit leidt tot betere afvangprestaties
@@ -3973,6 +4163,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Grootkeukenapparatuur
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een elektrische combisteamer toe in plaats van een gasgestookte variant.
       omschrijving: Door het toepassen van een elektrische combisteamer in plaats van een gasgestookte
         combisteamer kan op aardgas worden bespaard.
@@ -3988,6 +4179,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Terreinverlichting
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een tijdklok samen met een daglichtregeling als de verlichting op vaste tijden moet
         branden terwijl het donker is.
       omschrijving: Door het gebruik van een tijdklok samen met een daglichtregeling staan lampen die
@@ -4006,6 +4198,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Terreinverlichting
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats een bewegingssensor op plaatsen waar de lampen niet altijd aan hoeven te zijn.
       omschrijving: Door het plaatsen van een bewegingssensor op plaatsen waar de terreinverlichting alleen
         aan hoeft te zijn als er mensen aanwezig zijn, staan lampen niet onnodig aan.
@@ -4025,6 +4218,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Terreinverlichting
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang op een lichtmast de armaturen met spaarlampen of gasontladingslampen door LED-armaturen.
       omschrijving: Door op een lichtmast armaturen met spaarlampen of gasontladingslampen te vervangen
         door LED-armaturen wordt het energiegebruik beperkt. De lichtmast blijft behouden.
@@ -4041,6 +4235,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Terreinverlichting
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang bij terreinverlichting zonder mast de armaturen met gasontladingslampen door LED-armaturen.
       omschrijving: Door bij terreinverlichting, die niet op een mast staat, het armatuur met gasontladingslampen
         te vervangen door LED-armaturen wordt het energiegebruik beperkt.
@@ -4055,6 +4250,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas virtualisatie en consolidatie toe bij servers.
       omschrijving: Door middel van virtualisatie en consolidatie (het intern of extern samenvoegen van
         werklast) wordt het aantal in gebruik zijnde servers teruggebracht.
@@ -4075,6 +4271,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Stel geautomatiseerd energiebeheer in op servers
       omschrijving: Door het instellen van geautomatiseerd energiebeheer (power management) past de server
         zijn energiegebruik aan op de actuele vraag naar verwerkingscapaciteit. Het afstemmen kan door
@@ -4094,6 +4291,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Neem een laagbelaste Uninterrupted Power Supply (UPS) uit bedrijf.
       omschrijving: Door de belasting van UPS-en (Batterijen) te optimaliseren kan een maximale conversie
         efficiëntie worden bereikt. Door het uit bedrijf nemen van laagbelaste UPS-en (<30%) en/of het
@@ -4118,6 +4316,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een buitenluchtklep toe voor koeling van de serverruimte.
       omschrijving: Bij kleine serverruimtes die grenzen aan de buitenlucht kan een geautomatiseerde buitenluchtklep
         een effectieve maatregel zijn. Door het toepassen van een buitenluchtklep met sensoren voor luchtvochtigheid
@@ -4145,6 +4344,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een energiezuinige koelinstallatie toe voor de koeling van serverruimten.
       omschrijving: Vervang bestaande directe expansie koelinstallaties door nieuwe efficiëntere koelinstallaties.
         Door lagere condensatietemperaturen in tussenseizoen en winter verbetert de efficiëntie substantieel
@@ -4165,6 +4365,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Serverruimte
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Breng een scheiding aan tussen de koude aanvoerlucht en de warme afvoerlucht in de datazaal.
       omschrijving: Door het aanbrengen van gangafdekking, deuren en blindplaten worden koude en warme
         compartimenten gecreëerd. Dat voorkomt vermenging van koude aanvoerlucht waarmee de apparatuur
@@ -4180,6 +4381,7 @@ properties:
       onderdeel: Faciliteiten
       categorie: Zonnepanelen
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Plaats zonnepanelen op het dak.
       omschrijving: Door de plaatsing van zonnepanelen wordt duurzame elektriciteit opgewekt. Daarmee
         wordt bespaard op de inkoop van elektriciteit via het elektriciteitsnet.
@@ -4215,6 +4417,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Energiebeheersysteem
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een automatisch energieregistratie- en bewakingssysteem (EBS) met rapportagefunctie toe,
         waarbij gas- en warmte- (per uur) en elektragebruik (per kwartier) van het gebouw wordt geregistreerd.
       omschrijving: Voor het beheren van het gas-, elektriciteits- en warmtegebruik is een automatisch
@@ -4238,6 +4441,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een automatisch sluitmechanisme toe bij overheaddeuren.
       omschrijving: Door het toepassen van een automatisch sluitmechanisme bij een overheaddeur sluit
         deze zodra iemand de deur is gepasseerd. Dit voorkomt warmteverlies, doordat de deur een kortere
@@ -4257,6 +4461,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Isoleer platte daken (onder de dakbedekking).
       omschrijving: Door het aanbrengen van isolatie met een Rd-waarde van ten minste 3,7 m²K/W op ongeïsoleerde
         daken wordt het warmteverlies in het stookseizoen beperkt. Breng de isolatie aan onder de dakbedekking
@@ -4278,6 +4483,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang in bestaande kozijnen en ramen het enkelglas door HR++ glas.
       omschrijving: Door in bestaande kozijnen en ramen het enkelglas door HR++-glas te vervangen wordt
         warmteverlies in het stookseizoen beperkt.
@@ -4300,6 +4506,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Gebruik opblaasbare luchtkussens bij een vrachtwagendocking.
       omschrijving: Door een afsluitvoorziening met opblaasbare luchtkussens te plaatsen bij een docking
         voor vrachtwagens wordt het warmteverlies beperkt.
@@ -4320,6 +4527,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Isolatie van de schil
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Plaats een loopdeur in overheaddeuren.
       omschrijving: Door het plaatsen van overheaddeuren met een loopdeur voor personen wordt warmteverlies
         voorkomen, omdat de gehele deur dan minder vaak open gaat.
@@ -4339,6 +4547,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een klokregeling toe en regel deze in.
       omschrijving: Pas voor het centrale verwarmingssysteem een klokregeling of klokthermostaat toe en
         regel deze zo in dat de werkelijke gebruikstijden zo nauw mogelijk worden gevolgd. Dit voorkomt
@@ -4359,6 +4568,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een weersafhankelijke regeling toe.
       omschrijving: Gebruik voor de aanvoertemperatuur van het verwarmingswater een automatische regeling
         op basis van de buitentemperatuur. Hierdoor kan de warmte uit het rookgas teruggewonnen worden
@@ -4380,6 +4590,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Isoleer de verwarmingsleidingen en appendages in niet of beperkt verwarmde ruimtes.
       omschrijving: Door het toepassen van buisisolatie met een Rd-waarde van ten minste 0,5 m²K/W om
         de verwarmingsleidingen en appendages wordt het warmteverlies in niet of beperkt verwarmde ruimtes,
@@ -4398,6 +4609,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Isoleer ventilatiekanalen in onverwarmde ruimtes.
       omschrijving: Door het toepassen van isolatiemateriaal met een Rd-waarde van ten minste 0,7 m²K/W
         om de ventilatiekanalen wordt het warmteverlies in onverwarmde ruimtes beperkt.
@@ -4412,6 +4624,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een individuele regeling van de temperatuur per ruimte toe.
       omschrijving: Door per ruimte een individuele (na)regeling van de temperatuur met een thermostatische
         radiatorkraan of andere temperatuurregeling toe te passen, hoeft deze niet onnodig te worden verwarmd.
@@ -4426,6 +4639,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteverwarming
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas frequentiegeregelde circulatiepompen toe.
       omschrijving: Door toepassing van frequentiegeregelde circulatiepompen in het verwarmingssysteem
         kan het debiet worden aangepast aan de warmtevraag, waardoor de pomp efficienter werkt. Pas de
@@ -4443,6 +4657,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een klokregeling toe op het ventilatiesysteem.
       omschrijving: Door het ventilatiesysteem van een gebouw te voorzien van een klokregeling kan deze
         buiten bedrijfstijden uit of naar een veel lager debiet worden gezet. Er geldt hier een dubbel
@@ -4468,6 +4683,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas warmteterugwinning toe op een ventilatiesysteem met mechanische toevoer en afvoer.
       omschrijving: Door in een ventilatiesysteem met mechanische toevoer en afvoer warmteterugwinning
         met een twincoilsysteem toe te passen worden warmteverliezen door ventilatie beperkt. Er zijn
@@ -4492,6 +4708,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang ventilatoren van klasse IE1 door ventilatoren van klasse IE4 of hoger.
       omschrijving: Door IE1-ventilatoren door ventilatoren van klasse IE4 of hoger te vervangen, neemt
         de efficiëntie van de ventilatie toe. IE staat voor International Efficiency en is een aanduiding
@@ -4513,6 +4730,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang indirect gedreven IE1-slakkenhuisventilatoren door direct gedreven ventilatoren.
       omschrijving: Door in de luchtbehandelingskast (LBK) de ventilatorsectie met indirect gedreven IE1-slakkenhuisventilatoren
         te vervangen door een ventilatorsectie met direct gedreven ventilatoren (plugfans) neemt de efficiëntie
@@ -4534,6 +4752,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang indirect gedreven IE2-slakkenhuisventilatoren door direct gedreven ventilatoren.
       omschrijving: Door in de luchtbehandelingskast (LBK) de ventilatorsectie met indirect gedreven IE2-slakkenhuisventilatoren
         te vervangen door een ventilatorsectie met direct gedreven ventilatoren (plugfans) wordt de efficiëntie
@@ -4555,6 +4774,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang indirect gedreven IE3 slakkenhuisventilatoren door direct gedreven ventilatoren.
       omschrijving: Door in de luchtbehandelingskast (LBK) de ventilatorsectie met indirect gedreven IE3-slakkenhuisventilatoren
         te vervangen door een ventilatorsectie met direct gedreven ventilatoren (plugfans) wordt de efficientie
@@ -4576,6 +4796,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Ruimteventilatie
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang ventilatoren van klasse IE2 of IE3 door ventilatoren van klasse IE4 of hoger.
       omschrijving: Door IE2 of IE3-ventilatoren door ventilatoren van klasse IE4 of hoger te vervangen,
         neemt de efficiëntie van de ventilatie toe. IE staat voor International Efficiency en is een aanduiding
@@ -4594,6 +4815,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Warm tapwater
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Isoleer warmwaterleidingen en appendages.
       omschrijving: |-
         Met het aanbrengen van isolatie met een Rd-waarde van ten minste 0,5 m²K/W rondom de circulatieleidingen en appendages van het warme tapwater wordt warmteverlies tegengegaan.
@@ -4612,6 +4834,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Warm tapwater
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Gebruik waterbesparende douchekoppen.
       omschrijving: Door in douches waterbesparende douchekoppen toe te passen wordt er minder warm tapwater
         gebruikt.
@@ -4634,6 +4857,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Warm tapwater
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang bij een indirect verwarmd voorraadvat de bestaande ketel door een HR-ketel.
       omschrijving: Door in een warm tapwatersysteem met een indirect verwarmd voorraadvat een hoogrendementsketel
         (HR) toe te passen in plaats van een verbeterd rendementsketel of conventionele ketel wordt het
@@ -4653,6 +4877,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Pas een regeling toe op de verlichting, zodat deze buiten gebruikstijden niet onnodig brandt.
       omschrijving: Door gebruik van een regeling wordt het onnodig branden van verlichting buiten gebruikstijden
         voorkomen. Er zijn diverse regelingen die hiervoor kunnen worden toegepast, zoals aanwezigheidsdetectie
@@ -4668,6 +4893,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang TL8-buizen door LED-buizen.
       omschrijving: Door het vervangen van TL-buizen (TL8) in de armaturen door LED-buizen wordt het energiegebruik
         beperkt. Het wisselen van de buizen door LED-buizen met een vergelijkbare lichtopbrengst en lichtkleur
@@ -4690,6 +4916,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang TL5-fluorescentiebuizen door LED-buizen.
       omschrijving: Door het vervangen van TL5-buizen in de armaturen door LED-buizen wordt het energiegebruik
         beperkt. Het wisselen van de buizen door LED-buizen met een vergelijkbare lichtopbrengst en lichtkleur
@@ -4712,6 +4939,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang gloei-, halogeen- en spaarlampen door LED-lampen.
       omschrijving: Door gloei-, halogeen- en spaarlampen in de bestaande armaturen te vervangen door
         LED-lampen wordt het energiegebruik beperkt.
@@ -4734,6 +4962,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang gasontladingslampen door LED-lampen.
       omschrijving: Vervang gasontladingslampen in de armaturen door LED-lampen. Dit beperkt het energiegebruik.
       uitgangssituatie: 'Er zijn armaturen met één van de volgende gasontladingslampen aanwezig: kwiklampen,
@@ -4756,6 +4985,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang montagebalken en lichtlijnen met TL8-buizen door LED-armaturen.
       omschrijving: Door bij montagebalken en lichtlijnen de armaturen met TL8-buizen te vervangen door
         LED-armaturen wordt het energiegebruik beperkt.
@@ -4773,6 +5003,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang plafondspots met spaarlampen door LED-spots.
       omschrijving: Door plafondspots met spaarlampen (CFL of PL) te vervangen door spots met LED-verlichting
         wordt het energiegebruik beperkt.
@@ -4789,6 +5020,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang wandarmaturen met spaarlampen door LED-wandarmaturen.
       omschrijving: Door wandarmaturen met spaarlampen te vervangen door LED-wandarmaturen wordt het energiegebruik
         beperkt.
@@ -4805,6 +5037,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang wandarmaturen met halogeenlampen door LED-wandarmaturen.
       omschrijving: Door wandarmaturen met halogeenlampen te vervangen door LED-wandarmaturen wordt het
         energiegebruik beperkt.
@@ -4821,6 +5054,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang spots met halogeenlampen door LED-spots.
       omschrijving: Door spots met halogeenlampen te vervangen door spots met LED-verlichting wordt het
         energiegebruik beperkt.
@@ -4837,6 +5071,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang railspots met halogeenlampen door LED-railspots.
       omschrijving: Door railspotarmaturen met halogeenlampen te vervangen door LED-railspots wordt het
         energiegebruik beperkt. De bestaande spanningsrail/contactrail blijft bewaard.
@@ -4855,6 +5090,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang railspots met gasontladingslampen door LED-railspots.
       omschrijving: Door railspots met gasontladingslampen te vervangen door LED-railspots wordt het energiegebruik
         beperkt. De bestaande spanningsrail/contactrail blijft bewaard.
@@ -4877,6 +5113,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang pendelarmaturen en opbouwarmaturen met gasontladingslampen door LED-armaturen.
       omschrijving: Door pendelarmaturen en opbouwarmaturen ("high bay") met gasontladingslampen te vervangen
         door LED-armaturen wordt het energiegebruik beperkt.
@@ -4891,6 +5128,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang ingebouwde plafondarmaturen met TL8-buizen door LED-armaturen.
       omschrijving: Door de ingebouwde plafondarmaturen met TL8-buizen te vervangen door LED-armaturen
         wordt het energiegebruik beperkt.
@@ -4904,6 +5142,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Binnenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang vluchtwegsignaleringsarmaturen met TL-buizen of spaarlampen door LED-armaturen.
       omschrijving: Door vluchtwegsignaleringsarmaturen met TL-buizen of spaarlampen te vervangen door
         vluchtwegsignaleringsarmaturen met LED-verlichting wordt het energiegebruik beperkt.
@@ -4916,6 +5155,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Buitenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang armaturen met TL8-buizen door LED-armaturen.
       omschrijving: Door ingebouwde en opgebouwde armaturen met TL8-buizen (die niet op een mast zitten)
         te vervangen door LED-armaturen wordt het energiegebruik verlaagd.
@@ -4929,6 +5169,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Buitenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang wandarmaturen met halogeenlampen door LED-armaturen.
       omschrijving: Door wandarmaturen met halogeenlampen te vervangen door LED-armaturen, wordt het energiegebruik
         beperkt.
@@ -4942,6 +5183,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Buitenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang wandarmaturen met spaarlampen door LED-armaturen.
       omschrijving: Door wandarmaturen met spaarlampen te vervangen door LED-armaturen, wordt het energiegebruik
         beperkt.
@@ -4955,6 +5197,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Buitenverlichting
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang armaturen met gasontladingslampen door LED-armaturen.
       omschrijving: Door ingebouwde en opgebouwde armaturen (die niet op een mast zitten) met gasontladingslampen
         (Kwiklampenkwiklampen, SON, HPL, HQL of HPI) door LED-armaturen te vervangen, wordt het energiegebruik
@@ -4970,6 +5213,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Zonnepanelen
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Plaats zonnepanelen op het dak.
       omschrijving: Door de plaatsing van zonnepanelen wordt duurzame elektriciteit opgewekt. Daarmee
         wordt bespaard op de inkoop van elektriciteit via het elektriciteitsnet.
@@ -5005,6 +5249,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Tuinbouwkassen
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Breng beweegbare gevelschermen aan, aan de binnenzijde van de lichtdoorlatende tuinbouwkas.
       omschrijving: Door het aanbrengen van gevelschermen kan het warmteverlies via de gevel worden beperkt.
         Dit betreft transparante (niet verduisterende) doeken in kassen ter plaatse van de buitengevels.
@@ -5038,6 +5283,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Tuinbouwkassen
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Vervang de kasgevel met enkel glas door een gevel met kanaalplaten.
       omschrijving: Door enkel glas in de gevels te vervangen door kunststof kanaalplaten wordt warmteverlies
         via de kasgevels beperkt en is er minder energie nodig om de kas warm te houden. Indien er kunststof
@@ -5067,6 +5313,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Tuinbouwkassen
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Maak gebruik van een extern CO2-netwerk voor CO2-dosering in de kas.
       omschrijving: Door aansluiting op een extern CO2-netwerk is het niet meer nodig om de ketel aan
         te zetten om CO2 te produceren. Het gaat hier om die momenten dat wél CO2 nodig is, maar geen
@@ -5096,6 +5343,7 @@ properties:
       onderdeel: Gebouwen
       categorie: Tuinbouwkassen
       bijlage: XIVa
+      grondslag: artikel 3.84, vijfde lid, Besluit bouwwerken leefomgeving
       naam: Installeer een tweede warmtewisselaar in het rookgaskanaal van de verwarmingsketel.
       omschrijving: Door het installeren van een extra warmtewisselaar in het rookgaskanaal wordt er meer
         warmte benut uit dezelfde m³ gas. De warmtewisselaar zorgt ervoor dat energie wordt teruggewonnen
@@ -5124,6 +5372,7 @@ properties:
       onderdeel: Processen
       categorie: Drogen
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas vermogensregeling toe op de ventilatietoevoer naar de droogkamer.
       omschrijving: Door het toepassen van toerenregeling of andere vermogensregeling op de ventilatietoevoer
         naar de droogkamer kan het ventileren worden beperkt. Hierdoor neemt het energiegebruik van de
@@ -5147,6 +5396,7 @@ properties:
       onderdeel: Processen
       categorie: Drogen
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een vochtsensor inclusief regeling toe in de uittredelucht van droogprocessen.
       omschrijving: |-
         Door toepassing van een vochtsensor, inclusief regeling op basis van het vochtgehalte van de uittredelucht, kan het recirculatiedebiet van de drooglucht worden verhoogd. Dat zorgt voor energiebesparing door de vermindering van verse luchttoevoer op lage temperatuur.
@@ -5169,6 +5419,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Optimaliseer de procesparameters van procesapparatuur.
       omschrijving: Bepaal de optimale procesparameters zoals opwarmtijd, koeltijd, draaiuren, druk en
         temperatuur van de procesapparatuur en regel deze in, zodat er minimaal energiegebruik is met
@@ -5188,6 +5439,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een hoogfrequente HR-lader toe voor het opladen van tractiebatterijen.
       omschrijving: Door de toepassing van een hoogfrequente HR-lader voor het opladen van tractiebatterijen
         neemt de efficiëntie van het oplaadproces fors toe. Tractiebatterijen worden gebruikt in voertuigen
@@ -5207,6 +5459,7 @@ properties:
       onderdeel: Processen
       categorie: Procesapparatuur
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang aanwezige verlichting op of nabij procesapparatuur door LED-verlichting.
       omschrijving: Door het vervangen van TL-buizen (TL8), spaar-, halogeen- of gasontladingslampen door
         LED-lampen wordt het energiegebruik van de verlichting beperkt.
@@ -5227,6 +5480,7 @@ properties:
       onderdeel: Processen
       categorie: Proceswarmte
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer warme productleidingen en appendages.
       omschrijving: Door het aanbrengen van isolatiemateriaal met een Rd-waarde van minimaal 1,5 m²K/W
         om leidingen en appendages waarin warme producten worden verplaatst wordt het warmteverlies beperkt.
@@ -5242,6 +5496,7 @@ properties:
       onderdeel: Processen
       categorie: Glastuinbouw
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas meerdere schakelgroepen toe bij de groeibelichting in de kas.
       omschrijving: Het kan voorkomen dat niet alle delen van de kas volgens hetzelfde regime belicht
         hoeven te worden. Door toepassing van schakelgroepen wordt voorkomen dat in sommige delen van
@@ -5263,6 +5518,7 @@ properties:
       onderdeel: Processen
       categorie: Glastuinbouw
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een set van meerdere en specifieke sensoren toe in een kasafdeling voor een betere beheersing
         van het binnenklimaat.
       omschrijving: Door de plaatsing van een mobiele set sensoren in een kasafdeling,  kan met name de
@@ -5286,6 +5542,7 @@ properties:
       onderdeel: Processen
       categorie: Glastuinbouw
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Pas een frequentieregeling toe op de circulatiepompen van de CV-installatie van de kas.
       omschrijving: Door het toepassen van een frequentieregelaar op de circulatiepomp(en) van het verwarmingssysteem
         van de kas, kan het debiet van de pomp(en) worden aangepast aan de warmtevraag. De pomp werkt
@@ -5312,6 +5569,7 @@ properties:
       onderdeel: Processen
       categorie: Glastuinbouw
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Breng een horizontaal transparant beweegbaar energiescherm in de kas aan als tweede scherm.
       omschrijving: Door het aanbrengen van een transparant tweede energiescherm wordt het warmteverlies
         via het kasdek beperkt en is er minder energie nodig om de kas warm te houden. Het scherm moet
@@ -5346,6 +5604,7 @@ properties:
       onderdeel: Processen
       categorie: Glastuinbouw
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Isoleer de verwarmingsleidingen en appendages op plekken waar warmte niet nodig is.
       omschrijving: Door het toepassen van isolatiemateriaal met een Rd-waarde van ten minste 0,5 m2K/W
         om de verwarmingsleidingen en appendages wordt het warmteverlies beperkt op plekken in de kas
@@ -5367,6 +5626,7 @@ properties:
       onderdeel: Processen
       categorie: Glastuinbouw
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang bij de groeibelichting SON-T armaturen door LED-armaturen.
       omschrijving: LED-lampen hebben een hogere lichtopbrengst per Watt dan SON-T lampen. Het energiegebruik
         van LED-lampen is daardoor lager dan van SON-T lampen bij een gelijk aantal branduren. Bovendien
@@ -5388,6 +5648,7 @@ properties:
       onderdeel: Processen
       categorie: Glastuinbouw
       bijlage: VIIaa
+      grondslag: artikel 5.15, vierde lid, Besluit activiteiten leefomgeving
       naam: Vervang circulatieventilatoren van klasse IE2 of lager door gelijkstroom circulatieventilatoren.
       omschrijving: In de glastuinbouw wordt gebruik gemaakt van serieventilatoren om de temperatuur in
         de kas homogeen te krijgen. Dit zijn ventilatoren die zorgen voor een horizontale luchtstroom
@@ -5547,7 +5808,7 @@ actions:
     law: Omgevingsregeling
     bwb_id: BWBR0045528
     article: '4.14'
-    url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Artikel4.14
+    url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Hoofdstuk4_Afdeling4.4_Artikel4.14
     juriconnect: jci1.3:c:BWBR0045528&artikel=4.14&lid=2&z=2024-01-01&g=2024-01-01
     explanation: Artikel 4.14, tweede lid, en artikel 5.29, tweede lid, van de Omgevingsregeling wijzen
       de glastuinbouwbijlagen aan bij een activiteit als bedoeld in artikel 3.205 van het Besluit activiteiten
@@ -5565,7 +5826,7 @@ actions:
     law: Omgevingsregeling
     bwb_id: BWBR0045528
     article: '4.14'
-    url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Artikel4.14
+    url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Hoofdstuk4_Afdeling4.4_Artikel4.14
     juriconnect: jci1.3:c:BWBR0045528&artikel=4.14&z=2024-01-01&g=2024-01-01
     explanation: Bijlage VII geldt, tenzij de aanwijzing van het tweede lid opgaat; dan geldt bijlage
       VIIaa.
@@ -5579,7 +5840,7 @@ actions:
     law: Omgevingsregeling
     bwb_id: BWBR0045528
     article: '5.29'
-    url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Artikel5.29
+    url: https://wetten.overheid.nl/BWBR0045528/2024-01-01#Hoofdstuk5_Afdeling5.1_Paragraaf5.1.4_Artikel5.29
     juriconnect: jci1.3:c:BWBR0045528&artikel=5.29&z=2024-01-01&g=2024-01-01
     explanation: Bijlage XIV geldt, tenzij de aanwijzing van het tweede lid opgaat; dan geldt bijlage
       XIVa.
@@ -5600,7 +5861,7 @@ actions:
     law: Besluit activiteiten leefomgeving
     bwb_id: BWBR0041330
     article: '5.15'
-    url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Artikel5.15
+    url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
     juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=4&z=2024-01-01&g=2024-01-01
     explanation: 'Uit de voor het bedrijf geldende bijlagen worden de maatregelen genomen in de categorieen
       die bij het bedrijf voorkomen. De randvoorwaarden blijven bij de maatregel staan: de bijlage wijst
@@ -5613,7 +5874,7 @@ actions:
     law: Besluit activiteiten leefomgeving
     bwb_id: BWBR0041330
     article: '5.15'
-    url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Artikel5.15
+    url: https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15
     juriconnect: jci1.3:c:BWBR0041330&artikel=5.15&lid=4&z=2024-01-01&g=2024-01-01
     explanation: Telling van de aangewezen maatregelen die in de aanwezige categorieen vallen.
     paragraph: '4'
