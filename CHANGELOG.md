@@ -2,6 +2,78 @@
 
 <!-- version list -->
 
+## v2.0.0 (2026-08-17)
+
+### Bug Fixes
+
+- Delete python script to generate eml law
+  ([#507](https://github.com/MinBZK/poc-machine-law/pull/507),
+  [`2b2f564`](https://github.com/MinBZK/poc-machine-law/commit/2b2f56400337393c2d24de1dcad996fcbbde9a14))
+
+- Revert openpyxl ([#507](https://github.com/MinBZK/poc-machine-law/pull/507),
+  [`2b2f564`](https://github.com/MinBZK/poc-machine-law/commit/2b2f56400337393c2d24de1dcad996fcbbde9a14))
+
+- **laws**: Geverifieerde wetsankers en de juiste grondslag per maatregel
+  ([#507](https://github.com/MinBZK/poc-machine-law/pull/507),
+  [`2b2f564`](https://github.com/MinBZK/poc-machine-law/commit/2b2f56400337393c2d24de1dcad996fcbbde9a14))
+
+- **laws**: Valid_from als datum, anders weigert de engine de EML-wet
+  ([#507](https://github.com/MinBZK/poc-machine-law/pull/507),
+  [`2b2f564`](https://github.com/MinBZK/poc-machine-law/commit/2b2f56400337393c2d24de1dcad996fcbbde9a14))
+
+### Chores
+
+- Raise the Dependabot cooldown to five days
+  ([#500](https://github.com/MinBZK/poc-machine-law/pull/500),
+  [`f09966f`](https://github.com/MinBZK/poc-machine-law/commit/f09966f8c57a9178d7787c6e34f28cc409ad1285))
+
+- Sync VERSION file to 1.13.0
+  ([`5eaf911`](https://github.com/MinBZK/poc-machine-law/commit/5eaf91162cfdb01d79f2b637d337119843639d21))
+
+- Uv.lock gelijktrekken met main ([#507](https://github.com/MinBZK/poc-machine-law/pull/507),
+  [`2b2f564`](https://github.com/MinBZK/poc-machine-law/commit/2b2f56400337393c2d24de1dcad996fcbbde9a14))
+
+### Continuous Integration
+
+- Geef de testworkflows een read-only token
+  ([#504](https://github.com/MinBZK/poc-machine-law/pull/504),
+  [`ddfe1fd`](https://github.com/MinBZK/poc-machine-law/commit/ddfe1fdbb2930cb5e6bebf36af0966081e2a3c21))
+
+- Houd het token helemaal van schijf in version-bump
+  ([#503](https://github.com/MinBZK/poc-machine-law/pull/503),
+  [`5ba830b`](https://github.com/MinBZK/poc-machine-law/commit/5ba830b69c67049b723cfd6fb6715a9950669b3d))
+
+- Houd VERSION_BUMP_TOKEN weg bij de pip install
+  ([#503](https://github.com/MinBZK/poc-machine-law/pull/503),
+  [`5ba830b`](https://github.com/MinBZK/poc-machine-law/commit/5ba830b69c67049b723cfd6fb6715a9950669b3d))
+
+- Install node dependencies with --ignore-scripts
+  ([#501](https://github.com/MinBZK/poc-machine-law/pull/501),
+  [`7bdecd7`](https://github.com/MinBZK/poc-machine-law/commit/7bdecd76d61689816d36925d4e8ea2b024cc23a2))
+
+- Maak de toelichting bij de permissions-blokken kloppend
+  ([#504](https://github.com/MinBZK/poc-machine-law/pull/504),
+  [`ddfe1fd`](https://github.com/MinBZK/poc-machine-law/commit/ddfe1fdbb2930cb5e6bebf36af0966081e2a3c21))
+
+- Pin pnpm and freeze the lockfiles in the Docker build
+  ([#501](https://github.com/MinBZK/poc-machine-law/pull/501),
+  [`7bdecd7`](https://github.com/MinBZK/poc-machine-law/commit/7bdecd76d61689816d36925d4e8ea2b024cc23a2))
+
+### Features
+
+- EML 2023 volledig en sectorbewust uit de Omgevingsregeling
+  ([#507](https://github.com/MinBZK/poc-machine-law/pull/507),
+  [`2b2f564`](https://github.com/MinBZK/poc-machine-law/commit/2b2f56400337393c2d24de1dcad996fcbbde9a14))
+
+### Breaking Changes
+
+- De outputs eml_gc1_van_toepassing tot en met eml_gd1_van_toepassing zijn vervangen door
+  maatregelen, aantal_maatregelen, is_glastuinbouwsector, bijlage_milieubelastende_activiteiten en
+  bijlage_gebouwen. De parameters HEEFT_KOELINSTALLATIE en HEEFT_AFZUIGINSTALLATIE zijn vervangen
+  door AANWEZIGE_CATEGORIEEN, TEELT_GEWASSEN_IN_KAS, TEELT_GEWASSEN_IN_GEBOUW_GEEN_KAS en
+  MAAKT_GEBRUIK_VAN_VERLAAGD_ENERGIEBELASTINGTARIEF.
+
+
 ## v1.13.0 (2026-06-12)
 
 ### Chores
