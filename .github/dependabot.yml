@@ -1,16 +1,36 @@
 version: 2
+
+# Cooldown: a release has to be five days old before Dependabot opens a version
+# update for it. Dependabot's own default has been three days since 2026-07-14;
+# raising it here also records the choice, so a future change to that default
+# cannot silently shrink the window.
+#
+# Five days is measured against how fast the registry compromises of the past
+# year surfaced - chalk/debug, shai-hulud, and the keyv/cacheable maintainer
+# hijack of 2026-08-04 were all detected within hours to days. Those are all
+# npm incidents; the same window is applied to the other ecosystems here for
+# consistency rather than from separate evidence. With `interval: weekly` the
+# practical delay is "at least five days, at most until the next weekly run".
+#
+# This applies to version updates only. Dependabot *security* updates are
+# exempt from cooldown and keep opening immediately, so advisory fixes are not
+# delayed by this.
 updates:
   # Docker
   - package-ecosystem: docker
     directory: "/"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
 
   # GitHub Actions
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
     groups:
       actions:
         patterns:
@@ -21,6 +41,8 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
     groups:
       python-minor-patch:
         update-types:
@@ -35,6 +57,8 @@ updates:
     directory: "/features"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
     groups:
       go-deps:
         patterns:
@@ -43,6 +67,8 @@ updates:
     directory: "/lac-to-regelspraak"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
     groups:
       go-deps:
         patterns:
@@ -51,6 +77,8 @@ updates:
     directory: "/machinev2/backend"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
     groups:
       go-deps:
         patterns:
@@ -59,6 +87,8 @@ updates:
     directory: "/machinev2/machine"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
     groups:
       go-deps:
         patterns:
@@ -67,6 +97,8 @@ updates:
     directory: "/simulator"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
     groups:
       go-deps:
         patterns:
@@ -77,6 +109,8 @@ updates:
     directory: "/analysis/graph"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
     groups:
       npm-minor-patch:
         update-types:
@@ -86,6 +120,8 @@ updates:
     directory: "/analysis/laws"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
     groups:
       npm-minor-patch:
         update-types:
@@ -95,6 +131,8 @@ updates:
     directory: "/importer"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
     groups:
       npm-minor-patch:
         update-types:

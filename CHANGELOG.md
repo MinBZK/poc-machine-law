@@ -2,6 +2,49 @@
 
 <!-- version list -->
 
+## v1.13.0 (2026-06-12)
+
+### Chores
+
+- Pre-commit autoupdate ([#396](https://github.com/MinBZK/poc-machine-law/pull/396),
+  [`92091b7`](https://github.com/MinBZK/poc-machine-law/commit/92091b7a93bb4728b67e0606006a9494a6cebe14))
+
+- Sync VERSION file to 1.12.2
+  ([`1894796`](https://github.com/MinBZK/poc-machine-law/commit/18947969b6cbb24a0c97b823e1061a97ae093413))
+
+- **deps**: Bump golang.org/x/text ([#435](https://github.com/MinBZK/poc-machine-law/pull/435),
+  [`478772c`](https://github.com/MinBZK/poc-machine-law/commit/478772c2dd29656816904d5352c8f87ecbcfef40))
+
+- **deps**: Bump the go-deps group across 1 directory with 3 updates
+  ([#436](https://github.com/MinBZK/poc-machine-law/pull/436),
+  [`502bc8e`](https://github.com/MinBZK/poc-machine-law/commit/502bc8e8d4d588c443649606fc7eb99cf23742c4))
+
+- **deps**: Bump the go-deps group across 1 directory with 6 updates
+  ([#437](https://github.com/MinBZK/poc-machine-law/pull/437),
+  [`fac36e3`](https://github.com/MinBZK/poc-machine-law/commit/fac36e31caaa37578de59c6c36a98818fdd28898))
+
+- **deps**: Bump the npm-minor-patch group across 1 directory with 14 updates
+  ([#443](https://github.com/MinBZK/poc-machine-law/pull/443),
+  [`0f716aa`](https://github.com/MinBZK/poc-machine-law/commit/0f716aac2268a77e308d29422184dbed09720c01))
+
+- **deps**: Bump the python-minor-patch group across 1 directory with 20 updates
+  ([#434](https://github.com/MinBZK/poc-machine-law/pull/434),
+  [`cd5f4df`](https://github.com/MinBZK/poc-machine-law/commit/cd5f4dfcd9a329b94cb6d8bafd3741f4ae9a6b97))
+
+- **deps-dev**: Bump the npm-minor-patch group across 1 directory with 13 updates
+  ([#442](https://github.com/MinBZK/poc-machine-law/pull/442),
+  [`524a4c6`](https://github.com/MinBZK/poc-machine-law/commit/524a4c625335e5c44b219ae4df966386281a7104))
+
+- **deps-dev**: Bump the npm-minor-patch group across 1 directory with 13 updates
+  ([#441](https://github.com/MinBZK/poc-machine-law/pull/441),
+  [`025ec50`](https://github.com/MinBZK/poc-machine-law/commit/025ec5048e0ba5d0932c1d9a411b9c01a1698bf7))
+
+### Features
+
+- **laws**: EML 2023 maatregelbepaling (demo-subset, RVO)
+  ([`e597598`](https://github.com/MinBZK/poc-machine-law/commit/e597598bf557765baefa8048a9ffe758babd5683))
+
+
 ## v1.12.2 (2026-04-10)
 
 ### Bug Fixes

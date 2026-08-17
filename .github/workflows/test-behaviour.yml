@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+# These jobs pull in and run third-party code: the Python dependency tree, the
+# Go module tree, and a Playwright browser download. None of it needs a token
+# that can write to this repository.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -58,10 +64,6 @@ jobs:
   go-test-features:
     name: Run Go Features
     runs-on: ubuntu-latest
-    # Add this permissions block
-    permissions:
-      # Set only what you need
-      contents: read
 
     steps:
       - name: Checkout code
@@ -83,10 +85,6 @@ jobs:
   go-test-machinev2:
     name: Run Go Tests
     runs-on: ubuntu-latest
-    # Add this permissions block
-    permissions:
-      # Set only what you need
-      contents: read
 
     steps:
       - name: Checkout code
