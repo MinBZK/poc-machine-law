@@ -247,7 +247,7 @@ properties:
         article: "5.15d"
         url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
         juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
-        explanation: "De volgende rapportagedeadline is 1 december 2027; rapportage vindt elke vier jaar plaats"
+        explanation: "De volgende rapportagedeadline is 1 december 2026; rapportage vindt elke vier jaar plaats"
 
     - name: "rapportage_methode"
       description: "De wijze waarop de rapportage moet worden ingediend"
@@ -285,7 +285,7 @@ properties:
     DREMPEL_ONDERZOEK_ELEKTRICITEIT_KWH: 10000000
     DREMPEL_ONDERZOEK_GAS_M3: 170000
     RAPPORTAGE_FREQUENTIE_JAREN: 4
-    VOLGENDE_DEADLINE: "2027-12-01"
+    VOLGENDE_DEADLINE: "2026-12-01"
     RAPPORTAGE_METHODE: "RVO eLoket (mijn.rvo.nl) met eHerkenning niveau 2+"
 
 variables: []
@@ -386,7 +386,7 @@ actions:
       article: "5.15d"
       url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
       juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
-      explanation: "De volgende rapportagedeadline is 1 december 2027"
+      explanation: "De volgende rapportagedeadline is 1 december 2026"
 
   - output: "rapportage_methode"
     value: "$RAPPORTAGE_METHODE"
