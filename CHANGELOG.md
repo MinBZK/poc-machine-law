@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v2.0.1 (2026-08-24)
+
+### Bug Fixes
+
+- **informatieplicht**: Rapportagedeadline op 1 december 2026 voor het gebruikersonderzoek
+  ([#512](https://github.com/MinBZK/poc-machine-law/pull/512),
+  [`32965f2`](https://github.com/MinBZK/poc-machine-law/commit/32965f2aabf7c3eebd5b8ca98cc2248d9c6c3ada))
+
+### Chores
+
+- Sync VERSION file to 2.0.0
+  ([`0e3ec1b`](https://github.com/MinBZK/poc-machine-law/commit/0e3ec1b31fe9a608d469318c9b882c18a6056404))
+
+
 ## v2.0.0 (2026-08-17)
 
 ### Bug Fixes
