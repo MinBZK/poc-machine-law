@@ -88,16 +88,22 @@ class BracketLearner:
         return prepare_synthesis_data(df)
 
     def _fit_hinge(self, income: np.ndarray, amount: np.ndarray) -> tuple[float, float, float]:
-        """Fit a hinge function: max(0, base - rate * max(0, income - threshold)).
+        """Fit a hinge function, auto-detecting direction.
 
-        Tries a grid of candidate thresholds across the full income range
-        and picks the best (lowest MAE).
-        Returns (base, rate, threshold).
+        For citizen benefits (amount decreases with income):
+            max(0, base - rate * max(0, income - threshold))
+        For business costs (amount increases with income):
+            base + rate * max(0, income - threshold)
+
+        Tries both directions and picks the best (lowest MAE).
+        Returns (base, rate, threshold) where negative rate = increasing costs.
         """
         if len(income) < 5:
             return float(np.mean(amount)), 0.0, 0.0
 
-        # Search thresholds across the full income range (5th to 90th percentile)
+        # Detect direction: positive correlation = costs increase with income
+        correlation = float(np.corrcoef(income, amount)[0, 1]) if len(income) > 2 else 0.0
+
         candidates = np.percentile(income, np.arange(5, 91, 5))
 
         best_mae = float("inf")
@@ -109,22 +115,28 @@ class BracketLearner:
             if above.sum() < 3 or at_or_below.sum() < 3:
                 continue
 
-            # base = average amount at/below threshold
             base = float(np.mean(amount[at_or_below]))
-
-            # rate via least squares: amount_above ≈ base - rate * (income_above - thresh)
             excess = income[above] - thresh
-            decline = base - amount[above]
-            rate = float(np.sum(decline * excess) / np.sum(excess**2)) if np.sum(excess**2) > 0 else 0.0
-            rate = max(0.0, rate)  # rate must be non-negative
 
-            # Evaluate MAE
-            predicted = np.maximum(0.0, base - rate * np.maximum(0.0, income - thresh))
+            if correlation >= 0:
+                # Increasing costs: amount ≈ base + rate * (income - thresh)
+                increase = amount[above] - base
+                rate = float(np.sum(increase * excess) / np.sum(excess**2)) if np.sum(excess**2) > 0 else 0.0
+                rate = max(0.0, rate)
+                predicted = base + rate * np.maximum(0.0, income - thresh)
+            else:
+                # Declining benefits: amount ≈ base - rate * (income - thresh)
+                decline = base - amount[above]
+                rate = float(np.sum(decline * excess) / np.sum(excess**2)) if np.sum(excess**2) > 0 else 0.0
+                rate = max(0.0, rate)
+                predicted = np.maximum(0.0, base - rate * np.maximum(0.0, income - thresh))
+
             mae = float(np.mean(np.abs(amount - predicted)))
 
             if mae < best_mae:
                 best_mae = mae
-                best_params = (base, rate, thresh)
+                # Store negative rate for increasing costs so _compute_boundary_amounts works
+                best_params = (base, -rate if correlation >= 0 else rate, thresh)
 
         return best_params
 
@@ -339,15 +351,20 @@ class BracketLearner:
         )
 
     def _compute_boundary_amounts(self, income: np.ndarray, amount: np.ndarray, boundaries: list[float]) -> list[float]:
-        """Compute the benefit amount at each bracket boundary.
+        """Compute the amount at each bracket boundary.
 
-        Uses a hinge function: max(0, base - rate * max(0, income - threshold)).
-        This produces a monotonically declining benefit curve which is the
-        natural shape for most social benefits (full amount below threshold,
-        declining above).
+        Uses a hinge function fitted by _fit_hinge. Direction is encoded in rate sign:
+        - Positive rate: declining benefits: max(0, base - rate * max(0, x - threshold))
+        - Negative rate: increasing costs: base + |rate| * max(0, x - threshold)
         """
         base, rate, threshold = self._fit_hinge(income, amount)
-        return [self._round_amount(max(0.0, base - rate * max(0.0, b - threshold))) for b in boundaries]
+        if rate < 0:
+            # Increasing costs
+            abs_rate = abs(rate)
+            return [self._round_amount(base + abs_rate * max(0.0, b - threshold)) for b in boundaries]
+        else:
+            # Declining benefits
+            return [self._round_amount(max(0.0, base - rate * max(0.0, b - threshold))) for b in boundaries]
 
     def _round_amount(self, val: float) -> float:
         return round(val / self.config.rounding_amount) * self.config.rounding_amount
