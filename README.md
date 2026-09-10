@@ -4,12 +4,22 @@
 # RegelRecht PoC
 *Van wet naar digitale werking*
 
+> **Deze repository wordt binnenkort gearchiveerd.**
+> De code blijft leesbaar beschikbaar, maar er worden geen wijzigingen meer
+> doorgevoerd. Openstaande pull requests en issues worden gesloten en
+> Dependabot version updates zijn uitgezet.
+>
+> Een nieuwe versie van de demo wordt ontwikkeld op
+> [demo.regelrecht.rijks.app](https://demo.regelrecht.rijks.app/).
+> Het bredere werk gaat verder in het
+> [RegelRecht Ecosysteem](https://regelrecht.rijks.app/).
+
 > **Note**: Dit project is nu de Proof of Concept voor **RegelRecht**.
 > Voorheen bekend als PoC Machine Law, Machine Law, Van wet naar werking, Van wet naar digitale werking, Project Zonder Naam, en Law as Code.
 
 > Een proof-of-concept voor het uitvoeren van machine-leesbare specificaties van Nederlandse wet- en regelgeving.
 
-Deze PoC is onderdeel van het **[RegelRecht Ecosysteem](https://minbzk.github.io/regelrecht/)**.
+Deze PoC is onderdeel van het **[RegelRecht Ecosysteem](https://regelrecht.rijks.app/)**.
 
 
 ## 💡 Motivatie
