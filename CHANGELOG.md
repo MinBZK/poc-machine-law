@@ -2,6 +2,42 @@
 
 <!-- version list -->
 
+## v2.1.0 (2026-09-13)
+
+### Chores
+
+- Bereid archivering voor (Dependabot uit, notitie in README)
+  ([#520](https://github.com/MinBZK/poc-machine-law/pull/520),
+  [`352a245`](https://github.com/MinBZK/poc-machine-law/commit/352a245139a40f6af10c8432031950c3960a6d70))
+
+- Schakel Dependabot version updates uit
+  ([#520](https://github.com/MinBZK/poc-machine-law/pull/520),
+  [`352a245`](https://github.com/MinBZK/poc-machine-law/commit/352a245139a40f6af10c8432031950c3960a6d70))
+
+- Sync VERSION file to 2.0.1
+  ([`0c61ee0`](https://github.com/MinBZK/poc-machine-law/commit/0c61ee0a7cd319d4d56211a7237f7917bc8b96cb))
+
+### Documentation
+
+- Kondig archivering van de repository aan in README
+  ([#520](https://github.com/MinBZK/poc-machine-law/pull/520),
+  [`352a245`](https://github.com/MinBZK/poc-machine-law/commit/352a245139a40f6af10c8432031950c3960a6d70))
+
+- Verwijs naar demo en nieuwe ecosysteem-URL in archiveringsnotitie
+  ([#520](https://github.com/MinBZK/poc-machine-law/pull/520),
+  [`352a245`](https://github.com/MinBZK/poc-machine-law/commit/352a245139a40f6af10c8432031950c3960a6d70))
+
+- Verwijs naar nieuwe omgeving in archiveringsnotitie
+  ([#520](https://github.com/MinBZK/poc-machine-law/pull/520),
+  [`352a245`](https://github.com/MinBZK/poc-machine-law/commit/352a245139a40f6af10c8432031950c3960a6d70))
+
+### Features
+
+- Toon verhuisbericht naar demo.regelrecht.rijks.app
+  ([#521](https://github.com/MinBZK/poc-machine-law/pull/521),
+  [`e92099d`](https://github.com/MinBZK/poc-machine-law/commit/e92099d03db7ed72ac6ca5cbf6cbce49e492a9e5))
+
+
 ## v2.0.1 (2026-08-24)
 
 ### Bug Fixes
