@@ -60,6 +60,7 @@ DEMO_PROFILES: dict[str, dict] = {
                 "verordening_precariobelasting",
             ],
             "KVK": ["handelsregisterwet/jaarrekening"],
+            "DOUANE": ["wet_op_de_accijns/accijnsplicht_alcohol"],
             "NVWA": ["warenwet/haccp", "warenwet/meldplicht"],
             "PENSIOENFONDS": ["pensioenwet"],
             "RVO": [
@@ -91,6 +92,13 @@ DEMO_PROFILES: dict[str, dict] = {
                 "law": "verordening_precariobelasting",
                 "service": "GEMEENTE_ROTTERDAM",
             },
+            {
+                "id": "law-tab-2",
+                "path": "wet_op_de_accijns/accijnsplicht_alcohol/DOUANE-2024-01-01",
+                "name": "Accijns alcohol",
+                "law": "wet_op_de_accijns/accijnsplicht_alcohol",
+                "service": "DOUANE",
+            },
         ],
         "zaaksysteem_service": "GEMEENTE_ROTTERDAM",
         "portal_tab_label": "Overheid.nl",
@@ -105,9 +113,10 @@ DEMO_PROFILES: dict[str, dict] = {
             "HARMONIZE": True,
             "SIMULATION": False,
         },
-        # Wetten tab sidebar: only precariobelasting
+        # Wetten tab sidebar
         "sidebar_laws": [
             "verordening_precariobelasting/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01",
+            "wet_op_de_accijns/accijnsplicht_alcohol/DOUANE-2024-01-01",
         ],
         # Graaf analyse: no whitelist = show all non-hidden laws
         "graph_laws": None,
@@ -121,6 +130,7 @@ DEMO_PROFILES: dict[str, dict] = {
             "9c4e8f2a-7d3b-4e1f-8a5c-6f9d2e3a7b4c",  # BAG register
             "8b59ef92-03f8-4294-bce9-4eaac01ba0ed",  # Bepalen ondernemerschap
             "1b3c8d9e-5f2a-4c7b-8e1d-9a2b3c4d5e6f",  # Bedrijfsgegevens organisatie
+            "d4e8f2a1-7c3b-4a9e-b5d1-6f8e2c4a3b7d",  # Accijnsplicht alcohol (Douane)
         ],
         # Laws disabled for the portal tab (feature flags)
         "disabled_laws": {
@@ -128,6 +138,8 @@ DEMO_PROFILES: dict[str, dict] = {
             "DUO": ["wet_studiefinanciering"],
             "GEMEENTE_AMSTERDAM": ["participatiewet/bijstand"],
             "KIESRAAD": ["kieswet"],
+            "KVK": ["handelsregisterwet/jaarrekening"],
+            "NVWA": ["warenwet/haccp", "warenwet/meldplicht"],
             "PENSIOENFONDS": ["pensioenwet"],
             "RVO": ["omgevingswet/werkgebonden_personenmobiliteit"],
             "SVB": [

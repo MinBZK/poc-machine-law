@@ -38,6 +38,11 @@ def prepare_synthesis_data(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series, p
         X["housing_type_rent"] = (X["housing_type"] == "rent").astype(int)
         X = X.drop(columns=["housing_type"])
 
+    # Drop type_alcohol_product string column — too granular for harmonisation;
+    # the binary produceert_alcohol already captures the key distinction.
+    if "type_alcohol_product" in X.columns:
+        X = X.drop(columns=["type_alcohol_product"])
+
     if "childcare_type" in X.columns:
         X["childcare_type"] = X["childcare_type"].fillna("none")
         X["childcare_type_dagopvang"] = (X["childcare_type"] == "dagopvang").astype(int)
@@ -58,6 +63,7 @@ def prepare_synthesis_data(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series, p
         "rechtsvorm_vereist_jaarrekening",
         "heeft_actief_incident",
         "has_terrace",
+        "produceert_alcohol",
     ]:
         if col in X.columns:
             X[col] = X[col].astype(int)
