@@ -25,7 +25,7 @@
             {% if display_value is boolean %}
                 {{ 'Ja' if display_value else 'Nee' }}
             {% elif display_value is number %}
-                {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
+                {% if node.details and node.details.type == "amount" and node.details.type_spec and node.details.type_spec.unit == "eurocent" %}
                     {{ (display_value / 100) | format_currency }}
                 {% elif display_value % 1 != 0 %}
                     {{ '%.5f'|format(display_value) }}
@@ -59,7 +59,7 @@
                                 <span class="text-gray-400 mt-0.5">•</span>
                                 <span class="flex-1">
                                     {% for key, val in item.items() %}
-                                        {% if key|lower not in ['bsn', 'kind_bsn'] and val is not none %}
+                                        {% if key|lower not in ["bsn", "kind_bsn"] and val is not none %}
                                             <span class="text-gray-700">{{ key|replace('_', ' ') |title }}:</span>
                                             <span class="font-medium">{{ val }}</span>
                                             {% if not loop.last %}<span class="text-gray-400 mx-1">|</span>{% endif %}
@@ -97,7 +97,7 @@
                 {% if claim.old_value is boolean %}
                     {{ 'Ja' if claim.old_value else 'Nee' }}
                 {% elif claim.old_value is number %}
-                    {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
+                    {% if node.details and node.details.type == "amount" and node.details.type_spec and node.details.type_spec.unit == "eurocent" %}
                         {{ (claim.old_value / 100) | format_currency }}
                     {% elif claim.old_value % 1 != 0 %}
                         {{ '%.5f'|format(claim.old_value) }}
@@ -118,7 +118,7 @@
                 {% if claim.new_value is boolean %}
                     {{ 'Ja' if claim.new_value else 'Nee' }}
                 {% elif claim.new_value is number %}
-                    {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
+                    {% if node.details and node.details.type == "amount" and node.details.type_spec and node.details.type_spec.unit == "eurocent" %}
                         {{ (claim.new_value / 100) | format_currency }}
                     {% elif claim.new_value % 1 != 0 %}
                         {{ '%.5f'|format(claim.new_value) }}
@@ -190,7 +190,7 @@
 {% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values=none) %}
     {# Check if this key has a changed value #}
     {% set change_info = changed_values[key] if changed_values and key in changed_values else none %}
-    {% if node is mapping and ('service' in node and 'children' in node and node.children) %}
+    {% if node is mapping and ("service" in node and "children" in node and node.children) %}
         <div x-data="{ open: false }" class="text-sm leading-5">
             <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer gap-2"
                  @click="open = !open">
@@ -229,7 +229,7 @@
         </div>
     {% else %}
         {% set display_result = node.result if node is mapping and node.result is defined else node %}
-        {% if (display_result is not none and display_result != {} and display_result != {'value': None} and display_result != '') or (node is mapping and node.required) %}
+        {% if (display_result is not none and display_result != {} and display_result != {"value": None} and display_result != "") or (node is mapping and node.required) %}
             <div class="text-sm leading-5 py-0.5">
                 <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
                 <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
@@ -313,7 +313,7 @@
                             <div class="mt-1">
                                 <input type="hidden" name="keys[{{ loop.index0 }}]" value="{{ item.key }}">
                                 <!-- Debug info: {{ item.node.details }} -->
-                                {% if item.node.details and item.node.details.type == 'array' and item.node.details.type_spec and item.node.details.type_spec.fields %}
+                                {% if item.node.details and item.node.details.type == "array" and item.node.details.type_spec and item.node.details.type_spec.fields %}
                                     <!-- Array van objecten component -->
                                     <div class="space-y-4"
                                          x-data="{ arrayItems: [{}], hasFilledItems() { return this.arrayItems.some(item => Object.values(item).some(val => val !== undefined && val !== '')) } }">
@@ -339,7 +339,10 @@
                                                         @click="arrayItems.splice(index, 1)"
                                                         class="absolute top-2 right-2 text-gray-400 hover:text-red-500 cursor-pointer"
                                                         x-show="arrayItems.length > 1">
-                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <svg class="w-4 h-4"
+                                                         fill="none"
+                                                         viewBox="0 0 24 24"
+                                                         stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
                                                 </button>
@@ -347,7 +350,7 @@
                                                     {% for field in item.node.details.type_spec.fields %}
                                                         <div>
                                                             <label class="block text-xs font-medium text-gray-700 mb-1">{{ field.name|title|replace('_', ' ') }}</label>
-                                                            {% if field.type == 'string' and field.enum is defined %}
+                                                            {% if field.type == "string" and field.enum is defined %}
                                                                 <select x-model="item.{{ field.name }}"
                                                                         class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                                                     <option value="">Selecteer {{ field.name|title|replace('_', ' ') }}</option>
@@ -357,7 +360,7 @@
                                                                         {% for enum_value in field.enum %}<option value="{{ enum_value }}">{{ enum_value }}</option>{% endfor %}
                                                                     {% endif %}
                                                                 </select>
-                                                            {% elif field.type == 'enum' %}
+                                                            {% elif field.type == "enum" %}
                                                                 <select x-model="item.{{ field.name }}"
                                                                         class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                                                     <option value="">Selecteer {{ field.name|title|replace('_', ' ') }}</option>
@@ -367,11 +370,11 @@
                                                                         {% for enum_value in field.enum %}<option value="{{ enum_value }}">{{ enum_value }}</option>{% endfor %}
                                                                     {% endif %}
                                                                 </select>
-                                                            {% elif field.type == 'number' %}
+                                                            {% elif field.type == "number" %}
                                                                 <input type="number"
                                                                        x-model.number="item.{{ field.name }}"
                                                                        class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                                            {% elif field.type == 'amount' %}
+                                                            {% elif field.type == "amount" %}
                                                                 <div class="flex items-center">
                                                                     <span class="mr-2 text-gray-700">€</span>
                                                                     <input type="number"
@@ -402,7 +405,7 @@
                                         return result; }))" x-init="$watch('arrayItems', () => { console.log('Array items updated:', arrayItems); })">
                                     </div>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="array">
-                                {% elif item.node.details and item.node.details.type == 'boolean' %}
+                                {% elif item.node.details and item.node.details.type == "boolean" %}
                                     <select id="value-{{ item.key }}"
                                             name="values[{{ loop.index0 }}]"
                                             class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -410,8 +413,8 @@
                                         <option value="false">Nee</option>
                                     </select>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="boolean">
-                                {% elif item.node.details and (item.node.details.type == 'number' or item.node.details.type == 'amount') %}
-                                    {% if item.node.details.type == 'amount' and item.node.details.type_spec and item.node.details.type_spec.unit == 'eurocent' %}
+                                {% elif item.node.details and (item.node.details.type == "number" or item.node.details.type == "amount") %}
+                                    {% if item.node.details.type == "amount" and item.node.details.type_spec and item.node.details.type_spec.unit == "eurocent" %}
                                         <div class="flex items-center">
                                             <span class="mr-2 text-gray-700">€</span>
                                             <!-- Gebruik een eenvoudiger aanpak zonder Alpine.js voor de conversie -->
@@ -445,7 +448,7 @@
                                                required>
                                     {% endif %}
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="number">
-                                {% elif item.node.details and item.node.details.type == 'date' %}
+                                {% elif item.node.details and item.node.details.type == "date" %}
                                     <input type="date"
                                            id="value-{{ item.key }}"
                                            name="values[{{ loop.index0 }}]"
@@ -453,7 +456,7 @@
                                            {% if loop.first %}autofocus{% endif %}
                                            required>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="date">
-                                {% elif item.node.details and item.node.details.type == 'time' %}
+                                {% elif item.node.details and item.node.details.type == "time" %}
                                     <input type="time"
                                            id="value-{{ item.key }}"
                                            name="values[{{ loop.index0 }}]"
@@ -461,7 +464,7 @@
                                            {% if loop.first %}autofocus{% endif %}
                                            required>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="time">
-                                {% elif item.node.details and item.node.details.type == 'enum' and item.node.details.type_spec and item.node.details.type_spec.enum %}
+                                {% elif item.node.details and item.node.details.type == "enum" and item.node.details.type_spec and item.node.details.type_spec.enum %}
                                     <select id="value-{{ item.key }}"
                                             name="values[{{ loop.index0 }}]"
                                             class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -480,7 +483,7 @@
                                 {% else %}
                                     {# Check if this is a KVK field and we have kvk in context #}
                                     {% set prefill_value = "" %}
-                                    {% if item.key|lower in ['kvk_nummer', 'kvk', 'kvknummer'] and kvk is defined and kvk %}
+                                    {% if item.key|lower in ["kvk_nummer", "kvk", "kvknummer"] and kvk is defined and kvk %}
                                         {% set prefill_value = kvk %}
                                     {% endif %}
                                     <input type="text"

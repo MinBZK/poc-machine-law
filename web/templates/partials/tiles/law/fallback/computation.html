@@ -8,7 +8,7 @@
                     {% if value is boolean %}
                         {{ 'Ja' if value else 'Nee' }}
                     {% elif value is number %}
-                        {% if 'euro' in key.lower() or 'toeslag' in key.lower() %}
+                        {% if "euro" in key.lower() or "toeslag" in key.lower() %}
                             {{ (value / 100) | format_currency }}
                         {% else %}
                             {{ value }}

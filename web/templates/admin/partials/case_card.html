@@ -9,7 +9,7 @@
              data-case-id="{{ case.id }}">
             <div class="font-medium mb-2">{{ case.person_name }}</div>
             <div class="text-sm text-gray-500 mb-2">BSN: {{ case.bsn }}</div>
-            {% if case.status in ['IN_REVIEW', 'OBJECTED'] %}
+            {% if case.status in ["IN_REVIEW", "OBJECTED"] %}
                 <div class="flex space-x-2">
                     <button type="button"
                             class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 cursor-pointer"
@@ -19,7 +19,7 @@
                             onclick="showDialog('{{ case.id }}', false)">Afwijzen</button>
                 </div>
             {% endif %}
-            {% if case.status == 'DECIDED' %}
+            {% if case.status == "DECIDED" %}
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if case.approved %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
                     {{ 'Toegekend' if case.approved else 'Afgewezen' }}
                 </span>

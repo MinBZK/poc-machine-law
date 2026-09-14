@@ -52,7 +52,7 @@
                 <div class="flex items-start justify-between border-b border-gray-100 pb-4">
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900">{{ rule_spec.name }}</h3>
-                        {% if current_case and current_case.status == 'IN_REVIEW' %}
+                        {% if current_case and current_case.status == "IN_REVIEW" %}
                             <div class="mt-2">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">In behandeling</span>
                             </div>
@@ -67,14 +67,14 @@
             </div>
             <!-- Actions Section -->
             <div class="mt-6 pt-4 border-t border-gray-100">
-                {% if current_case and current_case.status == 'SUBMITTED' %}
+                {% if current_case and current_case.status == "SUBMITTED" %}
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
                         <p class="text-sm text-blue-800">
                             Uw aanvraag wordt beoordeeld door een medewerker van Gemeente Rotterdam.
                             U ontvangt bericht zodra de beoordeling is afgerond.
                         </p>
                     </div>
-                {% elif current_case and current_case.status == 'IN_REVIEW' %}
+                {% elif current_case and current_case.status == "IN_REVIEW" %}
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
                         <h4 class="font-medium text-blue-900 mb-3">Wat gebeurt er nu?</h4>
                         <ol class="space-y-2 text-sm text-blue-800">
@@ -95,7 +95,7 @@
                             Heeft u vragen? <a href="#" class="underline">Klik hier</a>, of bel 14010.
                         </p>
                     </div>
-                {% elif ns.heeft_alcoholvergunning or (current_case and current_case.status == 'DECIDED' and current_case.approved) %}
+                {% elif ns.heeft_alcoholvergunning or (current_case and current_case.status == "DECIDED" and current_case.approved) %}
                     <div class="bg-green-50 border border-green-200 rounded-lg p-4">
                         <div class="flex items-center">
                             <svg class="w-5 h-5 text-green-600 mr-2"

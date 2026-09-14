@@ -9,7 +9,7 @@
             {% if delegation_context %}
                 <!-- Acting on behalf of someone -->
                 <div class="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center {% if delegation_context.subject_type == 'BUSINESS' %}bg-amber-100{% else %}bg-blue-100{% endif %}">
-                    {% if delegation_context.subject_type == 'BUSINESS' %}
+                    {% if delegation_context.subject_type == "BUSINESS" %}
                         <svg xmlns="http://www.w3.org/2000/svg"
                              class="h-5 w-5 text-amber-600"
                              fill="none"
@@ -67,9 +67,9 @@
             <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">Handelen namens</div>
             <!-- Delegations -->
             {% for delegation in delegations %}
-                {% if delegation.subject_type == 'SELF' %}
+                {% if delegation.subject_type == "SELF" %}
                     <!-- SELF delegation - reset to own context -->
-                    <form action="/delegation/reset" method="POST" class="block">
+                    <form action="/delegation/reset" method="post" class="block">
                         <input type="hidden" name="bsn" value="{{ bsn }}">
                         <button type="submit"
                                 class="w-full flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 text-left {% if not delegation_context %}bg-blue-50{% endif %}">
@@ -97,13 +97,13 @@
                     </form>
                 {% else %}
                     <!-- Other delegations (BUSINESS, CITIZEN) -->
-                    <form action="/delegation/switch" method="POST" class="block">
+                    <form action="/delegation/switch" method="post" class="block">
                         <input type="hidden" name="bsn" value="{{ bsn }}">
                         <input type="hidden" name="subject_id" value="{{ delegation.subject_id }}">
                         <button type="submit"
                                 class="w-full flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 text-left {% if delegation_context and delegation_context.subject_id == delegation.subject_id %}bg-blue-50{% endif %}">
                             <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 {% if delegation.subject_type == 'BUSINESS' %}bg-amber-100{% else %}bg-blue-100{% endif %}">
-                                {% if delegation.subject_type == 'BUSINESS' %}
+                                {% if delegation.subject_type == "BUSINESS" %}
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                          class="h-5 w-5 text-amber-600"
                                          fill="none"
@@ -125,7 +125,7 @@
                                 <div class="font-medium text-gray-900">{{ delegation.subject_name }}</div>
                                 <div class="text-xs text-gray-500">
                                     {{ delegation.delegation_type.replace('_', ' ').title() }}
-                                    {% if delegation.subject_type == 'BUSINESS' %}- KVK {{ delegation.subject_id }}{% endif %}
+                                    {% if delegation.subject_type == "BUSINESS" %}- KVK {{ delegation.subject_id }}{% endif %}
                                 </div>
                             </div>
                             {% if delegation_context and delegation_context.subject_id == delegation.subject_id %}

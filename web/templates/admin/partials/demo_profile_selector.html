@@ -14,8 +14,8 @@
                     hx-vals='{"profile_name": "{{ profile_name }}", "source": "admin"}'>
                 <div class="font-semibold">{{ profile.name }}</div>
                 <div class="text-xs {{ 'text-blue-200' if active_profile == profile_name else 'text-gray-500' }}">
-                    {{ profile.type | title }} &middot; BSN {{ profile.bsn }}
-                    {% if profile.kvk %}&middot; KVK {{ profile.kvk }}{% endif %}
+                    {{ profile.type | title }} · BSN {{ profile.bsn }}
+                    {% if profile.kvk %}· KVK {{ profile.kvk }}{% endif %}
                 </div>
             </button>
         {% endfor %}

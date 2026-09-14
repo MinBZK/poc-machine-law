@@ -428,7 +428,7 @@
                                 </div>
                                 <template x-if="profileType !== 'ondernemer'">
                                     <div class="bg-gray-50 rounded-lg p-3">
-                                        <div class="text-sm font-medium text-gray-500">Verklarende waarde bedrag (R&sup2;)</div>
+                                        <div class="text-sm font-medium text-gray-500">Verklarende waarde bedrag (R²)</div>
                                         <div class="text-2xl font-bold text-gray-900"
                                              x-text="formatNum(activeRun?.result?.metrics?.amount_r2)"></div>
                                         <div class="text-xs text-gray-400 mt-1">Hoe goed het model het bedrag kan voorspellen (1.0 = perfect)</div>
@@ -681,7 +681,8 @@
                                                  class="mt-2 pt-2 border-t border-gray-100">
                                                 <div class="text-xs text-gray-500 mb-1">Voorwaarden voor deze groep:</div>
                                                 <template x-for="(cond, ci) in formula.segment_conditions" :key="ci">
-                                                    <code class="text-xs bg-yellow-50 px-1.5 py-0.5 rounded mr-1" x-text="cond"></code>
+                                                    <code class="text-xs bg-yellow-50 px-1.5 py-0.5 rounded mr-1"
+                                                          x-text="cond"></code>
                                                 </template>
                                             </div>
                                         </div>
@@ -726,7 +727,8 @@
                                     <template x-if="group.bands.some(b => b.amount_from > 0)">
                                         <details class="border border-gray-200 rounded-lg" :open="gi === 0">
                                             <summary class="px-3 py-2 cursor-pointer hover:bg-gray-50 flex justify-between items-center">
-                                                <span class="text-sm font-medium text-gray-700" x-text="group.label"></span>
+                                                <span class="text-sm font-medium text-gray-700"
+                                                      x-text="group.label"></span>
                                                 <span class="text-xs text-gray-400"
                                                       x-text="'max €' + Math.max(...group.bands.map(b => b.amount_from)).toFixed(0) + (profileType === 'ondernemer' ? '' : '/mnd')"></span>
                                             </summary>
@@ -806,14 +808,15 @@
                                                     max(0,
                                                     <span class="text-blue-700 font-semibold"
                                                           x-text="'€' + Number(comp.base_single).toFixed(0)"></span>
-                                                    &minus;
+                                                    −
                                                     <span class="text-red-700 font-semibold"
                                                           x-text="(comp.rate_single * 100).toFixed(1) + '%'"></span>
-                                                    &times; max(0, inkomen &minus;
+                                                    × max(0, inkomen −
                                                     <span class="text-green-700 font-semibold"
                                                           x-text="'€' + Number(comp.threshold_single).toLocaleString('nl-NL')"></span>))
                                                 </span>
-                                                <span x-show="comp.base_single <= 0" class="text-gray-400">€0 (niet van toepassing)</span>
+                                                <span x-show="comp.base_single <= 0"
+                                                      class="text-gray-400">€0 (niet van toepassing)</span>
                                             </div>
                                             <p class="text-xs text-gray-400 mt-1" x-show="comp.base_single > 0">
                                                 Basisbedrag
@@ -837,14 +840,15 @@
                                                         max(0,
                                                         <span class="text-blue-700 font-semibold"
                                                               x-text="'€' + Number(comp.base_partner).toFixed(0)"></span>
-                                                        &minus;
+                                                        −
                                                         <span class="text-red-700 font-semibold"
                                                               x-text="(comp.rate_partner * 100).toFixed(1) + '%'"></span>
-                                                        &times; max(0, inkomen &minus;
+                                                        × max(0, inkomen −
                                                         <span class="text-green-700 font-semibold"
                                                               x-text="'€' + Number(comp.threshold_partner).toLocaleString('nl-NL')"></span>))
                                                     </span>
-                                                    <span x-show="comp.base_partner <= 0" class="text-gray-400">€0 (niet van toepassing)</span>
+                                                    <span x-show="comp.base_partner <= 0"
+                                                          class="text-gray-400">€0 (niet van toepassing)</span>
                                                 </div>
                                                 <p class="text-xs text-gray-400 mt-1" x-show="comp.base_partner > 0">
                                                     Basisbedrag
@@ -1076,7 +1080,7 @@
                                         </template>
                                     </tr>
                                     <tr x-show="profileType !== 'ondernemer'">
-                                        <td class="px-4 py-2 text-gray-700">Verklarende waarde bedrag (R&sup2;)</td>
+                                        <td class="px-4 py-2 text-gray-700">Verklarende waarde bedrag (R²)</td>
                                         <template x-for="(run, i) in completedRuns" :key="'r2-'+run.id">
                                             <td class="px-4 py-2 text-right">
                                                 <span x-text="formatNum(run.result?.metrics?.amount_r2)"></span>

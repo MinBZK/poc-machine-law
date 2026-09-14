@@ -58,14 +58,14 @@
                      @click="switchTab('features')">
                     <span class="tab-label">Scenarios</span>
                 </div>
-                {% if feature_flags.get('SIMULATION', True) %}
+                {% if feature_flags.get("SIMULATION", True) %}
                     <div class="tab"
                          :class="{ 'active': activeTab === 'simulatie' }"
                          @click="switchTab('simulatie')">
                         <span class="tab-label">Simulatie</span>
                     </div>
                 {% endif %}
-                {% if feature_flags.get('HARMONIZE', False) %}
+                {% if feature_flags.get("HARMONIZE", False) %}
                     <div class="tab"
                          :class="{ 'active': activeTab === 'harmonize' }"
                          @click="switchTab('harmonize')">
@@ -244,7 +244,7 @@
                             class="tab-iframe"
                             title="Zaaksysteem"></iframe>
                 </div>
-                {% if feature_flags.get('SIMULATION', True) %}
+                {% if feature_flags.get("SIMULATION", True) %}
                     <!-- Simulatie Tab (IFrame) -->
                     <div class="tab-content iframe-content"
                          x-show="activeTab === 'simulatie'"
@@ -255,7 +255,7 @@
                                 title="Simulatie"></iframe>
                     </div>
                 {% endif %}
-                {% if feature_flags.get('HARMONIZE', False) %}
+                {% if feature_flags.get("HARMONIZE", False) %}
                     <!-- Harmonisatie Tab (IFrame) -->
                     <div class="tab-content iframe-content"
                          x-show="activeTab === 'harmonize'"

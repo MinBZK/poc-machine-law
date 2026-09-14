@@ -21,7 +21,7 @@
             </p>
         </div>
     {% endif %}
-    {% if result.is_gerechtigd and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
+    {% if result.is_gerechtigd and current_case and current_case.status in ["IN_REVIEW", "DECIDED"] and current_case.claimed_result %}
         {% if result.subsidiebedrag != current_case.claimed_result.subsidiebedrag %}
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4">
                 <h4 class="font-medium text-gray-900 mb-2">Verschil met eerdere aanvraag</h4>

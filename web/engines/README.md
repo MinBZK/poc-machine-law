@@ -27,22 +27,16 @@ from fastapi import Depends
 from web.dependencies import get_case_manager, get_machine_service
 from engine import CaseManagerInterface, EngineInterface
 
+
 @router.get("/cases/{bsn}")
-def get_case(
-    bsn: str,
-    service: str,
-    law: str,
-    case_manager: CaseManagerInterface = Depends(get_case_manager)
-):
+def get_case(bsn: str, service: str, law: str, case_manager: CaseManagerInterface = Depends(get_case_manager)):
     case = case_manager.get_case(bsn, service, law)
     return case
 
+
 @router.post("/evaluate")
 def evaluate_law(
-    service: str,
-    law: str,
-    parameters: dict,
-    machine_service: EngineInterface = Depends(get_machine_service)
+    service: str, law: str, parameters: dict, machine_service: EngineInterface = Depends(get_machine_service)
 ):
     result = machine_service.evaluate(service, law, parameters)
     return result
@@ -52,9 +46,7 @@ def evaluate_law(
 
 ```python
 @router.get("/discoverable-laws")
-async def get_discoverable_laws(
-    machine_service: EngineInterface = Depends(get_machine_service)
-):
+async def get_discoverable_laws(machine_service: EngineInterface = Depends(get_machine_service)):
     laws = machine_service.get_discoverable_service_laws()
     return laws
 ```
@@ -75,13 +67,9 @@ from engine.factory import CaseManagerFactory, MachineFactory, MachineType
 
 # Switch to Go implementation
 case_manager = CaseManagerFactory.create_case_manager(
-    machine_type=MachineType.GO,
-    go_api_url="http://localhost:8081/v0"
+    machine_type=MachineType.GO, go_api_url="http://localhost:8081/v0"
 )
 
 # Switch to Python implementation
-machine_service = MachineFactory.create_machine_service(
-    machine_type=MachineType.PYTHON,
-    services=services
-)
+machine_service = MachineFactory.create_machine_service(machine_type=MachineType.PYTHON, services=services)
 ```

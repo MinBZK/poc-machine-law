@@ -126,11 +126,11 @@
                             class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
                         Gegevens aanleveren
                     </button>
-                {% elif current_case.status == 'SUBMITTED' %}
+                {% elif current_case.status == "SUBMITTED" %}
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
                         <p class="text-sm text-blue-800">Uw gegevens zijn ontvangen en worden verwerkt door de NVWA.</p>
                     </div>
-                {% elif current_case.status == 'IN_REVIEW' %}
+                {% elif current_case.status == "IN_REVIEW" %}
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
                         <h4 class="font-medium text-blue-900 mb-3">Wat gebeurt er nu?</h4>
                         <ol class="space-y-2 text-sm text-blue-800">
@@ -148,7 +148,7 @@
                             </li>
                         </ol>
                     </div>
-                {% elif current_case.status == 'DECIDED' and current_case.approved %}
+                {% elif current_case.status == "DECIDED" and current_case.approved %}
                     <div class="bg-green-50 border border-green-100 rounded-lg p-4">
                         <div class="flex items-center text-green-800">
                             <svg class="w-5 h-5 mr-2 flex-shrink-0"

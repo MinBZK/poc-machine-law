@@ -115,7 +115,7 @@
 </section>
 <!-- Total Income Widget -->
 {% if total_income_widget_enabled %}
-    <div hx-get="/dashboard/total-net-income?bsn={{ effective_bsn|default(bsn) }}{% if request.query_params.get('date') %}&date={{ request.query_params.get("date") }}{% endif %}"
+    <div hx-get="/dashboard/total-net-income?bsn={{ effective_bsn|default(bsn) }}{% if request.query_params.get('date') %}&date={{ request.query_params.get('date') }}{% endif %}"
          hx-trigger="load"
          hx-swap="outerHTML">
         <div class="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-100 overflow-hidden">
@@ -244,7 +244,7 @@
                     <h3 class="font-semibold text-lg">{{ profile.name }}</h3>
                     <div class="text-sm text-gray-600 mt-1">
                         BSN: {{ bsn }} | Geboortedatum: {{
-                        profile.sources.RvIG.personen[0].geboortedatum|format_date }}
+                            profile.sources.RvIG.personen[0].geboortedatum|format_date }}
                     </div>
                 </div>
                 <button class="text-blue-600 hover:text-blue-800 flex items-center cursor-pointer"
@@ -283,11 +283,11 @@
                                         </dt>
                                         <dd>
                                             {{ accepted_claims["verblijfplaats"].straat }} {{
-                                            accepted_claims["verblijfplaats"].huisnummer }}
+                                                accepted_claims["verblijfplaats"].huisnummer }}
                                         </dd>
                                         <dd>
                                             {{ accepted_claims["verblijfplaats"].postcode }} {{
-                                            accepted_claims["verblijfplaats"].woonplaats }}
+                                                accepted_claims["verblijfplaats"].woonplaats }}
                                         </dd>
                                     </div>
                                 {% elif accepted_claims["verblijfsadres"] %}
@@ -297,7 +297,7 @@
                                             {{ accepted_claims["verblijfsadres"] }}
                                         </dd>
                                     </div>
-                                {% elif profile.sources.RvIG.get('verblijfplaats') %}
+                                {% elif profile.sources.RvIG.get("verblijfplaats") %}
                                     <div>
                                         <dt class="text-sm text-gray-600">
                                             {% if profile.sources.RvIG.verblijfplaats[0].type ==
@@ -309,11 +309,11 @@
                                         </dt>
                                         <dd>
                                             {{ profile.sources.RvIG.verblijfplaats[0].straat }} {{
-                                            profile.sources.RvIG.verblijfplaats[0].huisnummer }}
+                                                profile.sources.RvIG.verblijfplaats[0].huisnummer }}
                                         </dd>
                                         <dd>
                                             {{ profile.sources.RvIG.verblijfplaats[0].postcode }} {{
-                                            profile.sources.RvIG.verblijfplaats[0].woonplaats }}
+                                                profile.sources.RvIG.verblijfplaats[0].woonplaats }}
                                         </dd>
                                     </div>
                                 {% elif profile.sources.RvIG.personen[0].verblijfsadres %}
@@ -349,8 +349,8 @@
                                             <dt class="text-sm text-gray-600">Inkomen uit werk</dt>
                                             <dd>
                                                 {{
-                                                ((accepted_claims["BOX1_DIENSTBETREKKING"] or profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking)
-                                                / 100) | format_currency }}
+                                                    ((accepted_claims["BOX1_DIENSTBETREKKING"] or profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking)
+                                                    / 100) | format_currency }}
                                             </dd>
                                         </div>
                                     {% endif %}
@@ -361,8 +361,8 @@
                                             <dt class="text-sm text-gray-600">Winst uit onderneming</dt>
                                             <dd>
                                                 {{
-                                                ((accepted_claims["BOX1_ONDERNEMING"] or profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming)
-                                                / 100) | format_currency }}
+                                                    ((accepted_claims["BOX1_ONDERNEMING"] or profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming)
+                                                    / 100) | format_currency }}
                                             </dd>
                                         </div>
                                     {% endif %}
@@ -373,7 +373,7 @@
                                             <dt class="text-sm text-gray-600">Spaargeld</dt>
                                             <dd>
                                                 {{ ((accepted_claims["BOX3_SPAREN"] or profile.sources.BELASTINGDIENST.box3[0].spaargeld) / 100) |
-                                                format_currency }}
+                                                    format_currency }}
                                             </dd>
                                         </div>
                                     {% endif %}
@@ -412,7 +412,7 @@
                                         <dt class="text-sm text-gray-600">Arbeidsvermogen</dt>
                                         <dd>
                                             {{
-                                            profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].arbeidsvermogen
+                                                profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].arbeidsvermogen
                                             }}
                                         </dd>
                                     </div>
@@ -423,7 +423,7 @@
                                             <dt class="text-sm text-gray-600">Re-integratietraject</dt>
                                             <dd>
                                                 {{
-                                                profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].re_integratie_traject
+                                                    profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].re_integratie_traject
                                                 }}
                                             </dd>
                                         </div>
@@ -435,7 +435,7 @@
                                             <dt class="text-sm text-gray-600">Ontheffing</dt>
                                             <dd>
                                                 {{
-                                                profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].ontheffing_reden
+                                                    profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].ontheffing_reden
                                                 }}
                                             </dd>
                                         </div>
@@ -457,7 +457,7 @@
     <h3 class="font-semibold text-lg mb-4">Berekende regelingen</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for law in discoverable_service_laws %}
-            <div hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if delegation_context and delegation_context.subject_type == 'BUSINESS' %}&kvk={{ delegation_context.subject_id }}{% endif %}{% if request.query_params.get('date') %}&date={{ request.query_params.get("date") }}{% endif %}&can_submit_claims={{ can_submit_claims|default(true) }}"
+            <div hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if delegation_context and delegation_context.subject_type == 'BUSINESS' %}&kvk={{ delegation_context.subject_id }}{% endif %}{% if request.query_params.get('date') %}&date={{ request.query_params.get('date') }}{% endif %}&can_submit_claims={{ can_submit_claims|default(true) }}"
                  hx-trigger="load"
                  hx-swap="outerHTML"
                  class="h-full bg-white rounded-lg shadow">{% include "partials/loading.html" %}</div>
@@ -635,7 +635,7 @@
     <div class="bg-gray-50 rounded-lg p-6">
         <h3 class="font-semibold text-lg mb-4">Beschikbare regelingen</h3>
         <ul class="space-y-2">
-            {% if active_profile_config and active_profile_config.type == 'ondernemer' %}
+            {% if active_profile_config and active_profile_config.type == "ondernemer" %}
                 <li class="flex items-center">
                     <span class="w-4 h-4 bg-green-200 rounded-full mr-2"></span>
                     <span>Alcoholwetvergunning</span>
