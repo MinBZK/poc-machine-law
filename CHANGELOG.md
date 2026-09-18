@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v2.1.1 (2026-09-18)
+
+### Bug Fixes
+
+- Afteller verhuisbericht pauzeert en spamt schermlezer niet
+  ([#523](https://github.com/MinBZK/poc-machine-law/pull/523),
+  [`d055943`](https://github.com/MinBZK/poc-machine-law/commit/d0559439e2de774f9105f7eae35b047af418a13b))
+
+- Verhuisbericht telt af en toont zich opnieuw per sessie
+  ([#523](https://github.com/MinBZK/poc-machine-law/pull/523),
+  [`d055943`](https://github.com/MinBZK/poc-machine-law/commit/d0559439e2de774f9105f7eae35b047af418a13b))
+
+### Chores
+
+- Sync VERSION file to 2.1.0
+  ([`1f8d66f`](https://github.com/MinBZK/poc-machine-law/commit/1f8d66f9a4b71ed9264fd0dfaca8d1b269348161))
+
+
 ## v2.1.0 (2026-09-13)
 
 ### Chores
