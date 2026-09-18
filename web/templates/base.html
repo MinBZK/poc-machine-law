@@ -100,15 +100,71 @@
     <link rel="manifest" href="/static/img/site.webmanifest" />
 </head>
 <body class="min-h-screen bg-gray-50">
-    <!-- Verhuisbericht modal -->
-    <div x-data="{ showMoveModal: localStorage.getItem('regelrecht-move-notice-dismissed') !== 'true' }"
+    <!-- Verhuisbericht modal.
+         Telt af en stuurt daarna zelf door. Wegklikken kan, en geldt dan voor
+         de rest van de sessie: wie de oude proof of concept bewust wil
+         doorklikken wordt niet op elke pagina opnieuw onderbroken.
+
+         `sessionStorage` en niet `localStorage`, want dat is het verschil met
+         de vorige versie. Die zette een vlag die eeuwig bleef staan, dus wie
+         het bericht één keer wegklikte kreeg het nooit meer te zien en bleef
+         op de oude omgeving werken zonder dat te weten. Nu is het bij een
+         nieuw bezoek weer een schone lei.
+
+         De afteller is er zodat de sprong aangekondigd is en niet als een
+         storing voelt. -->
+    <script>
+        // Staat hier en niet in het x-data attribuut zelf: de djlint
+        // pre-commit hook plakt zo'n attribuut op één regel, en dan slikt de
+        // eerste `//` alle code erna op. In een script-blok blijft het heel.
+        window.moveNotice = () => ({
+            showMoveModal: (() => {
+                try {
+                    return sessionStorage.getItem('regelrecht-move-notice-dismissed') !== 'true';
+                } catch (e) {
+                    return true;
+                }
+            })(),
+            seconds: 8,
+            timer: null,
+            target: 'https://demo.regelrecht.rijks.app',
+            start() {
+                if (!this.showMoveModal) return;
+                // Eén timer, ook als Alpine dit component opnieuw initialiseert.
+                // Zonder deze wacht liepen er twee intervals en telde de teller
+                // twee per seconde af, waardoor de sprong op de helft van de
+                // aangekondigde tijd viel.
+                if (this.timer) return;
+                // Respecteer wie bewegende/automatische dingen heeft afgezet:
+                // dan blijft het een mededeling die je zelf wegklikt.
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                this.timer = setInterval(() => {
+                    this.seconds--;
+                    if (this.seconds <= 0) {
+                        clearInterval(this.timer);
+                        window.location.href = this.target;
+                    }
+                }, 1000);
+            },
+            stay() {
+                clearInterval(this.timer);
+                this.showMoveModal = false;
+                try {
+                    sessionStorage.setItem('regelrecht-move-notice-dismissed', 'true');
+                } catch (e) {
+                    /* private mode */
+                }
+            }
+        });
+    </script>
+    <div x-data="moveNotice()"
+         x-init="start()"
          x-show="showMoveModal"
          x-cloak
          style="display: none"
-         @keydown.escape.window="showMoveModal = false; localStorage.setItem('regelrecht-move-notice-dismissed', 'true')"
+         @keydown.escape.window="stay()"
          class="fixed inset-0 z-[11000] flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/50"
-             @click="showMoveModal = false; localStorage.setItem('regelrecht-move-notice-dismissed', 'true')"></div>
+        <div class="absolute inset-0 bg-black/50" @click="stay()"></div>
         <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full p-6"
              role="dialog"
              aria-modal="true"
@@ -116,7 +172,7 @@
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 transform scale-95"
              x-transition:enter-end="opacity-100 transform scale-100">
-            <button @click="showMoveModal = false; localStorage.setItem('regelrecht-move-notice-dismissed', 'true')"
+            <button @click="stay()"
                     class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none rounded-lg p-1 cursor-pointer"
                     aria-label="Sluiten">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -124,7 +180,7 @@
                 </svg>
             </button>
             <h2 id="move-notice-title"
-                class="text-xl font-semibold text-gray-900 pr-8">Deze demo verhuist</h2>
+                class="text-xl font-semibold text-gray-900 pr-8">Deze demo is verhuisd</h2>
             <p class="mt-3 text-sm text-gray-700">
                 Er staat een nieuwe versie van RegelRecht klaar: een nieuw ontwerp, een nieuwe
                 implementatie onder de motorkap en een eigen adres:
@@ -143,12 +199,19 @@
                 Deze omgeving is de oude proof of concept en blijft voorlopig nog beschikbaar, maar
                 wordt niet meer doorontwikkeld. Werk uw bladwijzers bij.
             </p>
+            <!-- `aria-live="polite"` en niet `assertive`: een schermlezer meldt
+                 het aftellen tussen zinnen door in plaats van er elke seconde
+                 doorheen te praten. -->
+            <p class="mt-4 text-sm text-gray-700" x-show="timer" aria-live="polite">
+                U gaat er over <span class="font-semibold" x-text="seconds"></span>
+                <span x-text="seconds === 1 ? 'seconde' : 'seconden'"></span> automatisch heen.
+            </p>
             <div class="mt-6 flex flex-wrap gap-3">
                 <a href="https://demo.regelrecht.rijks.app"
                    class="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700">
-                    Naar de nieuwe RegelRecht
+                    Nu naar de nieuwe RegelRecht
                 </a>
-                <button @click="showMoveModal = false; localStorage.setItem('regelrecht-move-notice-dismissed', 'true')"
+                <button @click="stay()"
                         class="inline-flex items-center px-4 py-2 rounded-md border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 cursor-pointer">
                     Hier verder
                 </button>
@@ -157,7 +220,11 @@
     </div>
     {% if not demo_mode %}
         <!-- Proof of Concept Ribbon -->
-        <button onclick="localStorage.removeItem('regelrecht-banner-dismissed'); localStorage.removeItem('regelrecht-move-notice-dismissed'); location.reload();"
+        <!-- Haalt de weggeklikte berichten terug. Wist ook de oude
+             localStorage-sleutel van het verhuisbericht: die zat er eeuwig in
+             bij wie hem ooit heeft weggeklikt, en het bericht leest nu uit
+             sessionStorage. -->
+        <button onclick="localStorage.removeItem('regelrecht-banner-dismissed'); localStorage.removeItem('regelrecht-move-notice-dismissed'); sessionStorage.removeItem('regelrecht-move-notice-dismissed'); location.reload();"
                 class="fixed z-[10000] w-[180px] top-[30px] right-[-50px] text-center text-[15px] font-medium py-[5px] bg-[#FACC15] text-black transform rotate-45 origin-center shadow-md hover:bg-[#EAB308] transition-colors no-underline cursor-pointer border-0">
             Proof of Concept
         </button>
