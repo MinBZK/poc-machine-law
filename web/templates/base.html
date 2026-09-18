@@ -112,7 +112,8 @@
          nieuw bezoek weer een schone lei.
 
          De afteller is er zodat de sprong aangekondigd is en niet als een
-         storing voelt. -->
+         storing voelt. Hij pauzeert bij muis of focus in de dialoog, want
+         een tijdslimiet moet te verlengen zijn (WCAG 2.2.1). -->
     <script>
         // Staat hier en niet in het x-data attribuut zelf: de djlint
         // pre-commit hook plakt zo'n attribuut op één regel, en dan slikt de
@@ -125,8 +126,9 @@
                     return true;
                 }
             })(),
-            seconds: 8,
+            seconds: 20,
             timer: null,
+            paused: false,
             target: 'https://demo.regelrecht.rijks.app',
             start() {
                 if (!this.showMoveModal) return;
@@ -139,15 +141,27 @@
                 // dan blijft het een mededeling die je zelf wegklikt.
                 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
                 this.timer = setInterval(() => {
+                    if (this.paused) return;
                     this.seconds--;
                     if (this.seconds <= 0) {
                         clearInterval(this.timer);
+                        this.timer = null;
                         window.location.href = this.target;
                     }
                 }, 1000);
             },
+            // WCAG 2.2.1 wil dat een tijdslimiet te stoppen of te verlengen is.
+            // Muis erop of toetsenbordfocus in de dialoog pauzeert het aftellen,
+            // zodat wie meer tijd nodig heeft om te lezen die ook krijgt.
+            pause() {
+                this.paused = true;
+            },
+            resume() {
+                this.paused = false;
+            },
             stay() {
                 clearInterval(this.timer);
+                this.timer = null;
                 this.showMoveModal = false;
                 try {
                     sessionStorage.setItem('regelrecht-move-notice-dismissed', 'true');
@@ -169,6 +183,10 @@
              role="dialog"
              aria-modal="true"
              aria-labelledby="move-notice-title"
+             @mouseenter="pause()"
+             @mouseleave="resume()"
+             @focusin="pause()"
+             @focusout="resume()"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 transform scale-95"
              x-transition:enter-end="opacity-100 transform scale-100">
@@ -199,12 +217,19 @@
                 Deze omgeving is de oude proof of concept en blijft voorlopig nog beschikbaar, maar
                 wordt niet meer doorontwikkeld. Werk uw bladwijzers bij.
             </p>
-            <!-- `aria-live="polite"` en niet `assertive`: een schermlezer meldt
-                 het aftellen tussen zinnen door in plaats van er elke seconde
-                 doorheen te praten. -->
-            <p class="mt-4 text-sm text-gray-700" x-show="timer" aria-live="polite">
+            <!-- De teller zelf is `aria-hidden`. Een live region die elke
+                 seconde verandert laat een schermlezer twintig keer achter
+                 elkaar een getal voorlezen, dwars door de rest van de dialoog
+                 heen. De statische zin eronder vertelt hetzelfde, één keer. -->
+            <p class="mt-4 text-sm text-gray-700" x-show="timer" aria-hidden="true">
                 U gaat er over <span class="font-semibold" x-text="seconds"></span>
                 <span x-text="seconds === 1 ? 'seconde' : 'seconden'"></span> automatisch heen.
+                <span x-show="paused" class="text-gray-500">(gepauzeerd)</span>
+            </p>
+            <p class="sr-only" x-show="timer">
+                U wordt na twintig seconden automatisch doorgestuurd naar de nieuwe omgeving.
+                Het aftellen pauzeert zodra u met de muis of het toetsenbord in deze melding bent.
+                Kies "Hier verder" om op deze omgeving te blijven.
             </p>
             <div class="mt-6 flex flex-wrap gap-3">
                 <a href="https://demo.regelrecht.rijks.app"
