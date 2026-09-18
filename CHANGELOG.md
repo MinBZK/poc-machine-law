@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v2.1.2 (2026-09-18)
+
+### Bug Fixes
+
+- Toon verhuisbericht op elk instappunt ([#524](https://github.com/MinBZK/poc-machine-law/pull/524),
+  [`c913b64`](https://github.com/MinBZK/poc-machine-law/commit/c913b64fa98067634a308a8240dc07da9738ae1c))
+
+### Chores
+
+- Sync VERSION file to 2.1.1
+  ([`1df4861`](https://github.com/MinBZK/poc-machine-law/commit/1df4861276698b6dfc03a6b8e34a2fec03694ccb))
+
+
 ## v2.1.1 (2026-09-18)
 
 ### Bug Fixes
