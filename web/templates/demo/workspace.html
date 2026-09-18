@@ -30,6 +30,7 @@
         </style>
     </head>
     <body hx-on:profile-switched="refreshAfterProfileSwitch()">
+        {% include "partials/verhuisbericht.html" %}
         <div class="workspace-container"
              x-data="workspaceData()"
              x-init="init()"
