@@ -1,0 +1,234 @@
+{# Verhuisbericht modal.
+
+   Wordt door elk instappunt ingesloten (root base, admin, demo, simulator,
+   foutpagina), want bezoekers komen niet allemaal via de voorpagina binnen.
+
+   Volledig zelfstandig: eigen CSS met een `vhb-` prefix en, indien nodig,
+   een eigen Alpine. De demo-pagina's draaien op handgeschreven demo.css
+   zonder Tailwind, dus utility-klassen zouden daar niets doen. De
+   foutpagina laadt geen Alpine, dus zonder die fallback zou de melding
+   daar nooit verschijnen.
+
+   Telt af en stuurt daarna zelf door. Wegklikken kan, en geldt dan voor de
+   rest van de sessie: wie de oude proof of concept bewust wil doorklikken
+   wordt niet op elke pagina opnieuw onderbroken.
+
+   `sessionStorage` en niet `localStorage`, want dat is het verschil met de
+   eerdere versie. Die zette een vlag die eeuwig bleef staan, dus wie het
+   bericht een keer wegklikte kreeg het nooit meer te zien en bleef op de
+   oude omgeving werken zonder dat te weten. Nu is het bij een nieuw bezoek
+   weer een schone lei.
+
+   De afteller pauzeert bij muis of focus in de dialoog, want een
+   tijdslimiet moet te verlengen zijn (WCAG 2.2.1). #}
+<script>
+    if (!window.Alpine && !document.querySelector('script[src*="alpinejs"]')) {
+        var vhbAlpine = document.createElement('script');
+        vhbAlpine.defer = true;
+        vhbAlpine.src = 'https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js';
+        document.head.appendChild(vhbAlpine);
+    }
+</script>
+<style>
+    [x-cloak] { display: none !important; }
+    .vhb-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 11000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    .vhb-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .5); }
+    .vhb-dialog {
+        position: relative;
+        background: #fff;
+        border-radius: .5rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, .1), 0 8px 10px -6px rgba(0, 0, 0, .1);
+        max-width: 32rem;
+        width: 100%;
+        padding: 1.5rem;
+        box-sizing: border-box;
+    }
+    .vhb-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: 0;
+        padding: .25rem;
+        line-height: 0;
+        color: #9ca3af;
+        cursor: pointer;
+    }
+    .vhb-close:hover { color: #4b5563; }
+    .vhb-title {
+        margin: 0;
+        padding-right: 2rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111827;
+    }
+    .vhb-text { margin: .75rem 0 0; font-size: .875rem; color: #374151; }
+    .vhb-note { margin: .75rem 0 0; font-size: .75rem; color: #4b5563; }
+    .vhb-link {
+        display: inline-flex;
+        align-items: center;
+        margin-top: .75rem;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #2563eb;
+        word-break: break-all;
+    }
+    .vhb-link:hover { color: #1e40af; }
+    .vhb-actions { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: .75rem; }
+    .vhb-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: .5rem 1rem;
+        border-radius: .375rem;
+        font-size: .875rem;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .vhb-btn-primary { background: #2563eb; color: #fff; border: 1px solid #2563eb; }
+    .vhb-btn-primary:hover { background: #1d4ed8; }
+    .vhb-btn-secondary { background: #fff; color: #374151; border: 1px solid #d1d5db; }
+    .vhb-btn-secondary:hover { background: #f9fafb; }
+    .vhb-muted { color: #6b7280; }
+    .vhb-strong { font-weight: 600; }
+    .vhb-sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+</style>
+<script>
+    // Staat hier en niet in het x-data attribuut zelf: de djlint pre-commit
+    // hook plakt zo'n attribuut op een regel, en dan slikt de eerste `//`
+    // alle code erna op. In een script-blok blijft het heel.
+    window.moveNotice = () => ({
+        showMoveModal: (() => {
+            try {
+                return sessionStorage.getItem('regelrecht-move-notice-dismissed') !== 'true';
+            } catch (e) {
+                return true;
+            }
+        })(),
+        seconds: 20,
+        timer: null,
+        paused: false,
+        target: 'https://demo.regelrecht.rijks.app',
+        start() {
+            if (!this.showMoveModal) return;
+            // Een timer, ook als Alpine dit component opnieuw initialiseert.
+            // Zonder deze wacht liepen er twee intervals en telde de teller
+            // twee per seconde af, waardoor de sprong op de helft van de
+            // aangekondigde tijd viel.
+            if (this.timer) return;
+            // Respecteer wie bewegende/automatische dingen heeft afgezet:
+            // dan blijft het een mededeling die je zelf wegklikt.
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            this.timer = setInterval(() => {
+                if (this.paused) return;
+                this.seconds--;
+                if (this.seconds <= 0) {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                    window.location.href = this.target;
+                }
+            }, 1000);
+        },
+        // WCAG 2.2.1 wil dat een tijdslimiet te stoppen of te verlengen is.
+        // Muis erop of toetsenbordfocus in de dialoog pauzeert het aftellen,
+        // zodat wie meer tijd nodig heeft om te lezen die ook krijgt.
+        pause() {
+            this.paused = true;
+        },
+        resume() {
+            this.paused = false;
+        },
+        stay() {
+            clearInterval(this.timer);
+            this.timer = null;
+            this.showMoveModal = false;
+            try {
+                sessionStorage.setItem('regelrecht-move-notice-dismissed', 'true');
+            } catch (e) {
+                /* private mode */
+            }
+        }
+    });
+</script>
+<div x-data="moveNotice()"
+     x-init="start()"
+     x-show="showMoveModal"
+     x-cloak
+     style="display: none"
+     @keydown.escape.window="stay()"
+     class="vhb-overlay">
+    <div class="vhb-backdrop" @click="stay()"></div>
+    <div class="vhb-dialog"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="move-notice-title"
+         @mouseenter="pause()"
+         @mouseleave="resume()"
+         @focusin="pause()"
+         @focusout="resume()">
+        <button @click="stay()" class="vhb-close" aria-label="Sluiten">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </button>
+        <h2 id="move-notice-title" class="vhb-title">Deze demo is verhuisd</h2>
+        <p class="vhb-text">
+            Er staat een nieuwe versie van RegelRecht klaar: een nieuw ontwerp, een nieuwe
+            implementatie onder de motorkap en een eigen adres:
+        </p>
+        <a href="https://demo.regelrecht.rijks.app" class="vhb-link">
+            demo.regelrecht.rijks.app
+            <svg width="16"
+                 height="16"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24"
+                 style="margin-left: .25rem;
+                        flex-shrink: 0">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+        </a>
+        <p class="vhb-note">
+            Deze omgeving is de oude proof of concept en blijft voorlopig nog beschikbaar, maar
+            wordt niet meer doorontwikkeld. Werk uw bladwijzers bij.
+        </p>
+        {# De teller zelf is aria-hidden. Een live region die elke seconde
+           verandert laat een schermlezer twintig keer achter elkaar een getal
+           voorlezen, dwars door de rest van de dialoog heen. De statische zin
+           eronder vertelt hetzelfde, een keer. #}
+        <p class="vhb-text" x-show="timer" aria-hidden="true">
+            U gaat er over <span class="vhb-strong" x-text="seconds"></span>
+            <span x-text="seconds === 1 ? 'seconde' : 'seconden'"></span> automatisch heen.
+            <span x-show="paused" class="vhb-muted">(gepauzeerd)</span>
+        </p>
+        <p class="vhb-sr" x-show="timer">
+            U wordt na twintig seconden automatisch doorgestuurd naar de nieuwe omgeving.
+            Het aftellen pauzeert zodra u met de muis of het toetsenbord in deze melding bent.
+            Kies "Hier verder" om op deze omgeving te blijven.
+        </p>
+        <div class="vhb-actions">
+            <a href="https://demo.regelrecht.rijks.app"
+               class="vhb-btn vhb-btn-primary">Nu naar de nieuwe RegelRecht</a>
+            <button @click="stay()" class="vhb-btn vhb-btn-secondary">Hier verder</button>
+        </div>
+    </div>
+</div>
